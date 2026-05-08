@@ -28,7 +28,7 @@ export const authOrNot: RequestHandler = async (
     const user = await User.findOne({ _id: decoded._id });
 
     if (!user) {
-      return res.send({ error_code: 'INVALID_ACCESS_TOKEN', status: 401 });
+      return res.status(401).send({ error: "Недействительный access token" });
     }
 
     req.user = user;
@@ -36,11 +36,11 @@ export const authOrNot: RequestHandler = async (
   } catch (e) {
     console.log(e);
     if (e instanceof jwt.TokenExpiredError) {
-      return res.status(401).send({ error: 'Your token expired' });
+      return res.status(401).send({ error: "Токен истёк" });
     } else {
       return res
         .status(401)
-        .send({ error: 'Please authenticate. Invalid access token' });
+        .send({ error: "Пожалуйста, авторизуйтесь. Неверный access token" });
     }
   }
 };
@@ -53,7 +53,7 @@ const auth: RequestHandler = async (
   await authOrNot(expressReq, res, () => {
     const req = expressReq as RequestWithUser;
     if (!req.user) {
-      return res.status(401).send({ error: 'Unauthorized' });
+      return res.status(401).send({ error: "Не авторизован" });
     }
     next();
   });

@@ -28,7 +28,7 @@ usersRouter.post('/', async (req, res, next) => {
 
     if (existingUser) {
       return res.status(409).send({
-        error_code: 'USER_ALREADY_EXISTS',
+        error: "Пользователь уже существует"
       });
     }
 
@@ -60,9 +60,19 @@ usersRouter.post('/', async (req, res, next) => {
       user: newUser,
     });
   } catch (e) {
+    if (
+        typeof e === "object" &&
+        e !== null &&
+        "code" in e &&
+        (e as { code?: number }).code === 11000
+    ) {
+      return res.status(409).send({
+        error: "Пользователь уже существует"
+      });
+    }
     if (e instanceof mongoose.Error.ValidationError) {
       return res.status(400).send({
-        error_code: 'VALIDATION_ERROR',
+        error: "Ошибка валидации данных",
         details: e.errors,
       });
     }
@@ -78,7 +88,7 @@ usersRouter.post('/sessions', async (req, res, next) => {
 
     if (!user) {
       return res.status(401).send({
-        error_code: 'INVALID_CREDENTIALS',
+        error: "Неверный логин или пароль"
       });
     }
 
@@ -86,7 +96,7 @@ usersRouter.post('/sessions', async (req, res, next) => {
 
     if (!isMatch) {
       return res.status(401).send({
-        error_code: 'INVALID_CREDENTIALS',
+        error: "Неверный логин или пароль"
       });
     }
 
@@ -107,7 +117,7 @@ usersRouter.post('/sessions', async (req, res, next) => {
     });
 
     res.send({
-      message: 'SESSION_CREATED',
+      message: "Сессия создана",
       user,
     });
   } catch (e) {
@@ -138,14 +148,14 @@ usersRouter.delete('/sessions', async (req, res, next) => {
     httpOnly: true,
     sameSite: 'strict',
   });
-  res.send({ message: 'Logged out successfully' });
+  res.send({ message: "Выход выполнен успешно" });
 });
 
 usersRouter.post('/token', async (req, res) => {
   try {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
-      return res.status(401).send({ error: 'No refresh token present' });
+      return res.status(401).send({ error: "Отсутствует refresh token" });
     }
 
     const decoded = jwt.verify(refreshToken, config.refreshJWTSecret) as {
@@ -154,7 +164,7 @@ usersRouter.post('/token', async (req, res) => {
     const user = await User.findOne({ _id: decoded._id, token: refreshToken });
 
     if (!user) {
-      return res.status(401).send({ error: 'Invalid refresh token' });
+      return res.status(401).send({ error: "Неверный refresh token" });
     }
 
     user.token = createRefreshToken(user.id);
@@ -175,7 +185,7 @@ usersRouter.post('/token', async (req, res) => {
       maxAge: 15 * 60 * 1000,
     });
 
-    res.send({ message: 'Access token refreshed successfully' });
+    res.send({ message: "Access токен успешно обновлён" });
   } catch (e) {
     res.clearCookie('accessToken', {
       httpOnly: true,
@@ -185,7 +195,7 @@ usersRouter.post('/token', async (req, res) => {
       httpOnly: true,
       sameSite: 'strict',
     });
-    res.status(401).send({ error: 'Invalid or expired refresh token' });
+    res.status(401).send({ error: "Неверный или просроченный refresh token" });
   }
 });
 
@@ -198,7 +208,7 @@ usersRouter.patch(
 
     if (!mongoose.Types.ObjectId.isValid(id as string)) {
       return res.status(400).send({
-        error_code: 'INVALID_USER_ID',
+        error: "Неверный ID"
       });
     }
 
@@ -207,13 +217,13 @@ usersRouter.patch(
 
       if (!req.body.status) {
         return res.status(400).send({
-          error_code: 'STATUS_REQUIRED',
+          error: "Статус обязателен"
         });
       }
 
       if (!allowedStatuses.includes(req.body.status)) {
         return res.status(400).send({
-          error_code: 'INVALID_STATUS',
+          error: "Недопустимый статус"
         });
       }
 
@@ -225,12 +235,12 @@ usersRouter.patch(
 
       if (!updatedUser) {
         return res.status(404).send({
-          error_code: 'USER_NOT_FOUND',
+          error: "Пользователь не найден"
         });
       }
 
       res.send({
-        message: 'USER_UPDATED',
+        message: "Пользователь обновлён",
         user: updatedUser,
       });
     } catch (e) {
