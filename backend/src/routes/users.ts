@@ -6,11 +6,9 @@ const usersRouter = express.Router();
 
 usersRouter.post("/", async (req, res, next) => {
     try {
-        const { phone, email } = req.body;
+        const { phone } = req.body;
 
-        const existingUser = await User.findOne({
-            $or: [{ phone }, { email }],
-        });
+        const existingUser = await User.findOne({ phone });
 
         if (existingUser) {
             return res.status(409).send({
@@ -21,7 +19,6 @@ usersRouter.post("/", async (req, res, next) => {
         const newUser = new User({
             fullName: req.body.fullName,
             phone: req.body.phone,
-            email: req.body.email,
             password: req.body.password,
         });
 
@@ -32,6 +29,16 @@ usersRouter.post("/", async (req, res, next) => {
             user: savedUser,
         });
     } catch (e) {
+        if (
+            typeof e === "object" &&
+            e !== null &&
+            "code" in e &&
+            (e as { code?: number }).code === 11000
+        ) {
+            return res.status(409).send({
+                error_code: "USER_ALREADY_EXISTS",
+            });
+        }
         if (e instanceof mongoose.Error.ValidationError) {
             return res.status(400).send({
                 error_code: "VALIDATION_ERROR",
@@ -44,11 +51,9 @@ usersRouter.post("/", async (req, res, next) => {
 
 usersRouter.post("/sessions", async (req, res, next) => {
     try {
-        const { email, phone, password } = req.body;
+        const { phone, password } = req.body;
 
-        const user = await User.findOne({
-            $or: [{ email }, { phone }],
-        }).select("+password");
+        const user = await User.findOne({ phone }).select("+password");
 
         if (!user) {
             return res.status(401).send({
