@@ -6,12 +6,13 @@ const categoriesRouter = express.Router();
 
 
 categoriesRouter.post("/", async (req, res, next) => {
-    if (!req.body.title || req.body.title.trim() === '') {
+    const { title } = req.body;
+    if (typeof title !== "string" || title.trim() === "") {
         return res.status(400).send({error: 'Title is required'});
     }
 
     try {
-        const newCategory = new Category({title: req.body.title});
+        const newCategory = new Category({ title: title.trim() });
         await newCategory.save();
         return res.send(newCategory);
     } catch(e) {
@@ -19,6 +20,13 @@ categoriesRouter.post("/", async (req, res, next) => {
             return res.status(400).send({
                 error_code: "VALIDATION_ERROR",
                 details: e.errors,
+            });
+        }
+
+        if (e instanceof mongoose.mongo.MongoServerError && e.code === 11000) {
+            return res.status(409).send({
+                error_code: "DUPLICATE_CATEGORY_TITLE",
+                error: "Category title already exists",
             });
         }
         next(e);
@@ -43,7 +51,7 @@ categoriesRouter.patch('/:id', async (req, res, next) => {
     const category = await Category.findById(id);
     if (!category) return res.status(400).send({error: 'Category not found'});
 
-    category.isPublished = true;
+    category.isPublished = !category.isPublished;
     await category.save();
     return res.send(category);
 
