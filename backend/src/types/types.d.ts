@@ -4,4 +4,5 @@ export interface UserFields {
     password: string;
     status: "active" | "banned";
     role: "ADMIN" | "MANAGER" | "CLIENT";
+    token: string;
 }
