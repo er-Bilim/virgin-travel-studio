@@ -1,8 +1,8 @@
 import express from "express";
 import mongoose from "mongoose";
-import Category from "@/model/Category.js";
+import Category from "@/model/category/Category.js";
 import auth from "@/middlewares/auth.js";
-import permit from "@/middlewares/peermit.js";
+import permit from "@/middlewares/permit.js";
 
 const categoriesRouter = express.Router();
 

@@ -1,5 +1,4 @@
-import mongoose, { Schema, Model, HydratedDocument } from 'mongoose';
-
+import mongoose, { Schema } from 'mongoose';
 
 const CategorySchema = new Schema(
   {
@@ -21,6 +20,6 @@ const CategorySchema = new Schema(
   },
 );
 
-const Category = mongoose.model("Category", CategorySchema);
+const Category = mongoose.model('Category', CategorySchema);
 
 export default Category;
