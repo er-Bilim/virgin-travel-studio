@@ -8,7 +8,7 @@ const rootPath = path.dirname(__filename);
 const config = {
   rootPath,
   publicPath: path.join(rootPath, '../public'),
-  port: process.env.PORT ?? 3000,
+  port: process.env.PORT ?? 8000,
   db: 'mongodb://localhost/virgin-travel',
   refreshJWTSecret: process.env.REFRESH_SECRET_JWT ?? 'refresh_secret',
   accessJWTSecret: process.env.ACCESS_SECRET_JWT ?? 'access_secret',

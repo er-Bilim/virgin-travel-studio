@@ -45,10 +45,11 @@ categoriesRouter.patch('/:id', async (req, res, next) => {
 
     category.isPublished = true;
     await category.save();
+    return res.send(category);
 
   } catch (e) {
     console.log(e);
-    return res.status(400).send({ error: 'Cant delete category' });
+    next(e);
   }
 });
 
@@ -62,8 +63,12 @@ categoriesRouter.delete('/:id', async (req, res, next) => {
 
   try {
     await Category.deleteOne({_id: id});
+    return res.send({success: 'Delete category!'});
   } catch(e) {
     console.log(e);
-    return res.status(400).send({error: 'Cant delete category'});
+    next(e);
   }
 });
+
+
+export default categoriesRouter;
