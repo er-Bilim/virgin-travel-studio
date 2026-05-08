@@ -7,7 +7,7 @@ const CategorySchema = new Schema(
             type: String,
             unique: true,
             trim: true,
-            match: [/\p{L}|\s/u, "Название категории должно содержать только буквы"],
+            match: [/^[\p{L}\s]+$/u, "Название категории должно содержать только буквы"],
             minlength: [3, "Название категории должно быть минимум 3 символа"],
         },
         isPublished: {
