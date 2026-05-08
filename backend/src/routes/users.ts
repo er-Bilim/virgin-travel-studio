@@ -83,6 +83,12 @@ usersRouter.post("/sessions", async (req, res, next) => {
 usersRouter.patch("/:id/status", auth, permit("ADMIN"), async (req, res, next) => {
     const { id } = req.params;
 
+    if (!mongoose.Types.ObjectId.isValid(id as string)) {
+        return res.status(400).send({
+            error_code: "INVALID_USER_ID",
+        });
+    }
+
     try {
         const allowedStatuses = ["active", "banned"];
 
