@@ -1,6 +1,7 @@
 import { Router } from 'express';
-import usersRouter from "@/routes/users.js";
-import categoriesRouter from './categories.js';
+import usersRouter from './users/users.js';
+import categoriesRouter from './categories/categories.js';
+
 
 const apiRouter = Router();
 

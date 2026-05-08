@@ -1,15 +1,13 @@
-import { NextFunction, Request, Response, RequestHandler } from "express";
-import { UserFields } from "@/types/types.js";
-import { HydratedDocument } from "mongoose";
-import User from "@/model/User.js";
+import { NextFunction, Request, Response, RequestHandler } from 'express';
+import { UserFields } from '@/types/users.types.js';
+import { HydratedDocument } from 'mongoose';
+import User from '@/model/user/User.js';
 import jwt from 'jsonwebtoken';
-import config from "@/config.js";
+import config from '@/config.js';
 
-
-export interface RequestWithUser extends Request {  
+export interface RequestWithUser extends Request {
   user: HydratedDocument<UserFields>;
 }
-
 
 export const authOrNot: RequestHandler = async (
   expressReq: Request,
@@ -30,8 +28,7 @@ export const authOrNot: RequestHandler = async (
     const user = await User.findOne({ _id: decoded._id });
 
     if (!user) {
-      return res
-        .send({ error_code: 'INVALID_ACCESS_TOKEN', status: 401 });
+      return res.send({ error_code: 'INVALID_ACCESS_TOKEN', status: 401 });
     }
 
     req.user = user;
@@ -39,11 +36,11 @@ export const authOrNot: RequestHandler = async (
   } catch (e) {
     console.log(e);
     if (e instanceof jwt.TokenExpiredError) {
-      return res.status(401).send({ error: "Your token expired" });
+      return res.status(401).send({ error: 'Your token expired' });
     } else {
       return res
         .status(401)
-        .send({ error: "Please authenticate. Invalid access token" });
+        .send({ error: 'Please authenticate. Invalid access token' });
     }
   }
 };
@@ -62,6 +59,4 @@ const auth: RequestHandler = async (
   });
 };
 
-
-  
 export default auth;

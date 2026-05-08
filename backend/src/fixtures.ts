@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import config from './config.js';
-import User from './model/User.js';
-import Category from './model/Category.js';
+import User from './model/user/User.js';
+import Category from './model/category/Category.js';
 
 
 const run = async () => {

@@ -9,6 +9,7 @@ const config = {
   rootPath,
   publicPath: path.join(rootPath, '../public'),
   port: process.env.PORT ?? 8000,
+  corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:5173',
   db: 'mongodb://localhost/virgin-travel',
   refreshJWTSecret: process.env.REFRESH_SECRET_JWT ?? 'refresh_secret',
   accessJWTSecret: process.env.ACCESS_SECRET_JWT ?? 'access_secret',
