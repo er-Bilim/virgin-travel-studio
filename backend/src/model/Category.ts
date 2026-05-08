@@ -8,10 +8,7 @@ const CategorySchema = new Schema(
       type: String,
       unique: true,
       trim: true,
-      match: [
-        /^[A-Za-zА-Яа-яЁё ]+$/,
-        'The category name must contain only letters',
-      ],
+      match: [/\p{L}|\s/u, 'The category name must contain only letters'],
       minlength: [3, 'The category name must be at least 3 characters long.'],
     },
     isPublished: {

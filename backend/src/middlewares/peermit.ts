@@ -10,7 +10,7 @@ const permit = (...roles: string[]) => {
     }
 
     if (!roles.includes(req.user.role)) {
-      return res.status(403).send({ message: 'You dont have rights' });
+      return res.status(403).send({ message: 'Forbidden' });
     }
 
     next();

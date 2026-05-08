@@ -81,7 +81,10 @@ categoriesRouter.delete(
     }
 
     try {
-      await Category.deleteOne({ _id: id });
+      const { deletedCount } = await Category.deleteOne({ _id: id });
+      if (!deletedCount) {
+        return res.status(404).send({ error: 'Category not found' });
+      }
       return res.send({ success: 'Delete category!' });
     } catch (e) {
       console.log(e);

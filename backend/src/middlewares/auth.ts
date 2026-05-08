@@ -30,7 +30,8 @@ export const authOrNot: RequestHandler = async (
     const user = await User.findOne({ _id: decoded._id });
 
     if (!user) {
-      return res.status(401).send({ error: "Invalid or expired access token" });
+      return res
+        .send({ error_code: 'INVALID_ACCESS_TOKEN', status: 401 });
     }
 
     req.user = user;
