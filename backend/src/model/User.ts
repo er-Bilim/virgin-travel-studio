@@ -31,6 +31,13 @@ const UserSchema = new Schema<UserFields, UserModel, UserMethods>(
             select: false,
         },
 
+        status: {
+            type: String,
+            enum: ["active", "banned"],
+            default: "active",
+            required: true,
+        },
+
         role: {
             type: String,
             enum: ["ADMIN", "MANAGER", "CLIENT"],

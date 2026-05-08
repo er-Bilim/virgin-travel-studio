@@ -2,7 +2,7 @@ import { NextFunction, Request, Response, RequestHandler } from "express";
 import { UserFields } from "@/types/types.js";
 import { HydratedDocument } from "mongoose";
 import User from "@/model/User.js";
-import jwt, { TokenExpiredError } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import config from "@/config.js";
 
 
@@ -38,7 +38,7 @@ export const authOrNot: RequestHandler = async (
     next();
   } catch (e) {
     console.log(e);
-    if (e instanceof TokenExpiredError) {
+    if (e instanceof jwt.TokenExpiredError) {
       return res.status(401).send({ error: "Your token expired" });
     } else {
       return res
