@@ -208,7 +208,7 @@ usersRouter.patch(
 
     if (!mongoose.Types.ObjectId.isValid(id as string)) {
       return res.status(400).send({
-        error_code: 'INVALID_USER_ID',
+        error: "Неверный ID"
       });
     }
 
@@ -217,7 +217,7 @@ usersRouter.patch(
 
       if (!req.body.status) {
         return res.status(400).send({
-          error: "Неверный ID пользователя"
+          error: "Статус обязателен"
         });
       }
 

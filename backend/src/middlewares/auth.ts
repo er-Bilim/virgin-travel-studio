@@ -28,7 +28,7 @@ export const authOrNot: RequestHandler = async (
     const user = await User.findOne({ _id: decoded._id });
 
     if (!user) {
-      return res.send({ error: "Недействительный access token", status: 401 });
+      return res.status(401).send({ error: "Недействительный access token" });
     }
 
     req.user = user;

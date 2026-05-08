@@ -55,7 +55,7 @@ categoriesRouter.patch(
     try {
       const category = await Category.findById(id);
       if (!category)
-        return res.status(400).send({ error: "Категория не найдена" });
+        return res.status(404).send({ error: "Категория не найдена" });
 
       category.isPublished = !category.isPublished;
       await category.save();
