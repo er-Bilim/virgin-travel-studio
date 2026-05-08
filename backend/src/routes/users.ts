@@ -116,7 +116,7 @@ usersRouter.post("/sessions", async (req, res, next) => {
   }
 });
 
-usersRouter.delete("/sessions", async (req, res) => {
+usersRouter.delete("/sessions", async (req, res, next) => {
   try {
     const refreshToken = req.cookies.refreshToken;
 
@@ -128,7 +128,7 @@ usersRouter.delete("/sessions", async (req, res) => {
       }
     }
   } catch (e) {
-    return;
+    return next(e);
   }
 
   res.clearCookie('accessToken', {

@@ -47,6 +47,7 @@ const UserSchema = new Schema<UserFields, UserModel, UserMethods>(
 
     token: {
       type: String,
+      select: false,
     }
   },
   {
