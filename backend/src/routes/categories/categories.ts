@@ -10,7 +10,7 @@ const categoriesRouter = express.Router();
 categoriesRouter.post('/', auth, permit('ADMIN'), async (req, res, next) => {
   const { title } = req.body;
   if (typeof title !== 'string' || title.trim() === '') {
-    return res.status(400).send({ error: 'Title is required' });
+    return res.status(400).send({ error: "Название обязательно" });
   }
 
   try {
@@ -20,22 +20,21 @@ categoriesRouter.post('/', auth, permit('ADMIN'), async (req, res, next) => {
   } catch (e) {
     if (e instanceof mongoose.Error.ValidationError) {
       return res.status(400).send({
-        error_code: 'VALIDATION_ERROR',
-        details: e.errors,
+          error: "Ошибка валидации",
+          details: e.errors,
       });
     }
 
     if (e instanceof mongoose.mongo.MongoServerError && e.code === 11000) {
       return res.status(409).send({
-        error_code: 'DUPLICATE_CATEGORY_TITLE',
-        error: 'Category title already exists',
+          error: "Категория с таким названием уже существует"
       });
     }
     next(e);
   }
 });
 
-categoriesRouter.get('/', async (req, res, next) => {
+categoriesRouter.get('/', async (req, res) => {
     const result = await Category.find();
     return res.send(result);
 });
@@ -50,13 +49,13 @@ categoriesRouter.patch(
     const isValidId = mongoose.Types.ObjectId.isValid(id as string);
 
     if (!id || !isValidId) {
-      return res.status(400).send({ error: 'Invalid ID' });
+      return res.status(400).send({ error: "Неверный ID" });
     }
 
     try {
       const category = await Category.findById(id);
       if (!category)
-        return res.status(400).send({ error: 'Category not found' });
+        return res.status(400).send({ error: "Категория не найдена" });
 
       category.isPublished = !category.isPublished;
       await category.save();
@@ -77,15 +76,15 @@ categoriesRouter.delete(
     const isValidId = mongoose.Types.ObjectId.isValid(id as string);
 
     if (!id || !isValidId) {
-      return res.status(400).send({ error: 'Invalid ID' });
+      return res.status(400).send({ error: "Неверный ID" });
     }
 
     try {
       const { deletedCount } = await Category.deleteOne({ _id: id });
       if (!deletedCount) {
-        return res.status(404).send({ error: 'Category not found' });
+        return res.status(404).send({ error: "Категория не найдена" });
       }
-      return res.send({ success: 'Delete category!' });
+      return res.send({ message: "Категория удалена" });
     } catch (e) {
       console.log(e);
       next(e);
