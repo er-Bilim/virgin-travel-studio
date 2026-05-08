@@ -4,4 +4,5 @@ export interface UserFields {
     email: string;
     password: string;
     role: "ADMIN" | "MANAGER" | "CLIENT";
+    token: string;
 }
