@@ -6,11 +6,9 @@ const usersRouter = express.Router();
 
 usersRouter.post("/", async (req, res, next) => {
     try {
-        const { phone, email } = req.body;
+        const { phone } = req.body;
 
-        const existingUser = await User.findOne({
-            $or: [{ phone }, { email }],
-        });
+        const existingUser = await User.findOne({ phone });
 
         if (existingUser) {
             return res.status(409).send({
@@ -21,7 +19,6 @@ usersRouter.post("/", async (req, res, next) => {
         const newUser = new User({
             fullName: req.body.fullName,
             phone: req.body.phone,
-            email: req.body.email,
             password: req.body.password,
         });
 
@@ -44,11 +41,9 @@ usersRouter.post("/", async (req, res, next) => {
 
 usersRouter.post("/sessions", async (req, res, next) => {
     try {
-        const { email, phone, password } = req.body;
+        const { phone, password } = req.body;
 
-        const user = await User.findOne({
-            $or: [{ email }, { phone }],
-        }).select("+password");
+        const user = await User.findOne({ phone }).select("+password");
 
         if (!user) {
             return res.status(401).send({
