@@ -23,7 +23,6 @@ const run = async () => {
   const admin = new User({
     fullName: 'admin',
     phone: '0555172032',
-    email: 'admin@gmail.com',
     password: 'admin',
     role: 'ADMIN',
   });
@@ -32,7 +31,6 @@ const run = async () => {
   const manager = new User({
     fullName: 'manager',
     phone: '0555172043',
-    email: 'manager@gmail.com',
     password: 'manager',
     role: 'MANAGER',
   });
@@ -41,7 +39,6 @@ const run = async () => {
   const client = new User({
     fullName: 'client',
     phone: '0555172011',
-    email: 'client@gmail.com',
     password: 'client',
     role: 'CLIENT',
   });
