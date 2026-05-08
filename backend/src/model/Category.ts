@@ -7,8 +7,9 @@ const CategorySchema = new Schema(
       required: true,
       type: String,
       unique: true,
+      trim: true,
       match: [
-        /^[A-Za-zА-Яа-яЁё]+$/,
+        /^[A-Za-zА-Яа-яЁё ]+$/,
         'The category name must contain only letters',
       ],
       minlength: [3, 'The category name must be at least 3 characters long.'],
