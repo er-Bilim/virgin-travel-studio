@@ -33,7 +33,7 @@ axiosApi.interceptors.response.use((response) => response, async (error) => {
   const originalRequest = error.config;
 
   if (error.response?.status === 401 && originalRequest && !originalRequest._retry && originalRequest.url !== '/users/token') {
-    originalRequest.retry = true;
+    originalRequest._retry = true;
 
     try {
       await axios.post(`${apiURL}/users/token`, {}, {withCredentials: true});

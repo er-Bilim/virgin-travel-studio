@@ -37,9 +37,9 @@ usersRouter.post("/", async (req, res, next) => {
     });
 
     newUser.token = createRefreshToken(newUser.id)
-    const savedUser = await newUser.save();
+    await newUser.save();
 
-    res.cookie('refreshToken', savedUser.token, {
+    res.cookie('refreshToken', newUser.token, {
       'httpOnly': true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
@@ -55,7 +55,7 @@ usersRouter.post("/", async (req, res, next) => {
 
     res.send({
       message: "USER_CREATED",
-      user: savedUser,
+      user: newUser,
     });
   } catch (e) {
     if (e instanceof mongoose.Error.ValidationError) {
@@ -90,9 +90,9 @@ usersRouter.post("/sessions", async (req, res, next) => {
       });
     }
 
-    const userSave = await user.save();
     user.token = createRefreshToken(user.id);
-    res.cookie('refreshToken', userSave.token, {
+    await user.save();
+    res.cookie('refreshToken', user.token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
@@ -100,7 +100,7 @@ usersRouter.post("/sessions", async (req, res, next) => {
     });
 
 
-    res.cookie('accessToken', createAccessToken(userSave.id), {
+    res.cookie('accessToken', createAccessToken(user.id), {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
@@ -116,7 +116,7 @@ usersRouter.post("/sessions", async (req, res, next) => {
   }
 });
 
-usersRouter.delete("/sessions", async (req, res, next) => {
+usersRouter.delete("/sessions", async (req, res) => {
   try {
     const refreshToken = req.cookies.refreshToken;
 
@@ -128,7 +128,7 @@ usersRouter.delete("/sessions", async (req, res, next) => {
       }
     }
   } catch (e) {
-    next(e);
+    return;
   }
 
   res.clearCookie('accessToken', {
@@ -158,15 +158,36 @@ usersRouter.post("/token", async (req, res) => {
       return res.status(401).send({error: 'Invalid refresh token'});
     }
 
+    user.token = createRefreshToken(user.id);
     const accessToken = createAccessToken(user.id);
+
+    await user.save();
+    res.cookie('refreshToken', user.token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: 15 * 60 * 1000,
     });
+
+
     res.send({message: 'Access token refreshed successfully'});
   } catch (e) {
+    res.clearCookie('accessToken', {
+      httpOnly: true,
+      sameSite: 'strict',
+    });
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      sameSite: 'strict',
+    });
     res.status(401).send({error: 'Invalid or expired refresh token'})
   }
 })
