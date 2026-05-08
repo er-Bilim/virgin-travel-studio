@@ -1,6 +1,8 @@
 import express from "express";
 import mongoose from "mongoose";
 import User from "@/model/User.js";
+import auth from "@/middlewares/auth.js";
+import permit from "@/middlewares/peermit.js";
 import config from "@/config.js";
 import jwt from "jsonwebtoken";
 
@@ -16,12 +18,10 @@ const createRefreshToken = (userId: string) => {
 }
 
 usersRouter.post("/", async (req, res, next) => {
-  try {
-    const {phone, email} = req.body;
+    try {
+        const { phone } = req.body;
 
-    const existingUser = await User.findOne({
-      $or: [{phone}, {email}],
-    });
+        const existingUser = await User.findOne({ phone });
 
     if (existingUser) {
       return res.status(409).send({
@@ -29,12 +29,11 @@ usersRouter.post("/", async (req, res, next) => {
       });
     }
 
-    const newUser = new User({
-      fullName: req.body.fullName,
-      phone: req.body.phone,
-      email: req.body.email,
-      password: req.body.password,
-    });
+        const newUser = new User({
+            fullName: req.body.fullName,
+            phone: req.body.phone,
+            password: req.body.password,
+        });
 
     newUser.token = createRefreshToken(newUser.id)
     await newUser.save();
@@ -69,12 +68,10 @@ usersRouter.post("/", async (req, res, next) => {
 });
 
 usersRouter.post("/sessions", async (req, res, next) => {
-  try {
-    const {email, phone, password} = req.body;
+    try {
+        const { phone, password } = req.body;
 
-    const user = await User.findOne({
-      $or: [{email}, {phone}],
-    }).select("+password");
+        const user = await User.findOne({ phone }).select("+password");
 
     if (!user) {
       return res.status(401).send({
@@ -192,5 +189,49 @@ usersRouter.post("/token", async (req, res) => {
   }
 })
 
+usersRouter.patch("/:id/status", auth, permit("ADMIN"), async (req, res, next) => {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id as string)) {
+        return res.status(400).send({
+            error_code: "INVALID_USER_ID",
+        });
+    }
+
+    try {
+        const allowedStatuses = ["active", "banned"];
+
+        if (!req.body.status) {
+            return res.status(400).send({
+                error_code: "STATUS_REQUIRED",
+            });
+        }
+
+        if (!allowedStatuses.includes(req.body.status)) {
+            return res.status(400).send({
+                error_code: "INVALID_STATUS",
+            });
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            id,
+            { status: req.body.status },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).send({
+                error_code: "USER_NOT_FOUND",
+            });
+        }
+
+        res.send({
+            message: "USER_UPDATED",
+            user: updatedUser,
+        });
+    } catch (e) {
+        next(e);
+    }
+});
 
 export default usersRouter;

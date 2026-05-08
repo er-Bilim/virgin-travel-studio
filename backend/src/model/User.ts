@@ -18,25 +18,25 @@ const UserSchema = new Schema<UserFields, UserModel, UserMethods>(
       trim: true,
     },
 
-    phone: {
-      type: String,
-      required: true,
-      unique: true,
-    },
+        phone: {
+            type: String,
+            required: true,
+            unique: true,
+            trim: true,
+        },
 
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
-      trim: true,
-    },
+        password: {
+            type: String,
+            required: true,
+            select: false,
+        },
 
-    password: {
-      type: String,
-      required: true,
-      select: false,
-    },
+        status: {
+            type: String,
+            enum: ["active", "banned"],
+            default: "active",
+            required: true,
+        },
 
     role: {
       type: String,
