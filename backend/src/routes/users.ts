@@ -29,6 +29,16 @@ usersRouter.post("/", async (req, res, next) => {
             user: savedUser,
         });
     } catch (e) {
+        if (
+            typeof e === "object" &&
+            e !== null &&
+            "code" in e &&
+            (e as { code?: number }).code === 11000
+        ) {
+            return res.status(409).send({
+                error_code: "USER_ALREADY_EXISTS",
+            });
+        }
         if (e instanceof mongoose.Error.ValidationError) {
             return res.status(400).send({
                 error_code: "VALIDATION_ERROR",
