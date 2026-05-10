@@ -1,0 +1,1 @@
+// news.types.ts
