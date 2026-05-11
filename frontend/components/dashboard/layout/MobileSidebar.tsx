@@ -27,9 +27,12 @@ const MobileSidebar = ({ open, onClose }: Props) => {
     );
 
     const handleLogout = async () => {
-        await logoutMutation.mutateAsync();
-        onClose();
-        router.push('/login');
+        try {
+            await logoutMutation.mutateAsync();
+        } finally {
+            onClose();
+            router.push('/login');
+        }
     };
 
     return (

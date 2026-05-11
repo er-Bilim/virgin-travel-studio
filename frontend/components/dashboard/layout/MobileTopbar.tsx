@@ -24,6 +24,8 @@ const MobileTopbar = ({ onMenuClick }: Props) => {
             </div>
 
             <button
+                type="button"
+                aria-label="Открыть меню"
                 onClick={onMenuClick}
                 className="rounded-xl border border-gray-200 p-2 text-[#1E2B6D] transition hover:bg-gray-100"
             >

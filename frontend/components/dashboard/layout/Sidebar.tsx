@@ -22,8 +22,11 @@ const Sidebar = () => {
     );
 
     const handleLogout = async () => {
-        await logoutMutation.mutateAsync();
-        router.push('/login');
+        try {
+            await logoutMutation.mutateAsync();
+        } finally {
+            router.push('/login');
+        }
     };
 
     return (
