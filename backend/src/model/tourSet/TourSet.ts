@@ -1,6 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
+import { TourSetFields } from '@/types/tourSets.types.js';
 
-const TourSetSchema = new Schema(
+const TourSetSchema = new Schema<TourSetFields>(
   {
     tourId: {
       type: Schema.Types.ObjectId,
@@ -64,5 +65,5 @@ const TourSetSchema = new Schema(
   },
 );
 
-const TourSet = mongoose.model('TourSet', TourSetSchema);
+const TourSet = mongoose.model<TourSetFields>('TourSet', TourSetSchema);
 export default TourSet;
