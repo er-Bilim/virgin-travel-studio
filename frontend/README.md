@@ -32,7 +32,14 @@ frontend/
 │   ├── utils.ts                # Вспомогательные функции
 │   └── hooks/                  # Кастомные React хуки
 │
-└── types/                      # TypeScript интерфейсы
+├── types/                      # TypeScript интерфейсы
+├── store/                      # Zustand сторы
+│   ├── auth/
+│   │
+│   ├── tours/
+│   │   ├── toursStore.ts       # стейт
+│   │   └── toursActions.ts     # можно выносит запросы в такие файлы.
+└── middleware/                 # Защита роутов (auth, roles)
 ```
 
 ---
@@ -141,7 +148,6 @@ components/
     │   
     └── tours/
         ├── TourForm.tsx - пример
-        
 ```
 
 ---
