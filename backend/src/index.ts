@@ -2,6 +2,7 @@ import express, { type Express, type Request, type Response } from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+dotenv.config();
 import cookieParser from 'cookie-parser';
 import config from './config.js';
 import apiRouter from './routes/api.route.js';
@@ -17,7 +18,6 @@ app.use(
 app.use(cookieParser());
 app.use(express.static('public'));
 app.use(express.json());
-dotenv.config();
 app.use('/api', apiRouter);
 
 app.use((_req: Request, res: Response) => {
