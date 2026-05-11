@@ -41,6 +41,14 @@ const TourSetSchema = new Schema<TourSetFields>(
       type: Number,
       default: 0,
       min: [0, 'Количество забронированных мест не может быть отрицательным'],
+      validate: {
+        validator: function (value: number) {
+          const doc = this as unknown as TourSetFields;
+          return value <= doc.totalSeats;
+        },
+        message:
+          'Количество забронированных мест не может превышать общее количество мест',
+      },
     },
     isHot: {
       type: Boolean,
