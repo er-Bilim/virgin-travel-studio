@@ -1,7 +1,7 @@
-export default function Admin() {
-  return (
-    <section>
-      <p>admin page</p>
-    </section>
-  )
-}
+import { redirect } from 'next/navigation';
+
+const AdminPage = () => {
+    redirect('/admin/dashboard');
+};
+
+export default AdminPage;
