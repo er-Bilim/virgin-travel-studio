@@ -52,9 +52,7 @@ tourSetsRouter.get('/:id', authOrNot, async (req, res, next) => {
     if (!tourSet) return res.status(404).send({ error: 'Поток не найден' });
 
     if (!isAdminOrManager && tourSet.status === 'FINISHED') {
-      return res
-        .status(403)
-        .send({ error: 'Доступ к завершенному потоку закрыт' });
+      return res.status(404).send({ error: 'Поток не найден' });
     }
 
     res.send(tourSet);
@@ -89,9 +87,10 @@ tourSetsRouter.post(
         !tourId ||
         !startDate ||
         !endDate ||
-        !price ||
-        !hotelName ||
-        !hotelLocation
+        price === undefined ||
+        price === null ||
+        hotelName === undefined ||
+        hotelLocation === undefined
       ) {
         return res.status(400).send({ error: 'Отсутствуют обязательные поля' });
       }
@@ -112,9 +111,11 @@ tourSetsRouter.post(
         airline,
         flightDetails,
         totalSeats: totalSeats !== undefined ? Number(totalSeats) : 20,
-        isHot: Boolean(isHot),
+        isHot:
+          isHot === true || isHot === 'true' || isHot === 1 || isHot === '1',
         saleDeadline,
-        discountPrice: discountPrice ? Number(discountPrice) : undefined,
+        discountPrice:
+          discountPrice !== undefined ? Number(discountPrice) : undefined,
         status: status || 'OPEN',
         bookedSeats: 0,
       };
@@ -149,8 +150,12 @@ tourSetsRouter.patch(
     }
 
     try {
-      const updateData: UpdateQuery<TourSetFields> = {};
+      const currentSet = await TourSet.findById(id);
+      if (!currentSet) {
+        return res.status(404).send({ error: 'Поток не найден' });
+      }
 
+      const updateData: UpdateQuery<TourSetFields> = {};
       const allowedFields: (keyof TourSetFields)[] = [
         'startDate',
         'endDate',
@@ -176,14 +181,20 @@ tourSetsRouter.patch(
         return res.status(400).send({ error: 'Нет данных для обновления' });
       }
 
+      const nextStart = updateData.startDate ?? currentSet.startDate;
+      const nextEnd = updateData.endDate ?? currentSet.endDate;
+
+      if (new Date(nextStart as Date) > new Date(nextEnd as Date)) {
+        return res.status(400).send({
+          error: 'Дата начала не может быть позже даты окончания',
+        });
+      }
+
       const updatedTourSet = await TourSet.findByIdAndUpdate(
         id,
         { $set: updateData },
         { new: true, runValidators: true },
       );
-
-      if (!updatedTourSet)
-        return res.status(404).send({ error: 'Поток не найден' });
 
       res.send({ message: 'Данные потока обновлены', tourSet: updatedTourSet });
     } catch (e) {

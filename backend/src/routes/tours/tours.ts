@@ -12,8 +12,12 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
   const isAdminOrManager = user?.role === 'ADMIN' || user?.role === 'MANAGER';
 
   try {
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
+    const rawPage = Number.parseInt(req.query.page as string, 10);
+    const rawLimit = Number.parseInt(req.query.limit as string, 10);
+
+    const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
+    const limit =
+      Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(rawLimit, 50) : 10;
 
     const skip = (page - 1) * limit;
 
