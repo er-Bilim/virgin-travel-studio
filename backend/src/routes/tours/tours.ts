@@ -139,7 +139,7 @@ toursRouter.patch(
         tour.isPublished = String(isPublished) === 'true';
       }
 
-      if (baseAdvantages) {
+      if (baseAdvantages !== undefined) {
         tour.baseAdvantages =
           typeof baseAdvantages === 'string'
             ? baseAdvantages
