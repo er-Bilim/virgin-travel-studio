@@ -1,7 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import User from '@/model/user/User.js';
-import auth from '@/middlewares/auth.js';
+import auth, {RequestWithUser} from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
 import config from '@/config.js';
 import jwt from 'jsonwebtoken';
@@ -248,5 +248,21 @@ usersRouter.patch(
     }
   },
 );
+
+usersRouter.get("/me", auth, async (req, res, next) => {
+  try {
+    const { user } = req as RequestWithUser;
+
+    res.send({
+      _id: user._id,
+      fullName: user.fullName,
+      phone: user.phone,
+      role: user.role,
+      status: user.status,
+    });
+  } catch (e) {
+    next(e);
+  }
+});
 
 export default usersRouter;

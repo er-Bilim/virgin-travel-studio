@@ -43,4 +43,6 @@ axiosApi.interceptors.response.use((response) => response, async (error) => {
       return Promise.reject(refreshError);
     }
   }
-})
+});
+
+export default axiosApi;

@@ -130,7 +130,7 @@ components/
 │
 └── dashboard/
     ├── layout/
-    │   ├── Sidebar.tsx
+    │   ├── MobileTopbar.tsx
     │   └── TopBar.tsx
     ├── clients/
     │   
