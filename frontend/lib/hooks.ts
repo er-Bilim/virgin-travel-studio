@@ -1,8 +1,9 @@
 // будут кастомные хуки
 
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import {getMe, login} from "@/api/auth";
-import {createManager, deleteManager, getManagers} from "@/api/manager";
+import {getMe, login} from "@/services/auth";
+import {createManager, deleteManager, getManagers} from "@/services/manager";
+
 
 
 export const useUser = () => {

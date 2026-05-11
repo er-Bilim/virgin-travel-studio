@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import {useLogin} from "@/lib/hooks";
+import type {LoginMutation} from "@/types/user";
 
-import type { LoginMutation } from "@/types/user";
-import { useLogin } from "@/lib/hooks";
+
 
 export default function LoginPage() {
     const router = useRouter();

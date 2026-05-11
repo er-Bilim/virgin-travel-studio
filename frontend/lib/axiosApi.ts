@@ -14,7 +14,7 @@ const logoutAndRedirect = async () => {
       timeout: 2000
     });
   } catch (e) {
-    console.log('Could not notify api about logout', e);
+    console.log('Could not notify services about logout', e);
   }
 
 
