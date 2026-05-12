@@ -1,11 +1,15 @@
 // tour.types.ts
 
+export interface TourCategoryType {
+  title: string;
+}
+
 export interface TourType {
   _id: string;
   title: string;
-  description: string; 
+  description: string;
   images: string[];
-  category: string;
+  category: TourCategoryType;
   baseAdvantages: string[];
-  isPublished: boolean
+  isPublished: boolean;
 }

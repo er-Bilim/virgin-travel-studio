@@ -34,7 +34,7 @@ export function OrderCard({ isOpen, onClose, tourId }: Props) {
 
 
   const onSubmit: SubmitHandler<OrderType> = (data) => {
-    // здесь отправка заявки на /tour/tourId
+    // здесь отправка заявки на тур
     console.log(tourId);
     console.log("отправка заявки", data);
 
