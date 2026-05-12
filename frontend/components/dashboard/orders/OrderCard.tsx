@@ -55,13 +55,13 @@ export function OrderCard({ isOpen, onClose, tourId }: Props) {
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid gap-6 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="email">Имя:</Label>
+              <Label htmlFor="clientName">Имя:</Label>
               <Input
                 id="clientName"
                 type="text"
                 placeholder="Алёша"
                 {...register("clientName", {
-                  required: true,
+                  required: "Поле обязательно",
                   validate: (value) => {
                     return (
                       !!value.trim() ||
@@ -73,19 +73,13 @@ export function OrderCard({ isOpen, onClose, tourId }: Props) {
               {errors.clientName && <span>{errors.clientName.message}</span>}
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="password">Телефон:</Label>
+              <Label htmlFor="phone">Телефон:</Label>
               <Input
                 id="phone"
-                type="number"
-                placeholder="+996"
+                type="tel"
+                placeholder="0550182430"
                 {...register("phone", {
-                  required: true,
-                  validate: (value) => {
-                    return (
-                      !!value.trim() ||
-                      "Поле не может состоять только из пробелов"
-                    );
-                  },
+                  required: "Поле обязательно",
                 })}
               />
               {errors.phone && <span>{errors.phone.message}</span>}
@@ -94,7 +88,7 @@ export function OrderCard({ isOpen, onClose, tourId }: Props) {
 
           <div className="flex flex-col gap-2">
             <Button type="submit" className="w-full">
-              Оставть заявку
+              Оставить заявку
             </Button>
           </div>
         </form>
