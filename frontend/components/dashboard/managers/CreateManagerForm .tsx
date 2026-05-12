@@ -55,7 +55,7 @@ export const CreateManagerForm = () => {
             validate: (v) => v.trim() !== '' || 'Поле не должно быть пустым',
             minLength: {
               value: 2,
-              message: 'Имя должно больше 2 символов',
+              message: 'Имя должно содержать не менее 2 символов',
             },
           })}
           className={inputClass}

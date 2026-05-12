@@ -45,7 +45,7 @@ export const useCreateManager = (
         return;
       }
 
-      toast.error(data.error);
+      toast.error(data.error || 'Не удалось создать менеджера. Попробуйте снова.');
     },
   });
 };
