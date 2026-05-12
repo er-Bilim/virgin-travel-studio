@@ -5,6 +5,13 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getMe, login, logout } from '@/services/auth';
 import { createManager, deleteManager, getManagers } from '@/services/manager';
 
+import type {AxiosError} from "axios";
+import type {GlobalError} from "@/types/error";
+import type {UseFormSetError} from "react-hook-form";
+import type {IUser, ManagerMutation} from "@/types/user";
+import {toast} from "sonner";
+
+
 export const useUser = () => {
     return useQuery({
         queryKey: ['me'],
@@ -20,14 +27,34 @@ export const useManagers = () => {
     });
 };
 
-export const useCreateManager = () => {
+export const useCreateManager = (setError: UseFormSetError<ManagerMutation>) => {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: createManager,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['managers'] });
+        onSuccess: async (newManager) => {
+            toast.success('Менеджер успешно создался!')
+            queryClient.setQueryData<IUser[]>(['managers'], (old = []) => {
+                return [newManager, ...old];
+            });
         },
+        onError: (err: AxiosError<GlobalError>) => {
+            const data = err.response?.data;
+
+            if (!data) return;
+
+            if ("details" in data && data.details) {
+                Object.entries(data.details).forEach(([field, value]) => {
+                    setError(field as keyof ManagerMutation, {
+                        type: "server",
+                        message: value.message,
+                    });
+                });
+                return;
+            }
+
+            toast.error(data.error);
+        }
     });
 };
 
