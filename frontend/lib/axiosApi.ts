@@ -36,19 +36,25 @@ axiosApi.interceptors.response.use(
       ) {
         originalRequest._retry = true;
 
-        try {
-          await axios.post(`${apiURL}/users/token`, {}, { withCredentials: true });
+      try {
+        await axios.post(
+          `${apiURL}/users/token`,
+          {},
+          { withCredentials: true },
+        );
 
-          return axiosApi(originalRequest);
-        } catch (refreshError) {
-          await logoutAndRedirect();
+        return axiosApi(originalRequest);
+      } catch (refreshError) {
+        await logoutAndRedirect();
 
-          return Promise.reject(refreshError);
-        }
+        return Promise.reject(refreshError);
       }
+    }
 
-      return Promise.reject(error);
-    },
+    return Promise.reject(error);
+  },
 );
+
+export default axiosApi;
 
 export default axiosApi;
