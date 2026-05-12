@@ -31,7 +31,7 @@ const run = async () => {
   const manager = new User({
     fullName: 'manager',
     phone: '0555172043',
-    password: 'manager',
+    password: 'manager123',
     role: 'MANAGER',
   });
   await manager.save();
@@ -39,7 +39,7 @@ const run = async () => {
   const client = new User({
     fullName: 'client',
     phone: '0555172011',
-    password: 'client',
+    password: 'client123',
     role: 'CLIENT',
   });
   await client.save();
