@@ -5,8 +5,8 @@ import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 
 import { roleDashboardPaths } from '@/lib/constants';
-import { useUser } from '@/lib/hooks';
 import type { UserRole } from '@/types/user';
+import { useUser } from '@/lib/hooks/authHooks';
 
 type Props = {
     children: ReactNode;

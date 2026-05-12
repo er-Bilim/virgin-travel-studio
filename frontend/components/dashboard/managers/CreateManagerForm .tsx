@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useForm } from "react-hook-form";
+import { useForm } from 'react-hook-form';
 
-import { Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
-import type { ManagerMutation } from "@/types/user";
-import { useCreateManager } from "@/lib/hooks";
-import { Input } from "@/components/ui/input";
-import { inputClass } from "@/lib/constants";
+import { Eye, EyeOff } from 'lucide-react';
+import { useState } from 'react';
+import type { ManagerMutation } from '@/types/user';
+import { Input } from '@/components/ui/input';
+import { inputClass } from '@/lib/constants';
+import { useCreateManager } from '@/lib/hooks/managerHook';
 
 export const CreateManagerForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -20,9 +20,9 @@ export const CreateManagerForm = () => {
     formState: { errors },
   } = useForm<ManagerMutation>({
     defaultValues: {
-      fullName: "",
-      phone: "",
-      password: "",
+      fullName: '',
+      phone: '',
+      password: '',
     },
   });
   const { mutate, isPending } = useCreateManager(setError);
@@ -50,12 +50,12 @@ export const CreateManagerForm = () => {
 
         <Input
           id="fullName"
-          {...register("fullName", {
-            required: "Введите имя",
-            validate: (v) => v.trim() !== "" || "Поле не должно быть пустым",
+          {...register('fullName', {
+            required: 'Введите имя',
+            validate: (v) => v.trim() !== '' || 'Поле не должно быть пустым',
             minLength: {
               value: 2,
-              message: "Имя должно больше 2 символов",
+              message: 'Имя должно больше 2 символов',
             },
           })}
           className={inputClass}
@@ -75,11 +75,11 @@ export const CreateManagerForm = () => {
 
         <Input
           id="phone"
-          {...register("phone", {
-            required: "Введите номер телефона",
+          {...register('phone', {
+            required: 'Введите номер телефона',
             pattern: {
               value: /^\+?[0-9]{7,15}$/,
-              message: "Некорректный номер телефона",
+              message: 'Некорректный номер телефона',
             },
           })}
           className={inputClass}
@@ -98,12 +98,12 @@ export const CreateManagerForm = () => {
         </label>
         <div className="relative">
           <Input
-            type={showPassword ? "text" : "password"}
-            {...register("password", {
-              required: "Введите пароль",
+            type={showPassword ? 'text' : 'password'}
+            {...register('password', {
+              required: 'Введите пароль',
               minLength: {
                 value: 6,
-                message: "Минимум 6 символов",
+                message: 'Минимум 6 символов',
               },
             })}
             className={inputClass}
@@ -135,7 +135,7 @@ export const CreateManagerForm = () => {
         className="w-full rounded-2xl bg-[#1E2B6D] px-4 py-3 font-semibold text-white transition
                 hover:bg-[#162356] disabled:opacity-50"
       >
-        {isPending ? "создание..." : "Создать менеджера"}
+        {isPending ? 'создание...' : 'Создать менеджера'}
       </button>
     </form>
   );

@@ -4,9 +4,8 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import clsx from 'clsx';
 import { LogOut } from 'lucide-react';
-
 import { dashboardMenuItems, roleDashboardPaths } from '@/lib/constants';
-import { useLogout, useUser } from '@/lib/hooks';
+import { useLogout, useUser } from '@/lib/hooks/authHooks';
 
 type Props = {
     open: boolean;

@@ -1,6 +1,6 @@
 "use client";
 
-import {useDeleteManager, useManagers} from "@/lib/hooks";
+import {useDeleteManager, useManagers} from "@/lib/hooks/managerHook";
 import {useRouter} from "next/navigation";
 import {CreateManagerForm} from "@/components/dashboard/managers/CreateManagerForm ";
 
