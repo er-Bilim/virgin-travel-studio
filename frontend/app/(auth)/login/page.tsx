@@ -3,12 +3,12 @@
 import { useRouter } from 'next/navigation';
 
 import {inputClass, roleDashboardPaths} from '@/lib/constants';
-import { useLogin } from '@/lib/hooks';
 import type { LoginMutation } from '@/types/user';
 import {useForm} from "react-hook-form";
 import {Input} from "@/components/ui/input";
 import {useState} from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { useLogin } from '@/lib/hooks/authHooks';
 
 const LoginPage = () => {
     const router = useRouter();
