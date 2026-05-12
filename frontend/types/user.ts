@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 // user.types.ts// user.types.ts
+=======
+// user.types.ts
+>>>>>>> dev
 export type UserRole = 'ADMIN' | 'MANAGER' | 'CLIENT';
 
 export interface IUser {

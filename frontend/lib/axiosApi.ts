@@ -1,6 +1,6 @@
-import axios from "axios";
+import axios from 'axios';
 
-import { apiURL } from "@/lib/constants";
+import { apiURL } from '@/lib/constants';
 
 const axiosApi = axios.create({
   baseURL: apiURL,
@@ -14,27 +14,27 @@ const logoutAndRedirect = async () => {
       timeout: 2000,
     });
   } catch (e) {
-    console.log("Could not notify services about logout", e);
+    console.log('Could not notify services about logout', e);
   }
 
-  if (typeof window !== "undefined" && window.location.pathname !== "/login") {
-    window.location.replace("/login");
+  if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+    window.location.replace('/login');
   }
 };
 
 axiosApi.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
+    (response) => response,
+    async (error) => {
+      const originalRequest = error.config;
 
-    if (
-      error.response?.status === 401 &&
-      originalRequest &&
-      !originalRequest._retry &&
-      originalRequest.url !== "/users/token" &&
-      originalRequest.url !== "/users/sessions"
-    ) {
-      originalRequest._retry = true;
+      if (
+          error.response?.status === 401 &&
+          originalRequest &&
+          !originalRequest._retry &&
+          originalRequest.url !== '/users/token' &&
+          originalRequest.url !== '/users/sessions'
+      ) {
+        originalRequest._retry = true;
 
       try {
         await axios.post(
@@ -54,5 +54,7 @@ axiosApi.interceptors.response.use(
     return Promise.reject(error);
   },
 );
+
+export default axiosApi;
 
 export default axiosApi;

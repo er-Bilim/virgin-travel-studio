@@ -24,9 +24,11 @@ export default function RootLayout({
     <html className={`${montserrat.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <Providers>
-          {children}
+        <Providers>
+        {children}
         </Providers>
-          <Toaster />
+        </Providers>
+        <Toaster />
       </body>
     </html>
   );
