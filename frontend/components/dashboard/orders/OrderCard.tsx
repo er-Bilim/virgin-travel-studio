@@ -35,10 +35,12 @@ export function OrderCard({ isOpen, onClose, tourId }: Props) {
 
   const onSubmit: SubmitHandler<OrderType> = (data) => {
     // здесь отправка заявки на тур
-    console.log(tourId);
-    console.log("отправка заявки", data);
+    if (tourId) {
+      console.log(tourId);
+      console.log("отправка заявки", data);
 
-    toast.success("Заявка оставлена", { position: "top-center" });
+      toast.success("Заявка оставлена", { position: "top-center" });
+    }
   };
 
   return (

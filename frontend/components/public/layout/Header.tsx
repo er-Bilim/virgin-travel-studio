@@ -11,7 +11,7 @@ export default function Header() {
       <div className="mx-auto flex h-20 max-w-[1400px] px-[20px] items-center justify-between">
         <div className="flex items-center gap-4">
           <div className="flex h-21 w-21 items-center justify-center rounded-xl overflow-hidden">
-            <img src={Logo.src} alt="" />
+            <img src={Logo.src} alt="Логотип компании" />
           </div>
 
           <div>
@@ -38,8 +38,6 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <button className="hidden rounded-full border border-zinc-200 p-3 transition hover:bg-zinc-100 md:flex"></button>
-
           <button className="hidden text-sm font-medium md:block">Войти</button>
 
           <button className="rounded-full bg-yellow-400 px-6 py-3 font-bold text-black transition hover:bg-yellow-300">
