@@ -5,6 +5,7 @@ import Review from '@/model/review/Review.js';
 import { imagesUpload } from '@/middlewares/multer.js';
 import auth from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
+import deleteImage from '@/utils/deleteImage.js';
 
 const reviewsRouter = express.Router();
 
@@ -12,17 +13,27 @@ reviewsRouter.post(
   '/',
   imagesUpload.single('image'),
   async (req, res, next) => {
+    const currentFilePath = req.file?.path;
+
     try {
       const { clientName, tourId, rating, comment } = req.body;
 
       if (!clientName || !tourId || rating === undefined || !comment) {
+        await deleteImage(currentFilePath);
         return res
           .status(400)
           .send({ error: 'Заполните все обязательные поля' });
       }
 
       if (!mongoose.Types.ObjectId.isValid(tourId)) {
+        await deleteImage(currentFilePath);
         return res.status(400).send({ error: 'Неверный ID тура' });
+      }
+
+      const tour = await mongoose.model('Tour').findById(tourId);
+
+      if (!tour) {
+        return res.status(404).send({ error: 'Тур не найден' });
       }
 
       const reviewData: Partial<ReviewFields> = {
@@ -43,6 +54,8 @@ reviewsRouter.post(
       });
     } catch (e) {
       if (e instanceof mongoose.Error.ValidationError) {
+        await deleteImage(currentFilePath);
+
         return res
           .status(400)
           .send({ error: 'Ошибка валидации', details: e.errors });
