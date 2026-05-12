@@ -1,0 +1,170 @@
+import mongoose from 'mongoose';
+import express from 'express';
+import { ReviewFields } from '@/types/reviews.types.js';
+import Review from '@/model/review/Review.js';
+import { imagesUpload } from '@/middlewares/multer.js';
+import auth from '@/middlewares/auth.js';
+import permit from '@/middlewares/permit.js';
+
+const reviewsRouter = express.Router();
+
+reviewsRouter.post(
+  '/',
+  imagesUpload.single('image'),
+  async (req, res, next) => {
+    try {
+      const { clientName, tourId, rating, comment } = req.body;
+
+      if (!clientName || !tourId || rating === undefined || !comment) {
+        return res
+          .status(400)
+          .send({ error: 'Заполните все обязательные поля' });
+      }
+
+      if (!mongoose.Types.ObjectId.isValid(tourId)) {
+        return res.status(400).send({ error: 'Неверный ID тура' });
+      }
+
+      const reviewData: Partial<ReviewFields> = {
+        clientName,
+        tourId: new mongoose.Types.ObjectId(tourId),
+        rating: Number(rating),
+        comment,
+        image: req.file ? 'images/' + req.file.filename : null,
+        isModerated: false,
+      };
+
+      const review = new Review(reviewData);
+      await review.save();
+
+      res.send({
+        message: 'Отзыв отправлен на модерацию',
+        review,
+      });
+    } catch (e) {
+      if (e instanceof mongoose.Error.ValidationError) {
+        return res
+          .status(400)
+          .send({ error: 'Ошибка валидации', details: e.errors });
+      }
+      next(e);
+    }
+  },
+);
+
+reviewsRouter.get('/public', async (req, res, next) => {
+  try {
+    const { tourId } = req.query;
+
+    const query: {
+      isModerated: boolean;
+      tourId?: string;
+    } = {
+      isModerated: true,
+    };
+
+    if (typeof tourId === 'string') {
+      if (!mongoose.Types.ObjectId.isValid(tourId)) {
+        return res.status(400).send({ error: 'Неверный ID тура' });
+      }
+      query.tourId = tourId;
+    }
+
+    const reviews = await Review.find(query)
+      .sort({ createdAt: -1 })
+      .populate('tourId', 'title');
+
+    res.send(reviews);
+  } catch (e) {
+    next(e);
+  }
+});
+
+reviewsRouter.get(
+  '/admin',
+  auth,
+  permit('ADMIN', 'MANAGER'),
+  async (req, res, next) => {
+    try {
+      const { tourId } = req.query;
+
+      const query: {
+        tourId?: string;
+      } = {};
+
+      if (typeof tourId === 'string') {
+        if (!mongoose.Types.ObjectId.isValid(tourId)) {
+          return res.status(400).send({ error: 'Неверный ID тура' });
+        }
+        query.tourId = tourId;
+      }
+
+      const reviews = await Review.find(query)
+        .sort({ createdAt: -1 })
+        .populate('tourId', 'title');
+
+      res.send(reviews);
+    } catch (e) {
+      next(e);
+    }
+  },
+);
+
+reviewsRouter.patch(
+  '/:id/approve',
+  auth,
+  permit('ADMIN', 'MANAGER'),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+
+      if (!mongoose.Types.ObjectId.isValid(id as string)) {
+        return res.status(400).send({ error: 'Неверный ID отзыва' });
+      }
+
+      const approvedReview = await Review.findByIdAndUpdate(
+        id,
+        { isModerated: true },
+        { new: true, runValidators: true },
+      );
+
+      if (!approvedReview) {
+        return res.status(404).send({ error: 'Отзыв не найден' });
+      }
+
+      res.send({
+        message: 'Отзыв одобрен и опубликован',
+        review: approvedReview,
+      });
+    } catch (e) {
+      next(e);
+    }
+  },
+);
+
+reviewsRouter.delete(
+  '/:id',
+  auth,
+  permit('ADMIN', 'MANAGER'),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+
+      if (!mongoose.Types.ObjectId.isValid(id as string)) {
+        return res.status(400).send({ error: 'Неверный ID отзыва' });
+      }
+
+      const deletedReview = await Review.findByIdAndDelete(id);
+
+      if (!deletedReview) {
+        return res.status(404).send({ error: 'Отзыв не найден' });
+      }
+
+      res.send({ message: 'Отзыв успешно удален' });
+    } catch (e) {
+      next(e);
+    }
+  },
+);
+
+export default reviewsRouter;
