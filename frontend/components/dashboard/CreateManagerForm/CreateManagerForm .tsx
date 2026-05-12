@@ -5,8 +5,11 @@ import { useCreateManager } from "@/lib/hooks";
 import {useForm} from "react-hook-form";
 import {Input} from "@/components/ui/input";
 import {inputClass} from "@/lib/constants";
+import {Eye, EyeOff} from "lucide-react";
+import {useState} from "react";
 
 export const CreateManagerForm = () => {
+    const [showPassword, setShowPassword] = useState(false);
 
     const { register, handleSubmit, setError, reset, formState: {errors}} = useForm<ManagerMutation>({
         defaultValues: {
@@ -88,20 +91,33 @@ export const CreateManagerForm = () => {
                 <label className="text-sm font-medium text-gray-700">
                     Пароль
                 </label>
-
-                <Input
-                    type="password"
-                    {...register("password", {
-                        required: "Введите пароль",
-                        minLength: {
-                            value: 6,
-                            message: "Минимум 6 символов",
-                        },
-                    })}
-                    className={inputClass}
-                    placeholder="******"
-                    disabled={isPending}
-                />
+                <div className="relative">
+                    <Input
+                        type={showPassword ? "text" : "password"}
+                        {...register("password", {
+                            required: "Введите пароль",
+                            minLength: {
+                                value: 6,
+                                message: "Минимум 6 символов",
+                            },
+                        })}
+                        className={inputClass}
+                        placeholder="******"
+                        disabled={isPending}
+                        id="password"
+                    />
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword((p) => !p)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    >
+                        {!showPassword ? (
+                            <EyeOff className="size-5" />
+                        ) : (
+                            <Eye className="size-5" />
+                        )}
+                    </button>
+                </div>
 
                 {errors.password && (
                     <p className="text-sm text-red-500">

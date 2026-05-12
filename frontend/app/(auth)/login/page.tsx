@@ -9,7 +9,6 @@ import {useForm} from "react-hook-form";
 import {Input} from "@/components/ui/input";
 import {useState} from "react";
 import { Eye, EyeOff } from "lucide-react";
-import {Button} from "@/components/ui/button";
 
 const LoginPage = () => {
     const router = useRouter();
@@ -28,9 +27,9 @@ const LoginPage = () => {
         loginMutation.mutate(data, {
             onSuccess: (data) => {
                 router.push(roleDashboardPaths[data.user.role]);
+                reset();
             },
         });
-        reset();
     };
 
     return (
@@ -77,20 +76,22 @@ const LoginPage = () => {
                                 validate: (value) => value.trim() !== "" || "Поле не должно быть пустым",
                                 minLength: { value: 6, message: 'Пароль должен содержать минимум 6 символов' }
                             })}
-                            className={inputClass}
+                            className={`${inputClass} pr-10`}
                             placeholder="Пароль"
                             id="password"
                             disabled={loginMutation.isPending}
                         />
-                        <Button
+                        <button
                             type="button"
-                            variant="ghost"
-                            size="icon"
                             onClick={() => setShowPassword((p) => !p)}
-                            className="absolute right-2 top-1/2 -translate-y-1/2"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                         >
-                            {showPassword ? <EyeOff /> : <Eye />}
-                        </Button>
+                            {!showPassword ? (
+                                <EyeOff className="size-5" />
+                            ) : (
+                                <Eye className="size-5" />
+                            )}
+                        </button>
                     </div>
 
                     <button
