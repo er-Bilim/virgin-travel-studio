@@ -33,6 +33,7 @@ reviewsRouter.post(
       const tour = await mongoose.model('Tour').findById(tourId);
 
       if (!tour) {
+        await deleteImage(currentFilePath);
         return res.status(404).send({ error: 'Тур не найден' });
       }
 
@@ -54,12 +55,11 @@ reviewsRouter.post(
       });
     } catch (e) {
       if (e instanceof mongoose.Error.ValidationError) {
-        await deleteImage(currentFilePath);
-
         return res
           .status(400)
           .send({ error: 'Ошибка валидации', details: e.errors });
       }
+      await deleteImage(currentFilePath);
       next(e);
     }
   },
@@ -173,6 +173,7 @@ reviewsRouter.delete(
         return res.status(404).send({ error: 'Отзыв не найден' });
       }
 
+      await deleteImage(deletedReview.image);
       res.send({ message: 'Отзыв успешно удален' });
     } catch (e) {
       next(e);
