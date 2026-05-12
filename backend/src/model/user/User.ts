@@ -1,6 +1,6 @@
 import mongoose, {Schema, Model, HydratedDocument} from "mongoose";
 import argon2 from "argon2";
-import { UserFields } from "@/types/users.types.js";
+import {UserFields} from "@/types/users.types.js";
 
 interface UserMethods {
   checkPassword(password: string): Promise<boolean>;
@@ -12,44 +12,44 @@ export type UserDocument = HydratedDocument<UserFields, UserMethods>;
 
 const UserSchema = new Schema<UserFields, UserModel, UserMethods>(
   {
-      fullName: {
-          type: String,
-          required: [true, "Введите имя"],
-          trim: true,
-          minlength: [2, "Имя слишком короткое"],
+    fullName: {
+      type: String,
+      required: [true, "Введите имя"],
+      trim: true,
+      minlength: [2, "Имя слишком короткое"],
+    },
+
+    phone: {
+      type: String,
+      required: [true, "Введите номер телефона"],
+      unique: true,
+      trim: true,
+      match: [/^\+?[0-9]{7,15}$/, "Некорректный номер телефона"],
+    },
+
+    password: {
+      type: String,
+      required: [true, "Введите пароль"],
+      minlength: [6, "Пароль должен быть минимум 6 символов"],
+      select: false,
+    },
+
+    status: {
+      type: String,
+      enum: {
+        values: ["active", "banned"],
+        message: "Недопустимый статус",
       },
-
-        phone: {
-            type: String,
-            required: [true, "Введите номер телефона"],
-            unique: true,
-            trim: true,
-            match: [/^\+?[0-9]{7,15}$/, "Некорректный номер телефона"],
-        },
-
-        password: {
-            type: String,
-            required: [true, "Введите пароль"],
-            minlength: [6, "Пароль должен быть минимум 6 символов"],
-            select: false,
-        },
-
-        status: {
-            type: String,
-            enum: {
-                values: ["active", "banned"],
-                message: "Недопустимый статус",
-            },
-            default: "active",
-            required: true,
-        },
+      default: "active",
+      required: true,
+    },
 
     role: {
       type: String,
-        enum: {
-            values: ["ADMIN", "MANAGER", "CLIENT"],
-            message: "Недопустимая роль",
-        },
+      enum: {
+        values: ["ADMIN", "MANAGER", "CLIENT"],
+        message: "Недопустимая роль",
+      },
       default: "CLIENT",
       required: true,
     },

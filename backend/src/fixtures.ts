@@ -23,7 +23,7 @@ const run = async () => {
   const admin = new User({
     fullName: 'admin',
     phone: '0555172032',
-    password: 'admin',
+    password: '123456',
     role: 'ADMIN',
   });
   await admin.save();

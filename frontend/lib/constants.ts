@@ -6,6 +6,12 @@ export const itemsMenu = [
         icon: "👤",
         href: "/admin/managers",
         roles: ["ADMIN"],
+    },
+    {
+        label: "News",
+        icon: "📰",
+        href: "/manager/news",
+        roles: ["ADMIN"],
     }
 ];
 
