@@ -1,12 +1,14 @@
 "use client";
 
-import type { ManagerMutation} from "@/types/user";
-import { useCreateManager } from "@/lib/hooks";
+
 import {useForm} from "react-hook-form";
-import {Input} from "@/components/ui/input";
-import {inputClass} from "@/lib/constants";
+
 import {Eye, EyeOff} from "lucide-react";
 import {useState} from "react";
+import type {ManagerMutation} from "@/types/user";
+import {useCreateManager} from "@/lib/hooks";
+import {Input} from "@/components/ui/input";
+import {inputClass} from "@/lib/constants";
 
 export const CreateManagerForm = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -36,11 +38,12 @@ export const CreateManagerForm = () => {
             </h2>
 
             <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-700">
+                <label htmlFor="fullName" className="text-sm font-medium text-gray-700">
                     Личные данные ФИО
                 </label>
 
                 <Input
+                    id="fullName"
                     {...register("fullName", {
                         required: "Введите имя",
                         validate: (v) =>
@@ -63,11 +66,12 @@ export const CreateManagerForm = () => {
             </div>
 
             <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-700">
+                <label htmlFor="phone" className="text-sm font-medium text-gray-700">
                     Телефон
                 </label>
 
                 <Input
+                    id="phone"
                     {...register("phone", {
                         required: "Введите номер телефона",
                         pattern: {
@@ -88,7 +92,7 @@ export const CreateManagerForm = () => {
             </div>
 
             <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-700">
+                <label htmlFor="password" className="text-sm font-medium text-gray-700">
                     Пароль
                 </label>
                 <div className="relative">
@@ -132,7 +136,7 @@ export const CreateManagerForm = () => {
                 className="w-full rounded-2xl bg-[#1E2B6D] px-4 py-3 font-semibold text-white transition
                 hover:bg-[#162356] disabled:opacity-50"
             >
-                {isPending ? "Creating..." : "Create manager"}
+                {isPending ? "создание..." : "Создать менеджера"}
             </button>
         </form>
     );
