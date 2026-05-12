@@ -1,30 +1,42 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import Sidebar from '@/components/dashboard/layout/Sidebar';
+import MobileSidebar from '@/components/dashboard/layout/MobileSidebar';
+import MobileTopbar from '@/components/dashboard/layout/MobileTopbar';
+import ProtectedLayout from '@/middleware/ProtectedLayout';
+import { type ReactNode, useState} from "react";
 
-import { Sidebar } from "@/components/dashboard/layout/Sidebar";
-import {MobileTopbar} from "@/components/dashboard/layout/MobileTopbar";
-import {MobileSidebar} from "@/components/dashboard/layout/MobileSidebar";
-import ProtectedLayout from "@/middleware/ProtectedLayout";
+type Props = {
+    children: ReactNode;
+};
 
-export default function DashboardLayout({children}: {
-    children: React.ReactNode;
-}) {
-    const [open, setOpen] = useState(false);
+const DashboardLayout = ({ children }: Props) => {
+    const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
     return (
-        <ProtectedLayout roles={["ADMIN", "MANAGER"]}>
-            <div className="flex min-h-screen">
-                <Sidebar />
+        <ProtectedLayout roles={['ADMIN', 'MANAGER']}>
+            <div className="min-h-screen bg-[#F7F8F4]">
+                <div className="flex min-h-screen">
+                    <Sidebar />
 
-                <div className="flex-1">
-                    <MobileTopbar onMenuClick={() => setOpen(true)} />
+                    <MobileSidebar
+                        open={isMobileSidebarOpen}
+                        onClose={() => setIsMobileSidebarOpen(false)}
+                    />
 
-                    <main className="p-6">{children}</main>
+                    <div className="flex min-h-screen flex-1 flex-col">
+                        <MobileTopbar
+                            onMenuClick={() => setIsMobileSidebarOpen(true)}
+                        />
+
+                        <main className="flex-1 p-6 lg:p-8">
+                            {children}
+                        </main>
+                    </div>
                 </div>
-
-                <MobileSidebar open={open} onClose={() => setOpen(false)} />
             </div>
         </ProtectedLayout>
     );
-}
+};
+
+export default DashboardLayout;

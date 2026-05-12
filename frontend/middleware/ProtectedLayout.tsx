@@ -1,29 +1,46 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import {useUser} from "@/lib/hooks";
+import type { ReactNode } from 'react';
+import { useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 
+import { roleDashboardPaths } from '@/lib/constants';
+import { useUser } from '@/lib/hooks';
+import type { UserRole } from '@/types/user';
 
-export default function ProtectedLayout({
-                                            children,
-                                            roles,
-                                        }: {
-    children: React.ReactNode;
-    roles: string[];
-}) {
+type Props = {
+    children: ReactNode;
+    roles: UserRole[];
+};
+
+const ProtectedLayout = ({ children, roles }: Props) => {
     const router = useRouter();
+    const pathname = usePathname();
+
     const { data: user, isLoading } = useUser();
 
     useEffect(() => {
-        if (!isLoading && !user) {
-            router.push("/login");
+        if (isLoading) return;
+
+        if (!user) {
+            router.replace('/login');
+            return;
         }
 
-        if (user && !roles.includes(user.role)) {
-            router.push("/403");
+        if (!roles.includes(user.role)) {
+            router.replace('/login');
+            return;
         }
-    }, [user, isLoading, roles, router]);
+
+        if (pathname.startsWith('/admin') && user.role !== 'ADMIN') {
+            router.replace(roleDashboardPaths[user.role]);
+            return;
+        }
+
+        if (pathname.startsWith('/manager') && user.role !== 'MANAGER') {
+            router.replace(roleDashboardPaths[user.role]);
+        }
+    }, [isLoading, pathname, roles, router, user]);
 
     if (isLoading || !user) {
         return null;
@@ -33,5 +50,15 @@ export default function ProtectedLayout({
         return null;
     }
 
+    if (pathname.startsWith('/admin') && user.role !== 'ADMIN') {
+        return null;
+    }
+
+    if (pathname.startsWith('/manager') && user.role !== 'MANAGER') {
+        return null;
+    }
+
     return <>{children}</>;
-}
+};
+
+export default ProtectedLayout;
