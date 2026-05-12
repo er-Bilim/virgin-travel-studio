@@ -31,7 +31,7 @@ export default function Tours() {
           onClose={closeModalOrder}
         />
       )}
-      <div className="col-span-2 bg-gray-200 py-2 -mx-[100px] mb-2">
+      <div className="col-span-2 py-2 mb-2">
         <p className="my-4 text-center text-2xl font-semibold">
           Доступные туры
         </p>
@@ -39,7 +39,8 @@ export default function Tours() {
       <div className="grid">
         <div></div>
         <div>
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(min(300px,100%),450px))]">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-3">
+            {" "}
             {tours.map((tour) => (
               <TourCard key={tour._id} openModal={openOrder} tour={tour} />
             ))}
