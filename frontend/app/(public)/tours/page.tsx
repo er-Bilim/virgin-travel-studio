@@ -37,7 +37,6 @@ export default function Tours() {
         </p>
       </div>
       <div className="grid">
-        <div></div>
         <div>
       {isLoading && (
         <section>
