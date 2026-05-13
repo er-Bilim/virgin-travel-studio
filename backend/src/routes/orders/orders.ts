@@ -86,6 +86,7 @@ ordersRouter.post('/', async (req, res, next) => {
         if (e instanceof mongoose.Error.ValidationError) {
             return res.status(400).send({ error: 'Ошибка валидации', details: e.errors });
         }
+        next(e);
     }
 });
 
