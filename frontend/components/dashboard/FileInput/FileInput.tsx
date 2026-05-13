@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import {useEffect, useRef, useState} from "react";
-import {Camera, X} from "lucide-react";
-import {imageUrl} from "@/lib/constants";
+import { useEffect, useRef, useState } from 'react';
+import { Camera, X } from 'lucide-react';
+import { imageUrl } from '@/lib/constants';
 
 interface Props {
   name: string;
@@ -12,39 +12,38 @@ interface Props {
 }
 
 const FileInput: React.FC<Props> = ({
-                                      name,
-                                      label,
-                                      onChange,
-                                      editImage = null
-                                    }) => {
+  name,
+  label,
+  onChange,
+  editImage = null,
+}) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [fileName, setFileName] = useState("");
+  const blobUrlRef = useRef<string | null>(null);
+  const [fileName, setFileName] = useState('');
   const [preview, setPreview] = useState<string | null>(
-    editImage ? imageUrl + editImage : null
+    editImage ? imageUrl + editImage : null,
   );
 
   useEffect(() => {
-    if (editImage) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setPreview(imageUrl + editImage);
-    }
-
     return () => {
-      if (preview) {
-        URL.revokeObjectURL(preview);
+      if (blobUrlRef.current) {
+        URL.revokeObjectURL(blobUrlRef.current);
       }
-    }
-  }, [editImage, preview]);
-
+    };
+  }, []);
 
   const onChangeFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const {files} = e.target;
+    const { files } = e.target;
     if (files && files[0]) {
-      const file = files[0];
-      setFileName(file.name);
-      setPreview(URL.createObjectURL(file));
+      if (blobUrlRef.current) {
+        URL.revokeObjectURL(blobUrlRef.current);
+      }
+      const newUrl = URL.createObjectURL(files[0]);
+      blobUrlRef.current = newUrl;
+      setFileName(files[0].name);
+      setPreview(newUrl);
     } else {
-      setFileName("");
+      setFileName('');
       setPreview(null);
     }
     onChange(e);
@@ -58,15 +57,21 @@ const FileInput: React.FC<Props> = ({
 
   const clearFile = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setFileName("");
-    setPreview(null);
-    if (inputRef.current) inputRef.current.value = "";
+
+    if (blobUrlRef.current) {
+      URL.revokeObjectURL(blobUrlRef.current);
+      blobUrlRef.current = null;
+    }
+
+    setFileName('');
+    setPreview(editImage ? imageUrl + editImage : null);
+    if (inputRef.current) inputRef.current.value = '';
 
     const event = {
       target: {
         name,
-        files: null
-      }
+        files: null,
+      },
     } as unknown as React.ChangeEvent<HTMLInputElement>;
     onChange(event);
   };
@@ -74,6 +79,7 @@ const FileInput: React.FC<Props> = ({
   return (
     <div className="space-y-4">
       <input
+        title="image"
         className="hidden"
         type="file"
         accept="image/*"
@@ -87,12 +93,15 @@ const FileInput: React.FC<Props> = ({
           className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm text-muted-foreground cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors"
         >
           <span className="truncate">{fileName || label}</span>
-          {fileName && <X
-            className="h-4 w-4 text-muted-foreground hover:text-destructive"
-            onClick={clearFile}
-          />}
+          {fileName && (
+            <X
+              className="h-4 w-4 text-muted-foreground hover:text-destructive"
+              onClick={clearFile}
+            />
+          )}
         </div>
         <button
+          title="activate button"
           type="button"
           onClick={activateInput}
           className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors"
