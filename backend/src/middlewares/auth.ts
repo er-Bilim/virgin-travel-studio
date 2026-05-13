@@ -48,7 +48,7 @@ export const authOrNot: RequestHandler = async (
 const auth: RequestHandler = async (
   expressReq: Request,
   res: Response,
-  next: NextFunction,
+    next: NextFunction,
 ) => {
   await authOrNot(expressReq, res, () => {
     const req = expressReq as RequestWithUser;

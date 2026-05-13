@@ -8,7 +8,6 @@ import config from './config.js';
 import apiRouter from './routes/api.route.js';
 
 const app: Express = express();
-
 app.use(
   cors({
     origin: config.corsOrigin,
