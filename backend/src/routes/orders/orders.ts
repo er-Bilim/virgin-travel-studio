@@ -5,9 +5,9 @@ import Order from '@/model/order/Order.js';
 import {OrderStatus} from '@/types/orders.types.js';
 import mongoose from 'mongoose';
 
-const orderRouter = express.Router();
+const ordersRouter = express.Router();
 
-orderRouter.get('/', auth, permit('ADMIN', 'MANAGER'), async (req, res, next) => {
+ordersRouter.get('/', auth, permit('ADMIN', 'MANAGER'), async (req, res, next) => {
     try {
         const { user } = req as RequestWithUser;
         const { view, status, managerId } = req.query;
@@ -63,7 +63,33 @@ orderRouter.get('/', auth, permit('ADMIN', 'MANAGER'), async (req, res, next) =>
     }
 });
 
-orderRouter.patch('/:id', auth, permit('ADMIN', 'MANAGER'), async (req, res, next) => {
+ordersRouter.post('/', async (req, res, next) => {
+    try {
+         const { tourSetId, clientName, clientPhone } = req.body;
+
+         if (!tourSetId || !clientName || !clientPhone) {
+             return res.status(400).send({ error: 'Отсутствуют обязательные поля' });
+         }
+
+         const newOrder = new Order({
+             tourSetId,
+             clientName,
+             clientPhone,
+         });
+
+         await newOrder.save();
+         res.send({
+             message: 'Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время',
+             order: newOrder
+         });
+    } catch (e) {
+        if (e instanceof mongoose.Error.ValidationError) {
+            return res.status(400).send({ error: 'Ошибка валидации', details: e.errors });
+        }
+    }
+});
+
+ordersRouter.patch('/:id', auth, permit('ADMIN', 'MANAGER'), async (req, res, next) => {
     try {
         const { id } = req.params;
         const { status, rejectionReason } = req.body;
@@ -91,7 +117,7 @@ orderRouter.patch('/:id', auth, permit('ADMIN', 'MANAGER'), async (req, res, nex
         }
 
         if (user.role === 'MANAGER' && order.managerId && !order.managerId.equals(user._id)) {
-            res.status(403).send({ error: 'Вы не можете редактировать чужой заказ' })
+           return res.status(403).send({ error: 'Вы не можете редактировать чужой заказ' })
         }
 
         if (status) order.status = status as OrderStatus;
@@ -113,5 +139,6 @@ orderRouter.patch('/:id', auth, permit('ADMIN', 'MANAGER'), async (req, res, nex
         }
         next(e);
     }
-
 });
+
+export default ordersRouter;
