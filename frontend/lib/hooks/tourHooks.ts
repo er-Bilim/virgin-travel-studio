@@ -4,10 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 
 import { getTours } from "@/services/tours";
 
-export const useTours = () => {
+export const useTours = (page: number, limit: number) => {
   return useQuery({
-    queryKey: ["tours"],
-    queryFn: getTours,
-    retry: false,
+    queryKey: ['tours', page, limit], // При изменении page запрос перезапустится
+    queryFn: () => getTours(page, limit), // Ваша функция запроса должна принимать page
+    placeholderData: (previousData) => previousData, // Чтобы интерфейс не "мигал" при смене страниц
   });
 };

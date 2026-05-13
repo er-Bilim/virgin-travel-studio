@@ -4,6 +4,7 @@ import permit from '@/middlewares/permit.js';
 import { imagesUpload } from '@/middlewares/multer.js';
 import Tour from '@/model/tour/Tour.js';
 import mongoose from 'mongoose';
+import TourSet from '@/model/tourSet/TourSet.js';
 
 const toursRouter = express.Router();
 

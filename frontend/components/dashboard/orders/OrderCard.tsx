@@ -16,30 +16,29 @@ import type { OrderType } from "@/types/order";
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  tourId: string | null;
+  tourSetId: string | null;
 }
 
 
-export function OrderCard({ isOpen, onClose, tourId }: Props) {
+export function OrderCard({ isOpen, onClose, tourSetId }: Props) {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<OrderType>({
     defaultValues: {
-        clientName: "",
-        phone: "",
-    }
+      clientName: '',
+      phone: '',
+    },
   });
-
 
   const onSubmit: SubmitHandler<OrderType> = (data) => {
     // здесь отправка заявки на тур
-    if (tourId) {
-      console.log(tourId);
-      console.log("отправка заявки", data);
+    if (tourSetId) {
+      console.log(tourSetId);
+      console.log('отправка заявки', data);
 
-      toast.success("Заявка оставлена", { position: "top-center" });
+      toast.success('Заявка оставлена', { position: 'top-center' });
     }
   };
 
@@ -60,12 +59,12 @@ export function OrderCard({ isOpen, onClose, tourId }: Props) {
                 id="clientName"
                 type="text"
                 placeholder="Алёша"
-                {...register("clientName", {
-                  required: "Поле обязательно",
+                {...register('clientName', {
+                  required: 'Поле обязательно',
                   validate: (value) => {
                     return (
                       !!value.trim() ||
-                      "Поле не может состоять только из пробелов"
+                      'Поле не может состоять только из пробелов'
                     );
                   },
                 })}
@@ -78,8 +77,8 @@ export function OrderCard({ isOpen, onClose, tourId }: Props) {
                 id="phone"
                 type="tel"
                 placeholder="0550182430"
-                {...register("phone", {
-                  required: "Поле обязательно",
+                {...register('phone', {
+                  required: 'Поле обязательно',
                 })}
               />
               {errors.phone && <span>{errors.phone.message}</span>}
