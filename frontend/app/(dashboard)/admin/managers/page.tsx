@@ -4,7 +4,7 @@ import {useDeleteManager, useManagers} from "@/lib/hooks/managerHook";
 import {useRouter} from "next/navigation";
 import {CreateManagerForm} from "@/components/dashboard/managers/CreateManagerForm ";
 import {DataTable} from "@/components/dashboard/shared/data-table/data-table";
-import {getManagersColumns} from "@/components/dashboard/shared/data-table/columns/managers-columns";
+import {getManagersColumns} from "@/components/dashboard/shared/data-table/columns/manager-colum";
 
 
 
