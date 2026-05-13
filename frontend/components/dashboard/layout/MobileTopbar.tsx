@@ -1,8 +1,7 @@
 'use client';
 
+import { useUser } from '@/lib/hooks/authHooks';
 import { Menu } from 'lucide-react';
-
-import { useUser } from '@/lib/hooks';
 
 type Props = {
     onMenuClick: () => void;

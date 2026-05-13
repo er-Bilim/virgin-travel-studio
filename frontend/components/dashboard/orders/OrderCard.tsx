@@ -9,8 +9,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { OrderType } from "@/types/order";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import type { OrderType } from "@/types/order";
 
 
 interface Props {

@@ -10,7 +10,8 @@ import {
 
 import type { UserRole } from '@/types/user';
 
-export const apiURL = 'http://localhost:8000/api';
+export const apiURL = process.env.NEXT_API_URL || 'http://localhost:8000/api';
+export const imageUrl = process.env.NEXT_IMAGE_URL || 'http://localhost:8000/images';
 
 export type DashboardMenuItem = {
     label: string;
@@ -81,3 +82,7 @@ export const roleDashboardPaths: Record<UserRole, string> = {
     MANAGER: '/manager/dashboard',
     CLIENT: '/',
 };
+
+export const inputClass =
+    "w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition " +
+    "focus-visible:border-[#1E2B6D] focus-visible:ring-2 focus-visible:ring-[#1E2B6D]/20";
