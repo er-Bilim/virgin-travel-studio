@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { apiURL } from '@/lib/constants';
+import {apiURL} from '@/lib/constants';
 
 const axiosApi = axios.create({
   baseURL: apiURL,

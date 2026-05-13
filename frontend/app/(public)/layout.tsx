@@ -10,7 +10,7 @@ export default function PublicLayout({
     <>
       <Header />
       <main className="flex-1">
-        <div className="max-w-[1400px] mx-auto px-[20px]">{children}</div>
+        <div className="max-w-[1400px] mx-auto px-[10px] md:px-[20px]">{children}</div>
       </main>
       <Footer />
     </>

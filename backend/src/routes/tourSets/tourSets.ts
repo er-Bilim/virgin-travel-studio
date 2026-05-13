@@ -19,23 +19,52 @@ tourSetsRouter.get('/', authOrNot, async (req, res, next) => {
             status?: TourSetStatus | { $ne: TourSetStatus };
         } = {};
 
-        if (!isAdminOrManager) {
-            query.status = {$ne: 'FINISHED'};
-        }
+    if (!isAdminOrManager) {
+      query.status = { $ne: 'FINISHED' };
+    }
+
+    const rawPage = Number.parseInt(req.query.page as string, 10);
+    const rawLimit = Number.parseInt(req.query.limit as string, 10);
+    const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
+    const limit =
+      Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(rawLimit, 50) : 10;
+
+    const skip = (page - 1) * limit;
 
         if (typeof tourId === 'string') {
             if (!mongoose.Types.ObjectId.isValid(tourId)) {
                 return res.status(400).send({error: 'Неверный ID тура'});
             }
 
-            query.tourId = tourId;
-        }
-
-        const tourSets = await TourSet.find(query).sort({startDate: 1});
-        res.send(tourSets);
-    } catch (e) {
-        next(e);
+      query.tourId = tourId;
     }
+    const totalTourSets = await TourSet.countDocuments(query);
+
+     const tourSets = await TourSet.find(query)
+      .sort({ startDate: 1 })
+      .skip(skip)
+      .limit(limit)
+      .populate({
+        path: 'tourId',
+        select: 'title description images category baseAdvantages',
+        populate: {
+          path: 'category',
+          select: 'title',
+        },
+      });
+
+    res.send({
+      tourSets,
+      meta: {
+        total: totalTourSets,
+        page,
+        limit,
+        totalPages: Math.ceil(totalTourSets / limit),
+      },
+    });
+  } catch (e) {
+    next(e);
+  }
 });
 
 tourSetsRouter.get(
@@ -47,8 +76,19 @@ tourSetsRouter.get(
         const {id} = req.params;
         const isAdminOrManager = user?.role === 'ADMIN' || user?.role === 'MANAGER';
 
-        try {
-            const tourSet = await TourSet.findById(id).populate('tourId', 'title');
+  if (!mongoose.Types.ObjectId.isValid(id as string)) {
+    return res.status(400).send({ error: 'Неверный ID потока' });
+  }
+
+  try {
+    const tourSet = await TourSet.findById(id).populate({
+      path: 'tourId',
+      select: 'title description images category baseAdvantages',
+      populate: {
+        path: 'category',
+        select: 'title', 
+      },
+    });
 
             if (!tourSet) return res.status(404).send({error: 'Поток не найден'});
 
