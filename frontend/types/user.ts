@@ -1,3 +1,4 @@
+
 export type UserRole = 'ADMIN' | 'MANAGER' | 'CLIENT';
 
 export interface IUser {

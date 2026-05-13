@@ -1,5 +1,4 @@
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import BasePhoto from "@/components/assets/lake.webp";
 import {
   Card,
@@ -8,11 +7,10 @@ import type { TourType } from "@/types/tour";
 import { imageUrl } from "@/lib/constants";
 
 interface Props {
-  openModal: (id: string) => void;
   tour: TourType;
 }
 
-export function TourCard({ openModal, tour }: Props) {
+export function TourCard({ tour }: Props) {
   const image =
     tour.images.length > 0 ? imageUrl + tour.images[0] : BasePhoto.src;
 
@@ -52,15 +50,15 @@ export function TourCard({ openModal, tour }: Props) {
               </div>
             ))}
           </div>
-
+{/* 
           <Button
             onClick={() =>
-              openModal(tour._id)
+              
             }
             className="h-14 w-full rounded-2xl bg-white text-lg font-bold text-black hover:bg-zinc-200"
           >
             Оставить заявку
-          </Button>
+          </Button> */}
         </div>
       </div>
     </Card>
