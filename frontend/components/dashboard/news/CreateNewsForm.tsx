@@ -1,35 +1,67 @@
 "use client";
-import {useCreateNews} from "@/lib/hooks";
 import {useState} from "react";
 import type {NewsMutation} from "@/types/news";
 import FileInput from "@/components/dashboard/FileInput/FileInput";
 import {Plus, Trash2} from "lucide-react";
+import {useCreateNews, useEditNews} from "@/lib/hooks/newsHooks";
+import {Input} from "@/components/ui/input";
 
-export default function CreateNewsForm() {
-  const {mutate, isPending} = useCreateNews();
-  const [form, setForm] = useState<NewsMutation>({
-    title: "",
-    content: "",
-    image: null,
-    tags: []
-  });
-  const [fileInputKey, setFileInputKey] = useState(Date.now());
+interface Props {
+  isEdit?: boolean;
+  initialValues?: NewsMutation;
+  editedId?: string;
+}
+
+export default function CreateNewsForm({
+                                         isEdit = false,
+                                         editedId,
+                                         initialValues = {
+                                           title: "",
+                                           content: "",
+                                           image: null,
+                                           tags: []
+                                         }
+                                       }: Props) {
+  const {mutate: CreateNews, isPending} = useCreateNews();
+  const {mutate: EditNews} = useEditNews();
+  const [form, setForm] = useState<NewsMutation>(initialValues);
+  const [fileInputKey, setFileInputKey] = useState(0);
 
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    mutate(form, {
-      onSuccess: () => {
-        setForm({
-          title: "",
-          content: "",
-          image: null,
-          tags: []
-        });
-      },
-    });
-    setFileInputKey(Date.now());
+    if (isEdit && editedId) {
+      const newForm = {...form};
+      if(!form.image) {
+        delete newForm.image;
+      }
+
+      EditNews({id: editedId, data: newForm}, {
+        onSuccess: () => {
+          setForm({
+            title: "",
+            content: "",
+            image: null,
+            tags: []
+          });
+        },
+      });
+
+    } else {
+      CreateNews(form, {
+        onSuccess: () => {
+          setForm({
+            title: "",
+            content: "",
+            image: null,
+            tags: []
+          });
+        },
+      });
+    }
+
+    setFileInputKey(prev => prev + 1);
   };
 
 
@@ -78,15 +110,14 @@ export default function CreateNewsForm() {
       autoComplete="off"
     >
       <h2 className="text-xl font-semibold">
-        Create News
+        {isEdit ? "Редактировать" : "Создать новости"}
       </h2>
 
       <div className="space-y-1">
         <label className="text-sm font-medium">
-          Title
+          Название
         </label>
-
-        <input
+        <Input
           type="text"
           value={form.title}
           name="title"
@@ -98,10 +129,10 @@ export default function CreateNewsForm() {
 
       <div className="space-y-1">
         <label className="text-sm font-medium">
-          Content
+          Контент
         </label>
 
-        <input
+        <Input
           type="text"
           value={form.content}
           name="content"
@@ -112,7 +143,7 @@ export default function CreateNewsForm() {
 
       <div className="space-y-3">
         <label className="text-sm font-medium leading-none">
-          Tags
+          Тэги
         </label>
 
         <div className="space-y-2">
@@ -121,14 +152,13 @@ export default function CreateNewsForm() {
               key={i}
               className="flex items-center gap-2"
             >
-              <input
+              <Input
                 type="text"
                 value={tag}
                 onChange={(e) => handleTagChange(i, e.target.value)}
                 className="w-full border rounded-lg p-2"
                 required
               />
-
               <button
                 type="button"
                 onClick={() => removeTag(i)}
@@ -147,13 +177,13 @@ export default function CreateNewsForm() {
           className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-transparent hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 w-full mt-2"
         >
           <Plus className="mr-2 h-4 w-4" />
-          Add Tag
+          Добавить тэг
         </button>
       </div>
 
       <div className="space-y-1">
         <label className="text-sm font-medium leading-none">
-          Cover Image
+          Добавить изображение
         </label>
 
         <FileInput
@@ -169,7 +199,10 @@ export default function CreateNewsForm() {
         disabled={isPending}
         className="bg-black text-white px-4 py-2 rounded-lg disabled:opacity-50"
       >
-        {isPending ? "Creating..." : "Create manager"}
+        {isEdit
+          ? isPending ? "Редактируются..." : "Редактировать новости"
+          : isPending ? "Создать..." : "Создать новости"
+        }
       </button>
 
     </form>
