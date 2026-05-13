@@ -3,12 +3,23 @@
 import {useDeleteManager, useManagers} from "@/lib/hooks/managerHook";
 import {useRouter} from "next/navigation";
 import {CreateManagerForm} from "@/components/dashboard/managers/CreateManagerForm ";
+import {DataTable} from "@/components/dashboard/shared/data-table/data-table";
+import {getManagersColumns} from "@/components/dashboard/shared/data-table/columns/managers-columns";
+
 
 
 export default function ManagersPage() {
     const router = useRouter();
-    const { data, isLoading } = useManagers();
+    const { data = [], isLoading } = useManagers();
     const { mutate: deleteManager } = useDeleteManager();
+
+    const columns = getManagersColumns({
+        onView: (user) => router.push(`/admin/managers/${user._id}`),
+
+        onDelete: (user) => {
+            deleteManager(user._id);
+        },
+    });
 
     if (isLoading) {
         return <div className="p-6">Loading managers...</div>;
@@ -20,50 +31,7 @@ export default function ManagersPage() {
 
             <CreateManagerForm/>
 
-            <table className="w-full border">
-                <thead>
-                <tr className="text-left border-b">
-                    <th className="p-2">Full Name</th>
-                    <th className="p-2">Phone</th>
-                    <th className="p-2">Created</th>
-                    <th className="p-2">Actions</th>
-                </tr>
-                </thead>
-
-                <tbody>
-                {data?.map((m) => (
-                    <tr key={m._id} className="border-b">
-                        <td className="p-2">{m.fullName}</td>
-                        <td className="p-2">{m.phone}</td>
-                        <td className="p-2">
-                            {new Date(m.createdAt).toLocaleDateString()}
-                        </td>
-
-                        <td className="p-2 flex gap-2">
-                            <button
-                                className="text-blue-500"
-                                onClick={() =>
-                                    router.push(`/admin/managers/${m._id}`)
-                                }
-                            >
-                                View
-                            </button>
-
-                            <button
-                                className="text-red-500"
-                                onClick={() => {
-                                    if (confirm("Delete this manager?")) {
-                                        deleteManager(m._id);
-                                    }
-                                }}
-                            >
-                                Delete
-                            </button>
-                        </td>
-                    </tr>
-                ))}
-                </tbody>
-            </table>
+            <DataTable columns={columns} data={data} />
         </div>
     );
 }
