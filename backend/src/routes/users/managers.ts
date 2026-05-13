@@ -3,6 +3,7 @@ import permit from '@/middlewares/permit.js';
 import auth from '@/middlewares/auth.js';
 import User from '@/model/user/User.js';
 import mongoose from 'mongoose';
+import validateObjectId from "@/middlewares/validateObjectId.js";
 
 const managersRouter = Router();
 
@@ -53,12 +54,13 @@ managersRouter.post('/', auth, permit('ADMIN'), async (req, res, next) => {
     }
 });
 
-managersRouter.delete('/:id', auth, permit('ADMIN'), async (req, res, next) => {
+managersRouter.delete(
+    '/:id',
+    auth,
+    permit('ADMIN'),
+    validateObjectId(),
+    async (req, res, next) => {
     const id = req.params.id as string;
-
-    if(!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).send({ error: 'Неверный ID' });
-    }
 
     try {
         const user = await User.findById(id);
