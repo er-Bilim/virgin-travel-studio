@@ -15,7 +15,7 @@ export interface TourSetType {
   bookedSeats: number;
   isHot: boolean;
   saleDeadline: string;
-  discountPrice: number;
+  discountPrice?: number;
   status: string;
   createdAt: string;
   updatedAt: string;

@@ -11,8 +11,8 @@ import {
 
 const getPaginationRange = (currentPage: number, totalPages: number) => {
   const delta = 2; // Сколько страниц показывать до и после текущей
-  const range = [];
-  const rangeWithDots = [];
+  const range: number[] = [];
+  const rangeWithDots: Array<number | '...'> = [];
 
   for (let i = 1; i <= totalPages; i++) {
     if (
@@ -24,7 +24,7 @@ const getPaginationRange = (currentPage: number, totalPages: number) => {
     }
   }
 
-  let l;
+  let l: number | undefined;
   for (const i of range) {
     if (l) {
       if (i - l === 2) {
@@ -77,7 +77,7 @@ export function PaginationCustom({ page, totalPage, onChange }: Props) {
             ) : (
               <PaginationLink
                 href="#"
-                onClick={(e) => handlePageClick(e, p as number)}
+                onClick={(e) => handlePageClick(e, p)}
                 isActive={page === p}
               >
                 {p}
@@ -86,7 +86,6 @@ export function PaginationCustom({ page, totalPage, onChange }: Props) {
           </PaginationItem>
         ))}
 
-        {/* Кнопка Вперед */}
         <PaginationItem>
           <PaginationNext
             href="#"

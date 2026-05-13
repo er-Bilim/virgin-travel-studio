@@ -1,13 +1,15 @@
 import type { NextConfig } from "next";
+const imageUrl = process.env.NEXT_IMAGE_URL ?? 'http://localhost:8000';
+const parsedImageUrl = new URL(imageUrl);
 
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'http',
-        hostname: 'localhost',
-        port: '8000', // укажите порт вашего бэкенда
-        pathname: '/images/**', // путь к папке с картинками
+        protocol: parsedImageUrl.protocol.replace(':', '') as 'http' | 'https',
+        hostname: parsedImageUrl.hostname,
+        port: parsedImageUrl.port,
+        pathname: '/images/**',
       },
     ],
   },

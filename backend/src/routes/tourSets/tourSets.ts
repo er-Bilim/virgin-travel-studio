@@ -39,13 +39,18 @@ tourSetsRouter.get('/', authOrNot, async (req, res, next) => {
     }
     const totalTourSets = await TourSet.countDocuments(query);
 
-    const tourSets = await 
-    TourSet
-    .find(query)
-    .sort({ startDate: 1 })
-    .skip(skip)
-    .limit(limit)
-    .populate("tourId", "title description images category baseAdvantages");
+     const tourSets = await TourSet.find(query)
+      .sort({ startDate: 1 })
+      .skip(skip)
+      .limit(limit)
+      .populate({
+        path: 'tourId',
+        select: 'title description images category baseAdvantages',
+        populate: {
+          path: 'category',
+          select: 'title',
+        },
+      });
 
     res.send({
       tourSets,

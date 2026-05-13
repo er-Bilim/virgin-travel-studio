@@ -20,13 +20,21 @@ export function TourSetsCard({ tourSet, openModal }: Props) {
   const startDate = new Date(tourSet.startDate).toLocaleDateString('ru-RU');
   const endDate = new Date(tourSet.endDate).toLocaleDateString('ru-RU');
   const price = `${tourSet.price} сом`;
-  const freeSeets = tourSet.totalSeats - tourSet.bookedSeats;
+  const freeSeats = Math.max(0, tourSet.totalSeats - tourSet.bookedSeats);
 
   const router = useRouter();
 
   return (
     <Card
+      role="button"
+      tabIndex={0}
       onClick={() => router.push(`/tourSets/${tourSet._id}`)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          router.push(`/tourSets/${tourSet._id}`);
+        }
+      }}
       className="group relative mx-auto h-[420px] w-full overflow-hidden rounded-3xl border-0 bg-black text-white shadow-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)]"
     >
       <img
@@ -45,7 +53,7 @@ export function TourSetsCard({ tourSet, openModal }: Props) {
           </div>
           <div className="rounded-2xl bg-black/40 px-4 py-2 backdrop-blur">
             <p className="text-xs text-zinc-300">осталось мест</p>
-            <p className="text-lg font-bold">{freeSeets}</p>
+            <p className="text-lg font-bold">{freeSeats}</p>
           </div>
         </div>
 
@@ -95,7 +103,7 @@ export function TourSetsCard({ tourSet, openModal }: Props) {
           <Button
             onClick={(e) => {
               e.stopPropagation();
-              openModal(tourSet._id)
+              openModal(tourSet._id);
             }}
             className="py-4 self-end rounded-xl bg-white text-xs font-bold text-black hover:bg-zinc-200"
           >

@@ -43,11 +43,16 @@ export default function TourSetPage() {
 
   const { tourId, ...set } = data;
 
-  const nights = Math.ceil(
-    (new Date(set.endDate).getTime() - new Date(set.startDate).getTime()) /
-      (1000 * 3600 * 24),
-  );
-  const seatsLeft = set.totalSeats - set.bookedSeats;
+const days = Math.max(
+    1,
+    Math.ceil(
+     (new Date(set.endDate).getTime() - new Date(set.startDate).getTime()) /
+       (1000 * 3600 * 24),
+    )
+  )
+  const nights = Math.max(days - 1, 0);
+  const seatsLeft = Math.max(set.totalSeats - set.bookedSeats, 0);
+
   const savings = set.price - set.discountPrice;
 
   return (
@@ -152,7 +157,7 @@ export default function TourSetPage() {
                   <Calendar size={18} /> <span>Длительность</span>
                 </div>
                 <span className="font-bold">
-                  {nights} дн. / {nights - 1} ноч.
+                  {days} дн. / {nights - 1} ноч.
                 </span>
               </div>
               <div className="flex items-center justify-between py-3 border-b border-zinc-100">

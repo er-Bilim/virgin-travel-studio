@@ -39,6 +39,7 @@ export default function TourGallery({ images, title }: Props) {
       <div className="mt-4 grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3">
         {images.map((path, index) => (
           <button
+            type='button'
             key={index}
             onClick={() => setActiveIdx(index)}
             className={`relative aspect-square overflow-hidden rounded-xl border-2 transition-all 
