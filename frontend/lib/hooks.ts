@@ -1,9 +1,16 @@
 // будут кастомные хуки
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 
-import { getMe, login, logout } from '@/services/auth';
-import { createManager, deleteManager, getManagers } from '@/services/manager';
+import {getMe, login, logout} from '@/services/auth';
+import {createManager, deleteManager, getManagers} from '@/services/manager';
+import {
+    createNews,
+    deleteNews,
+    editNews,
+    getNews,
+    publicateNews
+} from "@/services/news";
 
 export const useUser = () => {
     return useQuery({
@@ -63,3 +70,54 @@ export const useLogout = () => {
         },
     });
 };
+
+export const useCreateNews = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: createNews,
+        onSuccess: (data) => {
+            queryClient.setQueryData(['news'], data.user);
+        },
+    })
+}
+
+export const useNews = () => {
+    return useQuery({
+        queryKey: ['news'],
+        queryFn: getNews,
+    });
+};
+
+export const useDeleteNews = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: deleteNews,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['news'] });
+        },
+    });
+};
+
+export const useEditNews = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: editNews,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['news'] });
+        }
+    })
+}
+
+export const usePublicateNews = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: publicateNews,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['news'] });
+        }
+    })
+}

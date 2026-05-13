@@ -57,4 +57,3 @@ axiosApi.interceptors.response.use(
 
 export default axiosApi;
 
-export default axiosApi;

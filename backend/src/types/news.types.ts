@@ -6,3 +6,4 @@ export type NewsFields = {
     isPublished?: boolean;
     author?: string;
 }
+
