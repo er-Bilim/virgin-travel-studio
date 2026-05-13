@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { apiURL } from '@/lib/constants';
+import {apiURL} from '@/lib/constants';
 
 const axiosApi = axios.create({
   baseURL: apiURL,
@@ -54,7 +54,5 @@ axiosApi.interceptors.response.use(
     return Promise.reject(error);
   },
 );
-
-export default axiosApi;
 
 export default axiosApi;

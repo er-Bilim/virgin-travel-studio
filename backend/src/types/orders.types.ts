@@ -9,4 +9,6 @@ export interface IOrder extends Document {
   status: OrderStatus;
   rejectionReason: string | null;
   managerId?: Types.ObjectId | null;
+  createdAt: Date;
+  updatedAt: Date;
 }
