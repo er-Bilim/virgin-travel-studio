@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { imageUrl } from '@/lib/constants';
+import { Button } from '../ui/button';
 
 interface Props {
     images: string[];
@@ -38,11 +39,11 @@ export default function TourGallery({ images, title }: Props) {
 
       <div className="mt-4 grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3">
         {images.map((path, index) => (
-          <button
+          <Button
             type='button'
             key={index}
             onClick={() => setActiveIdx(index)}
-            className={`relative aspect-square overflow-hidden rounded-xl border-2 transition-all 
+            className={`relative aspect-square overflow-hidden rounded-xl border-2 transition-all cursor-pointer
               ${
                 activeIdx === index
                   ? 'border-yellow-400 scale-95 ring-2 ring-yellow-400/20'
@@ -56,7 +57,7 @@ export default function TourGallery({ images, title }: Props) {
               unoptimized
               className="object-cover"
             />
-          </button>
+          </Button>
         ))}
       </div>
     </div>
