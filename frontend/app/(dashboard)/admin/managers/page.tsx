@@ -15,11 +15,13 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import { useState } from 'react';
 
 export default function ManagersPage() {
+  const [openDialogId, setOpenDialogId] = useState<string | null>(null);
   const router = useRouter();
   const { data, isLoading } = useManagers();
-  const { mutate: deleteManager } = useDeleteManager();
+  const { mutate: deleteManager, isPending: isDeleting } = useDeleteManager();
 
   if (isLoading) {
     return <div className="p-6">Loading managers...</div>;
@@ -58,7 +60,10 @@ export default function ManagersPage() {
                   View
                 </Button>
 
-                <AlertDialog>
+                <AlertDialog
+                  open={openDialogId === m._id}
+                  onOpenChange={(open) => setOpenDialogId(open ? m._id : null)}
+                >
                   <AlertDialogTrigger asChild>
                     <Button variant="destructive" className="cursor-pointer">
                       Delete
@@ -76,7 +81,10 @@ export default function ManagersPage() {
                         Отмена
                       </AlertDialogCancel>
                       <AlertDialogAction
-                        onClick={() => deleteManager(m._id)}
+                        disabled={isDeleting && openDialogId === m._id}
+                        onClick={() => deleteManager(m._id, {
+                            onSuccess: () => setOpenDialogId(null)
+                        })}
                         className="bg-red-500 cursor-pointer hover:bg-red-700"
                       >
                         Удалить
