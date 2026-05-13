@@ -3,11 +3,10 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { imageUrl } from '@/lib/constants';
-import { Button } from '../ui/button';
 
 interface Props {
-    images: string[];
-    title: string;
+  images: string[];
+  title: string;
 }
 
 export default function TourGallery({ images, title }: Props) {
@@ -17,14 +16,13 @@ export default function TourGallery({ images, title }: Props) {
 
   return (
     <div className="w-full max-w-[1440px] mx-auto px-4 py-8">
-
       <div className="relative aspect-[16/8] md:aspect-[21/9] w-full overflow-hidden rounded-[2.5rem] border border-zinc-800 shadow-2xl bg-zinc-900 transition-all duration-500">
         <Image
           src={`${imageUrl + images[activeIdx]}`}
           alt={title}
           fill
-          unoptimized 
-          priority 
+          unoptimized
+          priority
           className="object-cover transition-opacity duration-500"
         />
 
@@ -39,8 +37,9 @@ export default function TourGallery({ images, title }: Props) {
 
       <div className="mt-4 grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3">
         {images.map((path, index) => (
-          <Button
-            type='button'
+          <button
+            title={`Thumbnail ${index}`}
+            type="button"
             key={index}
             onClick={() => setActiveIdx(index)}
             className={`relative aspect-square overflow-hidden rounded-xl border-2 transition-all cursor-pointer
@@ -57,7 +56,7 @@ export default function TourGallery({ images, title }: Props) {
               unoptimized
               className="object-cover"
             />
-          </Button>
+          </button>
         ))}
       </div>
     </div>
