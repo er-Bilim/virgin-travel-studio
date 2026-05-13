@@ -10,11 +10,13 @@ interface Props {
   isEdit?: boolean;
   initialValues?: NewsMutation;
   editedId?: string;
+  editImage?: string | null;
 }
 
 export default function CreateNewsForm({
                                          isEdit = false,
                                          editedId,
+                                         editImage,
                                          initialValues = {
                                            title: "",
                                            content: "",
@@ -33,7 +35,7 @@ export default function CreateNewsForm({
 
     if (isEdit && editedId) {
       const newForm = {...form};
-      if(!form.image) {
+      if (!form.image) {
         delete newForm.image;
       }
 
@@ -185,13 +187,22 @@ export default function CreateNewsForm({
         <label className="text-sm font-medium leading-none">
           Добавить изображение
         </label>
+        {isEdit && editImage
+          ? <FileInput
+            key={fileInputKey}
+            name="image"
+            label="Add image"
+            onChange={fileChangeHandler}
+            editImage={editImage}
+          />
+          : <FileInput
+            key={fileInputKey}
+            name="image"
+            label="Add image"
+            onChange={fileChangeHandler}
+          />
+        }
 
-        <FileInput
-          key={fileInputKey}
-          name="image"
-          label="Add image"
-          onChange={fileChangeHandler}
-        />
       </div>
 
       <button

@@ -1,16 +1,40 @@
-import {useRef, useState} from "react";
+"use client";
+
+import {useEffect, useRef, useState} from "react";
 import {Camera, X} from "lucide-react";
+import {imageUrl} from "@/lib/constants";
 
 interface Props {
   name: string;
   label: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  editImage?: string;
 }
 
-const FileInput: React.FC<Props> = ({name, label, onChange}) => {
+const FileInput: React.FC<Props> = ({
+                                      name,
+                                      label,
+                                      onChange,
+                                      editImage = null
+                                    }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [fileName, setFileName] = useState("");
-  const [preview, setPreview] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | null>(
+    editImage ? imageUrl + editImage : null
+  );
+
+  useEffect(() => {
+    if (editImage) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setPreview(imageUrl + editImage);
+    }
+
+    return () => {
+      if (preview) {
+        URL.revokeObjectURL(preview);
+      }
+    }
+  }, [editImage, preview]);
 
 
   const onChangeFile = (e: React.ChangeEvent<HTMLInputElement>) => {

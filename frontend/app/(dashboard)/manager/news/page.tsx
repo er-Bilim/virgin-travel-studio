@@ -34,11 +34,11 @@ export default function News() {
     <div className="p-8 space-y-8 bg-gray-50 min-h-screen">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">News</h1>
-        <Dialog>
+        <Dialog >
           <DialogTrigger asChild>
             <Button>+ Добавить новость</Button>
           </DialogTrigger>
-          <DialogContent className="max-w-5xl">
+          <DialogContent className="sm:max-w-2xl">
             <CreateNewsForm />
           </DialogContent>
         </Dialog>
@@ -70,7 +70,12 @@ export default function News() {
                       {newEl.image
                         ? <Dialog>
                           <DialogTrigger asChild>
-                            <p className="text-blue-600">Посмотреть на картинку</p>
+                            <button
+                              type="button"
+                              className="text-blue-600 hover:underline cursor-pointer"
+                            >
+                              Посмотреть на картинку
+                            </button>
                           </DialogTrigger>
                           <DialogContent className="flex justify-center items-center">
                             <DialogHeader>
@@ -123,7 +128,7 @@ export default function News() {
                               Редактировать
                             </Button>
                           </DialogTrigger>
-                          <DialogContent className="max-w-5xl">
+                          <DialogContent className="sm:max-w-2xl">
                             <DialogHeader>
                               <DialogTitle>Редактировать новости</DialogTitle>
                             </DialogHeader>
@@ -135,6 +140,7 @@ export default function News() {
                                 tags: newEl.tags,
                                 image: null
                               }}
+                              editImage={newEl.image}
                               editedId={newEl._id}
                             />
                           </DialogContent>
