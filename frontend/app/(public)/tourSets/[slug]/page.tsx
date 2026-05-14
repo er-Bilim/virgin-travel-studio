@@ -43,17 +43,17 @@ export default function TourSetPage() {
 
   const { tourId, ...set } = data;
 
-const days = Math.max(
+  const days = Math.max(
     1,
     Math.ceil(
-     (new Date(set.endDate).getTime() - new Date(set.startDate).getTime()) /
-       (1000 * 3600 * 24),
-    )
-  )
+      (new Date(set.endDate).getTime() - new Date(set.startDate).getTime()) /
+        (1000 * 3600 * 24),
+    ),
+  );
   const nights = Math.max(days - 1, 0);
   const seatsLeft = Math.max(set.totalSeats - set.bookedSeats, 0);
 
-  const savings = set.price - (set.discountPrice ? set.discountPrice : 0);
+  const savings = set.discountPrice ? set.price - set.discountPrice : 0;
 
   return (
     <div className="max-w-7xl mx-auto py-10 text-zinc-100">
@@ -160,7 +160,7 @@ const days = Math.max(
                   <Calendar size={18} /> <span>Длительность</span>
                 </div>
                 <span className="font-bold">
-                  {days} дн. / {nights - 1} ноч.
+                  {days} дн. / {nights} ноч.
                 </span>
               </div>
               <div className="flex items-center justify-between py-3 border-b border-zinc-100">
@@ -202,7 +202,8 @@ const days = Math.max(
 
             <button
               onClick={() => {
-                const phoneNumber = '550176420';
+                const phoneNumber =
+                  process.env.NEXT_WHATSAPP_PHONE || '550176420';
                 const message = `Здравствуйте! Меня интересует ${data.tourId.title || 'тур'}, начиная с ${data.startDate}. Не могли бы вы предоставить более подробную информацию?`;
                 const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
@@ -221,12 +222,9 @@ const days = Math.max(
               Связаться через WhatsApp
             </button>
 
-            <a
-              href=""
-              className="text-center mt-4 text-xs text-zinc-400 font-medium"
-            >
+            <p className="text-center mt-4 text-xs text-zinc-400 font-medium">
               С вами свяжутся как только оставите заявку
-            </a>
+            </p>
           </div>
         </div>
       </div>
