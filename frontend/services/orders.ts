@@ -1,5 +1,5 @@
 import axiosApi from "@/lib/axiosApi";
-import { OrderType } from "@/types/order";
+import type { OrderType } from "@/types/order";
 
 
 export const postOrder = async (data: OrderType) => {
