@@ -1,6 +1,7 @@
 // order.types.ts
 
 export interface OrderType {
-    phone: string;
+    tourSetId: string;
+    clientPhone: string;
     clientName: string;
 } 
