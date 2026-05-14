@@ -11,12 +11,12 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import type { OrderType } from "@/types/order";
-
+import { useCreateOrder } from "@/lib/hooks/orderHooks";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  tourSetId: string | null;
+  tourSetId: string;
 }
 
 
@@ -27,19 +27,28 @@ export function OrderCard({ isOpen, onClose, tourSetId }: Props) {
     formState: { errors },
   } = useForm<OrderType>({
     defaultValues: {
+      tourSetId: tourSetId,
       clientName: '',
-      phone: '',
+      clientPhone: '',
     },
   });
 
-  const onSubmit: SubmitHandler<OrderType> = (data) => {
-    // здесь отправка заявки на тур
-    if (tourSetId) {
-      console.log(tourSetId);
-      console.log('отправка заявки', data);
+  const {mutate: postOrder } = useCreateOrder();
 
-      toast.success('Заявка оставлена', { position: 'top-center' });
-    }
+  const onSubmit: SubmitHandler<OrderType> = (data) => {
+      postOrder(data, {
+        onSuccess: () => {
+          onClose();
+          toast.success(
+            'Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время',
+            { position: 'top-center' },
+          );
+        },
+        onError: () => {
+          toast.error('Ошибка на стороне сервера, попробуйте позже', { position: 'top-center' });
+        }
+      })
+    
   };
 
   return (
@@ -77,11 +86,11 @@ export function OrderCard({ isOpen, onClose, tourSetId }: Props) {
                 id="phone"
                 type="tel"
                 placeholder="0550182430"
-                {...register('phone', {
+                {...register('clientPhone', {
                   required: 'Поле обязательно',
                 })}
               />
-              {errors.phone && <span>{errors.phone.message}</span>}
+              {errors.clientPhone && <span>{errors.clientPhone.message}</span>}
             </div>
           </div>
 
