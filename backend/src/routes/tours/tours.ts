@@ -152,8 +152,8 @@ toursRouter.patch(
       const { title, description, category, baseAdvantages, isPublished } =
         req.body;
 
-      if (title) tour.title = title;
-      if (description) tour.description = description;
+      if (title !== undefined) tour.title = title;
+      if (description !== undefined) tour.description = description;
 
       if (category) {
         if (!mongoose.Types.ObjectId.isValid(String(category))) {
