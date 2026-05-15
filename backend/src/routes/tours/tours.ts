@@ -60,20 +60,34 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
   }
 });
 
-toursRouter.get('/:id', async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const tour = await Tour.findById(id).populate('category');
+toursRouter.get(
+  '/:id',
+  authOrNot,
+  validateObjectId(),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const { user } = req as RequestWithUser;
 
-    if (!tour) {
-      return res.status(404).send({ error: 'Тур не найден' });
+      const tour = await Tour.findById(id).populate('category');
+
+      if (!tour) {
+        return res.status(404).send({ error: 'Тур не найден' });
+      }
+
+      const isAdminOrManager =
+        user?.role === 'ADMIN' || user?.role === 'MANAGER';
+
+      if (!tour.isPublished && !isAdminOrManager) {
+        return res.status(404).send({ error: 'Тур не найден' });
+      }
+
+      res.send(tour);
+    } catch (e) {
+      next(e);
     }
-
-    res.send(tour);
-  } catch (e) {
-    next(e);
-  }
-});
+  },
+);
 
 toursRouter.post(
   '/',

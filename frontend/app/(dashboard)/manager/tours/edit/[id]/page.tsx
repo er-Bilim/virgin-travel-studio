@@ -46,9 +46,9 @@ export default function EditTourPage() {
             title: tour.title,
             description: tour.description,
             category:
-              typeof tour.category === 'object'
+              tour.category && typeof tour.category === 'object'
                 ? tour.category._id
-                : tour.category,
+                : (tour.category ?? ''),
             baseAdvantages: tour.baseAdvantages,
             images: [],
           }}
