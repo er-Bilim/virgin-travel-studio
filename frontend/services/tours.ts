@@ -1,5 +1,5 @@
-import type { TourMutation, ToursGetResponse, TourType } from '@/types/tour';
 import axiosApi from '@/lib/axiosApi';
+import { TourMutation, ToursGetResponse, TourType } from '@/types/tour';
 
 export const getTours = async (
   page = 1,
@@ -10,7 +10,6 @@ export const getTours = async (
     page: page.toString(),
     limit: limit.toString(),
   });
-
   if (categoryId) params.append('category', categoryId);
 
   const res = await axiosApi.get<ToursGetResponse>(
@@ -19,21 +18,36 @@ export const getTours = async (
   return res.data;
 };
 
-export const createTour = async (data: TourMutation): Promise<TourType> => {
+const buildTourFormData = (data: TourMutation) => {
   const formData = new FormData();
   formData.append('title', data.title);
   formData.append('description', data.description);
   formData.append('category', data.category);
 
-  data.baseAdvantages.forEach((advantage) => {
-    formData.append('baseAdvantages', advantage);
-  });
+  data.baseAdvantages
+    .filter((adv: string) => adv.trim() !== '')
+    .forEach((adv: string) => formData.append('baseAdvantages', adv));
 
-  data.images.forEach((file) => {
-    formData.append('images', file);
-  });
+  if (data.images && data.images.length > 0) {
+    data.images.forEach((file: File) => formData.append('images', file));
+  }
+  return formData;
+};
 
+export const createTour = async (data: TourMutation): Promise<TourType> => {
+  const formData = buildTourFormData(data);
   const res = await axiosApi.post<TourType>('/tours', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return res.data;
+};
+
+export const updateTour = async (
+  id: string,
+  data: TourMutation,
+): Promise<TourType> => {
+  const formData = buildTourFormData(data);
+  const res = await axiosApi.patch<TourType>(`/tours/${id}`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
   return res.data;

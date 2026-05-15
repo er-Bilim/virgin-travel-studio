@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  createTour,
-  deleteTour,
   getTours,
+  createTour,
+  updateTour,
+  deleteTour,
   togglePublish,
 } from '@/services/tours';
 import { toast } from 'sonner';
@@ -12,50 +13,50 @@ export const useTours = (page: number, limit: number, categoryId?: string) => {
   return useQuery({
     queryKey: ['tours', page, limit, categoryId],
     queryFn: () => getTours(page, limit, categoryId),
-    placeholderData: (previousData) => previousData,
   });
 };
 
 export const useCreateTour = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (data: TourMutation) => createTour(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tours'] });
-      toast.success('Тур успешно создан');
-    },
-    onError: (error: any) => {
-      const message = error.response?.data?.error || 'Ошибка при создании тура';
-      toast.error(message);
+      toast.success('Тур создан');
     },
   });
 };
 
-export const useDeleteTour = () => {
+export const useUpdateTour = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: deleteTour,
+    mutationFn: ({ id, data }: { id: string; data: TourMutation }) =>
+      updateTour(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tours'] });
-      toast.success('Тур успешно удален');
-    },
-    onError: () => {
-      toast.error('Не удалось удалить тур');
+      toast.success('Тур обновлен');
     },
   });
 };
 
 export const useTogglePublish = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: ({ id, isPublished }: { id: string; isPublished: boolean }) =>
       togglePublish(id, isPublished),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tours'] });
-      toast.success('Статус обновлен');
+    },
+  });
+};
+
+export const useDeleteTour = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteTour,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tours'] });
+      toast.success('Тур удален');
     },
   });
 };

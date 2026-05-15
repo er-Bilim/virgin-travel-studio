@@ -1,4 +1,4 @@
-import { CreateTourForm } from '@/components/dashboard/tours/CreateTourForm';
+import { TourForm } from '@/components/dashboard/tours/TourForm';
 
 export default function NewTourPage() {
   return (
@@ -7,7 +7,7 @@ export default function NewTourPage() {
         <h1 className="text-2xl font-bold mb-6 text-[#1E2B6D]">
           Добавление нового тура
         </h1>
-        <CreateTourForm />
+        <TourForm />
       </div>
     </div>
   );
