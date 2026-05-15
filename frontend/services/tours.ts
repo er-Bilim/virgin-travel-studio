@@ -18,6 +18,11 @@ export const getTours = async (
   return res.data;
 };
 
+export const getTourById = async (id: string): Promise<TourType> => {
+  const res = await axiosApi.get<TourType>(`/tours/${id}`);
+  return res.data;
+};
+
 const buildTourFormData = (data: TourMutation) => {
   const formData = new FormData();
   formData.append('title', data.title);

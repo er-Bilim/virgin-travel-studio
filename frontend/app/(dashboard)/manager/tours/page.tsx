@@ -53,7 +53,7 @@ export default function ToursPage() {
   return (
     <div className="p-8 space-y-8 bg-gray-50 min-h-screen">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight text-[#1E2B6D]"></h1>
+        <h1 className="text-3xl font-bold tracking-tight text-[#1E2B6D]">Туры</h1>
         <div className="flex items-center gap-4">
           <Select
             value={categoryId}

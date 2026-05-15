@@ -5,6 +5,7 @@ import {
   updateTour,
   deleteTour,
   togglePublish,
+  getTourById,
 } from '@/services/tours';
 import { toast } from 'sonner';
 import { TourMutation } from '@/types/tour';
@@ -58,5 +59,13 @@ export const useDeleteTour = () => {
       queryClient.invalidateQueries({ queryKey: ['tours'] });
       toast.success('Тур удален');
     },
+  });
+};
+
+export const useTourById = (id: string) => {
+  return useQuery({
+    queryKey: ['tour', id],
+    queryFn: () => getTourById(id),
+    enabled: Boolean(id),
   });
 };
