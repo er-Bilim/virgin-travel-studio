@@ -7,7 +7,7 @@ import clsx from "clsx";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {itemsNavHeader, theme} from "@/lib/constants";
 import Image from "next/image";
 
@@ -18,7 +18,6 @@ export default function Header() {
   const [active, setActive] = useState("tours");
 
   const pathname = usePathname();
-  const router = useRouter();
 
     useEffect(() => {
         if (!open) return;
@@ -68,12 +67,13 @@ export default function Header() {
             >
               <div className="mx-auto flex h-20 max-w-[1400px] items-center px-[20px]">
                 <div className="flex items-center grow">
-                  <Image
-                      src={logo}
-                      className="h-8 w-auto sm:h-10 cursor-pointer"
-                      onClick={() => router.push("/")}
-                      alt="Virgin travel studio"
-                  />
+                    <Link href="/" aria-label="На главную страницу Virgin travel studio">
+                        <Image
+                            src={logo}
+                            className="h-8 w-auto sm:h-10 cursor-pointer"
+                            alt="Virgin travel studio"
+                        />
+                    </Link>
                 </div>
 
                 <nav className="hidden lg:flex justify-center items-center gap-8 md:mr-20">
