@@ -20,26 +20,42 @@ export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
 
-  useEffect(() => {
-    let lastScrollY = window.scrollY;
+    useEffect(() => {
+        if (!open) return;
 
-    const handleScroll = () => {
-      const currentY = window.scrollY;
+        const prevOverflow = document.body.style.overflow;
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") setOpen(false);
+        };
 
-      setHidden(currentY > lastScrollY && currentY > 80);
+        document.body.style.overflow = "hidden";
+        window.addEventListener("keydown", onKeyDown);
 
-      lastScrollY = currentY;
-    };
+        return () => {
+            document.body.style.overflow = prevOverflow;
+            window.removeEventListener("keydown", onKeyDown);
+        };
+    }, [open]);
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    useEffect(() => {
+        let lastScrollY = window.scrollY;
+
+        const handleScroll = () => {
+            const currentY = window.scrollY;
+
+            setHidden(currentY > lastScrollY && currentY > 80);
+
+            lastScrollY = currentY;
+        };
+
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
   const currentImage = itemsNavHeader.find((i) => i.id === active)?.image || itemsNavHeader[0].image;
 
   return (
       <>
-        {!open && (
             <header
                 className={clsx(
                     "sticky top-0 z-50 w-full transition-transform duration-300 shadow-[0_2px_14px_rgba(0,0,0,0.06)]",
@@ -82,7 +98,6 @@ export default function Header() {
                 </nav>
               </div>
             </header>
-        )}
 
         <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[1400px] px-[20px] h-20 flex justify-end items-center z-[999] pointer-events-none">
           <button
@@ -110,6 +125,9 @@ export default function Header() {
         />
 
         <div
+            role="dialog"
+           aria-modal="true"
+           aria-label="Навигационное меню"
             className={clsx(
                 "fixed top-0 right-0 h-full w-full max-w-2xl z-[1001] flex transition-transform duration-500",
                 open ? "translate-x-0" : "translate-x-full"
