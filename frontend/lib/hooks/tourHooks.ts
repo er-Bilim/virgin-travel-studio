@@ -33,8 +33,9 @@ export const useUpdateTour = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: TourMutation }) =>
       updateTour(id, data),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['tours'] });
+      queryClient.invalidateQueries({ queryKey: ['tour', variables.id] });
       toast.success('Тур обновлен');
     },
   });
@@ -45,8 +46,9 @@ export const useTogglePublish = () => {
   return useMutation({
     mutationFn: ({ id, isPublished }: { id: string; isPublished: boolean }) =>
       togglePublish(id, isPublished),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['tours'] });
+      queryClient.invalidateQueries({ queryKey: ['tour', variables.id] });
     },
   });
 };

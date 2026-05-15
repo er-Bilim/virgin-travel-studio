@@ -54,7 +54,18 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
   });
 
   const onSubmit = (data: TourMutation) => {
-    if (isEdit && tourId) {
+    if (!isEdit) {
+      createTour(data, {
+        onSuccess: () => {
+          reset();
+          router.push('/manager/tours');
+        },
+      });
+    } else {
+      if (!tourId) {
+        return;
+      }
+
       updateTour(
         { id: tourId, data },
         {
@@ -63,13 +74,7 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
           },
         },
       );
-    } else {
-      createTour(data, {
-        onSuccess: () => {
-          reset();
-          router.push('/manager/tours');
-        },
-      });
+      return;
     }
   };
 

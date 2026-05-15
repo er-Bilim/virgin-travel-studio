@@ -43,7 +43,7 @@ export default function ToursPage() {
   const [tourToDelete, setTourToDelete] = useState<string | null>(null);
 
   const { data: categories } = useCategories();
-  const { data, isLoading } = useTours(
+  const { data, isLoading, isError, refetch } = useTours(
     page,
     10,
     categoryId === 'all' ? undefined : categoryId,
@@ -98,6 +98,24 @@ export default function ToursPage() {
       <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
         {isLoading ? (
           <div className="p-8 text-center text-gray-500">Загрузка туров...</div>
+        ) : isError ? (
+          <div className="p-12 text-center space-y-4">
+            <p className="text-[#1E2B6D] font-bold">
+              Не удалось загрузить список туров
+            </p>
+            <p className="text-xs text-[#64748B] max-w-xs mx-auto">
+              Проверьте интернет-соединение или попробуйте перезагрузить данные
+              вручную.
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => refetch()}
+              className="mt-2 border-gray-200 text-[#1E2B6D]"
+            >
+              Повторить попытку
+            </Button>
+          </div>
         ) : (
           <>
             <div className="overflow-x-auto">

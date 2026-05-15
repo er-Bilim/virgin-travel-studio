@@ -52,10 +52,14 @@ export const updateTour = async (
   data: TourMutation,
 ): Promise<TourType> => {
   const formData = buildTourFormData(data);
-  const res = await axiosApi.patch<TourType>(`/tours/${id}`, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
-  return res.data;
+  const res = await axiosApi.patch<{ message: string; tour: TourType }>(
+    `/tours/${id}`,
+    formData,
+    {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    },
+  );
+  return res.data.tour;
 };
 
 export const deleteTour = async (id: string): Promise<void> => {
