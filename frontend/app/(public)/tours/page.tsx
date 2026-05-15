@@ -33,6 +33,8 @@ const Tours = () => {
 
   const isLoading = isToursLoading || isTourSetsLoading;
   const isError = isToursError || isTourSetsError;
+  const showError = isError;
+  const showLoading = !showError && isLoading;
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -61,13 +63,13 @@ const Tours = () => {
         </p>
       </div>
 
-      {isLoading && (
+      {showLoading && (
         <p className="my-10 text-center text-lg font-semibold">
           Загрузка туров...
         </p>
       )}
 
-      {isError && (
+      {showError && (
         <div className="my-10 text-center">
           <p className="mb-4 text-lg font-semibold text-red-500">
             Не удалось загрузить туры
@@ -83,7 +85,7 @@ const Tours = () => {
         </div>
       )}
 
-      {!isLoading && !isError && (
+      {!showLoading && !showError && (
         <>
           {tours.length === 0 ? (
             <p className="my-10 text-center text-gray-500">

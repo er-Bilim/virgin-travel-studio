@@ -75,12 +75,12 @@ const PublicTourCard = ({ tour, tourSets }: Props) => {
           ) : (
             <div className="space-y-3">
               {availableTourSets.map((tourSet) => {
-                const price = tourSet.discountPrice || tourSet.price;
+                const price = tourSet.discountPrice ?? tourSet.price;
 
                 return (
                   <Link
                     key={tourSet._id}
-                    href={`/tour-sets/${tourSet._id}`}
+                    href={`/tourSets/${tourSet._id}`}
                     className="block rounded-2xl border border-gray-100 bg-[#1E2B6D] p-4 text-white transition hover:-translate-y-0.5 hover:bg-[#176C99]"
                   >
                     <div className="flex items-start justify-between gap-3">
