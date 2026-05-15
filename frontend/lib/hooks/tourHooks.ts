@@ -6,6 +6,7 @@ import {
   togglePublish,
 } from '@/services/tours';
 import { toast } from 'sonner';
+import { TourMutation } from '@/types/tour';
 
 export const useTours = (page: number, limit: number, categoryId?: string) => {
   return useQuery({
@@ -19,7 +20,7 @@ export const useCreateTour = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: createTour,
+    mutationFn: (data: TourMutation) => createTour(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tours'] });
       toast.success('Тур успешно создан');
