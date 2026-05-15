@@ -86,3 +86,45 @@ export const roleDashboardPaths: Record<UserRole, string> = {
 export const inputClass =
     "w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition " +
     "focus-visible:border-[#1E2B6D] focus-visible:ring-2 focus-visible:ring-[#1E2B6D]/20";
+
+export const theme = {
+    bg: "#E9F0FA",
+    border: "#CBD9EE",
+
+    cyan: "#3FE6FF",
+    cyanHover: "#2fd6ef",
+
+    overlay: "rgba(0,0,0,0.4)",
+
+    shadow: "rgba(0,0,0,0.06)",
+    glow: "rgba(63,230,255,0.12)",
+
+    dark: "#031633",
+};
+
+export const itemsNavHeader = [
+    {
+        id: "tours",
+        label: "Туры",
+        image:
+            "https://images.unsplash.com/photo-1501785888041-af3ef285b470",
+    },
+    {
+        id: "dest",
+        label: "Направления",
+        image:
+            "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+    },
+    {
+        id: "about",
+        label: "О нас",
+        image:
+            "https://images.unsplash.com/photo-1526779259212-939e64788e3c",
+    },
+    {
+        id: "contacts",
+        label: "Контакты",
+        image:
+            "https://images.unsplash.com/photo-1522202176988-66273c2fd55f",
+    },
+];
