@@ -1,73 +1,122 @@
-"use client";
-import { TourCard } from "@/components/dashboard/tours/TourCard";
-import { useTours } from "@/lib/hooks/tourHooks";
-import { PaginationCustom } from "@/components/pagination/PaginationCustom";
-import { useState } from "react";
+'use client';
 
-export default function Tours() {
+import { useState } from 'react';
+
+import { PaginationCustom } from '@/components/pagination/PaginationCustom';
+import PublicTourCard from '@/components/public/tours/PublicTourCard';
+import { useTours } from '@/lib/hooks/tourHooks';
+import { useTourSets } from '@/lib/hooks/tourSets';
+
+const Tours = () => {
   const [page, setPage] = useState(1);
   const limit = 10;
 
-  const { data: toursData, isLoading, isError, refetch } = useTours(page, limit);
+  const {
+    data: toursData,
+    isLoading: isToursLoading,
+    isError: isToursError,
+    refetch: refetchTours,
+  } = useTours(page, limit);
 
-  const tours = toursData?.tours || [];
+  const {
+    data: tourSetsData,
+    isLoading: isTourSetsLoading,
+    isError: isTourSetsError,
+    refetch: refetchTourSets,
+  } = useTourSets(1, 100);
+
+  const tours = toursData?.tours.filter((tour) => tour.isPublished) || [];
+  const tourSets =
+    tourSetsData?.tourSets.filter((tourSet) => tourSet.status !== 'FINISHED') ||
+    [];
   const meta = toursData?.meta;
+
+  const isLoading = isToursLoading || isTourSetsLoading;
+  const isError = isToursError || isTourSetsError;
+  const showError = isError;
+  const showLoading = !showError && isLoading;
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
     window.scrollTo(0, 0);
   };
 
+  const handleRefetch = () => {
+    refetchTours();
+    refetchTourSets();
+  };
+
   return (
-    <section className="">
-      <div className="col-span-2 py-2 mb-2">
-        <p className="my-4 text-center text-2xl font-semibold">
-          Доступные туры
+    <section className="py-10">
+      <div className="mb-10 text-center">
+        <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#39C6C5]">
+          Virgin Travel Studio
+        </p>
+
+        <h1 className="mt-3 text-3xl font-black text-[#1E2B6D] md:text-5xl">
+          Каталог авторских туров
+        </h1>
+
+        <p className="mx-auto mt-4 max-w-2xl text-gray-600">
+          Выберите направление и подходящий поток. Завершенные потоки скрыты из
+          каталога.
         </p>
       </div>
-      <div className="grid">
-        <div>
-          {isLoading && (
-            <section>
-              <p className="my-4 text-center text-lg md:text-2xl font-semibold">
-                Загрузка туров…
-              </p>
-            </section>
-          )}
 
-          {isError && (
-            <section>
-              <p className="my-4 text-center text-2xl font-semibold">
-                Не удалось загрузить туры
-              </p>
-              <div className="flex justify-center">
-                <button
-                  className="rounded-md border px-4 py-2"
-                  onClick={() => refetch()}
-                >
-                  Повторить
-                </button>
-              </div>
-            </section>
-          )}
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-3">
-            {tours.map((tour) => (
-              <TourCard key={tour._id} tour={tour} />
-            ))}
-          </div>
+      {showLoading && (
+        <p className="my-10 text-center text-lg font-semibold">
+          Загрузка туров...
+        </p>
+      )}
+
+      {showError && (
+        <div className="my-10 text-center">
+          <p className="mb-4 text-lg font-semibold text-red-500">
+            Не удалось загрузить туры
+          </p>
+
+          <button
+            type="button"
+            className="rounded-2xl border px-5 py-3 font-semibold"
+            onClick={handleRefetch}
+          >
+            Повторить
+          </button>
         </div>
-      </div>
+      )}
 
-      <div className="my-8">
-        {meta && (
-          <PaginationCustom
-            page={page}
-            limit={meta.limit}
-            totalPage={meta.totalPages}
-            onChange={handlePageChange}
-          />
-        )}
-      </div>
+      {!showLoading && !showError && (
+        <>
+          {tours.length === 0 ? (
+            <p className="my-10 text-center text-gray-500">
+              Сейчас нет опубликованных туров.
+            </p>
+          ) : (
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6">
+              {tours.map((tour) => (
+                <PublicTourCard
+                  key={tour._id}
+                  tour={tour}
+                  tourSets={tourSets}
+                />
+              ))}
+            </div>
+          )}
+
+          {meta && (
+            <div className="my-8">
+              <PaginationCustom
+                page={page}
+                limit={meta.limit}
+                totalPage={meta.totalPages}
+                onChange={handlePageChange}
+              />
+            </div>
+          )}
+        </>
+      )}
     </section>
   );
-}
+};
+
+export default Tours;
