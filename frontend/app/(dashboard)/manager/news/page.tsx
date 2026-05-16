@@ -191,7 +191,7 @@ export default function News() {
                       colSpan={6}
                       className="p-8 text-center text-gray-500"
                     >
-                      Новости не были найдены. Дабавьте их.
+                      Новости не были найдены. Добавьте их.
                     </td>
                   </tr>
                 )}
