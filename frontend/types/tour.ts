@@ -2,6 +2,7 @@
 import type { MetaType } from "./meta";
 
 export interface TourCategoryType {
+  _id: string;
   title: string;
 }
 
@@ -18,4 +19,12 @@ export interface TourType {
   category: TourCategoryType;
   baseAdvantages: string[];
   isPublished: boolean;
+}
+
+export interface TourMutation {
+  title: string;
+  description: string;
+  category: string;
+  baseAdvantages: string[];
+  images: File[];
 }
