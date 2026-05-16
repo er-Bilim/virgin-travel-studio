@@ -1,13 +1,12 @@
-// user.types.ts
+
+export type UserRole = 'ADMIN' | 'MANAGER' | 'CLIENT';
+
 export interface IUser {
     _id: string;
     fullName: string;
     phone: string;
-
-    status: "active" | "banned";
-
-    role: "ADMIN" | "MANAGER" | "CLIENT";
-
+    status: 'active' | 'banned';
+    role: UserRole;
     createdAt: string;
     updatedAt: string;
 }
@@ -25,11 +24,5 @@ export interface LoginMutation {
 
 export interface LoginResponse {
     message: string;
-    user: {
-        _id: string;
-        fullName: string;
-        phone: string;
-        role: "ADMIN" | "MANAGER" | "CLIENT";
-        status: string;
-    };
+    user: IUser;
 }

@@ -2,8 +2,10 @@ import {Router} from 'express';
 import usersRouter from './users/users.js';
 import categoriesRouter from './categories/categories.js';
 import managersRouter from '@/routes/users/managers.js';
-import newsRouter from "@/routes/news/news.js";
+import newsRouter from '@/routes/news/news.js';
 import toursRouter from '@/routes/tours/tours.js';
+import tourSetsRouter from '@/routes/tourSets/tourSets.js';
+import ordersRouter from '@/routes/orders/orders.js';
 
 const apiRouter = Router();
 
@@ -12,5 +14,7 @@ apiRouter.use('/categories', categoriesRouter);
 apiRouter.use('/managers', managersRouter);
 apiRouter.use('/news', newsRouter);
 apiRouter.use('/tours', toursRouter);
+apiRouter.use('/tour-sets', tourSetsRouter);
+apiRouter.use('/orders', ordersRouter);
 
 export default apiRouter;

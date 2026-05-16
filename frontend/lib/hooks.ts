@@ -1,25 +1,7 @@
 // будут кастомные хуки
 
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import {getMe, login} from "@/services/auth";
-import {createManager, deleteManager, getManagers} from "@/services/manager";
-
-
-
-export const useUser = () => {
-    return useQuery({
-        queryKey: ["me"],
-        queryFn: getMe,
-        retry: false,
-    });
-};
-
-export const useManagers = () => {
-    return useQuery({
-        queryKey: ["managers"],
-        queryFn: getManagers,
-    });
-};
+import {useMutation, useQueryClient} from '@tanstack/react-query';
+import {createManager, deleteManager} from '@/services/manager';
 
 export const useCreateManager = () => {
     const queryClient = useQueryClient();
@@ -27,7 +9,7 @@ export const useCreateManager = () => {
     return useMutation({
         mutationFn: createManager,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["managers"] });
+            queryClient.invalidateQueries({ queryKey: ['managers'] });
         },
     });
 };
@@ -38,13 +20,9 @@ export const useDeleteManager = () => {
     return useMutation({
         mutationFn: deleteManager,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["managers"] });
+            queryClient.invalidateQueries({ queryKey: ['managers'] });
         },
     });
 };
 
-export const useLogin = () => {
-    return useMutation({
-        mutationFn: login,
-    });
-};
+
