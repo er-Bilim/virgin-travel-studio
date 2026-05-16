@@ -33,7 +33,7 @@ export default function News() {
   return (
     <div className="p-8 space-y-8 bg-gray-50 min-h-screen">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">News</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Новости</h1>
         <Dialog >
           <DialogTrigger asChild>
             <Button>+ Добавить новость</Button>
@@ -46,18 +46,18 @@ export default function News() {
 
       <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
         {isLoading ? (
-          <div className="p-8 text-center text-gray-500">Loading...</div>
+          <div className="p-8 text-center text-gray-500">Загрузка...</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
               <thead className="bg-muted/50 text-muted-foreground border-b">
                 <tr>
-                  <th className="p-4 font-medium">Image</th>
-                  <th className="p-4 font-medium">Title</th>
-                  <th className="p-4 font-medium">Author</th>
-                  <th className="p-4 font-medium">Date</th>
-                  <th className="p-4 font-medium text-center">Published</th>
-                  <th className="p-4 font-medium text-right">Actions</th>
+                  <th className="p-4 font-medium">Картинка</th>
+                  <th className="p-4 font-medium">Название</th>
+                  <th className="p-4 font-medium">Автор</th>
+                  <th className="p-4 font-medium">Дата</th>
+                  <th className="p-4 font-medium text-center">Опубликовано ли</th>
+                  <th className="p-4 font-medium text-right">Действия</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
@@ -89,7 +89,7 @@ export default function News() {
                           </DialogContent>
                         </Dialog>
                         :
-                        <div className="w-12 h-12 rounded bg-gray-200 flex items-center justify-center text-xs text-gray-400">No img</div>
+                        <div className="w-12 h-12 rounded bg-gray-200 flex items-center justify-center text-xs text-gray-400">Нет картинки</div>
                       }
                     </td>
                     <td
@@ -191,7 +191,7 @@ export default function News() {
                       colSpan={6}
                       className="p-8 text-center text-gray-500"
                     >
-                      No news found. Click on Add News to create one.
+                      Новости не были найдены. Дабавьте их.
                     </td>
                   </tr>
                 )}

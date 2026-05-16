@@ -4,12 +4,15 @@ import User from './model/user/User.js';
 import Category from './model/category/Category.js';
 import News from "./model/New/News.js";
 import Tour from "./model/tour/Tour.js";
+import TourSet from "./model/tourSet/TourSet.js";
+import Order from "./model/order/Order.js";
+import Review from "./model/review/Review.js";
 
 const run = async () => {
   await mongoose.connect(config.db);
   const db = mongoose.connection;
 
-  const collections = ['users', 'categories', 'news', 'tours'];
+  const collections = ['users', 'categories', 'news', 'tours', 'toursets', 'orders', 'reviews'];
 
   for (const collectionName of collections) {
     try {
@@ -55,7 +58,7 @@ const run = async () => {
     {title: 'Гастрономические', isPublished: true},
   )
 
-  const [news1, news2, news3, news4, news5] = await News.create([
+  await News.create([
     {
       title: "Раннее бронирование: Турция 2024 открыто!",
       content: "Успейте забронировать лучшие отели Анталии и Бодрума со скидкой до 40%. Первоначальный взнос всего 10%. Лето будет жарким!",
@@ -146,6 +149,168 @@ const run = async () => {
       isPublished: true,
     }
   ]);
+
+  if (!tour1 || !tour2 || !tour3 || !tour4 || !tour5) {
+    console.log("что пошло не так с турами");
+    return;
+  }
+
+  const [ts1, ts2, ts3, ts4, ts5] = await TourSet.create([
+    {
+      tourId: tour1._id,
+      startDate: new Date('2024-07-01'),
+      endDate: new Date('2024-07-12'),
+      price: 150000,
+      hotelName: "Ayana Resort & Spa",
+      hotelLocation: "Джимбаран, Бали",
+      airline: "Turkish Airlines",
+      flightDetails: "Рейс TK-1234, пересадка в Стамбуле",
+      totalSeats: 15,
+      bookedSeats: 5,
+      status: 'OPEN',
+    },
+    {
+      tourId: tour2._id,
+      startDate: new Date('2024-06-15'),
+      endDate: new Date('2024-06-25'),
+      price: 95000,
+      discountPrice: 75000,
+      isHot: true,
+      saleDeadline: new Date('2024-06-10'),
+      hotelName: "Steigenberger Al Dau Beach",
+      hotelLocation: "Хургада, Египет",
+      airline: "EgyptAir",
+      flightDetails: "Прямой чартер",
+      totalSeats: 25,
+      bookedSeats: 20,
+      status: 'OPEN',
+    },
+    {
+      tourId: tour3._id,
+      startDate: new Date('2024-08-05'),
+      endDate: new Date('2024-08-15'),
+      price: 60000,
+      hotelName: "Горный Приют 11",
+      hotelLocation: "Склон Эльбруса, 4200м",
+      airline: "Aeroflot",
+      flightDetails: "Рейс SU-1150 до Минвод",
+      totalSeats: 10,
+      bookedSeats: 10,
+      status: 'CLOSED',
+    },
+    {
+      tourId: tour4._id,
+      startDate: new Date('2023-12-01'),
+      endDate: new Date('2023-12-04'),
+      price: 45000,
+      hotelName: "Legacy Ottoman Hotel",
+      hotelLocation: "Сиркеджи, Стамбул",
+      status: 'FINISHED',
+      totalSeats: 20,
+      bookedSeats: 18,
+    },
+    {
+      tourId: tour5._id,
+      startDate: new Date('2024-09-20'),
+      endDate: new Date('2024-09-30'),
+      price: 250000,
+      hotelName: "Soneva Fushi",
+      hotelLocation: "Атолл Баа, Мальдивы",
+      airline: "Qatar Airways",
+      flightDetails: "Рейс QR-342 через Доху",
+      totalSeats: 8,
+      bookedSeats: 2,
+      status: 'OPEN',
+    }
+  ]);
+
+  if (!ts1 || !ts2 || !ts3 || !ts4 || !ts5) {
+    console.log("что не так пошло с турсетами");
+    return;
+  }
+
+  await Order.create([
+    {
+      tourSetId: ts1._id,
+      clientName: "Иван Иванов",
+      clientPhone: "+996555123456",
+      status: "NEW",
+      managerId: manager._id,
+    },
+    {
+      tourSetId: ts2._id,
+      clientName: "Виталий Тар",
+      clientPhone: "79001112233",
+      status: "IN_PROGRESS",
+      managerId: manager._id,
+    },
+    {
+      tourSetId: ts1._id,
+      clientName: "Виктор Петров",
+      clientPhone: "+996700123987",
+      status: "REJECTED",
+      managerId: manager._id,
+      rejectionReason: "передумал из-за изменения дат отпуска",
+    },
+    {
+      tourSetId: ts5._id,
+      clientName: "Ольга Новикова",
+      clientPhone: "+996999000111",
+      status: "CONTRACT_PENDING",
+      managerId: manager._id,
+    },
+    {
+      tourSetId: ts2._id,
+      clientName: "Сергей Васильев",
+      clientPhone: "+79112223344",
+      status: "COMPLETED",
+      managerId: manager._id,
+    }
+  ]);
+
+  await Review.create([
+    {
+      clientName: "Анна Петрова",
+      tourId: tour1._id,
+      rating: 5,
+      comment: "Это было незабываемое путешествие! Организация на высшем уровне, отель просто сказочный. Спасибо за такой отдых!",
+      image: "images/dracon.jpg",
+      isModerated: true,
+    },
+    {
+      clientName: "Игорь Смирнов",
+      tourId: tour2._id,
+      rating: 4,
+      comment: "В целом всё понравилось, пирамиды впечатляют. Единственный минус — долгий трансфер из аэропорта.",
+      image: null,
+      isModerated: true,
+    },
+    {
+      clientName: "Елена Соколова",
+      tourId: tour3._id,
+      rating: 5,
+      comment: "Тяжело, но оно того стоило! Виды с вершины открываются потрясающие. Гиды — настоящие профи.",
+      image: "images/dracon.jpg",
+      isModerated: true,
+    },
+    {
+      clientName: "Максим Волков",
+      tourId: tour4._id,
+      rating: 3,
+      comment: "Город красивый, но в отеле было шумновато. В следующий раз выберу другой район.",
+      image: null,
+      isModerated: false,
+    },
+    {
+      clientName: "Светлана Морозова",
+      tourId: tour5._id,
+      rating: 5,
+      comment: "Рай на земле! Тишина, спокойствие и бирюзовая вода. Обязательно вернусь еще раз.",
+      image: "images/dracon.jpg",
+      isModerated: true,
+    }
+  ]);
+
 
   console.log('Fixtures created successfully!');
   await db.close();

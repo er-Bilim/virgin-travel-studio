@@ -108,7 +108,7 @@ export default function CreateNewsForm({
   return (
     <form
       onSubmit={onSubmit}
-      className="space-y-4 border p-6 rounded-xl"
+      className="space-y-4 border p-6 rounded-xl "
       autoComplete="off"
     >
       <h2 className="text-xl font-semibold">
@@ -125,7 +125,7 @@ export default function CreateNewsForm({
           name="title"
           onChange={inputChangeHandler}
           className="w-full border rounded-lg p-2"
-          placeholder=""
+          placeholder="Заголовок новости"
         />
       </div>
 
@@ -140,6 +140,7 @@ export default function CreateNewsForm({
           name="content"
           onChange={inputChangeHandler}
           className="w-full border rounded-lg p-3"
+          placeholder="О чем эта новость? Опишите подробности..."
         />
       </div>
 
@@ -148,7 +149,7 @@ export default function CreateNewsForm({
           Тэги
         </label>
 
-        <div className="space-y-2">
+        <div className={`${form.tags.length > 2 && 'overflow-y-scroll h-[104px]'} space-y-2`}>
           {form.tags?.map((tag, i) => (
             <div
               key={i}
@@ -159,6 +160,7 @@ export default function CreateNewsForm({
                 value={tag}
                 onChange={(e) => handleTagChange(i, e.target.value)}
                 className="w-full border rounded-lg p-2"
+                placeholder="Тэги для новости"
                 required
               />
               <button
@@ -191,14 +193,14 @@ export default function CreateNewsForm({
           ? <FileInput
             key={fileInputKey}
             name="image"
-            label="Add image"
+            label="Добавить"
             onChange={fileChangeHandler}
             editImage={editImage}
           />
           : <FileInput
             key={fileInputKey}
             name="image"
-            label="Add image"
+            label="Добавить"
             onChange={fileChangeHandler}
           />
         }
