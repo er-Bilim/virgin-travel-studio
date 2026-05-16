@@ -114,7 +114,7 @@ const FileInput: React.FC<Props> = ({
           <img
             src={preview}
             alt="Preview"
-            className="object-cover w-full h-auto max-h-48"
+            className="object-cover w-full h-auto max-h-40"
           />
         </div>
       )}
