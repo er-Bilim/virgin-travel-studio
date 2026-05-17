@@ -1,5 +1,5 @@
 import axiosApi from '@/lib/axiosApi';
-import { TourMutation, ToursGetResponse, TourType } from '@/types/tour';
+import type { TourMutation, ToursGetResponse, TourType } from '@/types/tour';
 
 export const getTours = async (
   page = 1,
