@@ -35,14 +35,6 @@ const NewsSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      validate: {
-        validator: async function (userId: string) {
-          const user = await User.exists({_id: userId});
-
-          return !!user;
-        },
-        message: "Указанный автор не существует в базе данных"
-      }
     },
   },
   {

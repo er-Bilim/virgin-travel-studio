@@ -37,7 +37,7 @@ export default function CreateNewsForm({
     }
   })
   const {mutate: CreateNews, isPending} = useCreateNews(setError);
-  const {mutate: EditNews} = useEditNews(setError);
+  const {mutate: EditNews, isPending: isPendingEdit} = useEditNews(setError);
 
   const {fields, append, remove} = useFieldArray({
     control,
@@ -61,16 +61,22 @@ export default function CreateNewsForm({
       }
 
       EditNews({id: editedId, data: newForm}, {
-        onSuccess: () => reset()
+        onSuccess: () => {
+          reset();
+          setFileInputKey(prev => prev + 1);
+        }
       });
 
     } else {
       CreateNews(form, {
-        onSuccess: () => reset()
+        onSuccess: () => {
+          reset();
+          setFileInputKey(prev => prev + 1);
+        }
       });
     }
 
-    setFileInputKey(prev => prev + 1);
+
   };
 
   const fileChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -196,7 +202,7 @@ export default function CreateNewsForm({
         className="bg-black text-white px-4 py-2 rounded-lg disabled:opacity-50"
       >
         {isEdit
-          ? isPending ? "Редактируются..." : "Редактировать новости"
+          ? isPendingEdit ? "Редактируются..." : "Редактировать новости"
           : isPending ? "Создать..." : "Создать новости"
         }
       </button>
