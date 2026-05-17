@@ -16,7 +16,7 @@ import MultiImageInput from '@/components/dashboard/MultiImageInput/MultiImageIn
 import { inputClass } from '@/lib/constants';
 import { useCategories } from '@/lib/hooks/categoryHooks';
 import { useCreateTour, useUpdateTour } from '@/lib/hooks/tourHooks';
-import { TourMutation } from '@/types/tour';
+import type { TourMutation } from '@/types/tour';
 
 interface Props {
   isEdit?: boolean;
@@ -157,6 +157,7 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
                 disabled={isPending}
               />
               <button
+                aria-label='Удалить'
                 type="button"
                 onClick={() => remove(index)}
                 className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-input bg-background"

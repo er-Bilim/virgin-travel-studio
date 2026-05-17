@@ -131,6 +131,7 @@ export default function News() {
                           <DialogContent className="sm:max-w-2xl">
                             <DialogHeader>
                               <DialogTitle>Редактировать новости</DialogTitle>
+
                             </DialogHeader>
                             <CreateNewsForm
                               isEdit={true}
@@ -169,14 +170,14 @@ export default function News() {
                                 variant="outline"
                                 onClick={() => setNewsToDelete(null)}
                               >
-                                Cancel
+                                Отмена
                               </Button>
                               <Button
                                 variant="destructive"
                                 onClick={confirmDelete}
                                 disabled={isDeleting}
                               >
-                                {isDeleting ? "Deleting..." : "Yes, delete"}
+                                {isDeleting ? "Удаление..." : "Да, удалить"}
                               </Button>
                             </DialogFooter>
                           </DialogContent>

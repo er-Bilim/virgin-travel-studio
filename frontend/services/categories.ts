@@ -1,5 +1,5 @@
 import axiosApi from '@/lib/axiosApi';
-import { TourCategoryType } from '@/types/tour';
+import type { TourCategoryType } from '@/types/tour';
 
 export const getCategories = async () => {
   const res = await axiosApi.get<TourCategoryType[]>('/categories');
