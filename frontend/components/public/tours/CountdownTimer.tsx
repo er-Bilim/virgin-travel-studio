@@ -31,31 +31,29 @@ const getTimeLeft = (saleDeadline?: string) => {
     return `${days}д ${hours}ч ${minutes}м ${seconds}с`;
 };
 
-const isActiveDeadline = (saleDeadline?: string) => {
-    if (!saleDeadline) {
-        return false;
-    }
-
-    const deadline = new Date(saleDeadline).getTime();
-
-    return !Number.isNaN(deadline) && deadline > Date.now();
-};
-
 const CountdownTimer = ({ saleDeadline }: Props) => {
     const [timeLeft, setTimeLeft] = useState('Загрузка...');
 
     useEffect(() => {
-        setTimeLeft(getTimeLeft(saleDeadline));
+        const timer = window.setTimeout(() => {
+            setTimeLeft(getTimeLeft(saleDeadline));
+        }, 0);
 
-        if (!isActiveDeadline(saleDeadline)) {
+        return () => window.clearTimeout(timer);
+    }, [saleDeadline]);
+
+    useEffect(() => {
+        const deadline = saleDeadline ? new Date(saleDeadline).getTime() : NaN;
+
+        if (Number.isNaN(deadline) || deadline <= Date.now()) {
             return;
         }
 
-        const timer = setInterval(() => {
+        const interval = window.setInterval(() => {
             setTimeLeft(getTimeLeft(saleDeadline));
         }, 1000);
 
-        return () => clearInterval(timer);
+        return () => window.clearInterval(interval);
     }, [saleDeadline]);
 
     return <span>{timeLeft}</span>;
