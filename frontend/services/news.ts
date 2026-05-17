@@ -19,7 +19,7 @@ export const createNews = async (data: NewsMutation) => {
     }
   })
 
-  const response = await axiosApi.post("/news", formData);
+  const response = await axiosApi.post<{ message: string; news: NewsFields }>("/news", formData);
   return response.data;
 }
 
@@ -29,7 +29,7 @@ export const getNews = async () => {
 }
 
 export const deleteNews = async (id: string) => {
-  const response = await axiosApi.delete(`/news/${id}`);
+  const response = await axiosApi.delete<{ message: string}>(`/news/${id}`);
   return response.data;
 };
 
@@ -54,7 +54,7 @@ export const editNews = async ({id, data}: {
     }
   })
 
-  const response = await axiosApi.patch(`/news/${id}/edit`, formData);
+  const response = await axiosApi.patch<{ message: string; news: NewsFields }>(`/news/${id}/edit`, formData);
   return response.data;
 };
 

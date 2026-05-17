@@ -6,17 +6,46 @@ import {
   getNews,
   publicateNews
 } from "@/services/news";
+import {toast} from "sonner";
+import type {AxiosError} from "axios";
+import type {GlobalError} from "@/types/error";
+import type {UseFormSetError} from "react-hook-form";
+import type {NewsMutation} from "@/types/news";
 
-export const useCreateNews = () => {
+const useCreateNews = (setError: UseFormSetError<NewsMutation>) => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: createNews,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['news'] });
+    onSuccess: async (data) => {
+      toast.success(data.message || "Новость успешно создана!")
+      await queryClient.invalidateQueries({queryKey: ['news']});
     },
+    onError: async (err: AxiosError<GlobalError>) => {
+      const data = err.response?.data;
+
+      if (!data) {
+        return toast.error(
+          'Не удалось создать новость. Проверьте соединение и попробуйте снова.',
+        );
+      }
+
+      if ('details' in data && data.details) {
+        Object.entries(data.details).forEach(([key, value]) => {
+          setError(key as keyof NewsMutation, {
+            type: "server",
+            message: value.message
+          });
+        })
+        return;
+      }
+
+      toast.error(data.error || 'Не удалось создать новость. Попробуйте снова.');
+    }
+
   })
 }
+export default useCreateNews
 
 export const useNews = () => {
   return useQuery({
@@ -30,19 +59,41 @@ export const useDeleteNews = () => {
 
   return useMutation({
     mutationFn: deleteNews,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['news'] });
+    onSuccess: (data) => {
+      toast.success(data.message);
+      queryClient.invalidateQueries({queryKey: ['news']});
     },
   });
 };
 
-export const useEditNews = () => {
+export const useEditNews = (setError: UseFormSetError<NewsMutation>) => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: editNews,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['news'] });
+    onSuccess: async (data) => {
+      toast.success(data.message || "Новость успешно обновлена!")
+      await queryClient.invalidateQueries({queryKey: ['news']});
+    },
+    onError: async (err: AxiosError<GlobalError>) => {
+      const data = err.response?.data;
+      if (!data) {
+        return toast.error(
+          'Не удалось обновить новость. Проверьте соединение и попробуйте снова.',
+        );
+      }
+
+      if ('details' in data && data.details) {
+        Object.entries(data.details).forEach(([key, value]) => {
+          setError(key as keyof NewsMutation, {
+            type: "server",
+            message: value.message
+          })
+        })
+        return;
+      }
+
+      toast.error(data.error);
     }
   })
 }
@@ -53,7 +104,8 @@ export const usePublicateNews = () => {
   return useMutation({
     mutationFn: publicateNews,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['news'] });
+      toast.success("Успешно обновленно состояние опубликованности");
+      queryClient.invalidateQueries({queryKey: ['news']});
     }
   })
 }
