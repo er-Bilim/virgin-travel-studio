@@ -157,6 +157,7 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
                 disabled={isPending}
               />
               <button
+                aria-label='Удалить'
                 type="button"
                 onClick={() => remove(index)}
                 className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-input bg-background"
