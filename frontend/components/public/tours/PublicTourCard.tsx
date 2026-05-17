@@ -94,13 +94,9 @@ const PublicTourCard = ({ tour, tourSets }: Props) => {
                     <div className="grid h-full grid-cols-[1fr_auto] gap-4">
                       <div className="flex min-w-0 flex-col justify-between pr-2">
                         <p className="whitespace-nowrap text-xs text-white/70">
-                          {new Date(firstTourSet.startDate).toLocaleDateString(
-                              'ru-RU',
-                          )}
+                          {new Date(firstTourSet.startDate).toLocaleDateString('ru-RU', { timeZone: 'UTC' })}
                           {' — '}
-                          {new Date(firstTourSet.endDate).toLocaleDateString(
-                              'ru-RU',
-                          )}
+                          {new Date(firstTourSet.endDate).toLocaleDateString('ru-RU', { timeZone: 'UTC' })}
                         </p>
 
                         <p className="line-clamp-2 text-sm leading-relaxed text-white/85">
