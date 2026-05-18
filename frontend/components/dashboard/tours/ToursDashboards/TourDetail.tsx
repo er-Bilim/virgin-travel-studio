@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, usePathname } from 'next/navigation';
 import {
   useTourById,
   useDeleteTour,
@@ -20,10 +20,15 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
+
 export default function TourDetails() {
   const { id } = useParams();
   const router = useRouter();
   const user = useUser().data;
+  const pathname = usePathname();
+  const baseToursPath = pathname.startsWith('/admin')
+    ? '/admin/tours'
+    : '/manager/tours';
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -35,7 +40,7 @@ export default function TourDetails() {
     deleteTour(id as string, {
       onSuccess: () => {
         setIsDeleteDialogOpen(false);
-        router.push('/manager/tours');
+        router.push(`${baseToursPath}`);
       },
     });
   };
@@ -104,7 +109,7 @@ export default function TourDetails() {
               {tour.isPublished ? 'Снять с публикации' : 'Опубликовать'}
             </Button>
 
-            <Link href={`/manager/tours/edit/${tour._id}`}>
+            <Link href={`${baseToursPath}/edit/${tour._id}`}>
               <Button
                 variant="outline"
                 className="h-10 rounded-xl border-gray-200 text-[#1E2B6D] font-semibold"
