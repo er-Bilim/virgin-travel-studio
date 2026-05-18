@@ -42,7 +42,7 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const page = pagination?.page ?? 1;
   const pageSize = pagination?.pageSize ?? 10;
-  const totalPages = pagination ? Math.ceil(pagination.total / pageSize) : 1;
+  const totalPages = pagination ? Math.max(1, Math.ceil(pagination.total / pageSize)) : 1;
   const table = useReactTable({
     data,
     columns,
@@ -72,11 +72,17 @@ export function DataTable<TData, TValue>({
 
   if (isError) {
     return (
-        <TableCell colSpan={columns.length}>
-          <div className="p-6 text-center text-gray-500">
-            Нет данных
-          </div>
-        </TableCell>
+        <div className="rounded-2xl border bg-white">
+            <Table className="w-full table-fixed">
+                <TableBody>
+                    <TableRow>
+                        <TableCell colSpan={columns.length}>
+                            <div className="p-6 text-center text-gray-500">Нет данных</div>
+                        </TableCell>
+                    </TableRow>
+                </TableBody>
+            </Table>
+        </div>
     );
   }
 
