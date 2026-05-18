@@ -3,11 +3,21 @@
 import { useEffect, useState } from 'react';
 
 type Props = {
-    saleDeadline: string;
+    saleDeadline?: string;
 };
 
-const getTimeLeft = (saleDeadline: string) => {
-    const difference = new Date(saleDeadline).getTime() - new Date().getTime();
+const getTimeLeft = (saleDeadline?: string) => {
+    if (!saleDeadline) {
+        return 'Дата не указана';
+    }
+
+    const deadline = new Date(saleDeadline).getTime();
+
+    if (Number.isNaN(deadline)) {
+        return 'Дата не указана';
+    }
+
+    const difference = deadline - Date.now();
 
     if (difference <= 0) {
         return 'Акция завершена';
@@ -18,25 +28,35 @@ const getTimeLeft = (saleDeadline: string) => {
     const minutes = Math.floor((difference / (1000 * 60)) % 60);
     const seconds = Math.floor((difference / 1000) % 60);
 
-    return `${days} дн. ${hours} ч. ${minutes} мин. ${seconds} сек.`;
+    return `${days}д ${hours}ч ${minutes}м ${seconds}с`;
 };
 
 const CountdownTimer = ({ saleDeadline }: Props) => {
-    const [timeLeft, setTimeLeft] = useState(() => getTimeLeft(saleDeadline));
+    const [timeLeft, setTimeLeft] = useState('Загрузка...');
 
     useEffect(() => {
-        const timer = setInterval(() => {
+        const timer = window.setTimeout(() => {
+            setTimeLeft(getTimeLeft(saleDeadline));
+        }, 0);
+
+        return () => window.clearTimeout(timer);
+    }, [saleDeadline]);
+
+    useEffect(() => {
+        const deadline = saleDeadline ? new Date(saleDeadline).getTime() : NaN;
+
+        if (Number.isNaN(deadline) || deadline <= Date.now()) {
+            return;
+        }
+
+        const interval = window.setInterval(() => {
             setTimeLeft(getTimeLeft(saleDeadline));
         }, 1000);
 
-        return () => clearInterval(timer);
+        return () => window.clearInterval(interval);
     }, [saleDeadline]);
 
-    return (
-        <span className="text-sm font-semibold text-yellow-300">
-      {timeLeft}
-    </span>
-    );
+    return <span>{timeLeft}</span>;
 };
 
 export default CountdownTimer;
