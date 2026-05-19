@@ -1,8 +1,5 @@
-import TourDetails from "@/components/dashboard/tours/ToursDashboards/TourDetail";
+import TourDetails from '@/components/dashboard/tours/ToursDashboards/TourDetail';
 
 export default function TourDetailsPage() {
-  
-  return (
-    <TourDetails/>
-  );
+  return <TourDetails />;
 }
