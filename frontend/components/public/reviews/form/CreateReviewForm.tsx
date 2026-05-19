@@ -65,7 +65,7 @@ const CreateReviewForm = () => {
 
   const onSubmit = (data: IReviewMutation) => {
     if (!me) {
-      toast.error('Ошибка: Не был получен пользователь')
+      return toast.error('Ошибка: Не был получен пользователь')
     };
 
     const newData = {
@@ -103,7 +103,7 @@ const CreateReviewForm = () => {
 
     if (!me) {
       return <ReviewerBadge name="Аноним" />;
-    }
+    };
 
     return <ReviewerBadge name={me.fullName} />;
   };
