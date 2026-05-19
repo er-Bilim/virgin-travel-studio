@@ -7,6 +7,7 @@ import { LogOut } from 'lucide-react';
 import { dashboardMenuItems, roleDashboardPaths } from '@/lib/constants';
 import { useLogout, useUser } from '@/lib/hooks/authHooks';
 
+
 const Sidebar = () => {
     const pathname = usePathname();
     const router = useRouter();

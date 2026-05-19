@@ -37,7 +37,7 @@ const ProtectedLayout = ({ children, roles }: Props) => {
             return;
         }
 
-        if (pathname.startsWith('/manager') && user.role !== 'MANAGER') {
+        if (pathname.startsWith('/manager') && (user.role !== 'MANAGER' && user.role !== 'ADMIN')) {
             router.replace(roleDashboardPaths[user.role]);
         }
     }, [isLoading, pathname, roles, router, user]);
@@ -54,7 +54,7 @@ const ProtectedLayout = ({ children, roles }: Props) => {
         return null;
     }
 
-    if (pathname.startsWith('/manager') && user.role !== 'MANAGER') {
+    if (pathname.startsWith('/manager') && (user.role !== 'MANAGER' && user.role !== 'ADMIN')) {
         return null;
     }
 
