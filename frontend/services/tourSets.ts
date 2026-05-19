@@ -1,15 +1,15 @@
-import type {
-  TourSetMutation,
-  TourSetsGetType,
-  TourSetType,
-} from '@/types/tourSets';
+import type { TourSetMutation, TourSetType } from '@/types/tourSets';
 import axiosApi from '@/lib/axiosApi';
 
-export const getTourSets = async (page: number, limit: number) => {
-  const res = await axiosApi.get<TourSetsGetType>(
-    `/tour-sets/?page=${page}&limit=${limit}`,
-  );
-  return res.data;
+export const getTourSets = async (
+  page: number,
+  limit: number,
+  tourId?: string,
+) => {
+  const { data } = await axiosApi.get('/tour-sets', {
+    params: { page, limit, tourId },
+  });
+  return data;
 };
 
 export const getTourSetById = async (tourSetId: string) => {
@@ -33,4 +33,9 @@ export const updateTourSet = async (
     mutationData,
   );
   return data.tourSet;
+};
+
+export const deleteTourSet = async (id: string) => {
+  const { data } = await axiosApi.delete(`/tour-sets/${id}`);
+  return data;
 };

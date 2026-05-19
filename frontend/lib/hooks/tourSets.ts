@@ -4,13 +4,14 @@ import {
   getTourSetById,
   createTourSet,
   updateTourSet,
+  deleteTourSet,
 } from '@/services/tourSets';
 import type { TourSetMutation } from '@/types/tourSets';
 
-export const useTourSets = (page: number, limit: number) => {
+export const useTourSets = (page: number, limit: number, tourId?: string) => {
   return useQuery({
-    queryKey: ['tourSets', 'list', page, limit],
-    queryFn: () => getTourSets(page, limit),
+    queryKey: ['tourSets', 'list', page, limit, tourId],
+    queryFn: () => getTourSets(page, limit, tourId),
     placeholderData: (previousData) => previousData,
   });
 };
@@ -51,6 +52,17 @@ export const useUpdateTourSet = () => {
       queryClient.invalidateQueries({
         queryKey: ['tourSets', 'single', updatedData._id],
       });
+    },
+  });
+};
+
+export const useDeleteTourSet = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => deleteTourSet(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tourSets', 'list'] });
     },
   });
 };
