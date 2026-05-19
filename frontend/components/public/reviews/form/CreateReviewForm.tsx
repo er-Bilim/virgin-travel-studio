@@ -9,7 +9,7 @@ import { StyledTextarea } from '@/components/shared/form/field-styles';
 import { useCreateReview } from '@/lib/hooks/reviewHooks';
 import PhotoDropzone from '@/components/shared/PhotoDropzone';
 import { getTourId } from '@/lib/tour/tourId';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { CheckCircle } from 'lucide-react';
 import { useUser } from '@/lib/hooks/authHooks';
 import { Spinner } from '@/components/ui/spinner';
