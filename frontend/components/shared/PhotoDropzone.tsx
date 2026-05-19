@@ -10,10 +10,12 @@ import {
 } from 'react';
 import { UploadCloud, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import useObjectUrl from '@/lib/hooks/useObjectUrl';
 
 interface Props {
   id: string;
   name: string;
+  value?: File | null;
   label?: string;
   className?: string;
   onFile: (file: File | null) => void;
@@ -23,6 +25,7 @@ interface Props {
 const PhotoDropzone: React.FC<Props> = ({
   id,
   name,
+  value,
   label = 'Перетащите фото или выберите файл',
   className,
   onFile,
@@ -30,9 +33,10 @@ const PhotoDropzone: React.FC<Props> = ({
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const blobUrlRef = useRef<string | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
-  const [fileName, setFileName] = useState('');
   const [dragOver, setDragOver] = useState(false);
+
+  const preview = useObjectUrl(value);
+  const fileName = value instanceof File ? value.name : '';
 
   useEffect(() => {
     return () => {
@@ -47,9 +51,6 @@ const PhotoDropzone: React.FC<Props> = ({
 
     const url = URL.createObjectURL(file);
     blobUrlRef.current = url;
-
-    setPreview(url);
-    setFileName(file.name);
     onFile(file);
   };
 
@@ -69,9 +70,6 @@ const PhotoDropzone: React.FC<Props> = ({
       URL.revokeObjectURL(blobUrlRef.current);
       blobUrlRef.current = null;
     }
-
-    setPreview(null);
-    setFileName('');
 
     if (inputRef.current) inputRef.current.value = '';
     onFile(null);
