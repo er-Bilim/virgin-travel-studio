@@ -16,7 +16,7 @@ import MultiImageInput from '@/components/dashboard/MultiImageInput/MultiImageIn
 import { inputClass } from '@/lib/constants';
 import { useCategories } from '@/lib/hooks/categoryHooks';
 import { useCreateTour, useUpdateTour } from '@/lib/hooks/tourHooks';
-import { TourMutation } from '@/types/tour';
+import type { TourMutation } from '@/types/tour';
 
 interface Props {
   isEdit?: boolean;

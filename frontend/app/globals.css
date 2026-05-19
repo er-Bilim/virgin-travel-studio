@@ -1,6 +1,6 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
 body {
   font-family: var(--font-montserrat), sans-serif;
@@ -53,14 +53,29 @@ body {
 }
 
 :root {
+  --navy-900: #010b1a;
+  --navy-800: #031633;
+  --navy-700: #07224d;
+  --cyan-400: #3fe6ff;
+  --cyan-300: #4befff;
+  --cyan-200: #67f2ff;
+  --silver: #c8d2dc;
+
+  --card: #FFFFFF;
+  --card-foreground: #031633;
+  --muted-foreground: #5B6B7C;
+  --border: #cad2db;
+  --bg-muted: #F8FAFC;
+  --input: #F8FAFC;
+  --primary: #031633;
+  --primary-foreground: #FFFFFF;
+  --ring: #1A9FB8;
+
+
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --popover-foreground: oklch(0.145 0 0)
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -68,9 +83,6 @@ body {
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);

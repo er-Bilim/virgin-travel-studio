@@ -1,10 +1,10 @@
-"use client";
-import {useState} from "react";
-import type {NewsMutation} from "@/types/news";
-import FileInput from "@/components/dashboard/FileInput/FileInput";
-import {Plus, Trash2} from "lucide-react";
-import {useCreateNews, useEditNews} from "@/lib/hooks/newsHooks";
-import {Input} from "@/components/ui/input";
+'use client';
+import { useState } from 'react';
+import type { NewsMutation } from '@/types/news';
+import FileInput from '@/components/dashboard/FileInput/FileInput';
+import { Plus, Trash2 } from 'lucide-react';
+import { useCreateNews, useEditNews } from '@/lib/hooks/newsHooks';
+import { Input } from '@/components/ui/input';
 
 interface Props {
   isEdit?: boolean;
@@ -14,96 +14,95 @@ interface Props {
 }
 
 export default function CreateNewsForm({
-                                         isEdit = false,
-                                         editedId,
-                                         editImage,
-                                         initialValues = {
-                                           title: "",
-                                           content: "",
-                                           image: null,
-                                           tags: []
-                                         }
-                                       }: Props) {
-  const {mutate: CreateNews, isPending} = useCreateNews();
-  const {mutate: EditNews} = useEditNews();
+  isEdit = false,
+  editedId,
+  editImage,
+  initialValues = {
+    title: '',
+    content: '',
+    image: null,
+    tags: [],
+  },
+}: Props) {
+  const { mutate: CreateNews, isPending } = useCreateNews();
+  const { mutate: EditNews } = useEditNews();
   const [form, setForm] = useState<NewsMutation>(initialValues);
   const [fileInputKey, setFileInputKey] = useState(0);
-
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (isEdit && editedId) {
-      const newForm = {...form};
+      const newForm = { ...form };
       if (!form.image) {
         delete newForm.image;
       }
 
-      EditNews({id: editedId, data: newForm}, {
-        onSuccess: () => {
-          setForm({
-            title: "",
-            content: "",
-            image: null,
-            tags: []
-          });
+      EditNews(
+        { id: editedId, data: newForm },
+        {
+          onSuccess: () => {
+            setForm({
+              title: '',
+              content: '',
+              image: null,
+              tags: [],
+            });
+          },
         },
-      });
-
+      );
     } else {
       CreateNews(form, {
         onSuccess: () => {
           setForm({
-            title: "",
-            content: "",
+            title: '',
+            content: '',
             image: null,
-            tags: []
+            tags: [],
           });
         },
       });
     }
 
-    setFileInputKey(prev => prev + 1);
+    setFileInputKey((prev) => prev + 1);
   };
 
-
   const inputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const {name, value} = e.target;
+    const { name, value } = e.target;
 
-    setForm(prevState => ({...prevState, [name]: value}));
+    setForm((prevState) => ({ ...prevState, [name]: value }));
   };
 
   const handleTagChange = (index: number, value: string) => {
     setForm((prev) => {
       const newTags = [...(prev.tags || [])];
       newTags[index] = value;
-      return {...prev, tags: newTags};
+      return { ...prev, tags: newTags };
     });
   };
 
   const addTag = () => {
     setForm((prev) => ({
       ...prev,
-      tags: [...(prev.tags || []), ""],
+      tags: [...(prev.tags || []), ''],
     }));
   };
 
   const removeTag = (index: number) => {
     setForm((prev) => {
       const newTags = (prev.tags || []).filter((_, i) => i !== index);
-      return {...prev, tags: newTags};
+      return { ...prev, tags: newTags };
     });
   };
 
   const fileChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const {name, files} = e.target;
+    const { name, files } = e.target;
     if (files && files[0]) {
-      setForm(prevState => ({...prevState, [name]: files[0]}));
+      setForm((prevState) => ({ ...prevState, [name]: files[0] }));
     } else {
-      setForm(prevState => ({...prevState, [name]: null}));
+      setForm((prevState) => ({ ...prevState, [name]: null }));
     }
   };
-
 
   return (
     <form
@@ -112,13 +111,11 @@ export default function CreateNewsForm({
       autoComplete="off"
     >
       <h2 className="text-xl font-semibold">
-        {isEdit ? "Редактировать" : "Создать новости"}
+        {isEdit ? 'Редактировать' : 'Создать новости'}
       </h2>
 
       <div className="space-y-1">
-        <label className="text-sm font-medium">
-          Название
-        </label>
+        <label className="text-sm font-medium">Название</label>
         <Input
           type="text"
           value={form.title}
@@ -130,9 +127,7 @@ export default function CreateNewsForm({
       </div>
 
       <div className="space-y-1">
-        <label className="text-sm font-medium">
-          Контент
-        </label>
+        <label className="text-sm font-medium">Контент</label>
 
         <Input
           type="text"
@@ -145,16 +140,13 @@ export default function CreateNewsForm({
       </div>
 
       <div className="space-y-3">
-        <label className="text-sm font-medium leading-none">
-          Тэги
-        </label>
+        <label className="text-sm font-medium leading-none">Тэги</label>
 
-        <div className={`${form.tags.length > 2 && 'overflow-y-scroll h-[104px]'} space-y-2`}>
+        <div
+          className={`${form.tags.length > 2 && 'overflow-y-scroll h-[104px]'} space-y-2`}
+        >
           {form.tags?.map((tag, i) => (
-            <div
-              key={i}
-              className="flex items-center gap-2"
-            >
+            <div key={i} className="flex items-center gap-2">
               <Input
                 type="text"
                 value={tag}
@@ -189,22 +181,22 @@ export default function CreateNewsForm({
         <label className="text-sm font-medium leading-none">
           Добавить изображение
         </label>
-        {isEdit && editImage
-          ? <FileInput
+        {isEdit && editImage ? (
+          <FileInput
             key={fileInputKey}
             name="image"
             label="Добавить"
             onChange={fileChangeHandler}
             editImage={editImage}
           />
-          : <FileInput
+        ) : (
+          <FileInput
             key={fileInputKey}
             name="image"
             label="Добавить"
             onChange={fileChangeHandler}
           />
-        }
-
+        )}
       </div>
 
       <button
@@ -213,11 +205,13 @@ export default function CreateNewsForm({
         className="bg-black text-white px-4 py-2 rounded-lg disabled:opacity-50"
       >
         {isEdit
-          ? isPending ? "Редактируются..." : "Редактировать новости"
-          : isPending ? "Создать..." : "Создать новости"
-        }
+          ? isPending
+            ? 'Редактируются...'
+            : 'Редактировать новости'
+          : isPending
+            ? 'Создать...'
+            : 'Создать новости'}
       </button>
-
     </form>
   );
 }

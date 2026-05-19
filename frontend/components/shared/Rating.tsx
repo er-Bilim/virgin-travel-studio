@@ -8,8 +8,9 @@ interface Props {
   max?: number;
   onChangeStarValue?: (starValue: number) => void;
   isDisabled?: boolean;
-  ratingOptions? : { label: string; color: string }[]
+  ratingOptions?: { label: string; color: string }[];
   className?: string;
+  error?: string;
 }
 
 const Rating = ({
@@ -18,40 +19,45 @@ const Rating = ({
   onChangeStarValue,
   isDisabled = true,
   ratingOptions,
-  className
+  className,
+  error,
 }: Props) => {
-
   return (
-    <div className={`flex flex-row gap-3 ${className} items-center`}>
-      <div className="flex flex-row gap-2">
-        {Array.from({ length: max }).map((_num, index) => {
-          const starValue: number = index + 1;
-          const active = value >= starValue;
+    <div className={cn(`p-2 ${error && 'border-red-500 border-1 bg-red-100 rounded-2xl'}`, className)}>
+      <div className={cn('flex flex-row gap-3 ${className} items-center p-2')}>
+        <div className="flex flex-row gap-2">
+          {Array.from({ length: max }).map((_num, index) => {
+            const starValue: number = index + 1;
+            const active = value >= starValue;
 
-        return (
-          <button
-            type="button"
-            key={index}
-            aria-label="звезда"
-            onClick={() => onChangeStarValue?.(starValue)}
-            disabled={isDisabled}
-            className="cursor-pointer"
-          >
-            <Star
-              className={cn(
-                'size-8 stroke-2',
-                active
-                  ? 'stroke-yellow-400 text-yellow-400'
-                  : 'stroke-slate-500',
-              )}
-            />
-          </button>
-        );
-      })}
+            return (
+              <button
+                type="button"
+                key={index}
+                aria-label="звезда"
+                onClick={() => onChangeStarValue?.(starValue)}
+                disabled={isDisabled}
+                className="cursor-pointer"
+              >
+                <Star
+                  className={cn(
+                    'size-8 stroke-2',
+                    active
+                      ? 'stroke-yellow-400 text-yellow-400'
+                      : 'stroke-slate-500',
+                  )}
+                />
+              </button>
+            );
+          })}
+        </div>
+        {ratingOptions && (
+          <p className={`${ratingOptions[value].color} text-sm font-bold`}>
+            {ratingOptions[value].label}
+          </p>
+        )}
       </div>
-      {ratingOptions && (
-        <p className={`${ratingOptions[value].color} text-sm font-bold`}>{ratingOptions[value].label}</p>
-      )}
+        {error && <p className="text-sm text-red-500 mt-1 p-2">{error}</p>}
     </div>
   );
 };

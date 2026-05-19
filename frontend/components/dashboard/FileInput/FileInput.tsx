@@ -6,6 +6,7 @@ import { imageUrl } from '@/lib/constants';
 
 interface Props {
   name: string;
+  id?: string
   label: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   editImage?: string;
@@ -14,6 +15,7 @@ interface Props {
 const FileInput: React.FC<Props> = ({
   name,
   label,
+  id,
   onChange,
   editImage = null,
 }) => {
@@ -79,6 +81,7 @@ const FileInput: React.FC<Props> = ({
   return (
     <div className="space-y-4">
       <input
+        id={id}
         title="image"
         className="hidden"
         type="file"
