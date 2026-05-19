@@ -1,5 +1,5 @@
-import type { MetaType } from "./meta";
-import type { TourType } from "./tour";
+import type { MetaType } from './meta';
+import type { TourType } from './tour';
 
 export interface TourSetType {
   _id: string;
@@ -22,6 +22,24 @@ export interface TourSetType {
 }
 
 export interface TourSetsGetType {
-    tourSets: TourSetType[];
-    meta: MetaType;
+  tourSets: TourSetType[];
+  meta: MetaType;
+}
+
+export type TourSetStatus = 'OPEN' | 'CLOSED' | 'FINISHED';
+
+export interface TourSetMutation {
+  tourId: string;
+  startDate: string;
+  endDate: string;
+  price: number;
+  discountPrice?: number;
+  hotelName: string;
+  hotelLocation: string;
+  airline?: string;
+  flightDetails?: string;
+  totalSeats: number;
+  isHot: boolean;
+  saleDeadline?: string;
+  status?: TourSetStatus;
 }

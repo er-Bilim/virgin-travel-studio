@@ -20,7 +20,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-
 export default function TourDetails() {
   const { id } = useParams();
   const router = useRouter();
@@ -70,7 +69,7 @@ export default function TourDetails() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold tracking-tight text-[#1E2B6D] leading-none">
+              <h1 className="text-4xl font-bold tracking-tight text-[#1E2B6D] leading-none">
                 {tour.title}
               </h1>
               {!tour.isPublished && (
@@ -134,7 +133,7 @@ export default function TourDetails() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           <div className="lg:col-span-2 space-y-6">
             <div className="space-y-2">
-              <h3 className="text-[16px] font-bold tracking-tight text-[#1E2B6D] leading-none">
+              <h3 className="text-[18px] font-bold tracking-tight text-[#1E2B6D] leading-none">
                 Описание тура
               </h3>
               <p className="text-[#1E2B6D] text-[16px] leading-relaxed whitespace-pre-wrap">
@@ -143,18 +142,24 @@ export default function TourDetails() {
             </div>
 
             <div className="space-y-3">
-              <h3 className="text-[16px] font-bold tracking-tight text-[#1E2B6D] leading-none">
+              <h3 className="text-[18px] font-bold tracking-tight text-[#1E2B6D] leading-none">
                 Базовые преимущества тура
               </h3>
               <div className="flex flex-wrap gap-2">
-                {tour.baseAdvantages?.map((adv, idx) => (
-                  <span
-                    key={idx}
-                    className="bg-white border border-gray-100 px-3 py-1.5 rounded-lg text-sm font-medium text-[#1E2B6D]"
-                  >
-                    {adv}
-                  </span>
-                ))}
+                {tour.baseAdvantages.length > 0 ? (
+                  tour.baseAdvantages.map((adv, idx) => (
+                    <span
+                      key={idx}
+                      className="bg-white border border-gray-100 px-3 py-1.5 rounded-lg text-sm font-medium text-[#1E2B6D]"
+                    >
+                      {adv}
+                    </span>
+                  ))
+                ) : (
+                  <p className="text-[#1E2B6D] text-[16px] leading-relaxed whitespace-pre-wrap">
+                    Преимуществ пока нет.
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -164,14 +169,22 @@ export default function TourDetails() {
               Изображения
             </h3>
             <div className="grid grid-cols-2 gap-2">
-              {tour.images?.slice(0, 4).map((img, idx) => (
-                <img
-                  key={idx}
-                  src={imageUrl + img}
-                  className="w-full h-20 object-cover rounded-lg border"
-                  alt=""
-                />
-              ))}
+              {tour.images?.length > 0 ? (
+                tour.images
+                  ?.slice(0, 4)
+                  .map((img, idx) => (
+                    <img
+                      key={idx}
+                      src={imageUrl + img}
+                      className="w-full h-20 object-cover rounded-lg border"
+                      alt=""
+                    />
+                  ))
+              ) : (
+                <p className="text-[10px] text-gray-400 font-medium">
+                  Изображений пока нет.
+                </p>
+              )}
             </div>
             {tour.images && tour.images.length > 4 && (
               <p className="text-[10px] text-center text-gray-400 font-medium">
