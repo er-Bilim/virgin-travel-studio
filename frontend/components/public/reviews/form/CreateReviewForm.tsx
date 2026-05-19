@@ -93,24 +93,6 @@ const CreateReviewForm = () => {
     }
   };
 
-  if (submitted) {
-    return (
-      <div className="rounded-2xl border border-border bg-card p-8 text-center">
-        <CheckCircle className="mx-auto mb-3 size-12 text-green-400" />
-        <h3 className="text-lg font-medium text-foreground">
-          Спасибо за отзыв!
-        </h3>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Он появится на странице после модерации
-        </p>
-        <p className="text-sm text-muted-foreground flex gap-1 justify-center">
-          Отзыв будет опубликован от имени
-          <span className="font-medium text-foreground">{me?.fullName}</span>
-        </p>
-      </div>
-    );
-  }
-
   const renderClientName = () => {
     if (loadingUser) {
       return <Spinner />;
@@ -129,9 +111,24 @@ const CreateReviewForm = () => {
     return <ReviewerBadge name={me.fullName} />;
   };
 
+  if (submitted) {
+    return (
+      <div className="rounded-2xl border border-border bg-card p-8 text-center">
+        <CheckCircle className="mx-auto mb-3 size-12 text-green-400" />
+        <h3 className="text-lg font-medium text-foreground">
+          Спасибо за отзыв!
+        </h3>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Он появится на странице после модерации
+        </p>
+        <div className="mt-5">{renderClientName()}</div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-[var(--card)] border-1 border-[var(--border)] p-7 rounded-4xl">
-            <div className="mb-5">{renderClientName()}</div>
+      <div className="mb-5">{renderClientName()}</div>
       <h3 className="font-semibold text-[var(--card-foreground)] text-2xl">
         Оставьте ваш отзыв
       </h3>
