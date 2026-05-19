@@ -14,11 +14,12 @@ import { CheckCircle } from 'lucide-react';
 import { useUser } from '@/lib/hooks/authHooks';
 import { Spinner } from '@/components/ui/spinner';
 import ReviewerBadge from '../ReviewerBadge';
+import { toast } from 'sonner';
 
 const CreateReviewForm = () => {
   const [submitted, setSubmitted] = useState<boolean>(false);
-  const { mutate, isPending: loadingReview, isError } = useCreateReview();
-  const { data: me, isLoading: loadingUser } = useUser();
+  const { mutate, isPending: loadingReview } = useCreateReview();
+  const { data: me, isLoading: loadingUser, isError } = useUser();
 
   const ratingOptions = [
     {
@@ -62,14 +63,10 @@ const CreateReviewForm = () => {
     control,
   } = useForm<IReviewMutation>({ defaultValues });
 
-  useEffect(() => {
-    if (me) {
-      reset((prev) => ({ ...prev, name: me.fullName }));
-    }
-  }, [me, reset]);
-
   const onSubmit = (data: IReviewMutation) => {
-    if (!me) return;
+    if (!me) {
+      toast.error('Ошибка: Не был получен пользователь')
+    };
 
     const newData = {
       ...data,

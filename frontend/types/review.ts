@@ -8,7 +8,7 @@ export interface IReviewMutation {
 export interface IReview {
   rating: number;
   comment: string;
-  image: string;
+  image: string | null;
   createdDate: string;
   updatedDate: string;
 }

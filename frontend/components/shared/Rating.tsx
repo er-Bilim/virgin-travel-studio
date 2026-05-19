@@ -51,7 +51,7 @@ const Rating = ({
             );
           })}
         </div>
-        {ratingOptions && (
+        {ratingOptions && ratingOptions[value] && (
           <p className={`${ratingOptions[value].color} text-sm font-bold`}>
             {ratingOptions[value].label}
           </p>

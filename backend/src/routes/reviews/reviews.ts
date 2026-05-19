@@ -56,11 +56,11 @@ reviewsRouter.post(
       });
     } catch (e) {
       if (e instanceof mongoose.Error.ValidationError) {
+        await deleteImage(currentFilePath);  
         return res
           .status(400)
           .send({ error: 'Ошибка валидации', details: e.errors });
       }
-      await deleteImage(currentFilePath);
       next(e);
     }
   },

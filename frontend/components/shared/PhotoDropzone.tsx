@@ -134,6 +134,14 @@ const PhotoDropzone: React.FC<Props> = ({
           onDragOver={onDragOver}
           onDragLeave={() => setDragOver(false)}
           onDrop={onDrop}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              inputRef.current?.click();
+            }
+          }}
           className={`flex cursor-pointer flex-col items-center gap-2 rounded-md border-[1.5px] border-dashed border-slate-300 px-4 py-6 text-center transition-colors ${
             dragOver
               ? 'border-ring bg-accent/40'
