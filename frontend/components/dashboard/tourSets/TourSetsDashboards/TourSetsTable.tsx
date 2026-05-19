@@ -78,7 +78,7 @@ export default function TourSetsTable({
     <div className="space-y-4 pt-4 border-t border-gray-200">
       <div className="flex items-center justify-between">
         <h3 className="text-xl font-bold text-[#1E2B6D]">Потоки тура</h3>
-        <Link href={`${baseToursPath}/${tourId}/tour-sets/new`}>
+        <Link href={`${baseToursPath}/${tourId}/groups/new`}>
           <Button
             size="sm"
             className="bg-[#1E2B6D] hover:bg-[#162356] rounded-xl h-9 text-xs font-semibold shadow-sm"
@@ -114,20 +114,20 @@ export default function TourSetsTable({
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto">
+            <div className="w-full">
               <table className="w-full text-sm text-left">
-                <thead className="bg-muted/50 text-muted-foreground border-b text-xs uppercase tracking-wider font-semibold">
+                <thead className="bg-muted/50 text-muted-foreground border-b">
                   <tr>
-                    <th className="p-4">Старт потока</th>
-                    <th className="p-4">Конец потока</th>
-                    <th className="p-4">Отель</th>
-                    <th className="p-4">Стоимость</th>
-                    <th className="p-4 text-center">Статус</th>
-                    <th className="p-4 text-right">Действия</th>
+                    <th className="p-4 font-medium">Старт потока</th>
+                    <th className="p-4 font-medium">Конец потока</th>
+                    <th className="p-4 font-medium">Отель</th>
+                    <th className="p-4 font-medium">Стоимость</th>
+                    <th className="p-4 font-medium text-center">Статус</th>
+                    <th className="p-4 font-medium text-right">Действия</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">
-                  {data.tourSets.map((set: any) => (
+                  {data.tourSets.map((set: TourSetType) => (
                     <tr
                       key={set._id}
                       className="transition-colors hover:bg-[#07224D]/5 border-b border-gray-100"
@@ -176,10 +176,10 @@ export default function TourSetsTable({
                             title="Просмотр"
                             onClick={() => setSelectedSet(set)}
                           >
-                            <Eye className="w-4 h-4 text-gray-500" />
+                            <Eye className="w-4 h-4" />
                           </Button>
                           <Link
-                            href={`${baseToursPath}/${tourId}/tour-sets/edit/${set._id}`}
+                            href={`${baseToursPath}/${tourId}/groups/${set._id}/edit`}
                           >
                             <Button
                               variant="outline"
@@ -324,7 +324,7 @@ export default function TourSetsTable({
               Вы уверены, что хотите удалить этот поток?
             </DialogTitle>
           </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="gap-2">
             <Button
               variant="outline"
               size="sm"

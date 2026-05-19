@@ -19,6 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import TourSetsTable from '@/components/dashboard/tourSets/TourSetsDashboards/TourSetsTable';
 
 export default function TourDetails() {
   const { id } = useParams();
@@ -193,6 +194,11 @@ export default function TourDetails() {
             )}
           </div>
         </div>
+        <TourSetsTable
+          tourId={tour._id}
+          baseToursPath={baseToursPath}
+          userRole={user?.role}
+        />
       </div>
 
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>

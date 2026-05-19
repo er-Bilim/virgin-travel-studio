@@ -124,7 +124,7 @@ export const TourSetForm = ({
       autoComplete="off"
     >
       <h2 className="text-xl font-semibold text-[#1E2B6D]">
-        {isEdit ? 'Редактирование группы' : 'Добавление группы'}
+        {isEdit ? 'Редактирование потока' : 'Добавление потока'}
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -380,13 +380,13 @@ export const TourSetForm = ({
               <label className="flex items-center gap-3 cursor-pointer select-none">
                 <Checkbox
                   id="isHot"
-                  checked={field.value}
+                  checked={!!field.value}
                   onCheckedChange={field.onChange}
                   disabled={isPending}
                   className="data-[state=checked]:bg-[#1E2B6D] data-[state=checked]:border-[#1E2B6D] border-gray-300 rounded"
                 />
                 <span className="text-sm font-medium text-gray-700">
-                  Горящий заезд
+                  Горящий поток
                 </span>
               </label>
             )}
@@ -568,7 +568,7 @@ export const TourSetForm = ({
       {isEdit && (
         <div className="space-y-1">
           <label className="text-sm font-medium text-gray-700">
-            Статус заезда
+            Статус потока
           </label>
           <Controller
             control={control}
@@ -607,9 +607,9 @@ export const TourSetForm = ({
             <Loader2 className="w-5 h-5 animate-spin" /> Сохранение...
           </span>
         ) : isEdit ? (
-          'Сохранить изменения заезда'
+          'Сохранить изменения потока'
         ) : (
-          'Создать заезд'
+          'Создать поток'
         )}
       </button>
     </form>
