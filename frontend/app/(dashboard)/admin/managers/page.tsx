@@ -4,10 +4,9 @@ import { useDeleteManager, useManagers } from '@/lib/hooks/managerHook';
 import { useRouter } from 'next/navigation';
 import { CreateManagerForm } from '@/components/dashboard/managers/CreateManagerForm';
 import { DataTable } from '@/components/dashboard/shared/data-table/data-table';
-
-import { useMemo, useState} from "react";
 import {ConfirmDialog} from "@/components/dashboard/ConfirmDialog/ConfirmDialog";
 import {getManagersColumns} from "@/components/dashboard/shared/data-table/columns/createColumnInTable/manager-colum";
+import { useMemo, useState} from "react";
 
 export default function ManagersPage() {
     const router = useRouter();

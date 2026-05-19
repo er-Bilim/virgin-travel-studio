@@ -103,7 +103,7 @@ const Tours = () => {
             </div>
           )}
 
-          {meta && (
+          {meta && tours.length > 0 && (
             <div className="my-8">
               <PaginationCustom
                 page={page}
