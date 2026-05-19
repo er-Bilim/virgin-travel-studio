@@ -6,6 +6,7 @@ import newsRouter from '@/routes/news/news.js';
 import toursRouter from '@/routes/tours/tours.js';
 import tourSetsRouter from '@/routes/tourSets/tourSets.js';
 import ordersRouter from '@/routes/orders/orders.js';
+import reviewsRouter from './reviews/reviews.js';
 
 const apiRouter = Router();
 
@@ -15,6 +16,7 @@ apiRouter.use('/managers', managersRouter);
 apiRouter.use('/news', newsRouter);
 apiRouter.use('/tours', toursRouter);
 apiRouter.use('/tour-sets', tourSetsRouter);
+apiRouter.use('/reviews', reviewsRouter)
 apiRouter.use('/orders', ordersRouter);
 
 export default apiRouter;

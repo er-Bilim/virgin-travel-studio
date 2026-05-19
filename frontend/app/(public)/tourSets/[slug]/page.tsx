@@ -12,7 +12,9 @@ import {
   Clock,
 } from 'lucide-react';
 import { OrderCard } from '@/components/dashboard/orders/OrderCard';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import CreateReviewForm from '@/components/public/reviews/form/CreateReviewForm';
+import { setTourId } from '@/lib/tour/tourId';
 
 export default function TourSetPage() {
   const params = useParams();
@@ -29,6 +31,12 @@ export default function TourSetPage() {
   const closeModalOrder = () => {
     setIsOrderOpen(false);
   };
+
+  useEffect(() => {
+    if (data?.tourId?._id) {
+      setTourId(data.tourId._id);
+    }
+  }, [data?.tourId?._id]);
 
   if (isLoading)
     return <div className="text-center py-20 text-white">Загрузка...</div>;
@@ -227,6 +235,10 @@ export default function TourSetPage() {
             </p>
           </div>
         </div>
+      </div>
+
+      <div className="mt-20">
+        <CreateReviewForm />
       </div>
     </div>
   );
