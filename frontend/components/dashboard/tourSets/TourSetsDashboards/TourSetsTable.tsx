@@ -78,14 +78,15 @@ export default function TourSetsTable({
     <div className="space-y-4 pt-4 border-t border-gray-200">
       <div className="flex items-center justify-between">
         <h3 className="text-xl font-bold text-[#1E2B6D]">Потоки тура</h3>
-        <Link href={`${baseToursPath}/${tourId}/groups/new`}>
-          <Button
-            size="sm"
-            className="bg-[#1E2B6D] hover:bg-[#162356] rounded-xl h-9 text-xs font-semibold shadow-sm"
-          >
+        <Button
+          asChild
+          size="sm"
+          className="bg-[`#1E2B6D`] hover:bg-[`#162356`] rounded-xl h-9 text-xs font-semibold shadow-sm"
+        >
+          <Link href={`${baseToursPath}/${tourId}/groups/new`}>
             <Plus className="w-4 h-4 mr-1.5" /> Добавить поток
-          </Button>
-        </Link>
+          </Link>
+        </Button>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
@@ -178,17 +179,18 @@ export default function TourSetsTable({
                           >
                             <Eye className="w-4 h-4" />
                           </Button>
-                          <Link
-                            href={`${baseToursPath}/${tourId}/groups/${set._id}/edit`}
+                          <Button
+                            asChild
+                            variant="outline"
+                            size="sm"
+                            className="h-8 px-2.5 text-xs"
                           >
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-8 px-2.5 text-xs"
+                            <Link
+                              href={`${baseToursPath}/${tourId}/groups/${set._id}/edit`}
                             >
                               <Edit className="w-3.5 h-3.5 mr-1" /> Правка
-                            </Button>
-                          </Link>
+                            </Link>
+                          </Button>
                           {(userRole === 'ADMIN' || userRole === 'MANAGER') && (
                             <Button
                               variant="destructive"

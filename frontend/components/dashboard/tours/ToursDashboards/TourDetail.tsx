@@ -147,7 +147,8 @@ export default function TourDetails() {
                 Базовые преимущества тура
               </h3>
               <div className="flex flex-wrap gap-2">
-                {tour.baseAdvantages.length > 0 ? (
+                {Array.isArray(tour.baseAdvantages) &&
+                tour.baseAdvantages.length > 0 ? (
                   tour.baseAdvantages.map((adv, idx) => (
                     <span
                       key={idx}

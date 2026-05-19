@@ -20,8 +20,11 @@ export const getTourSetById = async (tourSetId: string) => {
 export const createTourSet = async (
   mutationData: TourSetMutation,
 ): Promise<TourSetType> => {
-  const { data } = await axiosApi.post<TourSetType>('/tour-sets', mutationData);
-  return data;
+  const { data } = await axiosApi.post<{
+    message: string;
+    tourSet: TourSetType;
+  }>('/tour-sets', mutationData);
+  return data.tourSet;
 };
 
 export const updateTourSet = async (

@@ -3,7 +3,8 @@
 import { useForm, Controller } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { Loader2, CalendarIcon } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, formatDate } from 'date-fns';
+import { usePathname } from 'next/navigation';
 import { ru } from 'date-fns/locale';
 
 import { Input } from '@/components/ui/input';
@@ -43,6 +44,8 @@ export const TourSetForm = ({
   parentTourId,
 }: Props) => {
   const router = useRouter();
+  const pathname = usePathname();
+  const dashboardBase = pathname.startsWith('/admin') ? '/admin' : '/manager';
 
   const { mutate: createTourSet, isPending: isCreating } = useCreateTourSet();
   const { mutate: updateTourSet, isPending: isUpdating } = useUpdateTourSet();
@@ -83,8 +86,12 @@ export const TourSetForm = ({
     const formattedData = {
       ...data,
       tourId: parentTourId,
-      startDate: data.startDate ? new Date(data.startDate).toISOString() : '',
-      endDate: data.endDate ? new Date(data.endDate).toISOString() : '',
+      startDate: data.startDate
+        ? formatDate(new Date(data.startDate), 'yyyy-MM-dd')
+        : '',
+      endDate: data.endDate
+        ? formatDate(new Date(data.endDate), 'yyyy-MM-dd')
+        : '',
       price: Number(data.price),
       discountPrice: data.discountPrice
         ? Number(data.discountPrice)
@@ -100,7 +107,7 @@ export const TourSetForm = ({
       createTourSet(formattedData, {
         onSuccess: () => {
           reset();
-          router.push(`/manager/tours/${parentTourId}`);
+          router.push(`${dashboardBase}/tours/${parentTourId}`);
         },
       });
     } else {
@@ -110,7 +117,7 @@ export const TourSetForm = ({
         { id: tourSetId, data: formattedData },
         {
           onSuccess: () => {
-            router.push(`/manager/tours/${parentTourId}`);
+            router.push(`${dashboardBase}/tours/${parentTourId}`);
           },
         },
       );
@@ -313,6 +320,9 @@ export const TourSetForm = ({
               validate: (value) => {
                 if (!value) return true;
                 const basePrice = Number(watch('price'));
+                if (Number(value) < 0) {
+                  return 'Скидочная цена не может быть отрицательной';
+                }
                 return (
                   Number(value) < basePrice ||
                   'Скидочная цена должна быть меньше основной'
