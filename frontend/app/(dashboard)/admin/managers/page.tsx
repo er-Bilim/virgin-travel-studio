@@ -7,7 +7,7 @@ import { DataTable } from '@/components/dashboard/shared/data-table/data-table';
 import { getManagersColumns } from '@/components/dashboard/shared/data-table/columns/manager-colum';
 
 export default function ManagersPage() {
-    const router = useRouter();
+  const router = useRouter();
   const { data = [], isLoading } = useManagers();
   const { mutate: deleteManager } = useDeleteManager();
 

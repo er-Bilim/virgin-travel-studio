@@ -8,7 +8,7 @@ import {
   getTourById,
 } from '@/services/tours';
 import { toast } from 'sonner';
-import { TourMutation } from '@/types/tour';
+import type { TourMutation } from '@/types/tour';
 
 export const useTours = (page: number, limit: number, categoryId?: string) => {
   return useQuery({
