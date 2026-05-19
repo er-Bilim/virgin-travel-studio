@@ -2,7 +2,7 @@
 
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -50,7 +50,7 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'baseAdvantages' as never,
+    name: 'baseAdvantages' as const as never,
   });
 
   const onSubmit = (data: TourMutation) => {
@@ -62,9 +62,7 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
         },
       });
     } else {
-      if (!tourId) {
-        return;
-      }
+      if (!tourId) return;
 
       updateTour(
         { id: tourId, data },
@@ -74,7 +72,6 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
           },
         },
       );
-      return;
     }
   };
 
@@ -94,11 +91,13 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
         </label>
         <Input
           {...register('title', { required: 'Введите название' })}
-          className={inputClass}
+          className={`${inputClass} ${errors.title ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
           disabled={isPending}
         />
         {errors.title && (
-          <p className="text-sm text-red-500">{errors.title.message}</p>
+          <p className="text-xs font-semibold text-red-500 pt-0.5">
+            {errors.title.message}
+          </p>
         )}
       </div>
 
@@ -114,10 +113,19 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
               value={field.value}
               disabled={isPending}
             >
-              <SelectTrigger className={inputClass}>
+              <SelectTrigger
+                className={`${inputClass} ${errors.category ? 'border-red-500 focus:ring-red-500' : ''}`}
+              >
                 <SelectValue
                   placeholder={
-                    isCatsLoading ? 'Загрузка...' : 'Выберите категорию'
+                    isCatsLoading ? (
+                      <span className="flex items-center gap-2 text-gray-400">
+                        <Loader2 className="w-4 h-4 animate-spin text-[#1E2B6D]" />{' '}
+                        Загрузка категорий...
+                      </span>
+                    ) : (
+                      'Выберите категорию'
+                    )
                   }
                 />
               </SelectTrigger>
@@ -131,15 +139,25 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
             </Select>
           )}
         />
+        {errors.category && (
+          <p className="text-xs font-semibold text-red-500 pt-0.5">
+            {errors.category.message}
+          </p>
+        )}
       </div>
 
       <div className="space-y-1">
         <label className="text-sm font-medium text-gray-700">Описание</label>
         <Textarea
           {...register('description', { required: 'Введите описание' })}
-          className={`${inputClass} min-h-[100px] resize-none`}
+          className={`${inputClass} min-h-[100px] resize-none ${errors.description ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
           disabled={isPending}
         />
+        {errors.description && (
+          <p className="text-xs font-semibold text-red-500 pt-0.5">
+            {errors.description.message}
+          </p>
+        )}
       </div>
 
       <div className="space-y-3">
@@ -148,29 +166,38 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
         </label>
         <div className="space-y-2">
           {fields.map((field, index) => (
-            <div key={field.id} className="flex items-center gap-2">
-              <Input
-                {...register(`baseAdvantages.${index}` as const, {
-                  required: 'Поле не может быть пустым',
-                })}
-                className={inputClass}
-                disabled={isPending}
-              />
-              <button
-                aria-label='Удалить'
-                type="button"
-                onClick={() => remove(index)}
-                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-input bg-background"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
+            <div key={field.id} className="space-y-1">
+              <div className="flex items-center gap-2">
+                <Input
+                  {...register(`baseAdvantages.${index}` as const, {
+                    required: 'Поле не может быть пустым',
+                  })}
+                  className={`${inputClass} ${errors.baseAdvantages?.[index] ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+                  disabled={isPending}
+                />
+                {fields.length > 1 && (
+                  <button
+                    aria-label="Удалить"
+                    type="button"
+                    onClick={() => remove(index)}
+                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-gray-200 text-red-500 hover:bg-red-50 transition-colors"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+              {errors.baseAdvantages?.[index] && (
+                <p className="text-xs font-semibold text-red-500 pt-0.5">
+                  {errors.baseAdvantages[index]?.message}
+                </p>
+              )}
             </div>
           ))}
         </div>
         <button
           type="button"
           onClick={() => append('')}
-          className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-transparent hover:bg-accent h-9 px-4 py-2 w-full mt-2"
+          className="inline-flex items-center justify-center rounded-xl text-sm font-semibold border border-gray-200 text-[#1E2B6D] bg-transparent hover:bg-gray-50 h-10 px-4 w-full mt-2 transition-colors"
         >
           <Plus className="mr-2 h-4 w-4" /> Добавить преимущество
         </button>
@@ -197,13 +224,17 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
       <button
         type="submit"
         disabled={isPending}
-        className="w-full rounded-2xl bg-[#1E2B6D] px-4 py-3 font-semibold text-white transition hover:bg-[#162356] disabled:opacity-50"
+        className="w-full flex items-center justify-center rounded-2xl bg-[#1E2B6D] px-4 py-3 font-semibold text-white transition hover:bg-[#162356] disabled:opacity-50 h-12"
       >
-        {isPending
-          ? 'Загрузка...'
-          : isEdit
-            ? 'Сохранить изменения'
-            : 'Создать тур'}
+        {isPending ? (
+          <span className="flex items-center gap-2">
+            <Loader2 className="w-5 h-5 animate-spin" /> Сохранение...
+          </span>
+        ) : isEdit ? (
+          'Сохранить изменения'
+        ) : (
+          'Создать тур'
+        )}
       </button>
     </form>
   );
