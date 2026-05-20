@@ -18,7 +18,7 @@ export const getTourRosterReport = async (req: Request, res: Response, next: Nex
             .writeHead(200, {
                 'Content-Type':
                     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'Content-Disposition': 'attachment; filename="daily.xlsx"',
+                'Content-Disposition': 'attachment; filename="tour-roster.xlsx"',
             })
             .end(file);
     } catch (e) {

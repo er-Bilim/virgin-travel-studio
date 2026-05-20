@@ -13,7 +13,6 @@ export const getTourRosterData = async (tourSetId: string) => {
         .populate('managerId')
         .lean() as unknown as PopulatedOrder[];
 
-    console.log(orders[0]);
     const formatDate = (date: Date) => {
         const d = new Date(date);
 
@@ -29,12 +28,14 @@ export const getTourRosterData = async (tourSetId: string) => {
         clientPhone: order.clientPhone,
         status: order.status,
 
-        tour: order.tourSetId?.tourId.title,
-        dates: `${formatDate(order.tourSetId.startDate)} - ${formatDate(order.tourSetId.endDate)}`,
-        hotel: order.tourSetId?.hotelName,
+        tour: order.tourSetId?.tourId?.title ?? '',
+        dates: order.tourSetId?.startDate && order.tourSetId?.endDate
+            ? `${formatDate(order.tourSetId.startDate)} - ${formatDate(order.tourSetId.endDate)}`
+            : '',
+        hotel: order.tourSetId?.hotelName ?? '',
 
-        manager: order.managerId?.fullName,
-        sum: order.tourSetId?.price,
+        manager: order.managerId?.fullName ?? '',
+        sum: order.tourSetId?.price ?? 0,
     }));
 };
 

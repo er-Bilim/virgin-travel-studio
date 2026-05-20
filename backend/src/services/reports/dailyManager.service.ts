@@ -18,7 +18,9 @@ export const getDailyManagerReportData = async ({
         }
 
         if (to) {
-            (match.createdAt as Record<string, Date>).$lte = new Date(to);
+            const toDate = new Date(to);
+            toDate.setHours(23, 59, 59, 999);
+            (match.createdAt as Record<string, Date>).$lte = toDate;
         }
     }
 
