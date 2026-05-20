@@ -1,17 +1,33 @@
 import {
     FolderOpen,
     LayoutDashboard,
+    type LucideIcon,
     Newspaper,
     Plane,
     Tags,
-    Users,
-    type LucideIcon,
+    Users
 } from 'lucide-react';
 
-import type { UserRole } from '@/types/user';
+import type {UserRole} from '@/types/user';
 
 export const apiURL = process.env.NEXT_API_URL || 'http://localhost:8000/api';
 export const imageUrl = process.env.NEXT_IMAGE_URL || 'http://localhost:8000/';
+
+export enum OrderStatus {
+    NEW = 'NEW',
+    IN_PROGRESS = 'IN_PROGRESS',
+    CONTRACT_PENDING = 'CONTRACT_PENDING',
+    COMPLETED = 'COMPLETED',
+    REJECTED = 'REJECTED'
+}
+
+export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
+  [OrderStatus.NEW]: 'Новый',
+  [OrderStatus.IN_PROGRESS]: 'В работе',
+  [OrderStatus.CONTRACT_PENDING]: 'Ожидает договора',
+  [OrderStatus.COMPLETED]: 'Завершён',
+  [OrderStatus.REJECTED]: 'Отклонён',
+};
 
 export type DashboardMenuItem = {
     label: string;
