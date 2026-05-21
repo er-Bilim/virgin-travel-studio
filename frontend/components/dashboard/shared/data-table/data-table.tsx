@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/table';
 import {Button} from "@/components/ui/button";
 import {ChevronLeft, ChevronRight, Loader} from "lucide-react";
+import {cn} from "@/lib/utils";
 
 type DataTableProps<TData, TValue> = {
   columns: ColumnDef<TData, TValue>[];
@@ -31,14 +32,22 @@ type DataTableProps<TData, TValue> = {
     total: number;
     onPageChange: (page: number) => void;
   };
+
+    className?: string;
+
+    headerRowClassName?: string;
+    rowClassName?: string | ((row: TData) => string);
 };
 
 export function DataTable<TData, TValue>({
-                                           columns,
-                                           data,
-                                           isLoading,
-                                           isError,
-                                           pagination,
+                                             columns,
+                                             data,
+                                             isLoading,
+                                             isError,
+                                             pagination,
+                                             className,
+                                             headerRowClassName,
+                                             rowClassName,
 }: DataTableProps<TData, TValue>) {
   const page = pagination?.page ?? 1;
   const pageSize = pagination?.pageSize ?? 10;
@@ -72,8 +81,8 @@ export function DataTable<TData, TValue>({
 
   if (isError) {
     return (
-        <div className="rounded-2xl border bg-white">
-            <Table className="w-full table-fixed">
+        <div className="rounded-2xl border bg-white overflow-hidden">
+            <Table className={cn("w-full table-fixed", className)}>
                 <TableBody>
                     <TableRow>
                         <TableCell colSpan={columns.length}>
@@ -87,11 +96,14 @@ export function DataTable<TData, TValue>({
   }
 
   return (
-    <div className="rounded-2xl border bg-white">
-      <Table className="w-full table-fixed">
+    <div className="rounded-2xl border bg-white overflow-hidden">
+      <Table className={cn("w-full table-fixed", className)}>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
+            <TableRow
+                key={headerGroup.id}
+                className={headerRowClassName}
+            >
               {headerGroup.headers.map((header) => (
                 <TableHead key={header.id}>
                   {header.isPlaceholder
@@ -107,17 +119,30 @@ export function DataTable<TData, TValue>({
         </TableHeader>
 
         <TableBody>
-          {table.getRowModel().rows.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : (
+            {table.getRowModel().rows.length ? (
+                table.getRowModel().rows.map((row) => {
+                    const rowClass =
+                        typeof rowClassName === 'function'
+                            ? rowClassName(row.original)
+                            : rowClassName;
+
+                    return (
+                        <TableRow
+                            key={row.id}
+                            className={rowClass}
+                        >
+                            {row.getVisibleCells().map((cell) => (
+                                <TableCell key={cell.id}>
+                                    {flexRender(
+                                        cell.column.columnDef.cell,
+                                        cell.getContext()
+                                    )}
+                                </TableCell>
+                            ))}
+                        </TableRow>
+                    );
+                })
+            ) : (
             <TableRow>
               <TableCell colSpan={columns.length}>Нет данных</TableCell>
             </TableRow>

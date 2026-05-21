@@ -3,4 +3,5 @@ export type TableAction<T> = {
     label: string | ((row: T) => string);
     onClick: (row: T) => void;
     className?: string;
+    hidden?: boolean | ((data: T) => boolean);
 };

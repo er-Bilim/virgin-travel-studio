@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import {useMemo, useState} from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { Plus, Trash2, Loader2, Globe, GlobeLock } from 'lucide-react';
+import { Plus, Loader2 } from 'lucide-react';
 import {
   useCategories,
   useCreateCategory,
@@ -12,14 +12,10 @@ import {
 } from '@/lib/hooks/categoryHooks';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { inputClass } from '@/lib/constants';
+import {headerRowClassName, inputClass, rowClassName, tableClassName} from '@/lib/constants';
+import {getCategoryColumns} from "@/components/dashboard/shared/data-table/columns/createColumnInTable/category-column";
+import {DataTable} from "@/components/dashboard/shared/data-table/data-table";
+import {ConfirmDialog} from "@/components/dashboard/ConfirmDialog/ConfirmDialog";
 
 interface CategoryFormInput {
   title: string;
@@ -28,9 +24,9 @@ interface CategoryFormInput {
 export default function CategoriesManagePage() {
   const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
 
-  const { data: categories, isLoading, isError, refetch } = useCategories();
+  const { data: categories, isLoading, isError } = useCategories();
   const { mutate: createCategory, isPending: isCreating } = useCreateCategory();
-  const { mutate: togglePublish, isPending: isPublishing } =
+  const { mutate: togglePublish} =
     useToggleCategoryPublish();
   const { mutate: deleteCategory, isPending: isDeleting } = useDeleteCategory();
 
@@ -44,6 +40,16 @@ export default function CategoriesManagePage() {
       title: '',
     },
   });
+
+  const columns = useMemo(
+      () =>
+          getCategoryColumns({
+            onDelete: (category) => setCategoryToDelete(category._id),
+
+            onTogglePublish: (category) => togglePublish(category._id),
+          }),
+      [togglePublish],
+  );
 
   const onCreateSubmit = (data: CategoryFormInput) => {
     createCategory(
@@ -126,139 +132,25 @@ export default function CategoriesManagePage() {
         </Button>
       </form>
 
-      <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
-        {isLoading ? (
-          <div className="p-12 flex items-center justify-center">
-            <Loader2 className="w-8 h-8 animate-spin text-[#1E2B6D]" />
-          </div>
-        ) : isError ? (
-          <div className="p-12 text-center space-y-4">
-            <p className="text-[#1E2B6D] font-bold">
-              Не удалось загрузить список категорий
-            </p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => refetch()}
-              className="mt-2 border-gray-200 text-[#1E2B6D]"
-            >
-              Повторить попытку
-            </Button>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="bg-muted/50 text-muted-foreground border-b">
-                <tr>
-                  <th className="p-4 font-medium">Название категории</th>
-                  <th className="p-4 font-medium text-center">
-                    Статус публикации
-                  </th>
-                  <th className="p-4 font-medium text-right">Действия</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {categories && categories.length > 0 ? (
-                  categories.map((category) => (
-                    <tr
-                      key={category._id}
-                      className="transition-colors hover:bg-[#07224D]/5 border-b border-gray-100"
-                    >
-                      <td className="p-4 font-medium text-gray-900">
-                        <div className="flex flex-col">
-                          <span>{category.title}</span>
-                          {!category.isPublished && (
-                            <span className="text-[10px] text-[#C8D2DC] font-bold uppercase tracking-wider">
-                              Скрыта
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="p-4 text-center">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          disabled={isPublishing}
-                          onClick={() => togglePublish(category._id)}
-                          className={`w-[185px] transition-all duration-200 h-9 rounded-xl font-semibold ${
-                            category.isPublished
-                              ? 'bg-white border-2 border-gray-200 text-gray-500 hover:bg-gray-100 hover:text-gray-700'
-                              : 'bg-[#1E2B6D] text-white hover:bg-[#162356] hover:text-white shadow-md'
-                          }`}
-                        >
-                          {category.isPublished ? (
-                            <GlobeLock className="w-4 h-4 mr-2" />
-                          ) : (
-                            <Globe className="w-4 h-4 mr-2" />
-                          )}
-                          {category.isPublished
-                            ? 'Снять с публикации'
-                            : 'Опубликовать'}
-                        </Button>
-                      </td>
-                      <td className="p-4 text-right">
-                        <div className="flex items-center justify-end">
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => setCategoryToDelete(category._id)}
-                            className="rounded-xl"
-                            aria-label="Удалить категорию"
-                            title="Удалить категорию"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={3} className="p-8 text-center text-gray-400">
-                      Список категорий пуст. Создайте первую категорию выше.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+      <DataTable
+          data={categories || []}
+          columns={columns}
+          isLoading={isLoading}
+          isError={isError}
+          headerRowClassName={headerRowClassName}
+          rowClassName={rowClassName}
+          className={tableClassName}
+      />
 
-      <Dialog
-        open={!!categoryToDelete}
-        onOpenChange={() => setCategoryToDelete(null)}
-      >
-        <DialogContent>
-          <DialogHeader className="pr-8">
-            <DialogTitle>
-              Вы уверены, что хотите удалить эту категорию?
-            </DialogTitle>
-          </DialogHeader>
-          <p className="text-sm text-gray-500">
-            Удаление невозможно, если к категории привязан хотя бы один
-            существующий тур.
-          </p>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setCategoryToDelete(null)}>
-              Отмена
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={confirmDelete}
-              disabled={isDeleting}
-            >
-              {isDeleting ? (
-                <span className="flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin" /> Удаление...
-                </span>
-              ) : (
-                'Удалить'
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ConfirmDialog
+          open={!!categoryToDelete}
+          title="Вы уверенны что хотите удалить категорию тура?"
+          description="Категорию тура нельзя удалить пока есть тур с такой категорией. Сначала удалите тур!"
+          loading={isDeleting}
+          confirmText="Удалить"
+          onCancel={() => setCategoryToDelete(null)}
+          onConfirm={confirmDelete}
+      />
     </div>
   );
 }
