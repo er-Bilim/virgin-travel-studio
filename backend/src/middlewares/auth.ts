@@ -1,6 +1,6 @@
-import { NextFunction, Request, Response, RequestHandler } from 'express';
-import { UserFields } from '@/types/users.types.js';
-import { HydratedDocument } from 'mongoose';
+import type { NextFunction, Request, Response, RequestHandler } from 'express';
+import type { UserFields } from '@/types/users.types.js';
+import type { HydratedDocument } from 'mongoose';
 import User from '@/model/user/User.js';
 import jwt from 'jsonwebtoken';
 import config from '@/config.js';

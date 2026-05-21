@@ -1,5 +1,5 @@
 import express from 'express';
-import auth, { authOrNot, RequestWithUser } from '@/middlewares/auth.js';
+import auth, { authOrNot, type RequestWithUser } from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
 import { imagesUpload } from '@/middlewares/multer.js';
 import Tour from '@/model/tour/Tour.js';
