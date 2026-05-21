@@ -46,17 +46,20 @@ export default function CategoriesManagePage() {
   });
 
   const onCreateSubmit = (data: CategoryFormInput) => {
-    createCategory(data, {
-      onSuccess: () => {
-        reset();
-        toast.success('Категория успешно создана');
+    createCategory(
+      { title: data.title.trim() },
+      {
+        onSuccess: () => {
+          reset();
+          toast.success('Категория успешно создана');
+        },
+        onError: (error: any) => {
+          const serverError =
+            error.response?.data?.error || 'Не удалось создать категорию';
+          toast.error(serverError);
+        },
       },
-      onError: (error: any) => {
-        const serverError =
-          error.response?.data?.error || 'Не удалось создать категорию';
-        toast.error(serverError);
-      },
-    });
+    );
   };
 
   const confirmDelete = () => {
@@ -94,7 +97,11 @@ export default function CategoriesManagePage() {
       >
         <div className="w-full md:max-w-md space-y-1">
           <Input
-            {...register('title', { required: 'Введите название категории' })}
+            {...register('title', {
+              required: 'Введите название категории',
+              validate: (value) =>
+                value.trim().length > 0 || 'Введите название категории',
+            })}
             placeholder="Например: Экскурсионные туры"
             className={`${inputClass} ${errors.title ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
             disabled={isCreating}
@@ -196,6 +203,7 @@ export default function CategoriesManagePage() {
                             size="sm"
                             onClick={() => setCategoryToDelete(category._id)}
                             className="rounded-xl"
+                            aria-label="Удалить категорию"
                             title="Удалить категорию"
                           >
                             <Trash2 className="w-4 h-4" />
