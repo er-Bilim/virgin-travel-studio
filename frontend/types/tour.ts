@@ -1,14 +1,15 @@
 // tour.types.ts
-import type { MetaType } from "./meta";
+import type { MetaType } from './meta';
 
 export interface TourCategoryType {
   _id: string;
   title: string;
+  isPublished: boolean;
 }
 
 export interface ToursGetResponse {
   tours: TourType[];
-  meta: MetaType
+  meta: MetaType;
 }
 
 export interface TourType {
