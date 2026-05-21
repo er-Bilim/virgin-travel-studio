@@ -77,26 +77,39 @@ categoriesRouter.delete(
   async (req, res, next) => {
     const { id } = req.params;
 
+    const session = await mongoose.startSession();
+
     try {
-      const tourWithCategory = await Tour.findOne({
-        category: new mongoose.Types.ObjectId(id as string),
+      let notFound = false;
+      let linked = false;
+
+      await session.withTransaction(async () => {
+        linked = !!(await Tour.exists({
+          category: new mongoose.Types.ObjectId(id as string),
+        }).session(session));
+        if (linked) return;
+
+        const { deletedCount } = await Category.deleteOne({ _id: id }).session(
+          session,
+        );
+        notFound = !deletedCount;
       });
 
-      if (tourWithCategory) {
+      if (linked) {
         return res.status(400).send({
           error:
             'Нельзя удалить категорию, так как к ней привязаны туры. Сначала удалите или перенесите эти туры',
         });
       }
-
-      const { deletedCount } = await Category.deleteOne({ _id: id });
-      if (!deletedCount) {
+      if (notFound) {
         return res.status(404).send({ error: 'Категория не найдена' });
       }
       return res.send({ message: 'Категория успешно удалена' });
     } catch (e) {
       console.log(e);
       next(e);
+    } finally {
+      await session.endSession();
     }
   },
 );
