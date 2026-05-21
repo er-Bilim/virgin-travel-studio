@@ -1,12 +1,13 @@
 import mongoose from 'mongoose';
 import express from 'express';
-import { ReviewFields } from '@/types/reviews.types.js';
+import type { ReviewFields } from '@/types/reviews.types.js';
 import Review from '@/model/review/Review.js';
 import { imagesUpload } from '@/middlewares/multer.js';
 import auth from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
 import deleteImage from '@/utils/deleteImage.js';
 import validateObjectId from '@/middlewares/validateObjectId.js';
+import Tour from '@/model/tour/Tour.js';
 
 const reviewsRouter = express.Router();
 
@@ -48,6 +49,11 @@ reviewsRouter.post(
       };
 
       const review = new Review(reviewData);
+      console.log(
+        await Tour.findByIdAndUpdate(tourId, {
+          $push: { reviews: review._id },
+        }),
+      );
       await review.save();
 
       res.send({
@@ -56,7 +62,7 @@ reviewsRouter.post(
       });
     } catch (e) {
       if (e instanceof mongoose.Error.ValidationError) {
-        await deleteImage(currentFilePath);  
+        await deleteImage(currentFilePath);
         return res
           .status(400)
           .send({ error: 'Ошибка валидации', details: e.errors });

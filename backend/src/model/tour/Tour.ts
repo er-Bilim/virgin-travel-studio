@@ -26,6 +26,20 @@ const TourSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    reviews: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Review',
+      },
+    ],
+    rating: {
+      type: Number,
+      default: 0
+    },
+    ratingCount: {
+      type: Number,
+      default: 0
+    }
   },
   {
     timestamps: true,
