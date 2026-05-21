@@ -5,21 +5,32 @@ import {Button} from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog";
-import {Edit, Trash2} from "lucide-react";
-import {useState} from "react";
-import {imageUrl} from "@/lib/constants";
+import {useMemo, useState} from "react";
+import {getNewsColumns} from "@/components/dashboard/shared/data-table/columns/createColumnInTable/new-column";
+import type {NewsFields} from "@/types/news";
+import {DataTable} from "@/components/dashboard/shared/data-table/data-table";
+import {ConfirmDialog} from "@/components/dashboard/ConfirmDialog/ConfirmDialog";
+import {headerRowClassName, rowClassName, tableClassName} from "@/lib/constants";
 
 export default function NewsList() {
-  const {data: news, isLoading} = useNews();
+  const {data: news, isLoading, isError} = useNews();
   const {mutate: deleteNews, isPending: isDeleting} = useDeleteNews();
-  const {mutate: togglePublicate, isPending: isPublishing} = usePublicateNews();
+  const {mutate: togglePublicate} = usePublicateNews();
 
   const [newsToDelete, setNewsToDelete] = useState<string | null>(null);
+  const [editingNewsId, setEditingNewsId] = useState<string | null>(null);
+  const [, setView] = useState<NewsFields | null>(null);
+
+  const columns = useMemo(() => getNewsColumns({
+    onView: (news: NewsFields) => setView(news),
+    onDelete: (news: NewsFields) => setNewsToDelete(news._id),
+    onEdit: (news: NewsFields) => setEditingNewsId(news._id),
+    onTogglePublish: (news: NewsFields) => togglePublicate(news._id),
+  }), [togglePublicate]);
 
   const confirmDelete = () => {
     if (newsToDelete) {
@@ -28,6 +39,10 @@ export default function NewsList() {
       });
     }
   };
+
+  const editingNews = news?.find(
+      (item) => item._id === editingNewsId
+  );
 
 
   return (
@@ -44,163 +59,51 @@ export default function NewsList() {
         </Dialog>
       </div>
 
-      <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
-        {isLoading ? (
-          <div className="p-8 text-center text-gray-500">Загрузка...</div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="bg-muted/50 text-muted-foreground border-b">
-                <tr>
-                  <th className="p-4 font-medium">Картинка</th>
-                  <th className="p-4 font-medium">Название</th>
-                  <th className="p-4 font-medium">Автор</th>
-                  <th className="p-4 font-medium">Дата</th>
-                  <th className="p-4 font-medium text-center">Опубликовано ли</th>
-                  <th className="p-4 font-medium text-right">Действия</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {news?.map((newEl) => (
-                  <tr
-                    key={newEl._id}
-                    className="hover:bg-muted/30 transition-colors"
-                  >
-                    <td className="p-4">
-                      {newEl.image
-                        ? <Dialog>
-                          <DialogTrigger asChild>
-                            <button
-                              type="button"
-                              className="text-blue-600 hover:underline cursor-pointer"
-                            >
-                              Посмотреть на картинку
-                            </button>
-                          </DialogTrigger>
-                          <DialogContent className="flex justify-center items-center">
-                            <DialogHeader>
-                              <DialogTitle className="sr-only">Просмотр изображения</DialogTitle>
-                            </DialogHeader>
-                            <img
-                              src={imageUrl + newEl.image}
-                              alt={newEl.title}
-                              className="w-48 h-48 rounded object-cover border"
-                            />
-                          </DialogContent>
-                        </Dialog>
-                        :
-                        <div className="w-12 h-12 rounded bg-gray-200 flex items-center justify-center text-xs text-gray-400">Нет картинки</div>
-                      }
-                    </td>
-                    <td
-                      className="p-4 font-medium text-gray-900 max-w-[200px] truncate"
-                      title={newEl.title}
-                    >
-                      {newEl.title}
-                    </td>
-                    <td className="p-4 text-gray-500">{newEl.author?.fullName}</td>
-                    <td className="p-4 text-gray-500">
-                      {new Date(newEl.updatedAt).toLocaleDateString()}
-                    </td>
-                    <td
-                      className="p-4 text-center"
-                    >
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        disabled={isPublishing}
-                        onClick={() => togglePublicate(newEl._id)}
-                        className={`w-[155px]  ${newEl.isPublished ? "text-orange-600 hover:bg-orange-50" : "text-blue-600 hover:bg-blue-50"}`}
-                      >
-                        {newEl.isPublished ? "Снять с публикации" : "Опубликовать"}
-                      </Button>
-                    </td>
-                    <td className="p-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
+      <DataTable
+          data={news || []}
+          columns={columns}
+          isError={isError}
+          isLoading={isLoading}
+          headerRowClassName={headerRowClassName}
+          rowClassName={rowClassName}
+          className={tableClassName}
+      />
 
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                            >
-                              <Edit className="w-4 h-4 mr-2" />
-                              Редактировать
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="sm:max-w-2xl">
-                            <DialogHeader>
-                              <DialogTitle>Редактировать новости</DialogTitle>
+      <ConfirmDialog
+          open={!!newsToDelete}
+          title="Вы уверенны что хотите удалить новость?"
+          description="Это действие нельзя отменить"
+          loading={isDeleting}
+          confirmText="Удалить"
+          onCancel={() => setNewsToDelete(null)}
+          onConfirm={confirmDelete}
+      />
 
-                            </DialogHeader>
-                            <CreateNewsForm
-                              isEdit={true}
-                              initialValues={{
-                                title: newEl.title,
-                                content: newEl.content,
-                                tags: newEl.tags,
-                                image: null
-                              }}
-                              editImage={newEl.image}
-                              editedId={newEl._id}
-                            />
-                          </DialogContent>
-                        </Dialog>
+      <Dialog
+          open={!!editingNewsId}
+          onOpenChange={() => setEditingNewsId(null)}
+      >
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Редактировать новости</DialogTitle>
+          </DialogHeader>
 
-                        <Dialog
-                          open={newsToDelete === newEl._id}
-                          onOpenChange={(isOpen) => !isOpen && setNewsToDelete(null)}
-                        >
-                          <DialogTrigger asChild>
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => setNewsToDelete(newEl._id)}
-                            >
-                              <Trash2 className="w-4 h-4 mr-2" />
-                              Delete
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Вы абсолютно уверены что хотите удалить?</DialogTitle>
-                            </DialogHeader>
-                            <DialogFooter>
-                              <Button
-                                variant="outline"
-                                onClick={() => setNewsToDelete(null)}
-                              >
-                                Отмена
-                              </Button>
-                              <Button
-                                variant="destructive"
-                                onClick={confirmDelete}
-                                disabled={isDeleting}
-                              >
-                                {isDeleting ? "Удаление..." : "Да, удалить"}
-                              </Button>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-                {news?.length === 0 && (
-                  <tr>
-                    <td
-                      colSpan={6}
-                      className="p-8 text-center text-gray-500"
-                    >
-                      Новости не были найдены. Добавьте их.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+          {editingNews && (
+              <CreateNewsForm
+                  key={editingNews._id}
+                  isEdit={true}
+                  initialValues={{
+                    title: editingNews.title,
+                    content: editingNews.content,
+                    tags: editingNews.tags,
+                    image: null
+                  }}
+                  editImage={editingNews.image}
+                  editedId={editingNews._id}
+              />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
