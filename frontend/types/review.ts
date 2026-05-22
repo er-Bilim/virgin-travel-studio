@@ -6,6 +6,8 @@ export interface IReviewMutation {
 }
 
 export interface IReview {
+  _id: string;
+  clientName: string;
   rating: number;
   comment: string;
   image: string | null;

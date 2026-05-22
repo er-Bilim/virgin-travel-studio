@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { type HydratedDocument } from 'mongoose';
 
 export interface ReviewFields {
   clientName: string;
@@ -11,4 +11,4 @@ export interface ReviewFields {
   updatedAt: Date;
 }
 
-export interface ReviewDocument extends ReviewFields, mongoose.Document {}
+export type ReviewDocument = HydratedDocument<ReviewFields>;

@@ -1,9 +1,9 @@
 import express from 'express';
-import mongoose, { UpdateQuery } from 'mongoose';
-import auth, { authOrNot, RequestWithUser } from '@/middlewares/auth.js';
+import mongoose, { type UpdateQuery } from 'mongoose';
+import auth, { authOrNot, type RequestWithUser } from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
 import TourSet from '@/model/tourSet/TourSet.js';
-import { TourSetFields, TourSetStatus } from '@/types/tourSets.types.js';
+import type { TourSetFields, TourSetStatus } from '@/types/tourSets.types.js';
 import validateObjectId from '@/middlewares/validateObjectId.js';
 
 const tourSetsRouter = express.Router();
@@ -83,7 +83,7 @@ tourSetsRouter.get(
     try {
       const tourSet = await TourSet.findById(id).populate({
         path: 'tourId',
-        select: 'title description images category baseAdvantages',
+        select: 'title description images category baseAdvantages reviews rating ratingCount',
         populate: {
           path: 'category',
           select: 'title',

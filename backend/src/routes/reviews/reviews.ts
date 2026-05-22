@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import express from 'express';
-import { ReviewFields } from '@/types/reviews.types.js';
+import type { ReviewFields } from '@/types/reviews.types.js';
 import Review from '@/model/review/Review.js';
 import { imagesUpload } from '@/middlewares/multer.js';
 import auth from '@/middlewares/auth.js';
@@ -56,7 +56,7 @@ reviewsRouter.post(
       });
     } catch (e) {
       if (e instanceof mongoose.Error.ValidationError) {
-        await deleteImage(currentFilePath);  
+        await deleteImage(currentFilePath);
         return res
           .status(400)
           .send({ error: 'Ошибка валидации', details: e.errors });

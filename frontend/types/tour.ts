@@ -1,5 +1,4 @@
-// tour.types.ts
-import type { MetaType } from './meta';
+import type { MetaType } from "./meta";
 
 export interface TourCategoryType {
   _id: string;
@@ -19,6 +18,8 @@ export interface TourType {
   images: string[];
   category: TourCategoryType;
   baseAdvantages: string[];
+  rating: number;
+  ratingCount: number;
   isPublished: boolean;
 }
 

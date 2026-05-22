@@ -12,9 +12,10 @@ export const useCreateReview = () => {
   });
 };
 
-export const useGetReviews = () => {
+export const useGetReviews = (tourId?: string) => {
   return useQuery({
-    queryKey: ['reviews'],
-    queryFn: getReviews,
+    queryKey: ['reviews', tourId],
+    queryFn: () => getReviews(tourId!),
+    enabled: !!tourId
   });
 };
