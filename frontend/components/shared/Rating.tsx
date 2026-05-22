@@ -11,6 +11,7 @@ interface Props {
   ratingOptions?: { label: string; color: string }[];
   className?: string;
   error?: string;
+  starSize?: number
 }
 
 const Rating = ({
@@ -21,6 +22,7 @@ const Rating = ({
   ratingOptions,
   className,
   error,
+  starSize = 8
 }: Props) => {
   return (
     <div className={cn(`p-2 ${error && 'border-red-500 border-1 bg-red-100 rounded-2xl'}`, className)}>
@@ -41,9 +43,9 @@ const Rating = ({
               >
                 <Star
                   className={cn(
-                    'size-8 stroke-2',
+                    `size-${starSize} stroke-2`,
                     active
-                      ? 'stroke-yellow-400 text-yellow-400'
+                      ? 'stroke-yellow-500 text-yellow-500'
                       : 'stroke-slate-500',
                   )}
                 />

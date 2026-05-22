@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { imageUrl } from '@/lib/constants';
+import { ImageOff } from 'lucide-react';
+import { imageUrl, isDev } from '@/lib/constants';
+import { cn } from '@/lib/utils';
 
 interface Props {
   images: string[];
@@ -12,53 +14,56 @@ interface Props {
 export default function TourGallery({ images, title }: Props) {
   const [activeIdx, setActiveIdx] = useState(0);
 
-  if (!images || images.length === 0) return null;
+  if (!images?.length) {
+    return (
+      <div className="w-full aspect-[21/9] rounded-3xl bg-muted flex items-center justify-center">
+        <ImageOff className="size-12 text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
-    <div className="w-full max-w-[1440px] mx-auto px-4 py-8">
-      <div className="relative aspect-[16/8] md:aspect-[21/9] w-full overflow-hidden rounded-[2.5rem] border border-zinc-800 shadow-2xl bg-zinc-900 transition-all duration-500">
+    <div className="w-full max-w-[1440px] mx-auto">
+      <div className="relative md:aspect-[21/9] w-full overflow-hidden rounded-3xl">
         <Image
-          src={`${imageUrl + images[activeIdx]}`}
-          alt={title}
+          src={imageUrl + images[activeIdx]}
+          alt={`${title} — фото ${activeIdx + 1}`}
           fill
-          unoptimized
-          priority
-          className="object-cover transition-opacity duration-500"
+          sizes="(max-width: 768px) 100vw, 1440px"
+          priority={activeIdx === 0}
+          className="object-cover"
+          unoptimized={isDev}
         />
-
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
-
-        <div className="absolute bottom-8 left-8">
-          <h1 className="text-3xl md:text-2xl font-black text-white uppercase italic tracking-tighter drop-shadow-lg">
-            {title}
-          </h1>
-        </div>
       </div>
 
-      <div className="mt-4 grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3">
-        {images.map((path, index) => (
-          <button
-            title={`Thumbnail ${index}`}
-            type="button"
-            key={index}
-            onClick={() => setActiveIdx(index)}
-            className={`relative aspect-square overflow-hidden rounded-xl border-2 transition-all cursor-pointer
-              ${
+      {images.length > 1 && (
+        <div className="mt-4 flex flex-wrap gap-3">
+          {images.map((path, index) => (
+            <button
+              type="button"
+              key={path}
+              onClick={() => setActiveIdx(index)}
+              aria-label={`Фото ${index + 1} из ${images.length}`}
+              aria-current={activeIdx === index ? 'true' : undefined}
+              className={cn(
+                'relative w-36 h-25 overflow-hidden rounded-lg border-1 transition-all cursor-pointer',
                 activeIdx === index
-                  ? 'border-yellow-400 scale-95 ring-2 ring-yellow-400/20'
-                  : 'border-transparent opacity-60 hover:opacity-100 hover:scale-105'
-              }`}
-          >
-            <Image
-              src={`${imageUrl + path}`}
-              alt={`Thumbnail ${index}`}
-              fill
-              unoptimized
-              className="object-cover"
-            />
-          </button>
-        ))}
-      </div>
+                  ? 'border-primary'
+                  : 'border-transparent opacity-60 hover:opacity-100 hover:scale-105',
+              )}
+            >
+              <Image
+                src={imageUrl + path}
+                alt={`${title} — фото ${activeIdx + 1}`}
+                fill
+                unoptimized={isDev}
+                className="object-cover"
+              />
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

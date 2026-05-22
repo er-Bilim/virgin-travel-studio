@@ -1,7 +1,11 @@
-import mongoose, { Schema } from 'mongoose';
-import { ReviewDocument } from '@/types/reviews.types.js';
+import { Model, model, Schema, Types } from 'mongoose';
+import type { ReviewFields } from '@/types/reviews.types.js';
 
-const ReviewSchema = new Schema<ReviewDocument>(
+interface IReviewModel extends Model<ReviewFields> {
+  calculateAverageRating(tourId: Types.ObjectId): Promise<void>;
+}
+
+const ReviewSchema = new Schema<ReviewFields>(
   {
     clientName: {
       type: String,
@@ -38,5 +42,47 @@ const ReviewSchema = new Schema<ReviewDocument>(
   },
 );
 
-const Review = mongoose.model<ReviewDocument>('Review', ReviewSchema);
+ReviewSchema.statics.calculateAverageRating = async function (tourId) {
+  const stats = await this.aggregate([
+    { $match: { tourId: tourId, isModerated: true } },
+    {
+      $group: {
+        _id: '$tourId',
+        countRating: { $sum: 1 },
+        avgRating: { $avg: '$rating' },
+      },
+    },
+  ]);
+
+  const update =
+    stats.length > 0
+      ? {
+          rating: Number(stats[0].avgRating.toFixed(1)),
+          ratingCount: stats[0].countRating,
+        }
+      : {
+          rating: 0,
+          ratingCount: 0,
+        };
+
+  await model('Tour').findByIdAndUpdate(tourId, update);
+};
+
+ReviewSchema.post('save', async function () {
+  const Review = this.constructor as IReviewModel;
+  await Review.calculateAverageRating(this.tourId);
+});
+
+ReviewSchema.post('findOneAndUpdate', async function (doc) {
+  if (!doc) return;
+  await (doc.constructor as IReviewModel).calculateAverageRating(doc.tourId);
+});
+
+ReviewSchema.post('findOneAndDelete', async function (doc) {
+  if (!doc) return;
+  await (doc.constructor as IReviewModel).calculateAverageRating(doc.tourId);
+});
+
+const Review = model<ReviewFields, IReviewModel>('Review', ReviewSchema);
+
 export default Review;

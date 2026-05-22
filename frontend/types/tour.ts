@@ -1,14 +1,14 @@
-// tour.types.ts
 import type { MetaType } from "./meta";
 
 export interface TourCategoryType {
   _id: string;
   title: string;
+  isPublished: boolean;
 }
 
 export interface ToursGetResponse {
   tours: TourType[];
-  meta: MetaType
+  meta: MetaType;
 }
 
 export interface TourType {
@@ -18,6 +18,8 @@ export interface TourType {
   images: string[];
   category: TourCategoryType;
   baseAdvantages: string[];
+  rating: number;
+  ratingCount: number;
   isPublished: boolean;
 }
 

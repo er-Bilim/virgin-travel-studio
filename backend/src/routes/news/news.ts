@@ -1,10 +1,10 @@
 import express from "express";
 import mongoose from "mongoose";
 import News from "@/model/New/News.js";
-import auth, {authOrNot, RequestWithUser} from "@/middlewares/auth.js";
+import auth, {authOrNot, type RequestWithUser} from "@/middlewares/auth.js";
 import permit from "@/middlewares/permit.js";
 import {imagesUpload} from "@/middlewares/multer.js";
-import {NewsFields} from "@/types/news.types.js";
+import type {NewsFields} from "@/types/news.types.js";
 import validateObjectId from "@/middlewares/validateObjectId.js";
 
 const newsRouter = express.Router();
