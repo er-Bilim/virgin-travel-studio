@@ -83,7 +83,7 @@ tourSetsRouter.get(
     try {
       const tourSet = await TourSet.findById(id).populate({
         path: 'tourId',
-        select: 'title description images category baseAdvantages',
+        select: 'title description images category baseAdvantages reviews rating ratingCount',
         populate: {
           path: 'category',
           select: 'title',
