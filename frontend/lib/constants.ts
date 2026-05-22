@@ -22,11 +22,23 @@ export enum OrderStatus {
 }
 
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
-  [OrderStatus.NEW]: 'Новый',
-  [OrderStatus.IN_PROGRESS]: 'В работе',
-  [OrderStatus.CONTRACT_PENDING]: 'Ожидает договора',
-  [OrderStatus.COMPLETED]: 'Завершён',
-  [OrderStatus.REJECTED]: 'Отклонён',
+    [OrderStatus.NEW]: 'Новый',
+    [OrderStatus.IN_PROGRESS]: 'В работе',
+    [OrderStatus.CONTRACT_PENDING]: 'Ожидает договора',
+    [OrderStatus.COMPLETED]: 'Завершён',
+    [OrderStatus.REJECTED]: 'Отклонён',
+};
+
+export enum TourSetStatus {
+    OPEN = 'OPEN',
+    CLOSED = 'CLOSED',
+    FINISHED = 'FINISHED',
+}
+
+export const TOUR_SET_STATUS_LABELS: Record<TourSetStatus, string> = {
+    [TourSetStatus.OPEN]: 'Открыт',
+    [TourSetStatus.CLOSED]: 'Закрыт',
+    [TourSetStatus.FINISHED]: 'Завершён',
 };
 
 export type DashboardMenuItem = {
