@@ -8,7 +8,6 @@ import Rating from '@/components/shared/Rating';
 import { StyledTextarea } from '@/components/shared/form/field-styles';
 import { useCreateReview } from '@/lib/hooks/reviewHooks';
 import PhotoDropzone from '@/components/shared/PhotoDropzone';
-import { getTourId } from '@/lib/tour/tourId';
 import { useState } from 'react';
 import { CheckCircle } from 'lucide-react';
 import { useUser } from '@/lib/hooks/authHooks';
@@ -16,7 +15,11 @@ import { Spinner } from '@/components/ui/spinner';
 import ReviewerBadge from '../ReviewerBadge';
 import { toast } from 'sonner';
 
-const CreateReviewForm = () => {
+interface Props {
+  tourId?: string;
+}
+
+const CreateReviewForm = ({tourId}: Props) => {
   const [submitted, setSubmitted] = useState<boolean>(false);
   const { mutate, isPending: loadingReview } = useCreateReview();
   const { data: me, isLoading: loadingUser, isError } = useUser();
@@ -70,7 +73,7 @@ const CreateReviewForm = () => {
 
     const newData = {
       ...data,
-      tourId: getTourId(),
+      tourId: tourId,
       clientName: me.fullName,
     };
 

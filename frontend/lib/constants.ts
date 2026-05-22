@@ -10,6 +10,7 @@ import {
 
 import type { UserRole } from '@/types/user';
 
+export const isDev = process.env.NODE_ENV === 'development';
 export const apiURL = process.env.NEXT_API_URL || 'http://localhost:8000/api';
 export const imageUrl = process.env.NEXT_IMAGE_URL || 'http://localhost:8000/';
 
