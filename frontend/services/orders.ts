@@ -1,8 +1,13 @@
 import axiosApi from '@/lib/axiosApi';
 import type { OrderMutationType, OrderType } from '@/types/order';
 
-export const getOrders = async (): Promise<OrderType[]> => {
-  const result = await axiosApi.get('/orders/');
+export const getOrders = async (
+  managerId: string | undefined = undefined,
+): Promise<OrderType[]> => {
+  let url = '/orders/';
+
+  if (managerId) url += `?managerId=${managerId}`
+  const result = await axiosApi.get(url);
   return result.data;
 };
 

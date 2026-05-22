@@ -4,10 +4,10 @@ import type { OrderMutationType } from '@/types/order';
 import { toast } from 'sonner';
 
 
-export const useOrders = () => {
+export const useOrders = (managerId: string | undefined = undefined) => {
   return useQuery({
-    queryKey: ['orders'],
-    queryFn: getOrders,
+    queryKey: ['orders', managerId],
+    queryFn: () => getOrders(managerId)
   });
 };
 

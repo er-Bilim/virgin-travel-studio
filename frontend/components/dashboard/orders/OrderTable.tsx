@@ -42,7 +42,7 @@ export default function OrderTable () {
       }),
     [],
   );
-  const { data = [], isLoading, error, refetch } = useOrders();
+  const { data = [], isLoading, error, refetch } = useOrders(selectedManagerId);
   const {
     data: managers = [],
     isLoading: managerLoading,
@@ -72,7 +72,7 @@ if (isPending) {
               <Select
                 value={selectedManagerId}
                 onValueChange={(val) => {
-                  setSelectedManagerId(val);
+                  setSelectedManagerId(val === 'all' ? undefined : val);
                   setPage(1);
                 }}
               >
