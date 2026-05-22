@@ -150,7 +150,7 @@ const run = async () => {
         title: 'Тайны древнего Египта: Каир и Луксор',
         description:
           'Глубокое погружение в историю: Пирамиды Гизы, Сфинкс и величественный Луксорский храм. Сопровождение историка-гида.',
-        images: ['images/dracon.jpg'],
+        images: ['images/egypt_1.png', 'images/egypt_2.png'],
         category: categoryTwo._id,
         baseAdvantages: [
           'Русскоговорящий гид',
@@ -163,7 +163,7 @@ const run = async () => {
         title: 'Восхождение на Эльбрус',
         description:
           'Профессиональная экспедиция для тех, кто хочет покорить самую высокую точку Европы. Полная экипировка и опытные инструкторы.',
-        images: ['images/dracon.jpg'],
+        images: ['images/elbrus_1.png'],
         category: categoryThree._id,
         baseAdvantages: [
           'Сертифицированные гиды',
@@ -176,7 +176,7 @@ const run = async () => {
         title: 'Уикенд в Стамбуле',
         description:
           'Прогулки по Босфору, ароматный кофе в районе Кадыкёй и величие Айя-Софии. Идеальный тур на 3 дня.',
-        images: ['images/dracon.jpg'],
+        images: ['images/stamb_1.png', 'images/stamb_2.png'],
         category: categoryFour._id,
         baseAdvantages: [
           'Отель в центре города',
@@ -188,7 +188,12 @@ const run = async () => {
         title: 'Мальдивы: Резорт Adaaran Select',
         description:
           'Уединенные виллы над водой, кристально чистая лагуна и дайвинг среди коралловых рифов.',
-        images: ['images/dracon.jpg', 'images/dracon.jpg'],
+        images: [
+          'images/mald_1.png',
+          'images/mald_2.png',
+          'images/mald_3.png',
+          'images/mald_4.png',
+        ],
         category: categoryFour._id,
         baseAdvantages: [
           'Всё включено',
@@ -327,7 +332,7 @@ const run = async () => {
         rating: 5,
         comment:
           'Это было незабываемое путешествие! Организация на высшем уровне, отель просто сказочный. Спасибо за такой отдых!',
-        image: 'images/dracon.jpg',
+        image: 'images/bali_one.jpg',
         isModerated: true,
       },
       {
@@ -336,6 +341,7 @@ const run = async () => {
         rating: 4,
         comment:
           'В целом всё понравилось, пирамиды впечатляют. Единственный минус — долгий трансфер из аэропорта.',
+        image: 'images/egypt_1.png',
         isModerated: true,
       },
       {
@@ -344,7 +350,7 @@ const run = async () => {
         rating: 5,
         comment:
           'Тяжело, но оно того стоило! Виды с вершины открываются потрясающие. Гиды — настоящие профи.',
-        image: 'images/dracon.jpg',
+        image: 'images/elbrus_1.png',
         isModerated: true,
       },
       {
@@ -353,6 +359,7 @@ const run = async () => {
         rating: 3,
         comment:
           'Город красивый, но в отеле было шумновато. В следующий раз выберу другой район.',
+        image: 'images/stamb_1.png',
         isModerated: false,
       },
       {
@@ -361,7 +368,7 @@ const run = async () => {
         rating: 5,
         comment:
           'Рай на земле! Тишина, спокойствие и бирюзовая вода. Обязательно вернусь еще раз.',
-        image: 'images/dracon.jpg',
+        image: 'images/mald_1.png',
         isModerated: true,
       },
     ]);
