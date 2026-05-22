@@ -239,40 +239,46 @@ const run = async () => {
     await Order.create([
       {
         tourSetId: ts1._id,
-        clientName: "Иван Иванов",
-        clientPhone: "+996555123456",
-        status: "NEW",
+        clientName: 'Иван Иванов',
+        clientPhone: '+996555123456',
+        status: 'NEW',
         managerId: manager._id,
       },
       {
         tourSetId: ts2._id,
-        clientName: "Виталий Тар",
-        clientPhone: "79001112233",
-        status: "IN_PROGRESS",
+        clientName: 'Виталий Тар',
+        clientPhone: '79001112233',
+        status: 'IN_PROGRESS',
         managerId: manager._id,
       },
       {
         tourSetId: ts1._id,
-        clientName: "Виктор Петров",
-        clientPhone: "+996700123987",
-        status: "REJECTED",
+        clientName: 'Виктор Петров',
+        clientPhone: '+996700123987',
+        status: 'REJECTED',
         managerId: manager._id,
-        rejectionReason: "передумал из-за изменения дат отпуска",
+        rejectionReason: 'передумал из-за изменения дат отпуска',
       },
       {
         tourSetId: ts5._id,
-        clientName: "Ольга Новикова",
-        clientPhone: "+996999000111",
-        status: "CONTRACT_PENDING",
+        clientName: 'Ольга Новикова',
+        clientPhone: '+996999000111',
+        status: 'CONTRACT_PENDING',
         managerId: manager._id,
       },
       {
         tourSetId: ts2._id,
-        clientName: "Сергей Васильев",
-        clientPhone: "+79112223344",
-        status: "COMPLETED",
+        clientName: 'Сергей Васильев',
+        clientPhone: '+79112223344',
+        status: 'COMPLETED',
         managerId: manager._id,
-      }
+      },
+      {
+        tourSetId: ts2._id,
+        clientName: 'Клиент которого не обработали',
+        clientPhone: '+79112223347',
+        status: 'NEW'
+      },
     ]);
 
     await Review.create([

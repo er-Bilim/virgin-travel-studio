@@ -14,7 +14,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { TourSetType } from '@/types/tourSets';
+import type { TourSetType } from '@/types/tourSets';
 import { useDeleteTourSet, useTourSets } from '@/lib/hooks/tourSets';
 
 interface Props {
