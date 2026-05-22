@@ -4,23 +4,40 @@ import { useParams } from 'next/navigation';
 import { useOneTourSet } from '@/lib/hooks/tourSets';
 import TourGallery from '@/components/tourGallery/TourGallery';
 import {
-  Calendar,
   Hotel,
   Plane,
-  CheckCircle,
-  Users,
-  Clock,
+  Flame,
+  Calendar1,
+  MapPin,
+  Star,
+  Dot,
+  BadgeCheck,
+  MessageSquareDashed,
 } from 'lucide-react';
 import { OrderCard } from '@/components/dashboard/orders/OrderCard';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import CreateReviewForm from '@/components/public/reviews/form/CreateReviewForm';
-import { setTourId } from '@/lib/tour/tourId';
+import {
+  cn,
+  formatDateToWords,
+  formatToReadablePrice,
+  getDayMonth,
+  getYearFullNumber,
+} from '@/lib/utils';
+import SeatsIndicator from '@/components/shared/SeatsIndicator';
+import { buildTourInquiryMessage, openWhatsApp } from '@/lib/whatsapp';
+import { FaWhatsapp } from 'react-icons/fa';
+import Review from '@/components/public/reviews/Review';
+import { Spinner } from '@/components/ui/spinner';
+import { useGetReviews } from '@/lib/hooks/reviewHooks';
 
 export default function TourSetPage() {
   const params = useParams();
   const slug = params?.slug as string;
 
   const { data, isLoading, isError } = useOneTourSet(slug);
+  const tourId = data?.tourId?._id;
+  const {data: reviews, isLoading: isLoadingReviews, isError: isReviewsError } = useGetReviews(tourId)
 
   const [isOrderOpen, setIsOrderOpen] = useState(false);
 
@@ -31,12 +48,6 @@ export default function TourSetPage() {
   const closeModalOrder = () => {
     setIsOrderOpen(false);
   };
-
-  useEffect(() => {
-    if (data?.tourId?._id) {
-      setTourId(data.tourId._id);
-    }
-  }, [data?.tourId?._id]);
 
   if (isLoading)
     return <div className="text-center py-20 text-white">Загрузка...</div>;
@@ -49,7 +60,7 @@ export default function TourSetPage() {
   if (!data)
     return <div className="text-center py-20 text-white">Тур не найден</div>;
 
-  const { tourId, ...set } = data;
+  const { tourId: tour, ...set } = data;
 
   const days = Math.max(
     1,
@@ -59,12 +70,51 @@ export default function TourSetPage() {
     ),
   );
   const nights = Math.max(days - 1, 0);
-  const seatsLeft = Math.max(set.totalSeats - set.bookedSeats, 0);
+  // const seatsLeft = Math.max(set.totalSeats - set.bookedSeats, 0);
 
-  const savings = set.discountPrice ? set.price - set.discountPrice : 0;
+  // const savings = set.discountPrice ? set.price - set.discountPrice : 0;
+
+  const handleWhatsAppClick = () => {
+    const message = buildTourInquiryMessage(
+      data.tourId.title ?? 'тур',
+      data.startDate,
+    );
+    openWhatsApp(message);
+  };
+
+  const renderReviews = () => {
+    if (isLoadingReviews) {
+      return <Spinner />;
+    }
+
+    if (isReviewsError) {
+      return (
+        <p className="text-lg text-muted-foreground font-semibold">Ошибка</p>
+      );
+    }
+
+    if (!reviews?.length) {
+      return (
+        <div className='border-1 border-[var(--border)] rounded-xl p-4 text-gray-600 h-35 flex flex-col justify-center gap-4 items-center'> 
+          <p className="text-gray-400 bg-gray-200 p-3 rounded-full">
+            <MessageSquareDashed />
+          </p>
+          <p>Здесь появятся отзывы путешественников.</p>
+        </div>
+      );
+    }
+
+    return (
+      <>
+        {reviews.map((review) => (
+          <Review review={review} key={review._id} />
+        ))}
+      </>
+    );
+  };
 
   return (
-    <div className="max-w-7xl mx-auto py-10 text-zinc-100">
+    <>
       {data._id && (
         <OrderCard
           isOpen={isOrderOpen}
@@ -72,174 +122,219 @@ export default function TourSetPage() {
           tourSetId={data._id}
         />
       )}
+      <section aria-labelledby="tour-title" className="mt-5">
+        {/* <nav aria-label="Хлебные крошки">Хлебные крошки</nav> */}
+        <div className="mb-4 flex items-center gap-4">
+          {set.isHot && (
+            <p className="flex gap-2 bg-red-100 text-red-500 border-1 border-red-500 rounded-4xl uppercase font-semibold px-4 py-2 text-sm items-center">
+              <Flame className="size-5" />
+              Горящий
+            </p>
+          )}
+          <p className="flex gap-2 bg-slate-100 text-slate-500 border-1 border-slate-500 rounded-4xl uppercase font-semibold px-4 py-2 text-sm">
+            {tour.category.title}
+          </p>
+        </div>
 
-      <div className="mb-12">
-        <TourGallery images={tourId.images} title={tourId.title} />
-      </div>
+        <TourGallery images={tour.images} title={tour.title} />
 
-      <div className="flex flex-col lg:flex-row gap-12">
-        <div className="flex-1 space-y-12">
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <span className="px-3 py-1 bg-yellow-400 text-black text-xs font-bold uppercase rounded-full">
-                {tourId.category.title}
+        <header>
+          <h1
+            id="tour-title"
+            className="text-[var(--primary)] font-semibold text-[1.8rem] mt-7"
+          >
+            {tour.title}
+          </h1>
+          <div className="flex text-gray-500 gap-6 text-sm mt-3">
+            <div className="flex gap-1 items-center">
+              <Calendar1 className="stroke-1" />
+              <span className="font-semibold">
+                {getDayMonth(data.startDate)}–{getDayMonth(data.endDate)}
               </span>
-              {set.isHot && (
-                <span className="px-3 py-1 bg-red-600 text-white text-xs font-bold uppercase rounded-full animate-pulse">
-                  Hot
-                </span>
-              )}
-            </div>
-            <h1 className="text-xl xs:text-2xl sm:text-3xl md:text-5xl font-black text-sky-900 uppercase tracking-tighter mb-6">
-              {tourId.title}
-            </h1>
-            <p className="text-zinc-700 text-lg leading-relaxed max-w-2xl">
-              {tourId.description}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {tourId.baseAdvantages.map((adv, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-3 p-4 bg-zinc-900/50 rounded-2xl"
-              >
-                <CheckCircle className="text-yellow-400 shrink-0" size={20} />
-                <span className="text-sm font-medium">{adv}</span>
-              </div>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 text-zinc-400">
-                <Hotel size={20} />
-                <h3 className="font-bold uppercase tracking-widest text-xs">
-                  Проживание
-                </h3>
-              </div>
-              <div className="p-6 bg-zinc-900 rounded-[2rem] border border-zinc-800">
-                <p className="text-xl font-bold mb-1">{set.hotelName}</p>
-                <p className="text-zinc-500 text-sm">{set.hotelLocation}</p>
-              </div>
+              <span>{formatDateToWords(data.startDate)}</span>
+              <span className="font-semibold">
+                {getYearFullNumber(data.endDate)}
+              </span>
             </div>
 
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 text-zinc-400">
-                <Plane size={20} />
-                <h3 className="font-bold uppercase tracking-widest text-xs">
-                  Перелет
-                </h3>
-              </div>
-              <div className="p-6 bg-zinc-900 rounded-[2rem] border border-zinc-800">
-                <p className="text-xl font-bold mb-1">{set.airline}</p>
-                <p className="text-zinc-500 text-sm">{set.flightDetails}</p>
-              </div>
+            <div className="flex gap-1 items-center">
+              <MapPin className="stroke-1" />
+              <span>{data.hotelLocation}</span>
+            </div>
+
+            <div className="flex gap-1 items-center">
+              <Star className="stroke-2 stroke-yellow-400 text-yellow-400" />
+              <span className="text-[var(--primary)] font-semibold">
+                {tour.rating > 0 ? tour.rating : 'нет оценок :('}
+              </span>
+              <Dot className="stroke-1 size-4" />
+              <p className="font-semibold flex gap-1">
+                {tour.ratingCount > 0 ? tour.ratingCount : 'нет'}
+                <span className="font-normal">отзывов</span>
+              </p>
             </div>
           </div>
-        </div>
+        </header>
+      </section>
 
-        <div className="lg:w-[400px]">
-          <div className="sticky top-10 p-4 sm:p-6 md:p-8 bg-white text-black rounded-[1rem] sm:rounded-[3rem] shadow-2xl">
-            <div className="flex justify-between items-start mb-8">
-              <div>
-                <p className="text-sm font-bold text-zinc-500 uppercase tracking-tighter">
-                  Стоимость
+      <div className="grid grid-cols-[1fr_420px] gap-6">
+        <div className="flex flex-col gap-6">
+          <section aria-labelledby="description-title" className="mt-6">
+            <h2 id="description-title" className="font-semibold text-[1.3rem]">
+              Описание
+            </h2>
+            <p className="mt-3">{tour.description}</p>
+          </section>
+
+          <section aria-labelledby="logistics-title">
+            <h2 id="logistics-title" className="sr-only">
+              Логистика
+            </h2>
+            <div className="grid grid-cols-2 gap-2.5">
+              <article className="border-1 border-[var(--border)] p-5 rounded-2xl bg-gray-50">
+                <p className="flex gap-2 uppercase font-semibold text-gray-400 text-sm">
+                  <Hotel className="stroke-2 size-4" />
+                  <span>Проживание</span>
                 </p>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-2xl md:text-4xl font-black">
-                    {set.discountPrice} с
-                  </span>
-                  <span className="text-lg text-zinc-400 line-through">
-                    {set.price} с
-                  </span>
-                </div>
-              </div>
-              {savings > 0 && (
-                <div className="bg-green-100 text-green-700 px-3 py-1 rounded-lg font-bold text-sm">
-                  -{savings} сом
-                </div>
-              )}
+                <p className="font-semibold text-[var(--primary)] mt-3">
+                  {data.hotelName}
+                </p>
+                <p className="text-gray-500 mt-1">{data.hotelLocation}</p>
+              </article>
+              <article className="border-1 border-[var(--border)] p-5 rounded-2xl bg-gray-50">
+                <p className="flex gap-2 uppercase font-semibold text-gray-400 text-sm">
+                  <Plane className="stroke-2 size-4" />
+                  <span>Перелёт</span>
+                </p>
+                <p className="font-semibold text-[var(--primary)] mt-3">
+                  {data.airline}
+                </p>
+                <p className="text-gray-500 mt-1">{data.flightDetails}</p>
+              </article>
             </div>
+          </section>
 
-            <div className="space-y-4 mb-8">
-              <div className="flex items-center justify-between py-3 border-b border-zinc-100">
-                <div className="flex items-center gap-2 text-zinc-500">
-                  <Calendar size={18} /> <span>Длительность</span>
-                </div>
-                <span className="font-bold">
-                  {days} дн. / {nights} ноч.
-                </span>
-              </div>
-              <div className="flex items-center justify-between py-3 border-b border-zinc-100">
-                <div className="flex items-center gap-2 text-zinc-500">
-                  <span>Даты:</span>
-                </div>
-                <span className="font-bold">
-                  {new Date(data.startDate).toLocaleDateString('ru-RU')}
-                  <span className="text-zinc-400 font-medium">{' по '}</span>
-                  {new Date(data.endDate).toLocaleDateString('ru-RU')}
-                </span>
-              </div>
-              <div className="flex items-center justify-between py-3 border-b border-zinc-100">
-                <div className="flex items-center gap-2 text-zinc-500">
-                  <Users size={18} /> <span>Свободно мест</span>
-                </div>
-                <span
-                  className={`font-bold ${seatsLeft < 5 ? 'text-red-600' : ''}`}
+          <section aria-labelledby="advantages-title">
+            <h2 id="advantages-title" className="font-semibold text-[1.3rem]">
+              Преимущества тура
+            </h2>
+            <ul className="grid grid-flow-col gap-x-[30px] mt-5">
+              {tour.baseAdvantages.map((advantage, index) => (
+                <li
+                  key={advantage + index}
+                  className="border-1 border-[var(--silver)] rounded-xl p-2 text-center flex items-center gap-5"
                 >
-                  {seatsLeft} из {set.totalSeats}
-                </span>
-              </div>
-              <div className="flex items-center justify-between py-3">
-                <div className="flex items-center gap-2 text-zinc-500">
-                  <Clock size={18} /> <span>Дедлайн скидки</span>
-                </div>
-                <span className="font-bold text-sm italic">
-                  {new Date(set.saleDeadline).toLocaleDateString()}
-                </span>
-              </div>
-            </div>
+                  <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-br from-[#FFF4B8] via-[#FFD700] to-[#DAA520]">
+                    <BadgeCheck className="w-8 h-8 text-white stroke-2" />
+                  </div>
 
-            <button
-              onClick={() => openModalOrder()}
-              className="w-full mb-3 py-5 bg-black text-white rounded-2xl font-black uppercase tracking-widest hover:bg-zinc-800 transition-colors active:scale-95 shadow-xl"
+                  <p>{advantage}</p>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section className="border-t border-border pt-10">
+            <CreateReviewForm tourId={tourId}/>
+
+            <h2
+              id="reviews-title"
+              className="font-semibold text-[1.3rem] mt-5 border-t border-border pt-5"
             >
-              Оставить заявку
-            </button>
+              Отзывы путешественников
+            </h2>
 
-            <button
-              onClick={() => {
-                const phoneNumber =
-                  process.env.NEXT_WHATSAPP_PHONE || '550176420';
-                const message = `Здравствуйте! Меня интересует ${data.tourId.title || 'тур'}, начиная с ${data.startDate}. Не могли бы вы предоставить более подробную информацию?`;
-                const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+            <div className="flex flex-col gap-3 mt-6">{renderReviews()}</div>
+          </section>
+        </div>
 
-                window.open(url, '_blank');
-              }}
-              className="w-full py-5 flex items-center justify-center gap-3 text-sm text-white bg-[#25D366] rounded-2xl font-black uppercase tracking-widest hover:bg-[#20ba5a] transition-all active:scale-95 shadow-[0_4px_14px_0_rgba(37,211,102,0.39)]"
-            >
-              <svg
-                className="w-6 h-6"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
+        <aside aria-labelledby="booking-title">
+          <h2 id="booking-title" className="sr-only">
+            Бронирование
+          </h2>
+          <div className="border-1 border-[var(--border)] p-4 rounded-2xl text-gray-400">
+            <p className="uppercase text-gray-400 text-sm">стоимость</p>
+            <div className="flex flex-row gap-3 items-end mt-3 mb-4">
+              {set.discountPrice && (
+                <p className="text-[var(--primary)] font-semibold text-2xl">
+                  {formatToReadablePrice(set.discountPrice)}
+                </p>
+              )}
+              <p
+                className={cn(
+                  'font-semibold',
+                  set.discountPrice
+                    ? 'line-through text-sm text-gray-300'
+                    : 'text-[var(--primary)] text-[1.5rem]',
+                )}
               >
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.414 0 0 5.415 0 12.05c0 2.122.554 4.197 1.607 6.013L0 24l6.135-1.61a11.75 11.75 0 005.914 1.586h.005c6.637 0 12.05-5.415 12.05-12.05a11.852 11.852 0 00-3.41-8.523z" />
-              </svg>
-              Связаться через WhatsApp
-            </button>
+                {formatToReadablePrice(set.price)}
+              </p>
+            </div>
+            {set.discountPrice && (
+              <p className="text-xs text-red-500 font-semibold flex gap-1 mt-1 mb-5">
+                Скидка до
+                <span>{getDayMonth(data.saleDeadline)}</span>
+                <span>{formatDateToWords(data.saleDeadline)}</span>
+              </p>
+            )}
 
-            <p className="text-center mt-4 text-xs text-zinc-400 font-medium">
-              С вами свяжутся как только оставите заявку
+            <dl className="flex flex-col gap-5 border-t border-border pt-5 text-sm">
+              <div className="flex items-center justify-between">
+                <dt className="text-muted-foreground">Даты</dt>
+                <dd className="font-semibold text-foreground flex gap-1">
+                  <span className="font-semibold">
+                    {getDayMonth(data.startDate)}–{getDayMonth(data.endDate)}
+                  </span>
+                  <span>{formatDateToWords(data.startDate)}</span>
+                </dd>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <dt className="text-muted-foreground">Длительность</dt>
+                <dd className="font-semibold text-foreground">
+                  <span>
+                    {days} дн. / {nights} ноч.
+                  </span>
+                </dd>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <dt className="text-muted-foreground">Свободно</dt>
+                <dd className="font-semibold text-amber-600">
+                  <SeatsIndicator
+                    free={data.bookedSeats}
+                    total={data.totalSeats}
+                  />
+                </dd>
+              </div>
+            </dl>
+
+            <div className="mt-5 flex gap-y-3 flex-col">
+              <button
+                type="button"
+                aria-label="Оставить заявку"
+                onClick={() => openModalOrder()}
+                className="w-full cursor-pointer bg-[var(--primary)] text-gray-50 rounded-lg py-4 font-semibold transition duration-300 ease-in-out hover:bg-gray-50 hover:text-[var(--primary)] hover:border-[var(--primary)] border-1"
+              >
+                Оставить заявку
+              </button>
+              <button
+                className="flex gap-2 justify-center items-center text-center w-full cursor-pointer text-[var(--primary)] border-1 border-gray-400 rounded-lg py-2 font-semibold transition duration-300 ease-in-out hover:bg-green-500 hover:text-green-50"
+                onClick={handleWhatsAppClick}
+                type="button"
+                aria-label="Связаться через WhatsAppу"
+              >
+                <FaWhatsapp className="size-9" />
+                <p>WhatsApp</p>
+              </button>
+            </div>
+            <p className="text-sm text-center mt-5 mb-4">
+              С вами свяжутся в течение часа
             </p>
           </div>
-        </div>
+        </aside>
       </div>
-
-      <div className="mt-20">
-        <CreateReviewForm />
-      </div>
-    </div>
+    </>
   );
 }
