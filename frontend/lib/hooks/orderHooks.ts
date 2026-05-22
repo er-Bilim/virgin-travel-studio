@@ -7,7 +7,8 @@ import { toast } from 'sonner';
 export const useOrders = (managerId: string | undefined = undefined) => {
   return useQuery({
     queryKey: ['orders', managerId],
-    queryFn: () => getOrders(managerId)
+    queryFn: () => getOrders(managerId),
+    refetchInterval: 10000,
   });
 };
 
