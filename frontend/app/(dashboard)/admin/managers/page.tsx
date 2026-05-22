@@ -7,6 +7,7 @@ import { DataTable } from '@/components/dashboard/shared/data-table/data-table';
 import {ConfirmDialog} from "@/components/dashboard/ConfirmDialog/ConfirmDialog";
 import {getManagersColumns} from "@/components/dashboard/shared/data-table/columns/createColumnInTable/manager-colum";
 import { useMemo, useState} from "react";
+import {headerRowClassName, rowClassName, tableClassName} from "@/lib/constants";
 
 export default function ManagersPage() {
     const router = useRouter();
@@ -38,7 +39,15 @@ export default function ManagersPage() {
 
       <CreateManagerForm />
 
-      <DataTable columns={columns} data={data} isLoading={isLoading} isError={isError}/>
+      <DataTable
+          columns={columns}
+          data={data}
+          isLoading={isLoading}
+          isError={isError}
+          headerRowClassName={headerRowClassName}
+          rowClassName={rowClassName}
+          className={tableClassName}
+      />
 
         <ConfirmDialog
             open={!!managerToDelete}
