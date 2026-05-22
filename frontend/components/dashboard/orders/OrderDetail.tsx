@@ -35,7 +35,7 @@ export default function OrderDetail() {
           toast.success('Заявка успешно удалена');
           router.back();
         },
-        onError: (error) => {
+        onError: () => {
           toast.error("Ошибка при удалениии")
         },
       });
