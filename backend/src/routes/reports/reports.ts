@@ -4,11 +4,10 @@ import ExcelJS from 'exceljs';
 
 import Order from '@/model/order/Order.js';
 import validateObjectId from '@/middlewares/validateObjectId.js';
-import type {MatchFilter, MongoDateFilter, PopulatedOrder} from "@/types/reports.types.js";
+import type {PopulatedOrder} from "@/types/reports.types.js";
 import {parseDate} from "@/utils/excel/parseDate.js";
 import {applyExcelStyles} from "@/utils/excel/applyExcelStyles.js";
 
-const MAX_DAYS = 31;
 
 async function getDailyManagerReport(req: Request, res: Response, next: NextFunction) {
     try {
@@ -52,170 +51,151 @@ async function getDailyManagerReport(req: Request, res: Response, next: NextFunc
             });
         }
 
-        if (fromDate && toDate) {
-            const diffDays = Math.ceil(
-                (toDate.getTime() - fromDate.getTime()) /
-                (1000 * 60 * 60 * 24)
-            );
+        const diffDays =
+            fromDate && toDate
+                ? Math.ceil((toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60 * 24))
+                : 0;
 
-            if (diffDays > MAX_DAYS) {
-                return res.status(400).json({
-                    error: 'Диапазон дат слишком большой (максимум 31 день)',
-                });
-            }
+        if (diffDays > 31) {
+            return res.status(400).json({
+                error: 'Диапазон дат слишком большой (максимум 31 день)',
+            });
         }
 
-        const match: MatchFilter = {
-            ...(managerObjectId && { managerId: managerObjectId }),
-        };
-
-        const createdAt: MongoDateFilter = {};
-
-        if (fromDate) {
-            createdAt.$gte = fromDate;
-        }
-
-        if (toDate) {
-            const endOfDay = new Date(toDate);
-            endOfDay.setHours(23, 59, 59, 999);
-            createdAt.$lte = endOfDay;
-        }
-
-        if (createdAt.$gte || createdAt.$lte) {
-            match.createdAt = createdAt;
-        }
-
-        const pipeline = [
-            {
-                $match: {
-                    role: 'MANAGER',
-                    ...(managerObjectId ? { _id: managerObjectId } : {}),
-                },
-            },
-
-            {
-                $lookup: {
-                    from: 'orders',
-                    let: { managerId: '$_id' },
-                    pipeline: [
-                        {
-                            $match: {
-                                $expr: {
-                                    $eq: ['$managerId', '$$managerId'],
-                                },
-                            },
-                        },
-
-                        ...(Object.keys(createdAt).length
-                            ? [
-                                {
-                                    $match: {
-                                        createdAt,
-                                    },
-                                },
-                            ]
-                            : []),
-
-                        {
-                            $lookup: {
-                                from: 'toursets',
-                                localField: 'tourSetId',
-                                foreignField: '_id',
-                                as: 'tourSet',
-                            },
-                        },
-
-                        {
-                            $unwind: {
-                                path: '$tourSet',
-                                preserveNullAndEmptyArrays: true,
-                            },
-                        },
-                    ],
-                    as: 'orders',
-                },
-            },
-
-            {
-                $addFields: {
-                    newOrders: {
-                        $size: {
-                            $filter: {
-                                input: '$orders',
-                                as: 'o',
-                                cond: { $eq: ['$$o.status', 'NEW'] },
-                            },
-                        },
-                    },
-
-                    inProgress: {
-                        $size: {
-                            $filter: {
-                                input: '$orders',
-                                as: 'o',
-                                cond: { $eq: ['$$o.status', 'IN_PROGRESS'] },
-                            },
-                        },
-                    },
-
-                    completed: {
-                        $size: {
-                            $filter: {
-                                input: '$orders',
-                                as: 'o',
-                                cond: { $eq: ['$$o.status', 'COMPLETED'] },
-                            },
-                        },
-                    },
-
-                    rejected: {
-                        $size: {
-                            $filter: {
-                                input: '$orders',
-                                as: 'o',
-                                cond: { $eq: ['$$o.status', 'REJECTED'] },
-                            },
-                        },
-                    },
-
-                    revenue: {
-                        $sum: {
-                            $map: {
-                                input: {
-                                    $filter: {
-                                        input: '$orders',
-                                        as: 'o',
-                                        cond: {
-                                            $eq: ['$$o.status', 'COMPLETED'],
-                                        },
-                                    },
-                                },
-                                as: 'o',
-                                in: {
-                                    $ifNull: ['$$o.tourSet.price', 0],
-                                },
-                            },
-                        },
-                    },
-                },
-            },
-
-            {
-                $project: {
-                    _id: 0,
-                    manager: '$fullName',
-                    newOrders: 1,
-                    inProgress: 1,
-                    completed: 1,
-                    rejected: 1,
-                    revenue: 1,
-                },
-            },
-        ];
+        const endOfDay =
+            toDate ? new Date(toDate.setHours(23, 59, 59, 999)) : null;
 
         const data = await mongoose.connection
             .collection('users')
-            .aggregate(pipeline)
+            .aggregate([
+                {
+                    $match: {
+                        role: 'MANAGER',
+                        ...(managerObjectId && { _id: managerObjectId }),
+                    },
+                },
+
+                {
+                    $lookup: {
+                        from: 'orders',
+                        let: { managerId: '$_id' },
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: {
+                                        $eq: ['$managerId', '$$managerId'],
+                                    },
+                                },
+                            },
+
+                            ...(fromDate || endOfDay
+                                ? [
+                                    {
+                                        $match: {
+                                            createdAt: {
+                                                ...(fromDate && { $gte: fromDate }),
+                                                ...(endOfDay && { $lte: endOfDay }),
+                                            },
+                                        },
+                                    },
+                                ]
+                                : []),
+
+                            {
+                                $lookup: {
+                                    from: 'toursets',
+                                    localField: 'tourSetId',
+                                    foreignField: '_id',
+                                    as: 'tourSet',
+                                },
+                            },
+                            {
+                                $unwind: {
+                                    path: '$tourSet',
+                                    preserveNullAndEmptyArrays: true,
+                                },
+                            },
+                        ],
+                        as: 'orders',
+                    },
+                },
+
+                {
+                    $addFields: {
+                        newOrders: {
+                            $size: {
+                                $filter: {
+                                    input: '$orders',
+                                    as: 'o',
+                                    cond: { $eq: ['$$o.status', 'NEW'] },
+                                },
+                            },
+                        },
+
+                        inProgress: {
+                            $size: {
+                                $filter: {
+                                    input: '$orders',
+                                    as: 'o',
+                                    cond: { $eq: ['$$o.status', 'IN_PROGRESS'] },
+                                },
+                            },
+                        },
+
+                        completed: {
+                            $size: {
+                                $filter: {
+                                    input: '$orders',
+                                    as: 'o',
+                                    cond: { $eq: ['$$o.status', 'COMPLETED'] },
+                                },
+                            },
+                        },
+
+                        rejected: {
+                            $size: {
+                                $filter: {
+                                    input: '$orders',
+                                    as: 'o',
+                                    cond: { $eq: ['$$o.status', 'REJECTED'] },
+                                },
+                            },
+                        },
+
+                        revenue: {
+                            $sum: {
+                                $map: {
+                                    input: {
+                                        $filter: {
+                                            input: '$orders',
+                                            as: 'o',
+                                            cond: {
+                                                $eq: ['$$o.status', 'COMPLETED'],
+                                            },
+                                        },
+                                    },
+                                    as: 'o',
+                                    in: {
+                                        $ifNull: ['$$o.tourSet.price', 0],
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+
+                {
+                    $project: {
+                        _id: 0,
+                        manager: '$fullName',
+                        newOrders: 1,
+                        inProgress: 1,
+                        completed: 1,
+                        rejected: 1,
+                        revenue: 1,
+                    },
+                },
+            ])
             .toArray();
 
         const workbook = new ExcelJS.Workbook();
@@ -236,7 +216,6 @@ async function getDailyManagerReport(req: Request, res: Response, next: NextFunc
             freezeHeader: true,
             currencyColumns: ['revenue'],
         });
-
 
         const buffer = await workbook.xlsx.writeBuffer();
 
@@ -313,6 +292,7 @@ async function getTourRosterReport(req: Request, res: Response, next: NextFuncti
 
         applyExcelStyles(sheet, {
             freezeHeader: true,
+            currencyColumns: ['sum'],
         });
 
         const buffer = await workbook.xlsx.writeBuffer();
