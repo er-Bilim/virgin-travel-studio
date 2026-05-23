@@ -1,4 +1,4 @@
-import {NextFunction, Request, Response} from 'express';
+import type {NextFunction, Request, Response} from 'express';
 
 import {buildDailyManagerExcel} from "@/services/builders/dailyManager.builder.js";
 import {buildTourRosterExcel} from "@/services/builders/tourRoster.builder.js";
