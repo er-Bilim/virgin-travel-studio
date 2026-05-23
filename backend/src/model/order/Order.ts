@@ -1,5 +1,5 @@
 import mongoose, {Schema, Types} from 'mongoose';
-import {IOrder} from '@/types/orders.types.js';
+import type {IOrder} from '@/types/orders.types.js';
 
 const OrderSchema = new Schema({
     tourSetId: {

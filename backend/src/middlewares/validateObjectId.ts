@@ -1,4 +1,4 @@
-import { RequestHandler } from 'express';
+import type { RequestHandler } from 'express';
 import mongoose from 'mongoose';
 
 const validateObjectId = (paramName = 'id'): RequestHandler => {

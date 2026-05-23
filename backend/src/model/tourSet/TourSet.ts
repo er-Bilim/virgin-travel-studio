@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
-import { TourSetFields } from '@/types/tourSets.types.js';
+import type { TourSetFields } from '@/types/tourSets.types.js';
 
 const TourSetSchema = new Schema<TourSetFields>(
   {

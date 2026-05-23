@@ -1,6 +1,6 @@
-import mongoose, { Schema, Model, HydratedDocument } from 'mongoose';
+import mongoose, { Schema, Model, type HydratedDocument } from 'mongoose';
 import argon2 from 'argon2';
-import { UserFields } from '@/types/users.types.js';
+import type { UserFields } from '@/types/users.types.js';
 
 interface UserMethods {
   checkPassword(password: string): Promise<boolean>;

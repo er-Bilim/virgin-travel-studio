@@ -45,7 +45,13 @@ export function createActionsColumn<T>({
                         <DropdownMenuLabel>Действия</DropdownMenuLabel>
                         <DropdownMenuSeparator />
 
-                        {actions.map((action) => {
+                        {actions.filter((action) => {
+                            if (typeof action.hidden === 'function') {
+                                return !action.hidden(data);
+                            }
+
+                            return !action.hidden;
+                        }).map((action) => {
                             const label =
                                 typeof action.label === 'function'
                                     ? action.label(data)

@@ -1,8 +1,8 @@
 import express from 'express';
-import auth, { RequestWithUser } from '@/middlewares/auth.js';
+import auth, { type RequestWithUser} from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
 import Order from '@/model/order/Order.js';
-import { OrderStatus } from '@/types/orders.types.js';
+import type {OrderStatus} from '@/types/orders.types.js';
 import mongoose from 'mongoose';
 import { populate } from 'dotenv';
 import validateObjectId from '@/middlewares/validateObjectId.js';

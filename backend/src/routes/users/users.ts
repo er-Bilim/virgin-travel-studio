@@ -1,7 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import User from '@/model/user/User.js';
-import auth, {RequestWithUser} from '@/middlewares/auth.js';
+import auth, {type RequestWithUser} from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
 import config from '@/config.js';
 import jwt from 'jsonwebtoken';
