@@ -106,16 +106,11 @@ async function getDailyManagerReport(req: Request, res: Response, next: NextFunc
                             },
                         },
 
-                        ...(fromDate || toDate
+                        ...(Object.keys(createdAt).length
                             ? [
                                 {
                                     $match: {
-                                        ...(fromDate && {
-                                            createdAt: { $gte: fromDate },
-                                        }),
-                                        ...(toDate && {
-                                            createdAt: { $lte: toDate },
-                                        }),
+                                        createdAt,
                                     },
                                 },
                             ]
