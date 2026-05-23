@@ -9,219 +9,244 @@ import validateObjectId from "@/middlewares/validateObjectId.js";
 
 const newsRouter = express.Router();
 
-newsRouter.get("/", authOrNot, async (req, res, next) => {
-    const {user} = req as RequestWithUser;
-    const isAdminOrManager =
-        user?.role === "ADMIN" || user?.role === "MANAGER";
-    try {
-        const query: {
-            isPublished?: boolean;
-            tags?: { $in: string[] };
-        } = {};
+newsRouter.get("/",validateObjectId("authorId"), authOrNot, async (req, res, next) => {
+  const {user} = req as RequestWithUser;
+  const isAdminOrManager =
+    user?.role === "ADMIN" || user?.role === "MANAGER";
+  try {
+    const query: {
+      isPublished?: boolean;
+      tags?: { $in: string[] };
+      title?: { $regex: string, $options: "i" };
+      author?: string;
+    } = {};
 
-        if (!isAdminOrManager) {
-            query.isPublished = true;
-        }
-
-        const tags = req.query.tags;
-
-        if (typeof tags === "string" && tags.length > 0) {
-            const parsedTags = tags
-                .split(",")
-                .map((t) => t.trim())
-                .filter(Boolean);
-
-            if (parsedTags.length > 0) {
-                query.tags = {$in: parsedTags};
-            }
-        }
-
-        const news = await News.find(query)
-            .sort({createdAt: -1})
-            .populate("author", "fullName");
-
-        res.send(news);
-    } catch (e) {
-        next(e);
+    const filterIsPublished = req.query.isPublished;
+    if (typeof filterIsPublished === "string" && filterIsPublished.trim().length > 0) {
+      query.isPublished = filterIsPublished === "true";
     }
+
+    if (!isAdminOrManager) {
+      query.isPublished = true;
+    }
+
+    const tags = req.query.tags;
+
+    if (typeof tags === "string" && tags.length > 0) {
+      const parsedTags = tags
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean);
+
+      if (parsedTags.length > 0) {
+        query.tags = {$in: parsedTags};
+      }
+    }
+
+    const searchTitleWord = req.query.searchTitle;
+
+    if (typeof searchTitleWord === "string") {
+      const trimmedSearch = searchTitleWord.trim();
+      if (trimmedSearch.length > 0) {
+        const safeSearch = trimmedSearch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        query.title = {$regex: safeSearch, $options: "i"};
+      }
+    }
+
+    const authorId = req.query.authorId;
+    if (typeof authorId === "string") {
+      if (authorId.trim().length > 0) {
+        query.author = authorId;
+      }
+    }
+
+
+    const news = await News.find(query)
+      .sort({createdAt: -1})
+      .populate("author", "fullName");
+
+    res.send(news);
+  } catch (e) {
+    next(e);
+  }
 });
 
 newsRouter.get(
-    "/:id",
-    authOrNot,
-    validateObjectId(),
-    async (req, res, next) => {
-        const {id} = req.params;
+  "/:id",
+  authOrNot,
+  validateObjectId(),
+  async (req, res, next) => {
+    const {id} = req.params;
 
-        const {user} = req as RequestWithUser;
-        const isAdminOrManager =
-            user?.role === "ADMIN" || user?.role === "MANAGER";
+    const {user} = req as RequestWithUser;
+    const isAdminOrManager =
+      user?.role === "ADMIN" || user?.role === "MANAGER";
 
-        try {
-            const filter =
-                isAdminOrManager
-                    ? {_id: id}
-                    : {_id: id, isPublished: true};
+    try {
+      const filter =
+        isAdminOrManager
+          ? {_id: id}
+          : {_id: id, isPublished: true};
 
-            const infoNew = await News.findOne(filter);
+      const infoNew = await News.findOne(filter);
 
-            if (!infoNew) {
-                return res.status(404).send({
-                    error: "Новость не найдена",
-                });
-            }
+      if (!infoNew) {
+        return res.status(404).send({
+          error: "Новость не найдена",
+        });
+      }
 
-            res.send(infoNew);
-        } catch (error) {
-            next(error);
-        }
-    },
+      res.send(infoNew);
+    } catch (error) {
+      next(error);
+    }
+  },
 );
 
 newsRouter.post(
-    "/",
-    auth,
-    permit("ADMIN", "MANAGER"),
-    imagesUpload.single("image"),
-    async (req, res, next) => {
-        try {
-            const {title, content, tags} = req.body;
+  "/",
+  auth,
+  permit("ADMIN", "MANAGER"),
+  imagesUpload.single("image"),
+  async (req, res, next) => {
+    try {
+      const {title, content, tags} = req.body;
 
-            const {user} = req as RequestWithUser;
+      const {user} = req as RequestWithUser;
 
-            const parsedTags =
-                typeof tags === "string"
-                    ? tags
-                        .split(",")
-                        .map((t) => t.trim())
-                        .filter(Boolean)
-                    : [];
+      const parsedTags =
+        typeof tags === "string"
+          ? tags
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean)
+          : [];
 
-            const news = new News({
-                title,
-                content,
-                image: req.file ? "images/" + req.file.filename : null,
-                tags: parsedTags,
-                author: user._id,
-            });
+      const news = new News({
+        title,
+        content,
+        image: req.file ? "images/" + req.file.filename : null,
+        tags: parsedTags,
+        author: user._id,
+      });
 
-            const savedNews = await news.save();
+      const savedNews = await news.save();
 
-            res.send({
-                message: "НОВОСТЬ СОЗДАНА",
-                news: savedNews,
-            });
-        } catch (e) {
-            if (e instanceof mongoose.Error.ValidationError) {
-                return res.status(400).send({
-                    error: "Ошибка валидации",
-                    details: e.errors,
-                });
-            }
-            next(e);
-        }
-    },
+      res.send({
+        message: "НОВОСТЬ СОЗДАНА",
+        news: savedNews,
+      });
+    } catch (e) {
+      if (e instanceof mongoose.Error.ValidationError) {
+        return res.status(400).send({
+          error: "Ошибка валидации",
+          details: e.errors,
+        });
+      }
+      next(e);
+    }
+  },
 );
 
 newsRouter.delete(
-    "/:id",
-    auth,
-    permit("ADMIN", "MANAGER"),
-    validateObjectId(),
-    async (req, res, next) => {
-        const {id} = req.params;
+  "/:id",
+  auth,
+  permit("ADMIN", "MANAGER"),
+  validateObjectId(),
+  async (req, res, next) => {
+    const {id} = req.params;
 
-        try {
-            const {deletedCount} = await News.deleteOne({_id: id});
-            if (!deletedCount) {
-                return res.status(404).send({
-                    error: "Новость не найдена",
-                });
-            }
+    try {
+      const {deletedCount} = await News.deleteOne({_id: id});
+      if (!deletedCount) {
+        return res.status(404).send({
+          error: "Новость не найдена",
+        });
+      }
 
-            return res.send({
-                message: "Новость удалена",
-            });
-        } catch (e) {
-            next(e);
-        }
-    },
+      return res.send({
+        message: "Новость удалена",
+      });
+    } catch (e) {
+      next(e);
+    }
+  },
 );
 
 newsRouter.patch(
-    "/:id/isPublished",
-    auth,
-    permit("ADMIN", "MANAGER"),
-    validateObjectId(),
-    async (req, res, next) => {
-        const {id} = req.params;
+  "/:id/isPublished",
+  auth,
+  permit("ADMIN", "MANAGER"),
+  validateObjectId(),
+  async (req, res, next) => {
+    const {id} = req.params;
 
-        try {
-            const news = await News.findById(id);
-            if (!news) {
-                return res.status(404).send({
-                    error: "Новость не найдена",
-                });
-            }
+    try {
+      const news = await News.findById(id);
+      if (!news) {
+        return res.status(404).send({
+          error: "Новость не найдена",
+        });
+      }
 
-            news.isPublished = !news.isPublished;
-            await news.save();
-            return res.send(news);
-        } catch (e) {
-            next(e);
-        }
-    },
+      news.isPublished = !news.isPublished;
+      await news.save();
+      return res.send(news);
+    } catch (e) {
+      next(e);
+    }
+  },
 );
 
 newsRouter.patch(
-    "/:id/edit",
-    auth,
-    permit("ADMIN", "MANAGER"),
-    validateObjectId(),
-    imagesUpload.single("image"),
-    async (req, res, next) => {
-        const {id} = req.params;
+  "/:id/edit",
+  auth,
+  permit("ADMIN", "MANAGER"),
+  validateObjectId(),
+  imagesUpload.single("image"),
+  async (req, res, next) => {
+    const {id} = req.params;
 
-        try {
-            const news = await News.findById(id);
+    try {
+      const news = await News.findById(id);
 
-            if (!news) {
-                return res.status(404).send({
-                    error: "Новость не найдена",
-                });
-            }
+      if (!news) {
+        return res.status(404).send({
+          error: "Новость не найдена",
+        });
+      }
 
-            const {title, content, tags} = req.body;
+      const {title, content, tags} = req.body;
 
-            const updateData: Partial<NewsFields> = {};
+      const updateData: Partial<NewsFields> = {};
 
-            if (title) updateData.title = title;
-            if (content) updateData.content = content;
+      if (title) updateData.title = title;
+      if (content) updateData.content = content;
 
-            if (typeof tags === "string") {
-                updateData.tags = tags
-                    .split(",")
-                    .map((t) => t.trim())
-                    .filter(Boolean);
-            }
+      if (typeof tags === "string") {
+        updateData.tags = tags
+          .split(",")
+          .map((t) => t.trim())
+          .filter(Boolean);
+      }
 
-            if (req.file) {
-                updateData.image = "images/" + req.file.filename;
-            }
+      if (req.file) {
+        updateData.image = "images/" + req.file.filename;
+      }
 
-            const updated = await News.findByIdAndUpdate(id, updateData, {
-                returnDocument: "after",
-                runValidators: true,
-            });
+      const updated = await News.findByIdAndUpdate(id, updateData, {
+        returnDocument: "after",
+        runValidators: true,
+      });
 
-            res.send({
-                message: "НОВОСТЬ ОБНОВЛЕНА",
-                news: updated,
-            });
-        } catch (e) {
-            next(e);
-        }
-    },
+      res.send({
+        message: "НОВОСТЬ ОБНОВЛЕНА",
+        news: updated,
+      });
+    } catch (e) {
+      next(e);
+    }
+  },
 );
 
 export default newsRouter;
