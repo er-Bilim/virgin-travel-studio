@@ -1,11 +1,13 @@
-const AdminLeadsPage = () => {
-    return (
-        <div>
-            <h1 className="text-2xl font-bold text-[#1E2B6D]">
-                Заявки
-            </h1>
-        </div>
-    );
-};
+import OrderTable from "@/components/dashboard/orders/OrderTable";
 
-export default AdminLeadsPage;
+
+const AdminOrderPage = () => {    
+    return (
+      <>
+        <OrderTable/>
+      </>
+    );
+}
+
+
+export default AdminOrderPage;

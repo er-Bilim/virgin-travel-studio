@@ -323,6 +323,12 @@ const run = async () => {
         status: 'COMPLETED',
         managerId: manager._id,
       },
+      {
+        tourSetId: ts2._id,
+        clientName: 'Клиент которого не обработали',
+        clientPhone: '+79112223347',
+        status: 'NEW'
+      },
     ]);
 
     await Review.create([
