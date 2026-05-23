@@ -1,17 +1,7 @@
-import {IOrder} from "@/types/orders.types.js";
-import {TourSetFields} from "@/types/tourSets.types.js";
-import {UserFields} from "@/types/users.types.js";
-
-export type TourRosterItem = {
-    clientName: string;
-    clientPhone: string;
-    tour: string;
-    status: string;
-    dates: string;
-    hotel: string;
-    manager: string;
-    sum: number;
-};
+import type{IOrder} from "@/types/orders.types.js";
+import type{TourSetFields} from "@/types/tourSets.types.js";
+import type {UserFields} from "@/types/users.types.js";
+import {Types} from "mongoose";
 
 export type PopulatedOrder = Omit<IOrder, 'tourSetId' | 'managerId'> & {
     tourSetId: Omit<TourSetFields, 'tourId'> & {
@@ -23,17 +13,12 @@ export type PopulatedOrder = Omit<IOrder, 'tourSetId' | 'managerId'> & {
     managerId: UserFields;
 };
 
-export type GetParams = {
-    from?: string;
-    to?: string;
-    managerId?: string;
+export type MongoDateFilter = {
+    $gte?: Date;
+    $lte?: Date;
 };
 
-export type DailyManagerRow = {
-    manager: string;
-    newOrders: number;
-    inProgress: number;
-    completed: number;
-    rejected: number;
-    revenue: number;
+export type MatchFilter = {
+    createdAt?: MongoDateFilter;
+    managerId?: Types.ObjectId;
 };
