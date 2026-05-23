@@ -9,7 +9,7 @@ import validateObjectId from "@/middlewares/validateObjectId.js";
 
 const newsRouter = express.Router();
 
-newsRouter.get("/", authOrNot, async (req, res, next) => {
+newsRouter.get("/",validateObjectId("authorId"), authOrNot, async (req, res, next) => {
   const {user} = req as RequestWithUser;
   const isAdminOrManager =
     user?.role === "ADMIN" || user?.role === "MANAGER";

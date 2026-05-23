@@ -7,7 +7,7 @@ export type NewsFields = {
   isPublished: boolean;
   author: {
     fullName: string;
-    id: string;
+    _id: string;
   };
   createdAt: string;
   updatedAt: string;
