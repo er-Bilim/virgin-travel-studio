@@ -26,8 +26,14 @@ export const createNews = async (data: NewsMutation) => {
   return response.data;
 }
 
-export const getNews = async (searchText?: string) => {
-  const response = await axiosApi.get<NewsFields[]>("/news", {params: {searchTitle: searchText}});
+export const getNews = async (searchText?: string, isPublished?: string, authorId?: string) => {
+  const params: Record<string, string | undefined> = {};
+
+  if (searchText) params.searchTitle = searchText;
+  if (isPublished && isPublished !== "all") params.isPublished = isPublished;
+  if (authorId && authorId !== "all") params.authorId = authorId;
+
+  const response = await axiosApi.get<NewsFields[]>("/news", { params });
   return response.data;
 }
 

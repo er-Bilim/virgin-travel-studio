@@ -6,6 +6,7 @@ import permit from '@/middlewares/permit.js';
 import config from '@/config.js';
 import jwt from 'jsonwebtoken';
 import validateObjectId from "@/middlewares/validateObjectId.js";
+import managersRouter from "@/routes/users/managers.js";
 
 const usersRouter = express.Router();
 
@@ -260,5 +261,19 @@ usersRouter.get("/me", auth, async (req, res, next) => {
         next(e);
     }
 });
+
+usersRouter.get(
+  '/',
+  auth,
+  permit('ADMIN', 'MANAGER'),
+  async (req, res, next) => {
+      try {
+          const users = await User.find({})
+          res.send(users);
+      } catch (e) {
+          next(e);
+      }
+  },
+);
 
 export default usersRouter;

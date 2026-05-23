@@ -25,10 +25,20 @@ import {
 } from "@/lib/constants";
 import {Input} from "@/components/ui/input";
 import {Search} from "lucide-react";
+import {
+  Select,
+  SelectContent, SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
+import {useUsers} from "@/lib/hooks/userHooks";
 
 export default function NewsList() {
   const [searchNews, setSearchNews] = useState("");
   const [searchNewsWithDelay, setSearchNewsWithDelay] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [authorFilter, setAuthorFilter] = useState("all");
+
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -36,11 +46,20 @@ export default function NewsList() {
     }, 700);
 
     return () => clearTimeout(timeout);
-  },[searchNews]);
+  }, [searchNews]);
 
-  const {data: news, isLoading, isError} = useNews(searchNewsWithDelay);
+  const {
+    data: news,
+    isLoading,
+    isError
+  } = useNews(searchNewsWithDelay, statusFilter, authorFilter);
   const {mutate: deleteNews, isPending: isDeleting} = useDeleteNews();
   const {mutate: togglePublicate} = usePublicateNews();
+
+  const {
+    data: users,
+    isLoading: loadingUsers,
+  } = useUsers();
 
   const [newsToDelete, setNewsToDelete] = useState<string | null>(null);
   const [editingNewsId, setEditingNewsId] = useState<string | null>(null);
@@ -65,7 +84,6 @@ export default function NewsList() {
     (item) => item._id === editingNewsId
   );
 
-
   return (
     <div className="p-8 space-y-8 bg-gray-50 min-h-screen">
       <div className="flex items-center justify-between">
@@ -78,8 +96,46 @@ export default function NewsList() {
               value={searchNews}
               onChange={(e) => setSearchNews(e.target.value)}
               placeholder="Поиск по названию..."
-              className="pl-9 bg-white border-gray-300 focus-visible:ring-1 focus-visible:ring-offset-0 transition-colors focus-visible:border-primary h-10"
+              className="pl-9 bg-white border-gray-300 focus-visible:ring-1 focus-visible:ring-offset-0 transition-colors focus-visible:border-primary h-8"
             />
+          </div>
+          <div className="w-full sm:w-48">
+            <Select
+              value={statusFilter}
+              onValueChange={setStatusFilter}
+            >
+              <SelectTrigger className="w-full bg-white border-gray-300">
+                <SelectValue placeholder="Статус" />
+              </SelectTrigger>
+              <SelectContent position="popper">
+                <SelectItem value="all">Все статусы</SelectItem>
+                <SelectItem value="true">Опубликовано</SelectItem>
+                <SelectItem value="false">Не опубликовано</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="w-full sm:w-48">
+            <Select
+              value={authorFilter}
+              onValueChange={setAuthorFilter}
+              disabled={loadingUsers}
+            >
+              <SelectTrigger className="w-full bg-white border-gray-300">
+                <SelectValue placeholder={loadingUsers ? "Загрузка пользователей" : "Авторы"} />
+              </SelectTrigger>
+              <SelectContent position="popper">
+                <SelectItem value="all">Все авторы</SelectItem>
+                {users?.map((user) => (
+                  <SelectItem
+                    key={user._id}
+                    value={user._id}
+                  >
+                    {user.fullName}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <Dialog>
             <DialogTrigger asChild>

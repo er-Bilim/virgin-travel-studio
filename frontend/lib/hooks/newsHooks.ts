@@ -59,10 +59,10 @@ const useCreateNews = (setError: UseFormSetError<NewsMutation>) => {
 };
 export default useCreateNews;
 
-export const useNews = (searchTitle?: string) => {
+export const useNews = (searchTitle?: string, isPublished?: string, authorId?: string) => {
   return useQuery({
-    queryKey: ['news', searchTitle],
-    queryFn: () => getNews(searchTitle),
+    queryKey: ['news', searchTitle, isPublished, authorId],
+    queryFn: () => getNews(searchTitle, isPublished, authorId),
   });
 };
 

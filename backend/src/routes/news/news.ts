@@ -18,7 +18,13 @@ newsRouter.get("/", authOrNot, async (req, res, next) => {
       isPublished?: boolean;
       tags?: { $in: string[] };
       title?: { $regex: string, $options: "i" };
+      author?: string;
     } = {};
+
+    const filterIsPublished = req.query.isPublished;
+    if (typeof filterIsPublished === "string" && filterIsPublished.trim().length > 0) {
+      query.isPublished = filterIsPublished === "true";
+    }
 
     if (!isAdminOrManager) {
       query.isPublished = true;
@@ -44,6 +50,13 @@ newsRouter.get("/", authOrNot, async (req, res, next) => {
       if (trimmedSearch.length > 0) {
         const safeSearch = trimmedSearch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         query.title = {$regex: safeSearch, $options: "i"};
+      }
+    }
+
+    const authorId = req.query.authorId;
+    if (typeof authorId === "string") {
+      if (authorId.trim().length > 0) {
+        query.author = authorId;
       }
     }
 
