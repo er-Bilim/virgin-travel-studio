@@ -1,0 +1,48 @@
+# Qodo Merge / PR-Agent configuration
+# Docs: https://qodo-merge-docs.qodo.ai/
+
+[config]
+model = "gpt-4o"
+# Язык ответа задаём через extra_instructions ниже,
+# отдельного language-параметра у Qodo нет
+
+[pr_reviewer]
+# Главный ревью-блок
+require_score_review = false
+require_tests_review = true
+require_security_review = true
+num_code_suggestions = 4
+extra_instructions = """
+Отвечай на русском языке.
+Это фронтенд-проект на TypeScript + React + Zustand + TanStack Query.
+Обращай внимание на: типы (strict mode), архитектуру (feature-based folders),
+разделение service layer, корректность хуков React.
+Не придирайся к стилю если он консистентный в проекте.
+Пропускай тривиальные комментарии типа 'добавь JSDoc'.
+"""
+
+[pr_description]
+publish_labels = true
+add_original_user_description = true
+extra_instructions = """
+Отвечай на русском языке. Описание PR делай кратким:
+2-3 предложения о сути изменений, затем bullet-list ключевых правок.
+"""
+
+[pr_code_suggestions]
+num_code_suggestions = 4
+commitable_code_suggestions = true
+extra_instructions = """
+Отвечай на русском языке.
+Предлагай только важные изменения: баги, типы, безопасность, производительность.
+Не предлагай переименования и косметику.
+"""
+
+[github_app]
+pr_commands = [
+    "/describe",
+    "/review",
+    "/improve",
+]
+
+handle_pr_actions = ['opened', 'reopened', 'ready_for_review']
