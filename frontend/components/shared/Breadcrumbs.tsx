@@ -25,7 +25,7 @@ export function Breadcrumbs({ items }: Props) {
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
           return (
-            <Fragment key={item.label}>
+            <Fragment key={item.label + item.href + index}>
               <BreadcrumbItem>
                 {item.href && !isLast ? (
                   <BreadcrumbLink asChild>
