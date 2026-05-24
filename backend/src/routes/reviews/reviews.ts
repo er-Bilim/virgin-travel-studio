@@ -70,8 +70,8 @@ reviewsRouter.get('/public', async (req, res, next) => {
   try {
     const { tourId, limit = '10', page = '1' } = req.query;
 
-    const pageNum = Math.max(Number(page) || 1, 1)
-    const limitNum = Math.min(Math.max(Number(limit) || 10, 1), 50);
+    const pageNum = Math.max(parseInt(page as string, 10) || 1, 1)
+    const limitNum = Math.min(Math.max(parseInt(limit as string) || 10, 1), 50);
     const skipNum = (pageNum - 1) * limitNum 
 
     const query: {
