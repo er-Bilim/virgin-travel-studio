@@ -6,13 +6,12 @@ import {
   updateTourSet,
   deleteTourSet,
 } from '@/services/tourSets';
-import type { TourSetMutation } from '@/types/tourSets';
+import type { TourSetMutation, TourSetsFilters } from '@/types/tourSets';
 
-export const useTourSets = (page: number, limit: number, tourId?: string) => {
+export const useTourSets = (filters: TourSetsFilters) => {
   return useQuery({
-    queryKey: ['tourSets', 'list', page, limit, tourId],
-    queryFn: () => getTourSets(page, limit, tourId),
-    placeholderData: (previousData) => previousData,
+    queryKey: ['tourSets', filters],
+    queryFn: () => getTourSets(filters),
   });
 };
 

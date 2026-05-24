@@ -43,3 +43,12 @@ export interface TourSetMutation {
   saleDeadline?: string;
   status?: TourSetStatus;
 }
+
+export interface TourSetsFilters {
+  page: number;
+  limit: number;
+  tourId: string;
+  maxPrice?: number;
+  startDate?: string;
+  endDate?: string;
+}
