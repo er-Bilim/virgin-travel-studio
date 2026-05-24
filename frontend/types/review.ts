@@ -18,11 +18,12 @@ export interface IReview {
 export interface IPaginationReviews {
   reviews: IReview[]
   totalReviews: number;
-  hasMore: boolean;
+  page: number;
+  totalPage: number;
 }
 
 export interface IReviewParams {
   tourId?: string;
   limit: number;
-  skip: number;
+  page: number;
 }

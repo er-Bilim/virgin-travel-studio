@@ -1,8 +1,9 @@
 import { createReview, getReviews } from '@/services/reviews';
-import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 const PAGE_SIZE = 10;
 const INITIAL_PAGE_SIZE = 3;
+const ADMIN_PAGE_SIZE = 20;
 
 export const useCreateReview = () => {
   const queryClient = useQueryClient();
@@ -17,22 +18,28 @@ export const useCreateReview = () => {
 
 export const useInfiniteReviews = (tourId?: string) => {
   return useInfiniteQuery({
-    queryKey: ['reviews', 'public', tourId],
+    queryKey: ['reviews', 'public', 'infinite',tourId],
     queryFn: ({ pageParam }) => {
-      const isFirst = pageParam === 0;
+      const limit = pageParam === 1 ? INITIAL_PAGE_SIZE : PAGE_SIZE;
       return getReviews({
-        tourId: tourId,
-        skip: pageParam,
-        limit: isFirst ? INITIAL_PAGE_SIZE : PAGE_SIZE,
+        tourId,
+        page: pageParam,
+        limit,
       })
     },
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages) => {
-      if (!lastPage.hasMore) return undefined;
-
-      const loaded = allPages.reduce((acc, page) => acc + page.reviews.length, 0);
-      return loaded;
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.page >= lastPage.totalPage) return undefined;
+      return lastPage.page + 1;
     },
     enabled: !!tourId,
   })
+};
+
+export const useAdminReviewsPage = (tourId: string | undefined, page: number) => {
+  return useQuery({
+    queryKey: ['reviews', 'admin', tourId, page],
+    queryFn: () => getReviews({ tourId, page, limit: ADMIN_PAGE_SIZE }),
+    placeholderData: keepPreviousData,
+  });
 };
