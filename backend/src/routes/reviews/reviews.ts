@@ -68,7 +68,10 @@ reviewsRouter.post(
 
 reviewsRouter.get('/public', async (req, res, next) => {
   try {
-    const { tourId } = req.query;
+    const { tourId, limit = '10', skip = '0' } = req.query;
+
+    const limitNum = Math.min(Math.max(Number(limit) || 10, 1), 50);
+    const skipNum = Math.max(Number(skip) || 0, 0);
 
     const query: {
       isModerated: boolean;
@@ -84,11 +87,20 @@ reviewsRouter.get('/public', async (req, res, next) => {
       query.tourId = tourId;
     }
 
-    const reviews = await Review.find(query)
-      .sort({ createdAt: -1 })
-      .populate('tourId', 'title');
+    const [reviews, totalReviews] = await Promise.all([
+      Review.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skipNum)
+        .limit(limitNum)
+        .populate('tourId', 'title'),
+      Review.countDocuments(query),
+    ]);
 
-    res.send(reviews);
+    res.send({
+      reviews,
+      totalReviews,
+      hasMore: skipNum + reviews.length < totalReviews,
+    });
   } catch (e) {
     next(e);
   }
