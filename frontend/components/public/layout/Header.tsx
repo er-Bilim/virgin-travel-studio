@@ -76,6 +76,7 @@ export default function Header() {
                 src={logo}
                 className="h-8 w-auto sm:h-10 cursor-pointer"
                 alt="Virgin travel studio"
+                priority
               />
             </Link>
           </div>
