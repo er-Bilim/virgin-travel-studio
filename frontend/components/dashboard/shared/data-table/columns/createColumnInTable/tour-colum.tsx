@@ -1,8 +1,15 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import type { TourType } from '@/types/tour';
+
 import { createActionsColumn } from '@/components/dashboard/shared/data-table/columns/createActionsColumn';
-import {imageUrl} from "@/lib/constants";
-import {Badge} from "@/components/ui/badge";
+import { imageUrl } from '@/lib/constants';
+import { Badge } from '@/components/ui/badge';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 type Props = {
     onView: (tour: TourType) => void;
@@ -27,39 +34,55 @@ export const getToursColumns = ({
             const tour = row.original;
 
             if (!tour.images?.[0]) {
-                return (
-                    <div className="w-10 h-10 rounded bg-gray-200" />
-                );
+                return <div className="w-10 h-10 rounded bg-gray-200" />;
             }
 
             return (
-                <img
-                    alt="Фото туров"
-                    src={imageUrl + tour.images[0]}
-                    width={40}
-                    height={40}
-                    className="rounded object-cover"
-                />
+                <a
+                    href={imageUrl + tour.images[0]}
+                    target="_blank"
+                    rel="noreferrer"
+                >
+                    <img
+                        alt="Фото тура"
+                        src={imageUrl + tour.images[0]}
+                        width={40}
+                        height={40}
+                        className="rounded object-cover transition hover:scale-105"
+                    />
+                </a>
             );
         },
     },
+
     {
         accessorKey: 'title',
         header: 'Название',
         cell: ({ row }) => (
             <div className="flex flex-col">
-                <div className="w-ful max-w-60 truncate">
-                    {row.original.title}
-                </div>
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <div className="w-full max-w-60 truncate cursor-default">
+                                {row.original.title}
+                            </div>
+                        </TooltipTrigger>
+
+                        <TooltipContent>
+                            {row.original.title}
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
 
                 {!row.original.isPublished && (
                     <span className="text-[10px] text-gray-400 uppercase">
-                    Черновик
-                </span>
+            Черновик
+          </span>
                 )}
             </div>
         ),
     },
+
     {
         accessorKey: 'category',
         header: 'Категория',
@@ -77,8 +100,8 @@ export const getToursColumns = ({
                     variant="outline"
                     className={
                         isPublished
-                            ? "bg-[#1E2B6D] text-white border-[#1E2B6D]"
-                            : "bg-gray-100 text-gray-600 border-gray-200"
+                            ? 'bg-[#1E2B6D] text-white border-[#1E2B6D]'
+                            : 'bg-gray-100 text-gray-600 border-gray-200'
                     }
                 >
                     {isPublished ? 'Опубликовано' : 'Не опубликовано'}
@@ -94,25 +117,30 @@ export const getToursColumns = ({
                 label: 'Просмотр',
                 onClick: onView,
             },
+
             {
                 id: 'toggle-publish',
                 label: (tour) =>
-                    tour.isPublished ? 'Снять с публикации' : 'Опубликовать',
+                    tour.isPublished
+                        ? 'Снять с публикации'
+                        : 'Опубликовать',
 
                 onClick: onTogglePublish,
                 className: 'text-blue-600',
             },
+
             {
-               id: 'edit',
-               label: 'Редактироание',
-               onClick: onEdit,
+                id: 'edit',
+                label: 'Редактирование',
+                onClick: onEdit,
             },
+
             {
                 id: 'delete',
                 label: 'Удалить',
                 onClick: onDelete,
                 className: 'text-red-600',
-                hidden: () => !visible
+                hidden: () => !visible,
             },
         ],
     }),
