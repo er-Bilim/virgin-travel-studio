@@ -1,4 +1,4 @@
-import { createReview, getReviews } from '@/services/reviews';
+import { createReview, getPublicReviews, getAdminReviews   } from '@/services/reviews';
 import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 const PAGE_SIZE = 10;
@@ -19,7 +19,7 @@ export const useInfiniteReviews = (tourId?: string) => {
   return useInfiniteQuery({
     queryKey: ['reviews', 'public', 'infinite',tourId],
     queryFn: ({ pageParam }) => {
-      return getReviews({
+      return getPublicReviews({
         tourId,
         page: pageParam,
         limit: PAGE_SIZE,
@@ -37,7 +37,7 @@ export const useInfiniteReviews = (tourId?: string) => {
 export const useAdminReviewsPage = (tourId: string | undefined, page: number) => {
   return useQuery({
     queryKey: ['reviews', 'admin', tourId, page],
-    queryFn: () => getReviews({ tourId, page, limit: ADMIN_PAGE_SIZE }),
+    queryFn: () => getAdminReviews({ tourId, page, limit: ADMIN_PAGE_SIZE }),
     placeholderData: keepPreviousData,
   });
 };

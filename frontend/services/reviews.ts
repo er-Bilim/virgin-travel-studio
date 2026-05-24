@@ -5,9 +5,22 @@ import { toast } from 'sonner';
 
 
 
-export const getReviews = async (params: IReviewParams): Promise<IPaginationReviews> => {
+export const getPublicReviews = async (params: IReviewParams): Promise<IPaginationReviews> => {
   try {
     const { data } = await axiosApi.get<IPaginationReviews>('/reviews/public', {
+      params,
+    });
+
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const getAdminReviews = async (params: IReviewParams): Promise<IPaginationReviews> => {
+  try {
+    const { data } = await axiosApi.get<IPaginationReviews>('/reviews/admin', {
       params,
     });
 
