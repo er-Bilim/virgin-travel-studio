@@ -1,11 +1,16 @@
 import axiosApi from '@/lib/axiosApi';
 import { createFormData } from '@/lib/utils';
-import type { IReview, IReviewMutation } from '@/types/review';
+import type { IPaginationReviews, IReview, IReviewMutation, IReviewParams } from '@/types/review';
 import { toast } from 'sonner';
 
-export const getReviews = async (tourId: string): Promise<IReview[]> => {
+
+
+export const getReviews = async (params: IReviewParams): Promise<IPaginationReviews> => {
   try {
-    const { data } = await axiosApi.get(`/reviews/public?tourId=${tourId}`);
+    const { data } = await axiosApi.get<IPaginationReviews>('/reviews/public', {
+      params,
+    });
+
     return data;
   } catch (error) {
     console.error(error);

@@ -14,3 +14,15 @@ export interface IReview {
   createdDate: string;
   updatedDate: string;
 }
+
+export interface IPaginationReviews {
+  reviews: IReview[]
+  totalReviews: number;
+  hasMore: boolean;
+}
+
+export interface IReviewParams {
+  tourId?: string;
+  limit: number;
+  skip: number;
+}
