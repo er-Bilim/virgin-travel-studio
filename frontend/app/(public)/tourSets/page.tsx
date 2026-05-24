@@ -15,7 +15,7 @@ export default function TourSets() {
     null,
   );
 
-  const { data: tourSetsData, isLoading, isError, refetch } = useTourSets(page, limit);
+  const { data: tourSetsData, isLoading, isError, refetch } = useTourSets({page, limit});
 
     const tourSets = tourSetsData?.tourSets || [];
     const meta = tourSetsData?.meta;
