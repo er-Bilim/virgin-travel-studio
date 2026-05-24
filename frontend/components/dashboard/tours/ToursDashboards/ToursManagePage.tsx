@@ -282,7 +282,7 @@ export default function ToursManagePage() {
                   </table>
                 </div>
 
-                {hasTours && (
+                {totalPages > 1 && (
                     <div className="px-4 py-3 bg-white border-t flex items-center justify-between">
                       <div className="text-sm text-gray-500 font-medium">
                         Страница <span className="text-[#1E2B6D]">{page}</span> из{' '}

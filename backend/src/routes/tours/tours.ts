@@ -8,6 +8,10 @@ import validateObjectId from '@/middlewares/validateObjectId.js';
 
 const toursRouter = express.Router();
 
+const escapeRegex = (value: string) => {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+};
+
 toursRouter.get('/', authOrNot, async (req, res, next) => {
   const { user } = req as RequestWithUser;
   const isAdminOrManager = user?.role === 'ADMIN' || user?.role === 'MANAGER';
@@ -41,7 +45,7 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
 
     if (typeof req.query.search === 'string' && req.query.search.trim() !== '') {
       query.title = {
-        $regex: req.query.search.trim(),
+        $regex: escapeRegex(req.query.search.trim()),
         $options: 'i',
       };
     }
