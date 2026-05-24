@@ -30,6 +30,7 @@ import { FaWhatsapp } from 'react-icons/fa';
 import Review from '@/components/public/reviews/Review';
 import { Spinner } from '@/components/ui/spinner';
 import { useInfiniteReviews } from '@/lib/hooks/reviewHooks';
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 
 export default function TourSetPage() {
   const params = useParams();
@@ -146,21 +147,32 @@ export default function TourSetPage() {
           tourSetId={data._id}
         />
       )}
-      <section aria-labelledby="tour-title" className="mt-5 relative">
-        {/* <nav aria-label="Хлебные крошки">Хлебные крошки</nav> */}
-        <div className="flex items-center gap-4 absolute z-1 top-3 left-3 text-xs">
-          {set.isHot && (
-            <p className="flex gap-2 bg-blur bg-red-500 text-red-50 border-1 border-red-500 rounded-4xl uppercase font-semibold px-4 py-2 items-center">
-              <Flame className="size-4" />
-              Горящий
-            </p>
-          )}
-          <p className="flex gap-2 bg-slate-100 text-slate-500 border-1 border-slate-500 rounded-4xl uppercase font-semibold px-4 py-2">
-            {tour.category.title}
-          </p>
-        </div>
 
-        <TourGallery images={tour.images} title={tour.title} />
+      <section aria-labelledby="tour-title" className="mt-5 ">
+        <Breadcrumbs
+          items={[
+            { label: 'Туры', href: '/tours' },
+            {
+              label: tour.category.title,
+              href: `/tours?category=${tour.category._id}`,
+            },
+            { label: tour.title },
+          ]}
+        />
+        <div className="relative">
+          <div className="flex items-center gap-4 absolute z-1 top-3 left-3 text-xs">
+            {set.isHot && (
+              <p className="flex gap-2 bg-blur bg-red-500 text-red-50 border-1 border-red-500 rounded-4xl uppercase font-semibold px-4 py-2 items-center">
+                <Flame className="size-4" />
+                Горящий
+              </p>
+            )}
+            <p className="flex gap-2 bg-slate-100 text-slate-500 border-1 border-slate-500 rounded-4xl uppercase font-semibold px-4 py-2">
+              {tour.category.title}
+            </p>
+          </div>
+          <TourGallery images={tour.images} title={tour.title} />
+        </div>
 
         <header>
           <h1
@@ -260,7 +272,7 @@ export default function TourSetPage() {
             <div className="flex flex-col gap-3 mt-6">{renderReviews()}</div>
             {hasNextPage && (
               <button
-                aria-label='загрузить еще отзывов'
+                aria-label="загрузить еще отзывов"
                 className="text-center border-1 border-[var(--silver)] rounded-lg p-3 mt-5 w-full font-semibold cursor-pointer"
                 onClick={() => fetchNextPage()}
                 disabled={isFetchingNextPage}
