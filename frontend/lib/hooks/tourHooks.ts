@@ -10,10 +10,16 @@ import {
 import { toast } from 'sonner';
 import type { TourMutation } from '@/types/tour';
 
-export const useTours = (page: number, limit: number, categoryId?: string) => {
+export const useTours = (
+    page: number,
+    limit: number,
+    categoryId?: string,
+    search?: string,
+    isPublished?: string,
+) => {
   return useQuery({
-    queryKey: ['tours', page, limit, categoryId],
-    queryFn: () => getTours(page, limit, categoryId),
+    queryKey: ['tours', page, limit, categoryId, search, isPublished],
+    queryFn: () => getTours(page, limit, categoryId, search, isPublished),
   });
 };
 

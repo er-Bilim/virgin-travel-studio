@@ -25,6 +25,7 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
     const query: {
       isPublished?: boolean;
       category?: string;
+      title?: { $regex: string; $options: string };
     } = {};
 
     if (!isAdminOrManager) {
@@ -36,6 +37,23 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
         return res.status(400).send({ error: 'Неверный category ID' });
       }
       query.category = req.query.category;
+    }
+
+    if (typeof req.query.search === 'string' && req.query.search.trim() !== '') {
+      query.title = {
+        $regex: req.query.search.trim(),
+        $options: 'i',
+      };
+    }
+
+    if (isAdminOrManager && typeof req.query.isPublished === 'string') {
+      if (req.query.isPublished === 'true') {
+        query.isPublished = true;
+      }
+
+      if (req.query.isPublished === 'false') {
+        query.isPublished = false;
+      }
     }
 
     const tours = await Tour.find(query)
