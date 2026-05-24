@@ -8,10 +8,17 @@ import {
 } from '@/services/tourSets';
 import type { TourSetMutation, TourSetsFilters } from '@/types/tourSets';
 
-export const useTourSets = (filters: TourSetsFilters) => {
+export const useTourSets = (filters: TourSetsFilters = {}) => {
+  const safeFilters = {
+    page: filters.page ?? 1,
+    limit: filters.limit ?? 10,
+    tourId: filters.tourId ?? '',
+    ...filters,
+  };
+
   return useQuery({
-    queryKey: ['tourSets', filters],
-    queryFn: () => getTourSets(filters),
+    queryKey: ['tourSets', 'list', safeFilters],
+    queryFn: () => getTourSets(safeFilters),
   });
 };
 

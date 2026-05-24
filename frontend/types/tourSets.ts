@@ -45,9 +45,9 @@ export interface TourSetMutation {
 }
 
 export interface TourSetsFilters {
-  page: number;
-  limit: number;
-  tourId: string;
+  page?: number;
+  limit?: number;
+  tourId?: string;
   maxPrice?: number;
   startDate?: string;
   endDate?: string;

@@ -83,18 +83,19 @@ tourSetsRouter.get('/', authOrNot, async (req, res, next) => {
 
     if (typeof startDate === 'string' && startDate.trim() !== '') {
       const parsedStart = new Date(startDate);
+
       if (!Number.isNaN(parsedStart.getTime())) {
+        const dateFilter: { $gte: Date; $lte?: Date } = { $gte: parsedStart };
+
         if (typeof endDate === 'string' && endDate.trim() !== '') {
           const parsedEnd = new Date(endDate);
+
           if (!Number.isNaN(parsedEnd.getTime())) {
-            query.startDate = {
-              $gte: parsedStart,
-              $lte: parsedEnd,
-            };
+            dateFilter.$lte = parsedEnd;
           }
-        } else {
-          query.startDate = { $gte: parsedStart };
         }
+
+        query.startDate = dateFilter;
       }
     }
 
