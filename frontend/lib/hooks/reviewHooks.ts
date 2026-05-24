@@ -2,7 +2,6 @@ import { createReview, getReviews } from '@/services/reviews';
 import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 const PAGE_SIZE = 10;
-const INITIAL_PAGE_SIZE = 3;
 const ADMIN_PAGE_SIZE = 20;
 
 export const useCreateReview = () => {
@@ -20,11 +19,10 @@ export const useInfiniteReviews = (tourId?: string) => {
   return useInfiniteQuery({
     queryKey: ['reviews', 'public', 'infinite',tourId],
     queryFn: ({ pageParam }) => {
-      const limit = pageParam === 1 ? INITIAL_PAGE_SIZE : PAGE_SIZE;
       return getReviews({
         tourId,
         page: pageParam,
-        limit,
+        limit: PAGE_SIZE,
       })
     },
     initialPageParam: 1,
