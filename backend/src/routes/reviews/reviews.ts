@@ -68,10 +68,11 @@ reviewsRouter.post(
 
 reviewsRouter.get('/public', async (req, res, next) => {
   try {
-    const { tourId, limit = '10', skip = '0' } = req.query;
+    const { tourId, limit = '10', page = '1' } = req.query;
 
+    const pageNum = Math.max(Number(page) || 1, 1)
     const limitNum = Math.min(Math.max(Number(limit) || 10, 1), 50);
-    const skipNum = Math.max(Number(skip) || 0, 0);
+    const skipNum = (pageNum - 1) * limitNum 
 
     const query: {
       isModerated: boolean;
@@ -99,7 +100,8 @@ reviewsRouter.get('/public', async (req, res, next) => {
     res.send({
       reviews,
       totalReviews,
-      hasMore: skipNum + reviews.length < totalReviews,
+      page: pageNum,
+      totalPage: Math.ceil(totalReviews / limitNum),
     });
   } catch (e) {
     next(e);
