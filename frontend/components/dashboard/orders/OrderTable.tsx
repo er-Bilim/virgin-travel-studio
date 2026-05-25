@@ -21,7 +21,7 @@ import { useUser } from '@/lib/hooks/authHooks';
 import { toast } from 'sonner';
 
 export default function OrderTable () {
-  const [page, setPage] = useState(1);
+  const [,setPage] = useState(1);
   const route = useRouter();
   const {data: user} = useUser();
     const {
@@ -98,7 +98,7 @@ if (isPending) {
               </Select>
             )}
             
-            <Link href={`leads/new`}>
+            <Link href='leads/new'>
               <Button className="bg-[#1E2B6D] hover:bg-[#162356]">
                 <Plus className="w-4 h-4 mr-2" /> Добавить заявку
               </Button>
@@ -132,4 +132,3 @@ if (isPending) {
     </>
   );
 };
-
