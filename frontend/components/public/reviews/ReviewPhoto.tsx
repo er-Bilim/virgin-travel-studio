@@ -5,6 +5,7 @@ import {
   DialogTrigger,
   DialogTitle,
   DialogClose,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { imageUrl, isDev } from '@/lib/constants';
@@ -36,6 +37,7 @@ const ReviewPhoto = ({ src, authorName, rating }: Props) => {
             sizes="120px"
             unoptimized={isDev}
             className="object-cover"
+            priority
           />
         </button>
       </DialogTrigger>
@@ -45,7 +47,7 @@ const ReviewPhoto = ({ src, authorName, rating }: Props) => {
           <button
             type="button"
             aria-label="Закрыть"
-            className="absolute right-4 top-4 z-10 flex size-9 items-center justify-center rounded-full bg-[var(--cyan-400)]/30 text-white backdrop-blur transition-colors hover:bg-[var(--cyan-400)]/80 cursor-pointer"
+            className="absolute right-2 top-2 z-10 flex size-9 items-center justify-center rounded-full bg-[var(--cyan-400)]/30 text-white backdrop-blur transition-colors hover:bg-[var(--cyan-400)]/80 cursor-pointer"
           >
             <X className="size-4" />
           </button>
@@ -56,6 +58,10 @@ const ReviewPhoto = ({ src, authorName, rating }: Props) => {
 
         <figure className="flex flex-col overflow-hidden rounded-lg bg-card">
           <div className="flex flex-1 items-center justify-center bg-black/95">
+            <DialogTitle>Просмотр фотографии</DialogTitle>
+            <DialogDescription>
+              Увеличенное изображение выбранного тура.
+            </DialogDescription>
             <Image
               src={fullSrc}
               alt={`Фото от ${authorName}`}

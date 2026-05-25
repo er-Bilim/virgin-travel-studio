@@ -7,15 +7,21 @@ import validateObjectId from "@/middlewares/validateObjectId.js";
 
 const managersRouter = Router();
 
-managersRouter.get('/', auth, permit('ADMIN'), async (req, res, next) => {
+managersRouter.get(
+  '/',
+  auth,
+  permit('ADMIN', 'MANAGER'),
+  async (req, res, next) => {
     try {
-        const managers = await User.find({ role: 'MANAGER' })
-            .sort({ createdAt: -1 });
-        res.send(managers);
+      const managers = await User.find({ role: 'MANAGER' }).sort({
+        createdAt: -1,
+      });
+      res.send(managers);
     } catch (e) {
-        next(e);
+      next(e);
     }
-});
+  },
+);
 
 managersRouter.post('/', auth, permit('ADMIN'), async (req, res, next) => {
     try {
