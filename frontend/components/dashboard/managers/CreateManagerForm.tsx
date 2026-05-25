@@ -39,10 +39,6 @@ export const CreateManagerForm = () => {
       className="space-y-5 rounded-3xl border border-gray-100 bg-white p-6 shadow-sm"
       autoComplete="off"
     >
-      <h2 className="text-xl font-semibold text-[#1E2B6D]">
-        Создание менеджера
-      </h2>
-
       <div className="space-y-1">
         <label htmlFor="fullName" className="text-sm font-medium text-gray-700">
           Личные данные ФИО

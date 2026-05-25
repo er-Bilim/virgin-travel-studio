@@ -16,7 +16,7 @@ export function Modal({ id, children, title, showCloseButton = true }: Props) {
 
     return (
         <Dialog open={isOpen} onOpenChange={closeModal}>
-            <DialogContent showCloseButton={showCloseButton}>
+            <DialogContent showCloseButton={showCloseButton} aria-describedby={undefined}>
                 {title &&
                     <DialogTitle className='text-lg font-semibold'>
                         {title}
