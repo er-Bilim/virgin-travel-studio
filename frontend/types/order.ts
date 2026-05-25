@@ -36,6 +36,16 @@ export interface OrderType {
   managerId: ManagerLite | null;
 }
 
+export interface PaginatedOrdersResponse {
+  orders: OrderType[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPage: number;
+  }
+}
+
 export interface OrderMutationType {
   tourSetId: string;
   clientPhone: string;
