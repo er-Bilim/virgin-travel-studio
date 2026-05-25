@@ -27,7 +27,6 @@ export default function OrderManageForm({ initialValues, orderId }: Props) {
     register,
     handleSubmit,
     control,
-    watch,
     setValue,
     formState: { errors },
   } = useForm<OrderMutationType>({ defaultValues: initialValues });
