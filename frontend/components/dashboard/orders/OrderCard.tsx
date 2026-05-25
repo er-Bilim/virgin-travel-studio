@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useForm, type SubmitHandler } from "react-hook-form";
-import type { OrderType } from "@/types/order";
+import type { OrderPostType  } from "@/types/order";
 import { useCreateOrder } from "@/lib/hooks/orderHooks";
 
 interface Props {
@@ -25,7 +25,7 @@ export function OrderCard({ isOpen, onClose, tourSetId }: Props) {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<OrderType>({
+  } = useForm<OrderPostType >({
     defaultValues: {
       tourSetId: tourSetId,
       clientName: '',
@@ -35,7 +35,7 @@ export function OrderCard({ isOpen, onClose, tourSetId }: Props) {
 
   const {mutate: postOrder } = useCreateOrder();
 
-  const onSubmit: SubmitHandler<OrderType> = (data) => {
+  const onSubmit: SubmitHandler<OrderPostType> = (data) => {
       postOrder(data, {
         onSuccess: () => {
           onClose();
