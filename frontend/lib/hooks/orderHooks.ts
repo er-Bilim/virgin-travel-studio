@@ -64,6 +64,7 @@ export const useDeleteOrder = () => {
     onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       queryClient.invalidateQueries({ queryKey: ['order', id] });
+      toast.success('Заявка удалена');
     },
   });
 }

@@ -1,28 +1,42 @@
 'use client';
 
-import { DataTable } from '@/components/dashboard/shared/data-table/data-table';
-import { getOrdersColumns } from '@/components/dashboard/shared/data-table/columns/createColumnInTable/order-columns';
-import { useMemo, useState } from 'react';
-import { useOrders } from '@/lib/hooks/orderHooks';
-import { useManagers } from '@/lib/hooks/managerHook';
+import {DataTable} from '@/components/dashboard/shared/data-table/data-table';
+import {
+  getOrdersColumns
+} from '@/components/dashboard/shared/data-table/columns/createColumnInTable/order-columns';
+import {useMemo, useState} from 'react';
+import {useDeleteOrder, useOrders} from '@/lib/hooks/orderHooks';
+import {useManagers} from '@/lib/hooks/managerHook';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from '@/components/ui/select';
 import Link from 'next/link';
-import { Loader, Plus } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { useDeleteOrder } from '@/lib/hooks/orderHooks';
-import { useUser } from '@/lib/hooks/authHooks';
-import { toast } from 'sonner';
+import {Loader, Plus} from 'lucide-react';
+import {usePathname, useRouter, useSearchParams} from 'next/navigation';
+import {Button} from '@/components/ui/button';
+import {useUser} from '@/lib/hooks/authHooks';
+import {toast} from 'sonner';
 
 export default function OrderTable () {
-  const [,setPage] = useState(1);
-  const route = useRouter();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const limit = Number(searchParams.get('limit') || 10);
+  const page = Number(searchParams.get('page') || 1);
+  const status = searchParams.get('status') || undefined;
+
+  const onChangePage = (numPage: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('page', String(numPage));
+
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
   const {data: user} = useUser();
     const {
       mutate: delOrder,
@@ -33,7 +47,7 @@ export default function OrderTable () {
   const columns = useMemo(
     () =>
       getOrdersColumns({
-        onView: (order) => route.push(`leads/${order._id}`),
+        onView: (order) => router.push(`leads/${order._id}`),
         onDelete: (order) => delOrder(order._id, {
           onError: () => {
             toast.error("Ошибка при удалениии");
@@ -42,12 +56,14 @@ export default function OrderTable () {
       }),
     [],
   );
-  const { data = [], isLoading, error, refetch } = useOrders(selectedManagerId);
+
   const {
     data: managers = [],
     isLoading: managerLoading,
     isError: managerError,
   } = useManagers();
+
+   const { data, isLoading, isError, error, refetch } = useOrders({ page, limit, managerId: selectedManagerId });
 
 if (isPending) {
   return (
@@ -73,7 +89,7 @@ if (isPending) {
                 value={selectedManagerId}
                 onValueChange={(val) => {
                   setSelectedManagerId(val === 'all' ? undefined : val);
-                  setPage(1);
+                  onChangePage(1);
                 }}
               >
                 <SelectTrigger className="w-[200px] bg-white">
@@ -126,7 +142,16 @@ if (isPending) {
             </Button>
           </div>
         ) : (
-          <DataTable columns={columns} data={data} />
+          <DataTable
+              columns={columns}
+              data={data?.orders || []}
+              pagination={{
+                page: page,
+                pageSize: limit,
+                total: data?.meta.total ?? 0,
+                onPageChange: onChangePage,
+              }}
+          />
         )}
       </div>
     </>
