@@ -2,27 +2,32 @@
 
 import { Controller, useForm } from 'react-hook-form';
 import type { IReviewMutation } from '@/types/review';
-import { commentRule, ratingRule } from './validation/reviewRules';
+import {
+  clientNameRule,
+  commentRule,
+  ratingRule,
+} from './validation/reviewRules';
 import { Button } from '@/components/ui/button';
 import Rating from '@/components/shared/Rating';
-import { StyledTextarea } from '@/components/shared/form/field-styles';
+import {
+  StyledInput,
+  StyledTextarea,
+} from '@/components/shared/form/field-styles';
 import { useCreateReview } from '@/lib/hooks/reviewHooks';
 import PhotoDropzone from '@/components/shared/PhotoDropzone';
 import { useState } from 'react';
 import { CheckCircle } from 'lucide-react';
-import { useUser } from '@/lib/hooks/authHooks';
 import { Spinner } from '@/components/ui/spinner';
 import ReviewerBadge from '../ReviewerBadge';
-import { toast } from 'sonner';
 
 interface Props {
   tourId?: string;
 }
 
-const CreateReviewForm = ({tourId}: Props) => {
+const CreateReviewForm = ({ tourId }: Props) => {
+  const [clientName, setClientName] = useState<string | null>(null)
   const [submitted, setSubmitted] = useState<boolean>(false);
   const { mutate, isPending: loadingReview } = useCreateReview();
-  const { data: me, isLoading: loadingUser, isError } = useUser();
 
   const ratingOptions = [
     {
@@ -64,17 +69,18 @@ const CreateReviewForm = ({tourId}: Props) => {
     formState: { errors },
     reset,
     control,
+    getValues
   } = useForm<IReviewMutation>({ defaultValues });
 
+  
+
   const onSubmit = (data: IReviewMutation) => {
-    if (!me) {
-      return toast.error('Ошибка: Не был получен пользователь')
-    };
+
+    setClientName(getValues('clientName'));
 
     const newData = {
       ...data,
       tourId: tourId,
-      clientName: me.fullName,
     };
 
     try {
@@ -93,24 +99,6 @@ const CreateReviewForm = ({tourId}: Props) => {
     }
   };
 
-  const renderClientName = () => {
-    if (loadingUser) {
-      return <Spinner />;
-    }
-
-    if (isError) {
-      return (
-        <p className="text-lg text-muted-foreground font-semibold">Ошибка</p>
-      );
-    }
-
-    if (!me) {
-      return <ReviewerBadge name="Аноним" />;
-    };
-
-    return <ReviewerBadge name={me.fullName} />;
-  };
-
   if (submitted) {
     return (
       <div className="rounded-2xl border border-border bg-card p-8 text-center">
@@ -121,14 +109,15 @@ const CreateReviewForm = ({tourId}: Props) => {
         <p className="mt-1 text-sm text-muted-foreground">
           Он появится на странице после модерации
         </p>
-        <div className="mt-5">{renderClientName()}</div>
+        <div className="mt-5">
+          <ReviewerBadge name={clientName} />
+        </div>
       </div>
     );
   }
 
   return (
     <div className="bg-[var(--card)] border-1 border-[var(--border)] p-7 rounded-4xl">
-      <div className="mb-5">{renderClientName()}</div>
       <h3 className="font-semibold text-[var(--card-foreground)] text-2xl">
         Оставьте ваш отзыв
       </h3>
@@ -155,6 +144,24 @@ const CreateReviewForm = ({tourId}: Props) => {
             )}
           />
           <div className="flex flex-col gap-2">
+            <label
+              htmlFor="clientName"
+              className="text-[var(--card-foreground)] text-sm font-semibold"
+            >
+              Имя
+            </label>
+            <StyledInput
+              id="clientName"
+              placeholder="Имя"
+              {...register('clientName', clientNameRule)}
+              className={`${errors.clientName && 'border-red-500 bg-red-100 focus-visible:border-red-500'}`}
+            />
+            {errors.clientName && (
+              <p className="text-red-500 text-sm">
+                {errors.clientName.message}
+              </p>
+            )}
+
             <label
               htmlFor="comment"
               className="text-[var(--card-foreground)] text-sm font-semibold"
