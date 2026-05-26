@@ -38,8 +38,7 @@ newsRouter.get("/", authOrNot, async (req, res, next) => {
 
         const news = await News.find(query)
             .sort({createdAt: -1})
-            .populate("author", "fullName");
-
+            .populate("author", "fullName")
         res.send(news);
     } catch (e) {
         next(e);
@@ -63,7 +62,7 @@ newsRouter.get(
                     ? {_id: id}
                     : {_id: id, isPublished: true};
 
-            const infoNew = await News.findOne(filter);
+            const infoNew = await News.findOne(filter).populate('author', 'fullName');
 
             if (!infoNew) {
                 return res.status(404).send({

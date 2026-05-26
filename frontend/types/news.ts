@@ -18,3 +18,5 @@ export type NewsMutation = {
   image?: File | null;
   tags: string[];
 }
+
+export type INews = Omit<NewsFields, 'isPublished'>
