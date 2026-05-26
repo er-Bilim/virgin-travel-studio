@@ -15,7 +15,7 @@ export const getTourSets = async (
   return res.data;
 };
 
-export const getTourSetById = async (tourSetId: string) => {
+export const getTourSetById = async (tourSetId: string): Promise<TourSetType> => {
   const res = await axiosApi.get<TourSetType>(`/tour-sets/${tourSetId}`);
   return res.data;
 };

@@ -1,5 +1,5 @@
 import axiosApi from '@/lib/axiosApi';
-import type { OrderMutationType, OrderType } from '@/types/order';
+import type { OrderMutationType, OrderPostType, OrderType } from '@/types/order';
 
 export const getOrders = async (
   managerId: string | undefined = undefined,
@@ -16,7 +16,7 @@ export const getOneOrder = async (id: string): Promise<OrderType> => {
   return result.data;
 };
 
-export const postOrder = async (data: OrderType) => {
+export const postOrder = async (data: OrderPostType) => {
   const result = await axiosApi.post('/orders/', data);
   return result.data;
 };
