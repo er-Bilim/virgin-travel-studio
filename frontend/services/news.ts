@@ -1,5 +1,5 @@
 import axiosApi from "@/lib/axiosApi";
-import type {NewsFields, NewsMutation} from "@/types/news";
+import type {NewsFields, NewsMutation, INews} from "@/types/news";
 
 export const createNews = async (data: NewsMutation) => {
   const formData = new FormData();
@@ -26,6 +26,11 @@ export const createNews = async (data: NewsMutation) => {
 export const getNews = async () => {
   const response = await axiosApi.get<NewsFields[]>("/news");
   return response.data;
+}
+
+export const getNewsById = async (newsId: string) => {
+  const { data } = await axiosApi.get<INews>(`/news/${newsId}`);
+  return data;
 }
 
 export const deleteNews = async (id: string) => {
