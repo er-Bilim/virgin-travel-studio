@@ -17,7 +17,6 @@ const NewsSchema = new Schema(
       type: String,
       default: null,
     },
-
     tags: [
       {
         type: String,

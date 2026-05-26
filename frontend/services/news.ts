@@ -1,5 +1,5 @@
 import axiosApi from "@/lib/axiosApi";
-import type {NewsFields, NewsMutation} from "@/types/news";
+import type {NewsData, NewsFields, NewsMutation} from "@/types/news";
 
 export const createNews = async (data: NewsMutation) => {
   const formData = new FormData();
@@ -26,14 +26,16 @@ export const createNews = async (data: NewsMutation) => {
   return response.data;
 }
 
-export const getNews = async (searchText?: string, isPublished?: string, authorId?: string) => {
-  const params: Record<string, string | undefined> = {};
+export const getNews = async (page: number, limit: number,searchText?: string, isPublished?: string, authorId?: string,) => {
+  const params: Record<string, string | undefined | number> = {};
 
   if (searchText) params.searchTitle = searchText;
   if (isPublished && isPublished !== "all") params.isPublished = isPublished;
   if (authorId && authorId !== "all") params.authorId = authorId;
+  params.page = Number(page);
+  params.limit = Number(limit);
 
-  const response = await axiosApi.get<NewsFields[]>("/news", { params });
+  const response = await axiosApi.get<NewsData>("/news", { params });
   return response.data;
 }
 

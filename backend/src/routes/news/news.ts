@@ -9,7 +9,7 @@ import validateObjectId from "@/middlewares/validateObjectId.js";
 
 const newsRouter = express.Router();
 
-newsRouter.get("/",validateObjectId("authorId",true), authOrNot, async (req, res, next) => {
+newsRouter.get("/", validateObjectId("authorId", true), authOrNot, async (req, res, next) => {
   const {user} = req as RequestWithUser;
   const isAdminOrManager =
     user?.role === "ADMIN" || user?.role === "MANAGER";
@@ -20,6 +20,12 @@ newsRouter.get("/",validateObjectId("authorId",true), authOrNot, async (req, res
       title?: { $regex: string, $options: "i" };
       author?: string;
     } = {};
+
+    const rawPage = Number.parseInt(req.query.page as string, 10);
+    const rawLimit = Number.parseInt(req.query.limit as string, 10);
+    const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
+    const limit = Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(50, rawLimit) : 10;
+    const skip = (page - 1) * limit;
 
     const filterIsPublished = req.query.isPublished;
     if (typeof filterIsPublished === "string" && filterIsPublished.trim().length > 0) {
@@ -60,12 +66,23 @@ newsRouter.get("/",validateObjectId("authorId",true), authOrNot, async (req, res
       }
     }
 
+    const [news, newsCount] = await Promise.all([
+      News.find(query)
+        .sort({createdAt: -1})
+        .skip(skip)
+        .limit(limit)
+        .populate("author", "fullName"),
+      News.countDocuments(query)
+    ]);
 
-    const news = await News.find(query)
-      .sort({createdAt: -1})
-      .populate("author", "fullName");
-
-    res.send(news);
+    res.send({
+      allNews: news, metadata: {
+        total: newsCount,
+        limit: limit,
+        page: page,
+        totalPages: Math.ceil(newsCount / limit),
+      }
+    });
   } catch (e) {
     next(e);
   }
