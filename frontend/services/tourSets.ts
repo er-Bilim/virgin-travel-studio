@@ -1,15 +1,18 @@
-import type { TourSetMutation, TourSetType, TourSetsGetType } from '@/types/tourSets';
+import type {
+  TourSetMutation,
+  TourSetsFilters,
+  TourSetsGetType,
+  TourSetType,
+} from '@/types/tourSets';
 import axiosApi from '@/lib/axiosApi';
 
 export const getTourSets = async (
-  page: number,
-  limit: number,
-  tourId?: string,
+  filters: TourSetsFilters,
 ): Promise<TourSetsGetType> => {
-  const { data } = await axiosApi.get('/tour-sets', {
-    params: { page, limit, tourId },
+  const res = await axiosApi.get<TourSetsGetType>('/tour-sets', {
+    params: filters,
   });
-  return data;
+  return res.data;
 };
 
 export const getTourSetById = async (tourSetId: string): Promise<TourSetType> => {

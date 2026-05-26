@@ -5,22 +5,98 @@ import permit from '@/middlewares/permit.js';
 import TourSet from '@/model/tourSet/TourSet.js';
 import type { TourSetFields, TourSetStatus } from '@/types/tourSets.types.js';
 import validateObjectId from '@/middlewares/validateObjectId.js';
+import Tour from '@/model/tour/Tour.js';
 
 const tourSetsRouter = express.Router();
 
 tourSetsRouter.get('/', authOrNot, async (req, res, next) => {
   try {
-    const { tourId } = req.query;
+    const { tourId, title, categoryId, maxPrice, startDate, endDate } =
+      req.query;
     const { user } = req as RequestWithUser;
     const isAdminOrManager = user?.role === 'ADMIN' || user?.role === 'MANAGER';
 
     const query: {
-      tourId?: string;
       status?: TourSetStatus | { $ne: TourSetStatus };
+      tourId?:
+        | mongoose.Types.ObjectId
+        | string
+        | { $in: mongoose.Types.ObjectId[] };
+      price?: { $lte: number };
+      startDate?: { $gte: Date } | { $gte: Date; $lte: Date };
     } = {};
 
     if (!isAdminOrManager) {
       query.status = { $ne: 'FINISHED' };
+    }
+
+    if (typeof tourId === 'string') {
+      if (!mongoose.Types.ObjectId.isValid(tourId)) {
+        return res.status(400).send({ error: 'Неверный ID тура' });
+      }
+      query.tourId = tourId;
+    }
+
+    if (typeof title === 'string' || typeof categoryId === 'string') {
+      const tourConditions: {
+        title?: { $regex: string; $options: string };
+        category?: string;
+      } = {};
+
+      if (typeof title === 'string' && title.trim() !== '') {
+        tourConditions.title = { $regex: title.trim(), $options: 'i' };
+      }
+
+      if (typeof categoryId === 'string' && categoryId !== 'all') {
+        if (!mongoose.Types.ObjectId.isValid(categoryId)) {
+          return res.status(400).send({ error: 'Неверный ID категории' });
+        }
+        tourConditions.category = categoryId;
+      }
+
+      const matchingTours = await Tour.find(tourConditions)
+        .select('_id')
+        .lean();
+      const tourIds = matchingTours.map(
+        (t) => t._id as mongoose.Types.ObjectId,
+      );
+
+      if (query.tourId) {
+        const singleTourIdStr = (query.tourId as string).toString();
+        const hasMatch = tourIds.some(
+          (id) => id.toString() === singleTourIdStr,
+        );
+        query.tourId = hasMatch
+          ? { $in: [new mongoose.Types.ObjectId(singleTourIdStr)] }
+          : { $in: [] };
+      } else {
+        query.tourId = { $in: tourIds };
+      }
+    }
+
+    if (typeof maxPrice === 'string' && maxPrice.trim() !== '') {
+      const parsedMaxPrice = Number(maxPrice);
+      if (!Number.isNaN(parsedMaxPrice)) {
+        query.price = { $lte: parsedMaxPrice };
+      }
+    }
+
+    if (typeof startDate === 'string' && startDate.trim() !== '') {
+      const parsedStart = new Date(startDate);
+
+      if (!Number.isNaN(parsedStart.getTime())) {
+        const dateFilter: { $gte: Date; $lte?: Date } = { $gte: parsedStart };
+
+        if (typeof endDate === 'string' && endDate.trim() !== '') {
+          const parsedEnd = new Date(endDate);
+
+          if (!Number.isNaN(parsedEnd.getTime())) {
+            dateFilter.$lte = parsedEnd;
+          }
+        }
+
+        query.startDate = dateFilter;
+      }
     }
 
     const rawPage = Number.parseInt(req.query.page as string, 10);
@@ -28,16 +104,8 @@ tourSetsRouter.get('/', authOrNot, async (req, res, next) => {
     const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
     const limit =
       Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(rawLimit, 50) : 10;
-
     const skip = (page - 1) * limit;
 
-    if (typeof tourId === 'string') {
-      if (!mongoose.Types.ObjectId.isValid(tourId)) {
-        return res.status(400).send({ error: 'Неверный ID тура' });
-      }
-
-      query.tourId = tourId;
-    }
     const totalTourSets = await TourSet.countDocuments(query);
 
     const tourSets = await TourSet.find(query)
@@ -83,7 +151,8 @@ tourSetsRouter.get(
     try {
       const tourSet = await TourSet.findById(id).populate({
         path: 'tourId',
-        select: 'title description images category baseAdvantages reviews rating ratingCount',
+        select:
+          'title description images category baseAdvantages reviews rating ratingCount',
         populate: {
           path: 'category',
           select: 'title',

@@ -23,7 +23,7 @@ const Tours = () => {
     isLoading: isTourSetsLoading,
     isError: isTourSetsError,
     refetch: refetchTourSets,
-  } = useTourSets(1, 100);
+  } = useTourSets({ page: 1, limit: 100 });
 
   const tours = toursData?.tours.filter((tour) => tour.isPublished) || [];
   const tourSets =

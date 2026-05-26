@@ -97,7 +97,7 @@ export default function TourDetails() {
               }
               className={`w-[185px] h-10 rounded-xl font-semibold text-sm transition-all ${
                 tour.isPublished
-                  ? 'bg-white border-2 border-gray-100 text-gray-500 hover:bg-gray-50'
+                  ? 'bg-white border-2 border-gray-100 text-gray-500 hover:bg-gray-50 w-[210px]'
                   : 'bg-[#1E2B6D] text-white hover:bg-[#162356] shadow-sm'
               }`}
             >
