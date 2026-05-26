@@ -1,28 +1,30 @@
 'use client';
 
 import { useDeleteManager, useManagers } from '@/lib/hooks/managerHook';
-import { useRouter } from 'next/navigation';
 import { CreateManagerForm } from '@/components/dashboard/managers/CreateManagerForm';
 import { DataTable } from '@/components/dashboard/shared/data-table/data-table';
 import {ConfirmDialog} from "@/components/dashboard/ConfirmDialog/ConfirmDialog";
-import {getManagersColumns} from "@/components/dashboard/shared/data-table/columns/createColumnInTable/manager-colum";
 import { useMemo, useState} from "react";
 import {headerRowClassName, rowClassName, tableClassName} from "@/lib/constants";
+import {Button} from "@/components/ui/button";
+import {Modal} from "@/components/shared/Modal";
+import {useModalStore} from "@/lib/stores/modalStore";
+import {Plus} from "lucide-react";
+import {getManagersColumns} from "@/components/dashboard/shared/data-table/columns/createColumnInTable/manager-colum";
 
 export default function ManagersPage() {
-    const router = useRouter();
     const [managerToDelete, setManagerToDelete] = useState<string | null>(null);
     const { data = [], isLoading, isError } = useManagers();
     const { mutate: deleteManager, isPending: isDeleting  } = useDeleteManager();
+    const { openModal } = useModalStore();
 
     const columns = useMemo(
         () => getManagersColumns({
-            onView: (user) => router.push(`/admin/managers/${user._id}`),
             onDelete: (user) => {
                 setManagerToDelete(user._id);
                 },
         }),
-        [router]
+        []
     );
 
     const confirmDelete = () => {
@@ -35,9 +37,19 @@ export default function ManagersPage() {
 
   return (
     <div className="p-6 space-y-4">
-      <h1 className="text-2xl font-bold">Менеджеры</h1>
+        <div className="flex items-center justify-between flex-wrap">
+            <h1 className="text-2xl font-bold">Менеджеры</h1>
+            <Button
+                className="bg-[#1E2B6D] hover:bg-[#162356]"
+                onClick={() => openModal("createManager")}
+            >
+                <Plus className="w-4 h-4 mr-2" /> Создать менеджера
+            </Button>
+        </div>
 
-      <CreateManagerForm />
+        <Modal id="createManager" title="Создание менеджера">
+            <CreateManagerForm />
+        </Modal>
 
       <DataTable
           columns={columns}
