@@ -60,6 +60,46 @@ managersRouter.post('/', auth, permit('ADMIN'), async (req, res, next) => {
     }
 });
 
+managersRouter.put('/:id', auth, permit('ADMIN'), validateObjectId(), async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { phone } = req.body;
+
+    const existingUser = await User.findOne({ phone });
+
+    if (existingUser && String(existingUser._id) !== id) {
+      return res.status(409).send({
+        error: 'Пользователь с таким номером уже существует',
+      });
+    }
+
+    const data = {
+      fullName: req.body.fullName,
+      phone: req.body.phone,
+      status: req.body.status,
+    };
+
+   const updatedManager = await User.findByIdAndUpdate(
+     id,
+     { $set: data },
+     { new: true }, 
+   );
+
+    res.send({
+      message: 'Менеджер успешно создан',
+      user: updatedManager,
+    });
+  } catch (e) {
+    if (e instanceof mongoose.Error.ValidationError) {
+      return res.status(400).send({
+        error: 'Ошибка валидации',
+        details: e.errors,
+      });
+    }
+    next(e);
+  }
+});
+
 managersRouter.delete(
     '/:id',
     auth,
