@@ -3,11 +3,12 @@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 import type { DateRange } from "react-day-picker";
+import {useState} from "react";
 
 type Props = {
     value: DateRange | undefined;
@@ -26,14 +27,15 @@ export function DateRangePicker({
                                     maxDate,
                                     minDate,
                                 }: Props) {
+    const [open, setOpen] = useState(false);
     const today = new Date();
     return (
-        <Popover>
+        <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
                 <Button
                     variant="outline"
                     className={cn(
-                        "w-full justify-start text-left font-normal bg-gray-50/50 rounded-xl border-gray-200 h-11 px-3 focus:ring-2 focus:ring-[#1E2B6D]",
+                        "w-full justify-start text-left font-normal bg-gray-50/50 rounded-xl border-gray-200 h-11 px-3",
                         !value && "text-muted-foreground"
                     )}
                 >
@@ -56,8 +58,18 @@ export function DateRangePicker({
 
             <PopoverContent
                 className="w-auto p-0 rounded-2xl shadow-lg border-gray-100"
-                align="start"
+                align="end"
             >
+                <div className="flex justify-end p-2 border-b">
+                    <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={() => setOpen(false)}
+                    >
+                        <X className="h-4 w-4" />
+                    </Button>
+                </div>
+
                 <Calendar
                     autoFocus
                     mode="range"
