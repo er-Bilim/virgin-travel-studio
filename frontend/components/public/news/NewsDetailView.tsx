@@ -157,21 +157,21 @@ const NewsDetailView = ({ id }: Props) => {
             url={url}
             title="telegram"
             variant="labeled"
-            className="px-5 py-3 size-1/ bg-slate-50"
+            className="px-5 py-3 size-1/3 bg-slate-50"
           />
           <ShareButton
             platform="whatsapp"
             url={url}
             title="whatsapp"
             variant="labeled"
-            className="px-5 py-2 size-1/ bg-slate-50"
+            className="px-5 py-3 size-1/3 bg-slate-50"
           />
           <ShareButton
             platform="copy"
             url={url}
             title="copy"
             variant="labeled"
-            className="px-5 py-3 size-1/ bg-slate-50 cursor-pointer"
+            className="px-5 py-3 size-2/5 bg-slate-50 cursor-pointer"
           />
         </div>
       </div>

@@ -12,7 +12,6 @@ export const useTourSets = (filters: TourSetsFilters = {}) => {
   const safeFilters = {
     page: filters.page ?? 1,
     limit: filters.limit ?? 10,
-    tourId: filters.tourId ?? '',
     ...filters,
   };
 
