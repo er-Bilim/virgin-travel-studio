@@ -1,3 +1,5 @@
+import type {MetaType} from "@/types/meta";
+
 export type NewsFields = {
   _id: string;
   title: string;
@@ -7,6 +9,7 @@ export type NewsFields = {
   isPublished: boolean;
   author: {
     fullName: string;
+    _id: string;
   };
   createdAt: string;
   updatedAt: string;
@@ -20,3 +23,8 @@ export type NewsMutation = {
 }
 
 export type INews = Omit<NewsFields, 'isPublished'>
+
+export type NewsData = {
+  allNews: NewsFields[];
+  metadata: MetaType
+}

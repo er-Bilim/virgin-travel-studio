@@ -1,4 +1,4 @@
-import type { IUser, ManagerMutation } from '@/types/user';
+import type { IUser, ManagerMutation, ManagerUpdateMutation } from '@/types/user';
 import axiosApi from '@/lib/axiosApi';
 
 export const getManagers = async () => {
@@ -9,6 +9,14 @@ export const getManagers = async () => {
 export const createManager = async (data: ManagerMutation): Promise<IUser> => {
   const res = await axiosApi.post<{ message: string; user: IUser }>(
     '/managers',
+    data,
+  );
+  return res.data.user;
+};
+
+export const updateManager = async (id: string, data: ManagerUpdateMutation): Promise<IUser> => {
+  const res = await axiosApi.put<{ message: string; user: IUser }>(
+    `/managers/${id}`,
     data,
   );
   return res.data.user;

@@ -1,11 +1,9 @@
-const ManagerLeadsPage = () => {
+import OrderTable from "@/components/dashboard/orders/OrderTable";
+
+const ManagerOrderPage = () => {
     return (
-        <div>
-            <h1 className="text-2xl font-bold text-[#1E2B6D]">
-                Заявки
-            </h1>
-        </div>
+        <OrderTable/>
     );
 };
 
-export default ManagerLeadsPage;
+export default ManagerOrderPage;

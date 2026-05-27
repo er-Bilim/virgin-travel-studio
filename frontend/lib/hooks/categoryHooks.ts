@@ -5,6 +5,8 @@ import {
   toggleCategoryPublish,
   deleteCategory,
 } from '@/services/categories';
+import type { AxiosError } from 'axios';
+import type { GlobalError } from '@/types/error';
 
 export const useCategories = () => {
   return useQuery({
@@ -38,7 +40,7 @@ export const useToggleCategoryPublish = () => {
 export const useDeleteCategory = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<{ message: string }, AxiosError<GlobalError>, string>({
     mutationFn: deleteCategory,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });

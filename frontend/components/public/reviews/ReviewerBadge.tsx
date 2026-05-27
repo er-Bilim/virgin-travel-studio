@@ -1,7 +1,7 @@
 import ClientAvatar from "@/components/shared/ClientAvatar";
 
 interface Props {
-  name: string;
+  name: string | null;
 }
 
 const ReviewerBadge = ({ name }: Props) => {

@@ -1,6 +1,6 @@
 'use client';
 
-import {useMemo, useState} from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Plus, Loader2 } from 'lucide-react';
@@ -12,10 +12,15 @@ import {
 } from '@/lib/hooks/categoryHooks';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import {headerRowClassName, inputClass, rowClassName, tableClassName} from '@/lib/constants';
-import {getCategoryColumns} from "@/components/dashboard/shared/data-table/columns/createColumnInTable/category-column";
-import {DataTable} from "@/components/dashboard/shared/data-table/data-table";
-import {ConfirmDialog} from "@/components/dashboard/ConfirmDialog/ConfirmDialog";
+import {
+  headerRowClassName,
+  inputClass,
+  rowClassName,
+  tableClassName,
+} from '@/lib/constants';
+import { getCategoryColumns } from '@/components/dashboard/shared/data-table/columns/createColumnInTable/category-column';
+import { DataTable } from '@/components/dashboard/shared/data-table/data-table';
+import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog/ConfirmDialog';
 
 interface CategoryFormInput {
   title: string;
@@ -26,8 +31,7 @@ export default function CategoriesManagePage() {
 
   const { data: categories, isLoading, isError } = useCategories();
   const { mutate: createCategory, isPending: isCreating } = useCreateCategory();
-  const { mutate: togglePublish} =
-    useToggleCategoryPublish();
+  const { mutate: togglePublish } = useToggleCategoryPublish();
   const { mutate: deleteCategory, isPending: isDeleting } = useDeleteCategory();
 
   const {
@@ -42,13 +46,13 @@ export default function CategoriesManagePage() {
   });
 
   const columns = useMemo(
-      () =>
-          getCategoryColumns({
-            onDelete: (category) => setCategoryToDelete(category._id),
+    () =>
+      getCategoryColumns({
+        onDelete: (category) => setCategoryToDelete(category._id),
 
-            onTogglePublish: (category) => togglePublish(category._id),
-          }),
-      [togglePublish],
+        onTogglePublish: (category) => togglePublish(category._id),
+      }),
+    [togglePublish],
   );
 
   const onCreateSubmit = (data: CategoryFormInput) => {
@@ -75,8 +79,9 @@ export default function CategoriesManagePage() {
           setCategoryToDelete(null);
           toast.success('Категория успешно удалена');
         },
-        onError: (error: any) => {
+        onError: (error) => {
           setCategoryToDelete(null);
+
           const serverError =
             error.response?.data?.error || 'Произошла ошибка при удалении';
           toast.error(serverError, { duration: 5000 });
@@ -133,23 +138,23 @@ export default function CategoriesManagePage() {
       </form>
 
       <DataTable
-          data={categories || []}
-          columns={columns}
-          isLoading={isLoading}
-          isError={isError}
-          headerRowClassName={headerRowClassName}
-          rowClassName={rowClassName}
-          className={tableClassName}
+        data={categories || []}
+        columns={columns}
+        isLoading={isLoading}
+        isError={isError}
+        headerRowClassName={headerRowClassName}
+        rowClassName={rowClassName}
+        className={tableClassName}
       />
 
       <ConfirmDialog
-          open={!!categoryToDelete}
-          title="Вы уверенны что хотите удалить категорию тура?"
-          description="Категорию тура нельзя удалить пока есть тур с такой категорией. Сначала удалите тур!"
-          loading={isDeleting}
-          confirmText="Удалить"
-          onCancel={() => setCategoryToDelete(null)}
-          onConfirm={confirmDelete}
+        open={!!categoryToDelete}
+        title="Вы уверенны что хотите удалить категорию тура?"
+        description="Категорию тура нельзя удалить пока есть тур с такой категорией. Сначала удалите тур!"
+        loading={isDeleting}
+        confirmText="Удалить"
+        onCancel={() => setCategoryToDelete(null)}
+        onConfirm={confirmDelete}
       />
     </div>
   );

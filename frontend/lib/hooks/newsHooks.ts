@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {
   createNews,
   deleteNews,
@@ -26,7 +26,7 @@ const useCreateNews = (setError: UseFormSetError<NewsMutation>) => {
     mutationFn: createNews,
     onSuccess: async (data) => {
       toast.success(data.message || 'Новость успешно создана!');
-      await queryClient.invalidateQueries({ queryKey: ['news'] });
+      await queryClient.invalidateQueries({queryKey: ['news']});
     },
     onError: async (err: AxiosError<GlobalError>) => {
       const data = err.response?.data;
@@ -60,10 +60,10 @@ const useCreateNews = (setError: UseFormSetError<NewsMutation>) => {
 };
 export default useCreateNews;
 
-export const useNews = () => {
+export const useNews = (page: number, limit: number, searchTitle?: string, isPublished?: string, authorId?: string) => {
   return useQuery({
-    queryKey: ['news'],
-    queryFn: getNews,
+    queryKey: ['news', page, limit, searchTitle, isPublished, authorId],
+    queryFn: () => getNews(page, limit, searchTitle, isPublished, authorId),
   });
 };
 
@@ -83,7 +83,7 @@ export const useDeleteNews = () => {
     mutationFn: deleteNews,
     onSuccess: (data) => {
       toast.success(data.message);
-      queryClient.invalidateQueries({ queryKey: ['news'] });
+      queryClient.invalidateQueries({queryKey: ['news']});
     },
   });
 };
@@ -95,7 +95,7 @@ export const useEditNews = (setError: UseFormSetError<NewsMutation>) => {
     mutationFn: editNews,
     onSuccess: async (data) => {
       toast.success(data.message || 'Новость успешно обновлена!');
-      await queryClient.invalidateQueries({ queryKey: ['news'] });
+      await queryClient.invalidateQueries({queryKey: ['news']});
     },
     onError: async (err: AxiosError<GlobalError>) => {
       const data = err.response?.data;
@@ -127,7 +127,7 @@ export const usePublicateNews = () => {
     mutationFn: publicateNews,
     onSuccess: () => {
       toast.success('Успешно обновленно состояние опубликованности');
-      queryClient.invalidateQueries({ queryKey: ['news'] });
+      queryClient.invalidateQueries({queryKey: ['news']});
     },
   });
 };

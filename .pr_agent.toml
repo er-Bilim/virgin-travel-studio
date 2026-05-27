@@ -1,32 +1,58 @@
 # Qodo Merge / PR-Agent configuration
 # Docs: https://qodo-merge-docs.qodo.ai/
 
-[config]
-model = "gpt-4o"
-# Язык ответа задаём через extra_instructions ниже,
-# отдельного language-параметра у Qodo нет
-
 [pr_reviewer]
-# Главный ревью-блок
 require_score_review = false
 require_tests_review = true
 require_security_review = true
 num_code_suggestions = 4
 extra_instructions = """
 Отвечай на русском языке.
-Это фронтенд-проект на TypeScript + React + Zustand + TanStack Query.
-Обращай внимание на: типы (strict mode), архитектуру (feature-based folders),
-разделение service layer, корректность хуков React.
-Не придирайся к стилю если он консистентный в проекте.
-Пропускай тривиальные комментарии типа 'добавь JSDoc'.
+
+Это fullstack монорепо virgin-travel с двумя пакетами:
+
+BACKEND (/backend):
+- Node.js + Express 5 (новый, с async error handling из коробки)
+- TypeScript ESM (type: module, NodeNext, strict + noUncheckedIndexedAccess + exactOptionalPropertyTypes)
+- MongoDB через Mongoose 9
+- Auth: JWT (jsonwebtoken) + argon2 для хешей паролей + cookie-parser
+- Файлы: multer, exceljs
+- Запуск через tsx
+
+FRONTEND (/frontend):
+- Next.js 16 (App Router) + React 19
+- TypeScript strict + verbatimModuleSyntax + noUnusedLocals
+- Состояние: Zustand 5, серверные данные: TanStack Query 5
+- UI: Radix UI primitives + shadcn/ui + Tailwind 4
+- Формы: react-hook-form, таблицы: TanStack Table
+- HTTP: axios
+
+ОБЩИЕ ПРАВИЛА РЕВЬЮ:
+- Архитектура feature-based (folders по фичам, не по типам)
+- Service layer должен быть отделён от роутов/контроллеров на бэке
+- На фронте: серверные данные строго через TanStack Query, не useEffect
+- Учитывай strict-режим TypeScript: indexed access всегда T | undefined,
+  exactOptionalPropertyTypes различает {x?: T} и {x: T | undefined}
+- verbatimModuleSyntax: type-only импорты пиши через `import type`
+- Безопасность бэка: проверяй CORS, валидацию входа, JWT secret из env,
+  что argon2 параметры не дефолтные слабые, утечки данных в ответах
+- React 19: новые хуки (use, useOptimistic, useActionState) — не ругай за их использование
+- Next.js 16 App Router: server components по умолчанию, 'use client' только когда нужен
+
+ЧЕГО НЕ ДЕЛАТЬ:
+- Не придирайся к стилю если он консистентный
+- Не предлагай JSDoc и тривиальные комментарии
+- Не предлагай добавить unit-тесты в каждый PR — отметь один раз
+- Не предлагай переход с Express на Fastify/NestJS, Zustand на Redux и т.п.
 """
 
 [pr_description]
 publish_labels = true
 add_original_user_description = true
 extra_instructions = """
-Отвечай на русском языке. Описание PR делай кратким:
+Отвечай на русском языке. Описание делай кратким:
 2-3 предложения о сути изменений, затем bullet-list ключевых правок.
+Если PR затрагивает оба пакета (backend + frontend) — раздели правки по секциям.
 """
 
 [pr_code_suggestions]
@@ -34,8 +60,10 @@ num_code_suggestions = 4
 commitable_code_suggestions = true
 extra_instructions = """
 Отвечай на русском языке.
-Предлагай только важные изменения: баги, типы, безопасность, производительность.
-Не предлагай переименования и косметику.
+Предлагай только важные изменения: баги, баги типов, безопасность, производительность,
+утечки памяти, race conditions, нарушения strict TypeScript.
+Не предлагай переименования, перестановки, косметику, добавление комментариев.
+Учитывай что noUncheckedIndexedAccess включён — arr[0] это T | undefined.
 """
 
 [github_app]
@@ -44,5 +72,4 @@ pr_commands = [
     "/review",
     "/improve",
 ]
-
 handle_pr_actions = ['opened', 'reopened', 'ready_for_review']

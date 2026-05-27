@@ -7,15 +7,21 @@ import validateObjectId from "@/middlewares/validateObjectId.js";
 
 const managersRouter = Router();
 
-managersRouter.get('/', auth, permit('ADMIN'), async (req, res, next) => {
+managersRouter.get(
+  '/',
+  auth,
+  permit('ADMIN', 'MANAGER'),
+  async (req, res, next) => {
     try {
-        const managers = await User.find({ role: 'MANAGER' })
-            .sort({ createdAt: -1 });
-        res.send(managers);
+      const managers = await User.find({ role: 'MANAGER' }).sort({
+        createdAt: -1,
+      });
+      res.send(managers);
     } catch (e) {
-        next(e);
+      next(e);
     }
-});
+  },
+);
 
 managersRouter.post('/', auth, permit('ADMIN'), async (req, res, next) => {
     try {
@@ -52,6 +58,50 @@ managersRouter.post('/', auth, permit('ADMIN'), async (req, res, next) => {
         }
         next(e);
     }
+});
+
+managersRouter.put('/:id', auth, permit('ADMIN'), validateObjectId(), async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { phone } = req.body;
+
+    const existingPhone = await User.findOne({ phone });
+
+    if (existingPhone && String(existingPhone._id) !== id) {
+      return res.status(409).send({
+        error: 'Пользователь с таким номером уже существует',
+      });
+    }
+
+    const existingUser = await User.findById(id);
+
+    if (!existingUser) {
+      return res.status(409).send({
+        error: 'Пользователь не найден',
+      });
+    }
+
+    const data = {
+      fullName: req.body.fullName,
+      phone: phone,
+      status: req.body.status,
+    };
+
+   const updatedManager = await existingUser.updateOne(data);
+
+    res.send({
+      message: 'Менеджер успешно обновлён',
+      user: updatedManager,
+    });
+  } catch (e) {
+    if (e instanceof mongoose.Error.ValidationError) {
+      return res.status(400).send({
+        error: 'Ошибка валидации',
+        details: e.errors,
+      });
+    }
+    next(e);
+  }
 });
 
 managersRouter.delete(

@@ -17,6 +17,12 @@ export interface ManagerMutation {
     password: string;
 }
 
+export interface ManagerUpdateMutation {
+  fullName: string;
+  phone: string;
+  status: string;
+}
+
 export interface LoginMutation {
     phone: string;
     password: string;

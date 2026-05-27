@@ -261,4 +261,18 @@ usersRouter.get("/me", auth, async (req, res, next) => {
     }
 });
 
+usersRouter.get(
+  '/',
+  auth,
+  permit('ADMIN', 'MANAGER'),
+  async (req, res, next) => {
+      try {
+          const users = await User.find({})
+          res.send(users);
+      } catch (e) {
+          next(e);
+      }
+  },
+);
+
 export default usersRouter;
