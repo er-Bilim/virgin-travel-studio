@@ -25,6 +25,7 @@ import {Button} from '@/components/ui/button';
 import {useUser} from '@/lib/hooks/authHooks';
 import {toast} from 'sonner';
 import {ORDER_STATUS_LABELS, OrderStatus} from '@/lib/constants';
+import {OrderTabs} from '@/components/dashboard/orders/OrderTabs';
 
 export default function OrderTable () {
   const { id } = useParams();
@@ -35,6 +36,8 @@ export default function OrderTable () {
   const limit = Number(searchParams.get('limit') ?? 10);
   const page = Number(searchParams.get('page') ?? 1);
   const status = (searchParams.get('status') as OrderStatus) || undefined;
+
+  const currentTab = searchParams.get('tab') ?? 'my';
 
   const [selectedManagerId, setSelectedManagerId] = useState<string | undefined>(id as string);
 
@@ -58,6 +61,15 @@ export default function OrderTable () {
     router.push(`${pathname}?${params.toString()}`);
   };
 
+  const onChangeTab = (tabValue: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('tab', tabValue);
+    params.set('page', '1');
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+
+
   const {data: user} = useUser();
     const {
       mutate: delOrder,
@@ -79,13 +91,45 @@ export default function OrderTable () {
     [user?.role, delOrder, router],
   );
 
+  const queryParams = useMemo(() => {
+    const params: { view?: string, managerId?: string } = {};
+
+    if (user?.role === 'MANAGER') {
+      params.view = currentTab;
+    }
+
+    if (user?.role === 'ADMIN') {
+      if (currentTab === 'my') {
+        params.managerId = user?._id;
+      }
+
+      if (currentTab === 'all') {
+        params.managerId = selectedManagerId;
+      }
+    }
+
+    return params;
+  },[user?.role, currentTab, user?._id, selectedManagerId]);
+
   const {
     data: managers = [],
     isLoading: managerLoading,
     isError: managerError,
   } = useManagers();
 
-   const { data, isLoading, error, refetch } = useOrders({ page, limit, managerId: selectedManagerId, status });
+   const {
+     data,
+     isLoading,
+     error,
+     refetch
+   } = useOrders({
+     page,
+     limit,
+     managerId: selectedManagerId,
+     status,
+     ...queryParams
+   });
+
 
 if (isPending) {
   return (
@@ -104,21 +148,27 @@ if (isPending) {
           <h1 className="text-3xl font-bold tracking-tight text-[#1E2B6D]">
             Заявки
           </h1>
-          <div className="flex items-center gap-4">
-            <Select value={status ?? 'all'} onValueChange={onChangeStatus}>
-              <SelectTrigger className="w-[180px] bg-white">
-                <SelectValue placeholder="Все статусы" />
-              </SelectTrigger>
 
-              <SelectContent>
-                <SelectItem value="all">Все статусы</SelectItem>
-                {Object.values(OrderStatus).map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {ORDER_STATUS_LABELS[status]}
-                    </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <OrderTabs onChangeTab={onChangeTab} currentTab={currentTab} />
+
+          <div className="flex items-center gap-4">
+
+            {user?.role !== 'MANAGER' && currentTab === 'all' &&
+                <Select value={status ?? 'all'} onValueChange={onChangeStatus}>
+                  <SelectTrigger className="w-[180px] bg-white">
+                    <SelectValue placeholder="Все статусы" />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    <SelectItem value="all">Все статусы</SelectItem>
+                    {Object.values(OrderStatus).map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {ORDER_STATUS_LABELS[status]}
+                        </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+            }
 
             {user?.role === 'ADMIN' && (
               <>
