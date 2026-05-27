@@ -2,48 +2,67 @@
 # Docs: https://qodo-merge-docs.qodo.ai/
 
 [pr_reviewer]
-require_score_review = false
+require_score_review = true
 require_tests_review = true
 require_security_review = true
 num_code_suggestions = 4
 extra_instructions = """
 Отвечай на русском языке.
 
-Это fullstack монорепо virgin-travel с двумя пакетами:
+Это fullstack монорепо virgin-travel с двумя пакетами.
 
 BACKEND (/backend):
-- Node.js + Express 5 (новый, с async error handling из коробки)
-- TypeScript ESM (type: module, NodeNext, strict + noUncheckedIndexedAccess + exactOptionalPropertyTypes)
+- Node.js + Express 5.2 (новый, async error handling из коробки)
+- TypeScript 6 ESM (type: module, NodeNext, strict + noUncheckedIndexedAccess + exactOptionalPropertyTypes)
 - MongoDB через Mongoose 9
-- Auth: JWT (jsonwebtoken) + argon2 для хешей паролей + cookie-parser
-- Файлы: multer, exceljs
-- Запуск через tsx
+- Auth: jsonwebtoken 9 + argon2 + cookie-parser
+- Файлы: multer 2.x (лимиты + fileFilter обязательны, проверяй MIME), exceljs
+- CORS: пакет cors 2.x — проверяй что origin не '*' для роутов с credentials
+- dotenv 17, запуск через tsx (без билда в dev)
 
 FRONTEND (/frontend):
-- Next.js 16 (App Router) + React 19
-- TypeScript strict + verbatimModuleSyntax + noUnusedLocals
-- Состояние: Zustand 5, серверные данные: TanStack Query 5
-- UI: Radix UI primitives + shadcn/ui + Tailwind 4
-- Формы: react-hook-form, таблицы: TanStack Table
-- HTTP: axios
+- Next.js 16 (App Router) + React 19.2
+- TypeScript 5 strict + verbatimModuleSyntax + noUnusedLocals
+- Состояние: Zustand 5; серверные данные: TanStack Query 5
+- UI: единый пакет radix-ui (новый unified API, не отдельные @radix-ui/*), shadcn/ui CLI v4
+- Стили: Tailwind 4 (CSS-first config через @theme в globals.css, без tailwind.config.js),
+  tw-animate-css, tailwind-merge, clsx, class-variance-authority
+- Формы: react-hook-form 7 (валидация ручная, zod не используется в проекте)
+- Таблицы: TanStack Table 8
+- Уведомления: sonner
+- Иконки: lucide-react + react-icons (обе используются осознанно)
+- Даты: date-fns 4 + dayjs (обе осознанно)
+- Карусели: embla-carousel-react (проверяй a11y: aria-label, keyboard nav)
+- HTTP: axios 1.x
 
 ОБЩИЕ ПРАВИЛА РЕВЬЮ:
 - Архитектура feature-based (folders по фичам, не по типам)
-- Service layer должен быть отделён от роутов/контроллеров на бэке
-- На фронте: серверные данные строго через TanStack Query, не useEffect
-- Учитывай strict-режим TypeScript: indexed access всегда T | undefined,
-  exactOptionalPropertyTypes различает {x?: T} и {x: T | undefined}
-- verbatimModuleSyntax: type-only импорты пиши через `import type`
-- Безопасность бэка: проверяй CORS, валидацию входа, JWT secret из env,
-  что argon2 параметры не дефолтные слабые, утечки данных в ответах
-- React 19: новые хуки (use, useOptimistic, useActionState) — не ругай за их использование
-- Next.js 16 App Router: server components по умолчанию, 'use client' только когда нужен
+- Service layer отделён от роутов/контроллеров на бэке
+- На фронте: серверные данные строго через TanStack Query, не useEffect+fetch
+- Strict TS: indexed access = T | undefined (arr[0], obj[key], match.groups[name] требуют narrowing)
+- exactOptionalPropertyTypes различает { x?: T } и { x: T | undefined } — не путай
+- verbatimModuleSyntax: type-only импорты через `import type`
+- ESM на бэке: расширения .js в относительных импортах обязательны
+- Безопасность бэка: CORS (origin/credentials), валидация входа, JWT secret из env (не дефолт),
+  argon2 параметры не слабые, утечки чувствительных полей (password, refreshToken, hash) в ответах,
+  multer limits + fileFilter, проверка ownership ресурса перед мутацией
+- TanStack Query: staleTime/gcTime осознанные, стабильные queryKeys,
+  invalidateQueries после мутаций, AbortSignal в queryFn для отмены
+- Mongoose: lean() для read-only, select/populate с ограничением полей,
+  индексы для часто-фильтруемых, не возвращать password из .toJSON
+- React 19: новые хуки (use, useOptimistic, useActionState, useFormStatus) — не ругай,
+  ref как обычный проп без forwardRef
+- Next.js 16 App Router: server components по умолчанию, 'use client' только когда реально нужен;
+  следи за случайным { cache: 'no-store' } в fetch; Server Actions помечены 'use server'
+- Tailwind 4: токены в @theme через CSS vars (--color-*, --font-*), arbitrary values только если нет токена
 
 ЧЕГО НЕ ДЕЛАТЬ:
-- Не придирайся к стилю если он консистентный
+- Не придирайся к консистентному стилю
 - Не предлагай JSDoc и тривиальные комментарии
-- Не предлагай добавить unit-тесты в каждый PR — отметь один раз
-- Не предлагай переход с Express на Fastify/NestJS, Zustand на Redux и т.п.
+- Не предлагай добавить тесты в каждый PR — упомяни один раз для всего PR
+- Не предлагай миграции стека (Express→Fastify/NestJS, Zustand→Redux, axios→fetch, Mongoose→Prisma)
+- Не предлагай унифицировать date-fns/dayjs, lucide/react-icons — это осознанно
+- Не предлагай zod/yup если их нет в текущем PR — это отдельное архитектурное решение
 """
 
 [pr_description]
@@ -52,7 +71,8 @@ add_original_user_description = true
 extra_instructions = """
 Отвечай на русском языке. Описание делай кратким:
 2-3 предложения о сути изменений, затем bullet-list ключевых правок.
-Если PR затрагивает оба пакета (backend + frontend) — раздели правки по секциям.
+Если PR затрагивает оба пакета — раздели на секции ## Backend и ## Frontend.
+Метки выбирай из: feature, bugfix, refactor, security, performance, ui, docs, chore.
 """
 
 [pr_code_suggestions]
@@ -60,10 +80,25 @@ num_code_suggestions = 4
 commitable_code_suggestions = true
 extra_instructions = """
 Отвечай на русском языке.
-Предлагай только важные изменения: баги, баги типов, безопасность, производительность,
-утечки памяти, race conditions, нарушения strict TypeScript.
-Не предлагай переименования, перестановки, косметику, добавление комментариев.
-Учитывай что noUncheckedIndexedAccess включён — arr[0] это T | undefined.
+Предлагай ТОЛЬКО важные изменения:
+- баги (edge cases, off-by-one, null/undefined, неправильная логика)
+- баги типов (нарушения strict TS, неправильные дженерики, any/as без причины)
+- безопасность (XSS, инъекции, утечки данных, слабая криптография, отсутствие auth-проверок)
+- производительность (N+1 в Mongoose, лишние ре-рендеры, отсутствие мемоизации в горячих местах)
+- утечки памяти (необработанные подписки, незакрытые стримы, забытые cleanup в useEffect)
+- race conditions (async handlers, оптимистичные обновления, отсутствие AbortController/AbortSignal)
+- нарушения React-правил (хуки в условиях, мутация state, отсутствие ключей в списках)
+
+НЕ ПРЕДЛАГАЙ:
+- переименования, перестановки, косметику
+- комментарии или JSDoc
+- замену работающих паттернов на «более идиоматичные» без явной выгоды
+- premature мемоизацию (useMemo/useCallback где это не нужно)
+
+Учитывай:
+- noUncheckedIndexedAccess: arr[0], obj[key] это T | undefined
+- exactOptionalPropertyTypes: { x?: T } ≠ { x: T | undefined }
+- ESM: .js расширения в импортах на бэке
 """
 
 [github_app]

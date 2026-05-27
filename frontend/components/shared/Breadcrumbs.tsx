@@ -32,10 +32,10 @@ export function Breadcrumbs({ items }: Props) {
                     <Link href={item.href}>{item.label}</Link>
                   </BreadcrumbLink>
                 ) : (
-                  <BreadcrumbPage>{item.label}</BreadcrumbPage>
+                  <BreadcrumbPage className='font-semibold'>{item.label}</BreadcrumbPage>
                 )}
               </BreadcrumbItem>
-              {!isLast && <BreadcrumbSeparator />}
+              {!isLast && <BreadcrumbSeparator/>}
             </Fragment>
           );
         })}
