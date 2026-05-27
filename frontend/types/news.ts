@@ -1,3 +1,5 @@
+import type {MetaType} from "@/types/meta";
+
 export type NewsFields = {
   _id: string;
   title: string;
@@ -18,4 +20,9 @@ export type NewsMutation = {
   content: string;
   image?: File | null;
   tags: string[];
+}
+
+export type NewsData = {
+  allNews: NewsFields[];
+  metadata: MetaType
 }

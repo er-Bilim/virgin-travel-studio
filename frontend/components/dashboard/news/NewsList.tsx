@@ -32,33 +32,48 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import {useUsers} from "@/lib/hooks/userHooks";
+import {PaginationCustom} from "@/components/pagination/PaginationCustom";
 
 export default function NewsList() {
   const [searchNews, setSearchNews] = useState("");
   const [searchNewsWithDelay, setSearchNewsWithDelay] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [authorFilter, setAuthorFilter] = useState("all");
+  const [page, setPage] = useState(1);
+  const limit = 10;
 
 
   useEffect(() => {
     const timeout = setTimeout(() => {
+      setPage(1);
       setSearchNewsWithDelay(searchNews);
     }, 700);
 
     return () => clearTimeout(timeout);
   }, [searchNews]);
 
+  useEffect(() => {
+    const changePage = () => {
+      setPage(1);
+    }
+
+    void changePage();
+  }, [statusFilter, authorFilter]);
+
   const {
-    data: news,
+    data: newsData,
     isLoading,
-    isError
-  } = useNews(searchNewsWithDelay, statusFilter, authorFilter);
+    isError,
+    refetch: refetchNews,
+  } = useNews(page, limit, searchNewsWithDelay, statusFilter, authorFilter);
   const {mutate: deleteNews, isPending: isDeleting} = useDeleteNews();
   const {mutate: togglePublicate} = usePublicateNews();
-
+  const news = newsData?.allNews;
+  const meta = newsData?.metadata
   const {
     data: users,
     isLoading: loadingUsers,
+    refetch: refetchUser
   } = useUsers();
 
   const [newsToDelete, setNewsToDelete] = useState<string | null>(null);
@@ -83,6 +98,16 @@ export default function NewsList() {
   const editingNews = news?.find(
     (item) => item._id === editingNewsId
   );
+
+  const handlePageChange = (page: number) => {
+    setPage(page);
+    window.scrollTo(0, 0);
+  }
+
+  const handleRefetch = async () => {
+    await refetchNews();
+    await refetchUser()
+  }
 
   return (
     <div className="p-8 space-y-8 bg-gray-50 min-h-screen">
@@ -114,6 +139,28 @@ export default function NewsList() {
               </SelectContent>
             </Select>
           </div>
+
+          {isLoading && (
+            <p className="my-10 text-center text-lg font-semibold">
+              Загрузка новостей...
+            </p>
+          )}
+
+          {isError && (
+            <div className="my-10 text-center">
+              <p className="mb-4 text-lg font-semibold text-red-500">
+                Не удалось загрузить новости
+              </p>
+
+              <button
+                type="button"
+                className="rounded-2xl border px-5 py-3 font-semibold"
+                onClick={handleRefetch}
+              >
+                Повторить
+              </button>
+            </div>
+          )}
 
           <div className="w-full sm:w-48">
             <Select
@@ -157,6 +204,17 @@ export default function NewsList() {
         rowClassName={rowClassName}
         className={tableClassName}
       />
+
+      {meta && news && news.length > 0 && (
+        <div className="my-8">
+          <PaginationCustom
+            page={page}
+            limit={meta.limit}
+            totalPage={meta.totalPages}
+            onChange={handlePageChange}
+          />
+        </div>
+      )}
 
       <ConfirmDialog
         open={!!newsToDelete}
