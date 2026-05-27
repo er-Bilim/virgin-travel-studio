@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createManager, deleteManager, getManagers } from '@/services/manager';
+import { createManager, deleteManager, getManagers, updateManager } from '@/services/manager';
 import type { UseFormSetError } from 'react-hook-form';
-import type { IUser, ManagerMutation } from '@/types/user';
+import type { IUser, ManagerMutation, ManagerUpdateMutation } from '@/types/user';
 import type { AxiosError } from 'axios';
 import { toast } from 'sonner';
 import type { GlobalError } from '@/types/error';
@@ -10,6 +10,14 @@ export const useManagers = () => {
   return useQuery({
     queryKey: ['managers'],
     queryFn: getManagers,
+  });
+};
+
+export const useOneManager = (id: string) => {
+  return useQuery({
+    queryKey: ['managers'],
+    queryFn: getManagers,
+    select: (data) => data.find((manager) => manager._id === id),
   });
 };
 
@@ -46,6 +54,46 @@ export const useCreateManager = (
       }
 
       toast.error(data.error || 'Не удалось создать менеджера. Попробуйте снова.');
+    },
+  });
+};
+
+export const useUpdateManager = (setError: UseFormSetError<ManagerUpdateMutation>) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: ManagerUpdateMutation }) =>
+      updateManager(id, data),
+    onSuccess: async (updatedManager) => {
+      toast.success('Менеджер успешно обновлен!');
+      queryClient.setQueryData<IUser[]>(['managers'], (old = []) =>
+        old.map((manager) =>
+          manager._id === updatedManager._id ? updatedManager : manager,
+        ),
+      );
+    },
+    onError: (err: AxiosError<GlobalError>) => {
+      const data = err.response?.data;
+
+      if (!data) {
+        return toast.error(
+          'Не удалось создать менеджера. Проверьте соединение и попробуйте снова.',
+        );
+      }
+
+      if ('details' in data && data.details) {
+        Object.entries(data.details).forEach(([field, value]) => {
+          setError(field as keyof ManagerUpdateMutation, {
+            type: 'server',
+            message: value.message,
+          });
+        });
+        return;
+      }
+
+      toast.error(
+        data.error || 'Не удалось создать менеджера. Попробуйте снова.',
+      );
     },
   });
 };

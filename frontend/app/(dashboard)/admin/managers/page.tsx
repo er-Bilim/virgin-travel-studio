@@ -11,8 +11,10 @@ import {Modal} from "@/components/shared/Modal";
 import {useModalStore} from "@/lib/stores/modalStore";
 import {Plus} from "lucide-react";
 import {getManagersColumns} from "@/components/dashboard/shared/data-table/columns/createColumnInTable/manager-colum";
+import { useRouter } from 'next/navigation';
 
 export default function ManagersPage() {
+    const route = useRouter();
     const [managerToDelete, setManagerToDelete] = useState<string | null>(null);
     const { data = [], isLoading, isError } = useManagers();
     const { mutate: deleteManager, isPending: isDeleting  } = useDeleteManager();
@@ -20,6 +22,7 @@ export default function ManagersPage() {
 
     const columns = useMemo(
         () => getManagersColumns({
+            onView: (user) => route.push(`managers/${user._id}`),
             onDelete: (user) => {
                 setManagerToDelete(user._id);
                 },
