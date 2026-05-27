@@ -1,5 +1,5 @@
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import {type ClassValue, clsx} from 'clsx';
+import {twMerge} from 'tailwind-merge';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
 
@@ -55,3 +55,33 @@ export const formatToReadablePrice = (price: number): string => {
   }).format(price);
   return formattedPrice;
 };
+
+export const isJsonBlob = (blob: Blob): boolean => {
+  return blob.type.includes("application/json");
+}
+
+export const parseBlobError = async (blob: Blob): Promise<{ message?: string; error?: string }> => {
+  const text = await blob.text();
+  return JSON.parse(text) as { message?: string; error?: string };
+}
+
+export const downloadBlobFile = (params: {
+  blob: Blob;
+  filename?: string;
+  disposition?: string;
+}) => {
+  const url = window.URL.createObjectURL(params.blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+
+  link.download = params.disposition?.match(/filename="(.+)"/)?.[1] ??
+      params.filename ??
+      "file.xlsx";
+
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  window.URL.revokeObjectURL(url);
+}

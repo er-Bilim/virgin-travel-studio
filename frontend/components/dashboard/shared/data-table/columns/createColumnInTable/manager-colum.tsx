@@ -2,7 +2,6 @@ import type {IUser} from "@/types/user";
 import type {ColumnDef} from "@tanstack/react-table";
 import {Button} from "@/components/ui/button";
 import {Eye, Trash2} from "lucide-react";
-import Link from "next/link";
 
 
 export const getManagersColumns = ({
