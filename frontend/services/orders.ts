@@ -1,15 +1,23 @@
 import axiosApi from '@/lib/axiosApi';
-import type { OrderMutationType, OrderPostType, OrderType } from '@/types/order';
+import type {
+  OrderMutationType,
+  OrderPostType,
+  OrderType,
+  PaginatedOrdersResponse
+} from '@/types/order';
 
 export const getOrders = async (
-  managerId: string | undefined = undefined,
-): Promise<OrderType[]> => {
-  let url = '/orders/';
-
-  if (managerId) url += `?managerId=${managerId}`
-  const result = await axiosApi.get(url);
+    filters: {
+      managerId?: string,
+      status?: string,
+      page?: number,
+      limit?: number,
+    } = {}): Promise<PaginatedOrdersResponse> => {
+  const result = await axiosApi.get<PaginatedOrdersResponse>('/orders', {
+    params: filters,
+  });
   return result.data;
-};
+}
 
 export const getOneOrder = async (id: string): Promise<OrderType> => {
   const result = await axiosApi.get(`/orders/${id}`);

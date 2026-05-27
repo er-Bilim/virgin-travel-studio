@@ -1,39 +1,68 @@
 'use client';
 
-import { DataTable } from '@/components/dashboard/shared/data-table/data-table';
-import { getOrdersColumns } from '@/components/dashboard/shared/data-table/columns/createColumnInTable/order-columns';
-import { useMemo, useState } from 'react';
-import { useOrders } from '@/lib/hooks/orderHooks';
-import { useManagers } from '@/lib/hooks/managerHook';
+import {DataTable} from '@/components/dashboard/shared/data-table/data-table';
+import {
+  getOrdersColumns
+} from '@/components/dashboard/shared/data-table/columns/createColumnInTable/order-columns';
+import {useMemo, useState} from 'react';
+import {useDeleteOrder, useOrders} from '@/lib/hooks/orderHooks';
+import {useManagers} from '@/lib/hooks/managerHook';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from '@/components/ui/select';
 import Link from 'next/link';
-import { Loader, Plus } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { useDeleteOrder } from '@/lib/hooks/orderHooks';
-import { useUser } from '@/lib/hooks/authHooks';
-import { toast } from 'sonner';
+import {Loader, Plus} from 'lucide-react';
+import {usePathname, useRouter, useSearchParams} from 'next/navigation';
+import {Button} from '@/components/ui/button';
+import {useUser} from '@/lib/hooks/authHooks';
+import {toast} from 'sonner';
+import {ORDER_STATUS_LABELS, OrderStatus} from '@/lib/constants';
 
 export default function OrderTable () {
-  const [,setPage] = useState(1);
-  const route = useRouter();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const limit = Number(searchParams.get('limit') ?? 10);
+  const page = Number(searchParams.get('page') ?? 1);
+  const status = (searchParams.get('status') as OrderStatus) || undefined;
+
+  const [selectedManagerId, setSelectedManagerId] = useState<string>();
+
+  const onChangeStatus = (val: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (val === 'all') {
+      params.delete('status');
+    }
+    else {
+      params.set('status', val);
+    }
+
+    params.set('page', '1');
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  const onChangePage = (numPage: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('page', String(numPage));
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
   const {data: user} = useUser();
     const {
       mutate: delOrder,
       isPending,
     } = useDeleteOrder();
 
-  const [selectedManagerId, setSelectedManagerId] = useState<string>();
   const columns = useMemo(
     () =>
       getOrdersColumns({
-        onView: (order) => route.push(`leads/${order._id}`),
+        onView: (order) => router.push(`leads/${order._id}`),
         onDelete: (order) => delOrder(order._id, {
           onError: () => {
             toast.error("Ошибка при удалениии");
@@ -42,12 +71,14 @@ export default function OrderTable () {
       }),
     [],
   );
-  const { data = [], isLoading, error, refetch } = useOrders(selectedManagerId);
+
   const {
     data: managers = [],
     isLoading: managerLoading,
     isError: managerError,
   } = useManagers();
+
+   const { data, isLoading, isError, error, refetch } = useOrders({ page, limit, managerId: selectedManagerId, status });
 
 if (isPending) {
   return (
@@ -69,35 +100,55 @@ if (isPending) {
           </h1>
           <div className="flex items-center gap-4">
             {user?.role === 'ADMIN' && (
-              <Select
-                value={selectedManagerId}
-                onValueChange={(val) => {
-                  setSelectedManagerId(val === 'all' ? undefined : val);
-                  setPage(1);
-                }}
-              >
-                <SelectTrigger className="w-[200px] bg-white">
-                  <SelectValue placeholder="Все менеджеры" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Все менеджеры</SelectItem>
-                  {managerLoading ? (
-                    <div>загрузка...</div>
-                  ) : managerError ? (
-                    <div>Ошибка загрузки</div>
-                  ) : managers?.length === 0 ? (
-                    <div>Пока нет менеджеров</div>
-                  ) : (
-                    managers?.map((manager) => (
-                      <SelectItem key={manager._id} value={manager._id}>
-                        {manager.fullName}
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
+                <>
+                  <Select
+                      value={status ?? 'all'}
+                      onValueChange={onChangeStatus}
+                  >
+                    <SelectTrigger className="w-[180px] bg-white">
+                      <SelectValue placeholder="Все статусы" />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                      <SelectItem value="all">Все статусы</SelectItem>
+                      {Object.values(OrderStatus).map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {ORDER_STATUS_LABELS[status]}
+                          </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <Select
+                      value={selectedManagerId}
+                      onValueChange={(val) => {
+                        setSelectedManagerId(val === 'all' ? undefined : val);
+                        onChangePage(1);
+                      }}
+                  >
+                    <SelectTrigger className="w-[200px] bg-white">
+                      <SelectValue placeholder="Все менеджеры" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Все менеджеры</SelectItem>
+                      {managerLoading ? (
+                          <div>загрузка...</div>
+                      ) : managerError ? (
+                          <div>Ошибка загрузки</div>
+                      ) : managers?.length === 0 ? (
+                          <div>Пока нет менеджеров</div>
+                      ) : (
+                          managers?.map((manager) => (
+                              <SelectItem key={manager._id} value={manager._id}>
+                                {manager.fullName}
+                              </SelectItem>
+                          ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                </>
             )}
-            
+
             <Link href='leads/new'>
               <Button className="bg-[#1E2B6D] hover:bg-[#162356]">
                 <Plus className="w-4 h-4 mr-2" /> Добавить заявку
@@ -126,7 +177,16 @@ if (isPending) {
             </Button>
           </div>
         ) : (
-          <DataTable columns={columns} data={data} />
+          <DataTable
+              columns={columns}
+              data={data?.orders || []}
+              pagination={{
+                page: page,
+                pageSize: limit,
+                total: data?.meta.total ?? 0,
+                onPageChange: onChangePage,
+              }}
+          />
         )}
       </div>
     </>

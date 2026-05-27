@@ -1,10 +1,9 @@
 import express from 'express';
-import auth, { type RequestWithUser} from '@/middlewares/auth.js';
+import auth, {type RequestWithUser} from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
 import Order from '@/model/order/Order.js';
 import type {OrderStatus} from '@/types/orders.types.js';
 import mongoose from 'mongoose';
-import { populate } from 'dotenv';
 import validateObjectId from '@/middlewares/validateObjectId.js';
 
 const ordersRouter = express.Router();
@@ -22,6 +21,13 @@ ordersRouter.get(
         status?: OrderStatus | { $ne: OrderStatus };
         managerId?: mongoose.Types.ObjectId | null;
       } = {};
+
+      const rawPage = Number.parseInt(req.query.page as string, 10);
+      const rawLimit = Number.parseInt(req.query.limit as string, 10);
+      const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
+      const limit = Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(rawLimit, 50) : 10;
+
+      const skip = (page - 1) * limit;
 
       // if (user.role === 'MANAGER') {
       //   if (view === 'my') {
@@ -55,6 +61,8 @@ ordersRouter.get(
         }
       }
 
+      const totalOrders = await Order.countDocuments(query);
+
       const orders = await Order.find(query)
         .populate('managerId', 'fullName phone')
         .populate({
@@ -65,10 +73,23 @@ ordersRouter.get(
             select: 'title',
           },
         })
-        .sort({ createdAt: -1 })
-        .lean();
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit)
+          .lean();
 
-      res.send(orders);
+      const calculatedPages = Math.ceil(totalOrders / limit);
+      const totalPages = calculatedPages === 0 ? 1 : calculatedPages;
+
+      res.send({
+        orders,
+        meta: {
+          total: totalOrders,
+          page,
+          limit,
+          totalPages,
+        }
+      });
     } catch (e) {
       next(e);
     }
