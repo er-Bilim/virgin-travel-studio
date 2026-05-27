@@ -1,20 +1,23 @@
 import type {OrderType} from '@/types/order';
-import type {ColumnDef} from '@tanstack/react-table';
+import type {CellContext, ColumnDef} from '@tanstack/react-table';
 import {
   createActionsColumn
 } from '@/components/dashboard/shared/data-table/columns/createActionsColumn';
 import {
   ORDER_STATUS_LABELS,
   ORDER_STATUS_STYLES,
-  OrderStatus
+  type OrderStatus
 } from '@/lib/constants';
 import {Badge} from '@/components/ui/badge';
+import dayjs from 'dayjs';
 
 
 export const getOrdersColumns = ({
   onView,
   onDelete,
+    role
 }: {
+  role?: string;
   onView: (order: OrderType) => void;
   onDelete: (order: OrderType) => void;
 }): ColumnDef<OrderType>[] => [
@@ -22,6 +25,28 @@ export const getOrdersColumns = ({
     accessorKey: '_id',
     header: 'ID',
   },
+  {
+    accessorKey: 'createdAt',
+    header: 'Дата создания',
+    cell: ({ getValue }) => {
+      const rawDate = getValue<string>();
+      return dayjs(rawDate).format('DD.MM.YYYY (HH:mm)');
+    }
+  },
+    ...(role === 'ADMIN' ? [
+      {
+        accessorKey: 'managerId',
+        header: 'Менеджер',
+        cell: ({ getValue } : CellContext<OrderType, unknown>) => {
+          const manager = getValue() as { fullName: string } | null;
+          if (!manager) {
+            return 'Не назначен';
+          }
+          return manager.fullName;
+        }
+      }
+    ]
+    : []),
   {
     accessorKey: 'clientName',
     header: 'Клиент',
@@ -58,3 +83,5 @@ export const getOrdersColumns = ({
     ],
   }),
 ];
+
+

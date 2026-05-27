@@ -64,9 +64,11 @@ export default function OrderTable () {
       isPending,
     } = useDeleteOrder();
 
+
   const columns = useMemo(
     () =>
       getOrdersColumns({
+        role: user?.role,
         onView: (order) => router.push(`leads/${order._id}`),
         onDelete: (order) => delOrder(order._id, {
           onError: () => {
@@ -74,7 +76,7 @@ export default function OrderTable () {
           }
         }),
       }),
-    [],
+    [user?.role, delOrder, router],
   );
 
   const {
@@ -94,7 +96,6 @@ if (isPending) {
     </div>
   );
 }
-
 
   return (
     <>
