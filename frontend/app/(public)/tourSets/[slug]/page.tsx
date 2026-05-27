@@ -148,7 +148,7 @@ export default function TourSetPage() {
         />
       )}
 
-      <section aria-labelledby="tour-title" className="mt-5 ">
+      <section aria-labelledby="tour-title" className="mt-5">
         <Breadcrumbs
           items={[
             { label: 'Туры', href: '/tours' },

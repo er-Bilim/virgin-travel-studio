@@ -14,7 +14,7 @@ const ClientAvatar = ({ name, size = "sm" }: Props) => {
   }
 
   return (
-    <span className={`flex size-[${sizes[size]}] items-center justify-center rounded-full bg-primary text-[${sizes[size]}] font-semibold text-primary-foreground`}>
+    <span className={`flex size-10 items-center justify-center rounded-full bg-primary text-[${sizes[size]}] font-semibold text-primary-foreground`}>
       {initial}
     </span>
   );
