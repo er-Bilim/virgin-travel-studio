@@ -14,6 +14,7 @@ import {
 import TourGallery from '@/components/tourGallery/TourGallery';
 import { Badge } from '@/components/ui/badge';
 import { useOneTourSet } from '@/lib/hooks/tourSets';
+import TourSetReviewsManager from '@/components/dashboard/tourSets/TourSetReviewsManager';
 
 const formatDate = (date?: string) => {
     if (!date) {
@@ -274,6 +275,7 @@ const TourSetDetailsPage = () => {
                                 </article>
                             </div>
                         </section>
+                        <TourSetReviewsManager tourId={tour._id} />
                     </article>
 
                     <aside className="h-fit rounded-3xl bg-white p-6 shadow-xl lg:sticky lg:top-8">

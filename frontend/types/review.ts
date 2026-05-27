@@ -1,8 +1,10 @@
 export interface IReviewMutation {
+  tourId?: string;
   rating: number;
   clientName: string;
   comment: string;
   image?: File | null;
+  companyReply?: string | null;
 }
 
 export interface IReview {
@@ -13,6 +15,7 @@ export interface IReview {
   image: string | null;
   createdDate: string;
   updatedDate: string;
+  companyReply?: string | null;
 }
 
 export interface IPaginationReviews {
