@@ -34,7 +34,7 @@ const NewsDetailView = ({ id }: Props) => {
     return toast.error('Что-то пошло не так');
   }
 
-  const words: number = news.content.length;
+  const words: number = news.content.trim().split(/\s+/).length;
 
   const imageSrc: string = `${imageUrl}${news.image}`;
 
@@ -48,7 +48,7 @@ const NewsDetailView = ({ id }: Props) => {
       <Breadcrumbs
         items={[{ label: 'Новости', href: '/news' }, { label: news.title }]}
       />
-      <article itemScope>
+      <article itemScope itemType="https://schema.org/NewsArticle">
         <header>
           <ul
             aria-label="Теги статьи"
@@ -90,7 +90,7 @@ const NewsDetailView = ({ id }: Props) => {
                   <Dot size={12} />
                   <div className="flex flex-row gap-1 items-center">
                     <Clock size={16} />
-                    <p>{Math.ceil(words / 300)} мин чтения</p>
+                    <p>{Math.ceil(words / 200)} мин чтения</p>
                   </div>
                 </div>
               </div>
