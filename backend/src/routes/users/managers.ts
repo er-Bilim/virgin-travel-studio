@@ -65,28 +65,32 @@ managersRouter.put('/:id', auth, permit('ADMIN'), validateObjectId(), async (req
     const { id } = req.params;
     const { phone } = req.body;
 
-    const existingUser = await User.findOne({ phone });
+    const existingPhone = await User.findOne({ phone });
 
-    if (existingUser && String(existingUser._id) !== id) {
+    if (existingPhone && String(existingPhone._id) !== id) {
       return res.status(409).send({
         error: 'Пользователь с таким номером уже существует',
       });
     }
 
+    const existingUser = await User.findById(id);
+
+    if (!existingUser) {
+      return res.status(409).send({
+        error: 'Пользователь не найден',
+      });
+    }
+
     const data = {
       fullName: req.body.fullName,
-      phone: req.body.phone,
+      phone: phone,
       status: req.body.status,
     };
 
-   const updatedManager = await User.findByIdAndUpdate(
-     id,
-     { $set: data },
-     { new: true }, 
-   );
+   const updatedManager = await existingUser.updateOne(data);
 
     res.send({
-      message: 'Менеджер успешно создан',
+      message: 'Менеджер успешно обновлён',
       user: updatedManager,
     });
   } catch (e) {

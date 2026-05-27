@@ -79,7 +79,7 @@ export default function OrderTable () {
     isError: managerError,
   } = useManagers();
 
-   const { data, isLoading, isError, error, refetch } = useOrders({ page, limit, managerId: selectedManagerId, status });
+   const { data, isLoading, error, refetch } = useOrders({ page, limit, managerId: selectedManagerId, status });
 
 if (isPending) {
   return (
@@ -161,7 +161,7 @@ if (isPending) {
         ) : error ? (
           <div className="p-12 text-center space-y-4">
             <p className="text-[#1E2B6D] font-bold">
-              Не удалось загрузить список Туров
+              Не удалось загрузить список Заявок
             </p>
             <p className="text-xs text-[#64748B] max-w-xs mx-auto">
               Проверьте интернет-соединение или попробуйте перезагрузить данные
