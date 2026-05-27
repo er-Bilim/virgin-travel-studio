@@ -14,9 +14,13 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-import Link from 'next/link';
-import {Loader, Plus} from 'lucide-react';
-import {usePathname, useRouter, useSearchParams, useParams} from 'next/navigation';
+import {Loader} from 'lucide-react';
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams
+} from 'next/navigation';
 import {Button} from '@/components/ui/button';
 import {useUser} from '@/lib/hooks/authHooks';
 import {toast} from 'sonner';
@@ -100,23 +104,23 @@ if (isPending) {
             Заявки
           </h1>
           <div className="flex items-center gap-4">
+            <Select value={status ?? 'all'} onValueChange={onChangeStatus}>
+              <SelectTrigger className="w-[180px] bg-white">
+                <SelectValue placeholder="Все статусы" />
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectItem value="all">Все статусы</SelectItem>
+                {Object.values(OrderStatus).map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {ORDER_STATUS_LABELS[status]}
+                    </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
             {user?.role === 'ADMIN' && (
               <>
-                <Select value={status ?? 'all'} onValueChange={onChangeStatus}>
-                  <SelectTrigger className="w-[180px] bg-white">
-                    <SelectValue placeholder="Все статусы" />
-                  </SelectTrigger>
-
-                  <SelectContent>
-                    <SelectItem value="all">Все статусы</SelectItem>
-                    {Object.values(OrderStatus).map((status) => (
-                      <SelectItem key={status} value={status}>
-                        {ORDER_STATUS_LABELS[status]}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
                 {!id && (
                   <Select
                     value={selectedManagerId}
@@ -149,11 +153,6 @@ if (isPending) {
               </>
             )}
 
-            <Link href="leads/new">
-              <Button className="bg-[#1E2B6D] hover:bg-[#162356]">
-                <Plus className="w-4 h-4 mr-2" /> Добавить заявку
-              </Button>
-            </Link>
           </div>
         </div>
         {isLoading ? (

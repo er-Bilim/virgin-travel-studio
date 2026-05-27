@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.100.10",
-    "@tanstack/react-query-devtools": "^5.100.10",
+    "@tanstack/react-query-devtools": "^5.100.14",
     "@tanstack/react-table": "^8.21.3",
     "axios": "^1.16.0",
     "class-variance-authority": "^0.7.1",
