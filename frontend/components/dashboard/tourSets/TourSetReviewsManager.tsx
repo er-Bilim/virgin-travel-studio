@@ -149,7 +149,7 @@ const TourSetReviewsManager = ({ tourId }: Props) => {
                                         onClick={() => handleReply(review)}
                                     >
                                         <MessageSquareReply className="mr-1 h-4 w-4" />
-                                        Ответить от Virgin Travel
+                                        {review.companyReply ? 'Редактировать ответ' : 'Ответить от Virgin Travel'}
                                     </Button>
 
                                     <Button
@@ -159,7 +159,7 @@ const TourSetReviewsManager = ({ tourId }: Props) => {
                                         onClick={() => handleEdit(review)}
                                     >
                                         <Edit className="mr-1 h-4 w-4" />
-                                        Edit
+                                        Редактировать отзыв
                                     </Button>
 
                                     <Button
@@ -169,7 +169,7 @@ const TourSetReviewsManager = ({ tourId }: Props) => {
                                         onClick={() => setReviewToDelete(review)}
                                     >
                                         <Trash2 className="mr-1 h-4 w-4" />
-                                        Delete
+                                        Удалить
                                     </Button>
                                 </div>
                             </div>
@@ -180,13 +180,34 @@ const TourSetReviewsManager = ({ tourId }: Props) => {
 
                             {review.companyReply && (
                                 <div className="mt-4 rounded-2xl border border-[#DCE4FF] bg-[#F4F7FF] p-4">
-                                    <p className="text-xs font-bold uppercase tracking-wide text-[#1E2B6D]">
-                                        Ответ Virgin Travel
-                                    </p>
+                                    <div className="flex items-start justify-between gap-3">
+                                        <div>
+                                            <p className="text-xs font-bold uppercase tracking-wide text-[#1E2B6D]">
+                                                Ответ Virgin Travel
+                                            </p>
 
-                                    <p className="mt-2 text-sm leading-relaxed text-gray-700">
-                                        {review.companyReply}
-                                    </p>
+                                            <p className="mt-2 text-sm leading-relaxed text-gray-700">
+                                                {review.companyReply}
+                                            </p>
+                                        </div>
+
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            className="text-red-600 hover:text-red-700"
+                                            onClick={() =>
+                                                updateReview({
+                                                    id: review._id,
+                                                    data: {
+                                                        companyReply: null,
+                                                    },
+                                                })
+                                            }
+                                        >
+                                            Удалить ответ
+                                        </Button>
+                                    </div>
                                 </div>
                             )}
 
