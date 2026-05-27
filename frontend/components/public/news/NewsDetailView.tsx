@@ -26,12 +26,12 @@ const NewsDetailView = ({ id }: Props) => {
   const url = `${process.env.NEXT_PUBLIC_SITE_URL}${pathname}`;
   const { data: news, isLoading, isError } = useGetSingleNews(id);
 
-  if (isError || !news) {
-    return toast.error('Что-то пошло не так');
-  }
-
   if (isLoading) {
     return <Spinner />;
+  }
+
+  if (isError || !news) {
+    return toast.error('Что-то пошло не так');
   }
 
   const words: number = news.content.length;
