@@ -88,6 +88,15 @@ newsRouter.get("/", validateObjectId("authorId", true), authOrNot, async (req, r
   }
 });
 
+newsRouter.get('/tags', async(_req, res, next) => {
+  try {
+    const tags = await News.distinct('tags', { isPublished: true });
+    return res.json(tags)
+  } catch (error) {
+    next(error)
+  }
+})
+
 newsRouter.get(
   "/:id",
   authOrNot,
