@@ -4,6 +4,7 @@ import {
   deleteNews,
   editNews,
   getNews,
+  getNewsTags,
   publicateNews,
 } from '@/services/news';
 import { toast } from 'sonner';
@@ -66,6 +67,13 @@ export const useNews = (page: number, limit: number, searchTitle?: string, isPub
     queryFn: () => getNews(page, limit, searchTitle, isPublished, authorId),
   });
 };
+
+export const useGetNewsTags = () => {
+  return useQuery({
+    queryKey: ['news', 'newsTags'],
+    queryFn: () => getNewsTags(),
+  })
+}
 
 
 export const useGetSingleNews = (newsId: string) => {

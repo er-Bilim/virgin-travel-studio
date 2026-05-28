@@ -27,4 +27,8 @@ export type INews = Omit<NewsFields, 'isPublished'>
 export type NewsData = {
   allNews: NewsFields[];
   metadata: MetaType
+} 
+
+export type INewsTags = {
+  tags: string[]
 }
