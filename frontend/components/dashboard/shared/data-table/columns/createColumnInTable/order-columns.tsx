@@ -15,11 +15,15 @@ import dayjs from 'dayjs';
 export const getOrdersColumns = ({
   onView,
   onDelete,
-    role
+    role,
+    currentTab,
+    onTake
 }: {
   role?: string;
   onView: (order: OrderType) => void;
   onDelete: (order: OrderType) => void;
+  currentTab?: string;
+  onTake: (order: OrderType) => void;
 }): ColumnDef<OrderType>[] => [
   {
     accessorKey: '_id',
@@ -69,11 +73,26 @@ export const getOrdersColumns = ({
   },
   createActionsColumn<OrderType>({
     actions: [
-      {
-        id: 'view',
-        label: 'Просмотр',
-        onClick: onView,
-      },
+       ...(currentTab !== 'all'
+      ? [
+          {
+            id: 'view',
+            label: 'Просмотр',
+            onClick: onView,
+          },
+        ]
+      : []),
+
+        ...(currentTab === 'all'
+      ? [
+          {
+            id: 'take',
+            label: 'Взять заявку',
+            onClick: onTake,
+          },
+        ]
+      : []),
+
       {
         id: 'delete',
         label: 'Удалить',

@@ -5,7 +5,11 @@ import {
   getOrdersColumns
 } from '@/components/dashboard/shared/data-table/columns/createColumnInTable/order-columns';
 import {useMemo, useState} from 'react';
-import {useDeleteOrder, useOrders} from '@/lib/hooks/orderHooks';
+import {
+  useDeleteOrder,
+  useOrders,
+  useUpdateOrder
+} from '@/lib/hooks/orderHooks';
 import {useManagers} from '@/lib/hooks/managerHook';
 import {
   Select,
@@ -36,7 +40,6 @@ export default function OrderTable () {
   const limit = Number(searchParams.get('limit') ?? 10);
   const page = Number(searchParams.get('page') ?? 1);
   const status = (searchParams.get('status') as OrderStatus) || undefined;
-
   const currentTab = searchParams.get('tab') ?? 'my';
 
   const [selectedManagerId, setSelectedManagerId] = useState<string | undefined>(id as string);
@@ -68,27 +71,37 @@ export default function OrderTable () {
     router.push(`${pathname}?${params.toString()}`);
   };
 
-
-
   const {data: user} = useUser();
     const {
       mutate: delOrder,
       isPending,
     } = useDeleteOrder();
 
+    const { mutate: updateOrder } = useUpdateOrder();
+
 
   const columns = useMemo(
     () =>
       getOrdersColumns({
         role: user?.role,
+        currentTab,
         onView: (order) => router.push(`leads/${order._id}`),
         onDelete: (order) => delOrder(order._id, {
           onError: () => {
             toast.error("Ошибка при удалениии");
           }
         }),
+        onTake: (order) => {
+          updateOrder({
+            id: order._id,
+            data: {
+              managerId: user?._id,
+              status: OrderStatus.IN_PROGRESS
+            }
+          })
+        }
       }),
-    [user?.role, delOrder, router],
+    [user?.role, delOrder, router, user?._id, updateOrder, currentTab],
   );
 
   const queryParams = useMemo(() => {
@@ -125,11 +138,9 @@ export default function OrderTable () {
    } = useOrders({
      page,
      limit,
-     managerId: selectedManagerId,
      status,
      ...queryParams
    });
-
 
 if (isPending) {
   return (
@@ -149,11 +160,11 @@ if (isPending) {
             Заявки
           </h1>
 
-          <OrderTabs onChangeTab={onChangeTab} currentTab={currentTab} />
+          <OrderTabs onChangeTab={onChangeTab} currentTab={currentTab} role={user?.role} />
 
           <div className="flex items-center gap-4">
 
-            {user?.role !== 'MANAGER' && currentTab === 'all' &&
+            {(user?.role !== 'MANAGER' || (user?.role === 'MANAGER' && currentTab === 'my')) &&
                 <Select value={status ?? 'all'} onValueChange={onChangeStatus}>
                   <SelectTrigger className="w-[180px] bg-white">
                     <SelectValue placeholder="Все статусы" />
@@ -170,7 +181,7 @@ if (isPending) {
                 </Select>
             }
 
-            {user?.role === 'ADMIN' && (
+            {user?.role === 'ADMIN' && currentTab === 'all' && (
               <>
                 {!id && (
                   <Select

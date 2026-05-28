@@ -47,11 +47,11 @@ export interface PaginatedOrdersResponse {
 }
 
 export interface OrderMutationType {
-  tourSetId: string;
-  clientPhone: string;
-  clientName: string;
-  status: string;
-  rejectionReason: string | null;
+  tourSetId?: string;
+  clientPhone?: string;
+  clientName?: string;
+  status?: string;
+  rejectionReason?: string | null;
   managerId: string | null | undefined;
 } 
 

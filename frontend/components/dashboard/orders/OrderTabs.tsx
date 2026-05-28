@@ -6,7 +6,7 @@ interface Props {
     currentTab: string,
 }
 
-export function OrderTabs({ onChangeTab, currentTab } : Props) {
+export function OrderTabs({ onChangeTab, currentTab, role } : Props) {
     return (
         <Tabs value={currentTab} onValueChange={onChangeTab} className="w-full sm:w-auto">
             <TabsList className="bg-gray-200/60 p-1 rounded-xl">
@@ -21,7 +21,7 @@ export function OrderTabs({ onChangeTab, currentTab } : Props) {
                     value='all'
                     className="rounded-lg px-4 py-2 data-[state=active]:bg-white data-[state=active]:text-[#1E2B6D] text-sm font-medium text-gray-600"
                 >
-                    Новые заявки
+                    {role === 'ADMIN' ? 'Все заявки' : 'Новые заявки'}
                 </TabsTrigger>
             </TabsList>
         </Tabs>
