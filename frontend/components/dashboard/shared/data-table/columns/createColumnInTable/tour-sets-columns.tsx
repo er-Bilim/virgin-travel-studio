@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/tooltip';
 import { createActionsColumn } from '@/components/dashboard/shared/data-table/columns/createActionsColumn';
 
-const getStatusBadge = (status: string) => {
+export const getStatusBadge = (status: string) => {
   switch (status) {
     case 'OPEN':
       return (
@@ -50,6 +50,7 @@ const getStatusBadge = (status: string) => {
 };
 
 type Props = {
+  onReport: (set: TourSetType) => void;
   onView: (set: TourSetType) => void;
   onEdit: (set: TourSetType) => void;
   onDelete: (set: TourSetType) => void;
@@ -57,10 +58,11 @@ type Props = {
 };
 
 export const getTourSetsColumns = ({
-  onView,
-  onEdit,
-  onDelete,
-  canDelete,
+                                     onView,
+                                     onEdit,
+                                     onDelete,
+                                     canDelete,
+                                     onReport
 }: Props): ColumnDef<TourSetType>[] => [
   {
     header: 'Старт',
@@ -151,6 +153,7 @@ export const getTourSetsColumns = ({
   },
   createActionsColumn<TourSetType>({
     actions: [
+      { id: 'report', label: 'Отчет по потоку тура', onClick: onReport},
       { id: 'view', label: 'Просмотреть', onClick: onView },
       { id: 'edit', label: 'Редактировать', onClick: onEdit },
       {

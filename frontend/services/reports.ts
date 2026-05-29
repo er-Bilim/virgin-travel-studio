@@ -9,3 +9,9 @@ export const reportsManager = async (params: ReportParams): Promise<AxiosRespons
     });
 }
 
+export const reportsTourSet = async (id: string): Promise<AxiosResponse<Blob>> => {
+    return await axiosApi.get(`/reports/tour-roster/${id}`, {
+        responseType: "blob",
+    });
+}
+

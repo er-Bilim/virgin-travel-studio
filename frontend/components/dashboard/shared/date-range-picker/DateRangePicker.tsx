@@ -17,6 +17,7 @@ type Props = {
     disableFuture?: boolean;
     maxDate?: Date;
     minDate?: Date;
+    numberOfMonths?: number;
 };
 
 export function DateRangePicker({
@@ -26,6 +27,7 @@ export function DateRangePicker({
                                     disableFuture,
                                     maxDate,
                                     minDate,
+                                    numberOfMonths=2
                                 }: Props) {
     const [open, setOpen] = useState(false);
     const today = new Date();
@@ -75,7 +77,7 @@ export function DateRangePicker({
                     mode="range"
                     selected={value}
                     onSelect={onChange}
-                    numberOfMonths={2}
+                    numberOfMonths={numberOfMonths}
                     disabled={(date) => {
                         if (disableFuture && date > today) return true;
                         if (minDate && date < minDate) return true;
