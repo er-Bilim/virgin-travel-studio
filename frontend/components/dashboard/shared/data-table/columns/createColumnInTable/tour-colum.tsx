@@ -2,7 +2,6 @@ import type { ColumnDef } from '@tanstack/react-table';
 import type { TourType } from '@/types/tour';
 
 import { createActionsColumn } from '@/components/dashboard/shared/data-table/columns/createActionsColumn';
-import { imageUrl } from '@/lib/constants';
 import { Badge } from '@/components/ui/badge';
 import {
     Tooltip,
@@ -10,6 +9,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import {TourImageCell} from "@/components/dashboard/shared/data-table/columnComponent/TourImageCell";
 
 type Props = {
     onView: (tour: TourType) => void;
@@ -30,29 +30,9 @@ export const getToursColumns = ({
         id: 'image',
         size: 70,
         header: 'Фото',
-        cell: ({ row }) => {
-            const tour = row.original;
-
-            if (!tour.images?.[0]) {
-                return <div className="w-10 h-10 rounded bg-gray-200" />;
-            }
-
-            return (
-                <a
-                    href={imageUrl + tour.images[0]}
-                    target="_blank"
-                    rel="noreferrer"
-                >
-                    <img
-                        alt="Фото тура"
-                        src={imageUrl + tour.images[0]}
-                        width={40}
-                        height={40}
-                        className="rounded object-cover transition hover:scale-105"
-                    />
-                </a>
-            );
-        },
+        cell: ({ row }) => (
+            <TourImageCell tour={row.original} />
+        ),
     },
 
     {

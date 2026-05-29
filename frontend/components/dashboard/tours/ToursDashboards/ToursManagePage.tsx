@@ -1,17 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import Link from 'next/link';
-import {
-  Edit,
-  Eye,
-  Plus,
-  Trash2,
-  Globe,
-  GlobeLock,
-  ChevronLeft,
-  ChevronRight,
-} from 'lucide-react';
+import {Plus} from 'lucide-react';
 import {
   useTours,
   useDeleteTour,
@@ -27,18 +18,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { imageUrl } from '@/lib/constants';
+import {headerRowClassName, rowClassName, tableClassName} from '@/lib/constants';
 import { useUser } from '@/lib/hooks/authHooks';
-import { usePathname } from 'next/navigation';
+import {usePathname, useRouter} from 'next/navigation';
+import {ConfirmDialog} from "@/components/dashboard/ConfirmDialog/ConfirmDialog";
+import {DataTable} from "@/components/dashboard/shared/data-table/data-table";
+import {getToursColumns} from "@/components/dashboard/shared/data-table/columns/createColumnInTable/tour-colum";
+import type {TourType} from "@/types/tour";
 
 export default function ToursManagePage() {
+  const router = useRouter();
   const user = useUser().data;
   const [page, setPage] = useState(1);
   const [categoryId, setCategoryId] = useState<string>('all');
@@ -69,7 +58,20 @@ export default function ToursManagePage() {
   );
 
   const { mutate: deleteTour, isPending: isDeleting } = useDeleteTour();
-  const { mutate: togglePublish, isPending: isPublishing } = useTogglePublish();
+  const { mutate: togglePublish } = useTogglePublish();
+
+  const isAdmin = user?.role === 'ADMIN';
+
+  const columns = useMemo(() => getToursColumns({
+    onDelete: (tour: TourType) => setTourToDelete(tour._id),
+    onView: (tour: TourType) => router.push(`${path}/${tour._id}`),
+    onEdit: (tour: TourType) => router.push(`${path}/edit/${tour._id}`),
+    onTogglePublish: (tour: TourType) => togglePublish({
+      id: tour._id,
+      isPublished: !tour.isPublished,
+    }),
+    visible: isAdmin,
+  }), [router,isAdmin, path, togglePublish]);
 
   const confirmDelete = () => {
     if (tourToDelete) {
@@ -78,9 +80,6 @@ export default function ToursManagePage() {
       });
     }
   };
-
-  const totalPages = data?.meta.totalPages || 1;
-  const hasTours = Boolean(data?.tours.length);
 
   return (
       <div className="p-8 space-y-8 bg-gray-50 min-h-screen">
@@ -142,6 +141,16 @@ export default function ToursManagePage() {
           </div>
         </div>
 
+        <ConfirmDialog
+            open={!!tourToDelete}
+            title="Вы уверенны что хотите удалить тур?"
+            description="Это действие нельзя отменить"
+            loading={isDeleting}
+            confirmText="Удалить"
+            onCancel={() => setTourToDelete(null)}
+            onConfirm={confirmDelete}
+        />
+
         <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
           {isLoading ? (
               <div className="p-8 text-center text-gray-500">Загрузка туров...</div>
@@ -164,177 +173,23 @@ export default function ToursManagePage() {
                 </Button>
               </div>
           ) : (
-              <>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left">
-                    <thead className="bg-muted/50 text-muted-foreground border-b">
-                    <tr>
-                      <th className="p-4 font-medium">Фото</th>
-                      <th className="p-4 font-medium">Название</th>
-                      <th className="p-4 font-medium">Категория</th>
-                      <th className="p-4 font-medium text-center">Статус</th>
-                      <th className="p-4 font-medium text-right">Действия</th>
-                    </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                    {hasTours ? (
-                        data?.tours.map((tour) => (
-                            <tr
-                                key={tour._id}
-                                className="transition-colors hover:bg-[#07224D]/5 border-b border-gray-100"
-                            >
-                              <td className="p-4">
-                                {tour.images?.[0] ? (
-                                    <img
-                                        src={imageUrl + tour.images[0]}
-                                        className="w-12 h-12 rounded-lg object-cover border"
-                                        alt="Фото тура"
-                                    />
-                                ) : (
-                                    <div className="w-12 h-12 rounded-lg bg-gray-200" />
-                                )}
-                              </td>
-
-                              <td className="p-4 font-medium text-gray-900">
-                                <div className="flex flex-col">
-                                  <span>{tour.title}</span>
-                                  {!tour.isPublished && (
-                                      <span className="text-[10px] text-[#C8D2DC] font-bold uppercase tracking-wider">
-                                Черновик
-                              </span>
-                                  )}
-                                </div>
-                              </td>
-
-                              <td className="p-4 text-gray-500">
-                                {typeof tour.category === 'object' &&
-                                tour.category !== null
-                                    ? tour.category.title
-                                    : '—'}
-                              </td>
-
-                              <td className="p-4 text-center">
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    disabled={isPublishing}
-                                    onClick={() =>
-                                        togglePublish({
-                                          id: tour._id,
-                                          isPublished: !tour.isPublished,
-                                        })
-                                    }
-                                    className={`w-46.25 transition-all duration-200 h-9 rounded-xl font-semibold ${
-                                        tour.isPublished
-                                            ? 'bg-white border-2 border-gray-200 text-gray-500 hover:bg-gray-100 hover:text-gray-700'
-                                            : 'bg-[#1E2B6D] text-white hover:bg-[#162356] hover:text-white shadow-md'
-                                    }`}
-                                >
-                                  {tour.isPublished ? (
-                                      <GlobeLock className="w-4 h-4" />
-                                  ) : (
-                                      <Globe className="w-4 h-4" />
-                                  )}
-                                  {tour.isPublished
-                                      ? 'Снять с публикации'
-                                      : 'Опубликовать'}
-                                </Button>
-                              </td>
-
-                              <td className="p-4 text-right">
-                                <div className="flex items-center justify-end gap-2">
-                                  <Link href={`${path}/${tour._id}`}>
-                                    <Button variant="outline" size="sm">
-                                      <Eye className="w-4 h-4 mr-2" /> Подробнее
-                                    </Button>
-                                  </Link>
-
-                                  <Link href={`${path}/edit/${tour._id}`}>
-                                    <Button variant="outline" size="sm">
-                                      <Edit className="w-4 h-4 mr-2" /> Правка
-                                    </Button>
-                                  </Link>
-
-                                  {user?.role === 'ADMIN' && (
-                                      <Button
-                                          variant="destructive"
-                                          size="sm"
-                                          onClick={() => setTourToDelete(tour._id)}
-                                      >
-                                        <Trash2 className="w-4 h-4" />
-                                      </Button>
-                                  )}
-                                </div>
-                              </td>
-                            </tr>
-                        ))
-                    ) : (
-                        <tr>
-                          <td
-                              colSpan={5}
-                              className="py-14 text-center text-gray-400 text-sm"
-                          >
-                            Туры не найдены
-                          </td>
-                        </tr>
-                    )}
-                    </tbody>
-                  </table>
-                </div>
-
-                {totalPages > 1 && (
-                    <div className="px-4 py-3 bg-white border-t flex items-center justify-between">
-                      <div className="text-sm text-gray-500 font-medium">
-                        Страница <span className="text-[#1E2B6D]">{page}</span> из{' '}
-                        <span className="text-[#1E2B6D]">{totalPages}</span>
-                      </div>
-
-                      <div className="flex gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            className="rounded-lg h-9 border-gray-200"
-                            disabled={page === 1}
-                            onClick={() => setPage((prev) => prev - 1)}
-                        >
-                          <ChevronLeft className="w-4 h-4 mr-1" /> Назад
-                        </Button>
-
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            className="rounded-lg h-9 border-gray-200"
-                            disabled={page >= totalPages}
-                            onClick={() => setPage((prev) => prev + 1)}
-                        >
-                          Вперед <ChevronRight className="w-4 h-4 ml-1" />
-                        </Button>
-                      </div>
-                    </div>
-                )}
-              </>
+              <DataTable
+                  data={data?.tours || []}
+                  isError={isError}
+                  columns={columns}
+                  isLoading={isLoading}
+                  pagination={{
+                    page,
+                    pageSize: 10,
+                    total: data?.meta.total || 0,
+                    onPageChange: setPage
+                  }}
+                  headerRowClassName={headerRowClassName}
+                  rowClassName={rowClassName}
+                  className={tableClassName}
+              />
           )}
         </div>
-
-        <Dialog open={!!tourToDelete} onOpenChange={() => setTourToDelete(null)}>
-          <DialogContent>
-            <DialogHeader className="pr-8">
-              <DialogTitle>Вы уверены, что хотите удалить этот тур?</DialogTitle>
-            </DialogHeader>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setTourToDelete(null)}>
-                Отмена
-              </Button>
-              <Button
-                  variant="destructive"
-                  onClick={confirmDelete}
-                  disabled={isDeleting}
-              >
-                {isDeleting ? 'Удаление...' : 'Удалить'}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
       </div>
   );
 }

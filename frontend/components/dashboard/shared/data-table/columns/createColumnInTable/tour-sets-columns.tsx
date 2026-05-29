@@ -99,7 +99,7 @@ export const getTourSetsColumns = ({
         <TooltipProvider delayDuration={150}>
           <Tooltip>
             <TooltipTrigger asChild>
-              <span className="font-medium text-gray-900 pb-0.5 block truncate max-w-[110px] md:max-w-[150px] lg:max-w-[220px] cursor-help border-b border-dotted border-gray-400 w-fit">
+              <span className="font-medium text-gray-900 pb-0.5 block truncate max-w-[110px] md:max-w-[150px] lg:max-w-[220px] cursor-help border-b border-dotted border-gray-400 w-fit whitespace-normal break-words">
                 {name}
               </span>
             </TooltipTrigger>
