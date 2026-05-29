@@ -162,6 +162,16 @@ async function getDailyManagerReport(req: Request, res: Response, next: NextFunc
                             },
                         },
 
+                        pending: {
+                            $size: {
+                                $filter: {
+                                    input: '$orders',
+                                    as: 'o',
+                                    cond: { $eq: ['$$o.status', 'CONTRACT_PENDING'] },
+                                }
+                            }
+                        },
+
                         revenue: {
                             $sum: {
                                 $map: {
@@ -192,6 +202,7 @@ async function getDailyManagerReport(req: Request, res: Response, next: NextFunc
                         inProgress: 1,
                         completed: 1,
                         rejected: 1,
+                        pending: 1,
                         revenue: 1,
                     },
                 },
@@ -207,6 +218,7 @@ async function getDailyManagerReport(req: Request, res: Response, next: NextFunc
             { header: 'В работе', key: 'inProgress', width: 15 },
             { header: 'Завершено', key: 'completed', width: 15 },
             { header: 'Отклонено', key: 'rejected', width: 15 },
+            { header: 'В ожидании договора', key: 'pending', width: 25 },
             { header: 'Доход', key: 'revenue', width: 20 },
         ];
 
@@ -219,13 +231,22 @@ async function getDailyManagerReport(req: Request, res: Response, next: NextFunc
 
         const buffer = await workbook.xlsx.writeBuffer();
 
-        return res
-            .writeHead(200, {
-                'Content-Type':
-                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'Content-Disposition': 'attachment; filename="daily.xlsx"',
-            })
-            .end(buffer);
+        res.setHeader(
+            'Access-Control-Expose-Headers',
+            'Content-Disposition'
+        );
+
+        res.setHeader(
+            'Content-Type',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        );
+
+        res.setHeader(
+            'Content-Disposition',
+            'attachment; filename="daily.xlsx"'
+        );
+
+        return res.end(buffer);
 
     } catch (e) {
         next(e);

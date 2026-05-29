@@ -6,11 +6,12 @@ import {
   getNews,
   publicateNews,
 } from '@/services/news';
-import {toast} from 'sonner';
-import type {AxiosError} from 'axios';
-import type {GlobalError} from '@/types/error';
-import type {UseFormSetError} from 'react-hook-form';
-import type {NewsMutation} from '@/types/news';
+import { toast } from 'sonner';
+import type { AxiosError } from 'axios';
+import type { GlobalError } from '@/types/error';
+import type { UseFormSetError } from 'react-hook-form';
+import type { NewsMutation } from '@/types/news';
+import { getNewsById } from '@/services/news';
 
 const useCreateNews = (setError: UseFormSetError<NewsMutation>) => {
   const queryClient = useQueryClient();
@@ -65,6 +66,15 @@ export const useNews = (page: number, limit: number, searchTitle?: string, isPub
     queryFn: () => getNews(page, limit, searchTitle, isPublished, authorId),
   });
 };
+
+
+export const useGetSingleNews = (newsId: string) => {
+  return useQuery({
+    queryKey: ['news', 'single', newsId],
+    queryFn: () => getNewsById(newsId),
+    enabled: !!newsId
+  })
+}
 
 export const useDeleteNews = () => {
   const queryClient = useQueryClient();

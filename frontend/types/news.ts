@@ -22,6 +22,8 @@ export type NewsMutation = {
   tags: string[];
 }
 
+export type INews = Omit<NewsFields, 'isPublished'>
+
 export type NewsData = {
   allNews: NewsFields[];
   metadata: MetaType

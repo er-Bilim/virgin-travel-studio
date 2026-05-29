@@ -1,140 +1,165 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import type { TourSetType } from '@/types/tourSets';
 import { format } from 'date-fns';
-import { Button } from '@/components/ui/button';
-import { Eye, Edit, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-
-type Props = {
-    onView: (set: TourSetType) => void;
-    onEdit: (set: TourSetType) => void;
-    onDelete: (set: TourSetType) => void;
-    canDelete: boolean;
-};
+import { Info } from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { createActionsColumn } from '@/components/dashboard/shared/data-table/columns/createActionsColumn';
 
 const getStatusBadge = (status: string) => {
-    switch (status) {
-        case 'OPEN':
-            return <Badge variant="outline" className="text-emerald-700 border-emerald-200 bg-emerald-50">Открыт</Badge>;
+  switch (status) {
+    case 'OPEN':
+      return (
+        <Badge
+          variant="outline"
+          className="text-emerald-700 border-emerald-200 bg-emerald-50 whitespace-nowrap"
+        >
+          Открыт
+        </Badge>
+      );
+    case 'CLOSED':
+      return (
+        <Badge
+          variant="outline"
+          className="text-amber-700 border-amber-200 bg-amber-50 whitespace-nowrap"
+        >
+          Мест нет
+        </Badge>
+      );
+    case 'FINISHED':
+      return (
+        <Badge
+          variant="outline"
+          className="text-gray-600 border-gray-200 bg-gray-100 whitespace-nowrap"
+        >
+          Завершен
+        </Badge>
+      );
+    default:
+      return (
+        <Badge variant="outline" className="whitespace-nowrap">
+          {status}
+        </Badge>
+      );
+  }
+};
 
-        case 'CLOSED':
-            return <Badge variant="outline" className="text-amber-700 border-amber-200 bg-amber-50">Мест нет</Badge>;
-
-        case 'FINISHED':
-            return <Badge variant="outline" className="text-gray-600 border-gray-200 bg-gray-100">Завершен</Badge>;
-
-        default:
-            return <Badge variant="outline">{status}</Badge>;
-    }
+type Props = {
+  onView: (set: TourSetType) => void;
+  onEdit: (set: TourSetType) => void;
+  onDelete: (set: TourSetType) => void;
+  canDelete: boolean;
 };
 
 export const getTourSetsColumns = ({
-                                       onView,
-                                       onEdit,
-                                       onDelete,
-                                       canDelete,
-                                   }: Props): ColumnDef<TourSetType>[] => [
-    {
-        header: 'Старт',
-        accessorKey: 'startDate',
-        cell: ({ row }) => {
-            const set = row.original;
-            return (
-                <div className="flex items-center gap-2">
-                    <span>{format(new Date(set.startDate), 'dd.MM.yyyy')}</span>
-                    {set.isHot && (
-                        <Badge className="bg-red-500 text-white text-[9px] px-1 py-0">
-                            HOT
-                        </Badge>
-                    )}
-                </div>
-            );
-        },
-    },
-
-    {
-        header: 'Конец',
-        accessorKey: 'endDate',
-        cell: ({ row }) =>
-            format(new Date(row.original.endDate), 'dd.MM.yyyy'),
-    },
-
-    {
-        header: 'Отель',
-        accessorKey: 'hotelName',
-        cell: ({ row }) => (
-            <div className="max-w-40 truncate">
-                {row.original.hotelName}
-            </div>
-        ),
-    },
-
-    {
-        header: 'Стоимость',
-        accessorKey: 'price',
-        cell: ({ row }) => {
-            const s = row.original;
-
-            return s.discountPrice ? (
-                <div className="flex flex-col">
-          <span className="text-emerald-600 font-bold">
-            {s.discountPrice} KGS
+  onView,
+  onEdit,
+  onDelete,
+  canDelete,
+}: Props): ColumnDef<TourSetType>[] => [
+  {
+    header: 'Старт',
+    accessorKey: 'startDate',
+    cell: ({ row }) => {
+      const set = row.original;
+      return (
+        <div className="flex items-center gap-1.5 min-w-[95px] whitespace-nowrap">
+          <span className="font-medium text-gray-900">
+            {format(new Date(set.startDate), 'dd.MM.yyyy')}
           </span>
-                    <span className="text-[11px] line-through text-gray-400">
-            {s.price} KGS
-          </span>
-                </div>
-            ) : (
-                <span>{s.price} KGS</span>
-            );
-        },
+          {set.isHot && (
+            <Badge className="bg-red-500 text-white text-[9px] px-1 py-0.5 leading-none font-bold rounded shrink-0">
+              HOT
+            </Badge>
+          )}
+        </div>
+      );
     },
-
-    {
-        header: 'Статус',
-        accessorKey: 'status',
-        cell: ({ row }) => {
-            const status = row.original.status;
-
-            return getStatusBadge(status);
-        },
+  },
+  {
+    header: 'Конец',
+    accessorKey: 'endDate',
+    cell: ({ row }) => (
+      <div className="min-w-[85px] whitespace-nowrap text-gray-600">
+        {format(new Date(row.original.endDate), 'dd.MM.yyyy')}
+      </div>
+    ),
+  },
+  {
+    header: 'Отель',
+    accessorKey: 'hotelName',
+    cell: ({ row }) => {
+      const name = row.original.hotelName;
+      return (
+        <TooltipProvider delayDuration={150}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="font-medium text-gray-900 pb-0.5 block truncate max-w-[110px] md:max-w-[150px] lg:max-w-[220px] cursor-help border-b border-dotted border-gray-400 w-fit whitespace-normal break-words">
+                {name}
+              </span>
+            </TooltipTrigger>
+            <TooltipContent
+              side="top"
+              className="bg-[#1E2B6D] text-white max-w-xs rounded-xl p-3 shadow-md border-none"
+            >
+              <div className="flex gap-2 items-start">
+                <Info className="w-4 h-4 mt-0.5 shrink-0 text-cyan-400" />
+                <p className="text-xs font-medium leading-relaxed">{name}</p>
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      );
     },
-
-    {
-        header: 'Действия',
-        id: 'actions',
-        cell: ({ row }) => {
-            const set = row.original;
-
-            return (
-                <div className="flex justify-end gap-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onView(set)}
-                    >
-                        <Eye className="w-4 h-4" />
-                    </Button>
-
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onEdit(set)}
-                    >
-                        <Edit className="w-4 h-4" />
-                    </Button>
-
-                    {canDelete && (
-                        <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => onDelete(set)}
-                        >
-                            <Trash2 className="w-4 h-4" />
-                        </Button>
-                    )}
-                </div>
-            );
-        },
+  },
+  {
+    header: 'Стоимость',
+    accessorKey: 'price',
+    cell: ({ row }) => {
+      const s = row.original;
+      return (
+        <div className="flex flex-col min-w-[90px] whitespace-nowrap">
+          {s.discountPrice ? (
+            <>
+              <span className="text-emerald-600 font-bold text-xs md:text-sm">
+                {s.discountPrice.toLocaleString()} KGS
+              </span>
+              <span className="text-[10px] line-through text-gray-400">
+                {s.price.toLocaleString()} KGS
+              </span>
+            </>
+          ) : (
+            <span className="text-xs md:text-sm font-medium text-gray-900">
+              {s.price.toLocaleString()} KGS
+            </span>
+          )}
+        </div>
+      );
     },
+  },
+  {
+    header: 'Статус',
+    accessorKey: 'status',
+    cell: ({ row }) => (
+      <div className="min-w-[90px]">{getStatusBadge(row.original.status)}</div>
+    ),
+  },
+  createActionsColumn<TourSetType>({
+    actions: [
+      { id: 'view', label: 'Просмотреть', onClick: onView },
+      { id: 'edit', label: 'Редактировать', onClick: onEdit },
+      {
+        id: 'delete',
+        label: 'Удалить',
+        onClick: onDelete,
+        className: 'text-red-600 focus:text-red-600 focus:bg-red-50',
+        hidden: !canDelete,
+      },
+    ],
+  }),
 ];

@@ -105,7 +105,7 @@ newsRouter.get(
           ? {_id: id}
           : {_id: id, isPublished: true};
 
-      const infoNew = await News.findOne(filter);
+            const infoNew = await News.findOne(filter).populate('author', 'fullName');
 
       if (!infoNew) {
         return res.status(404).send({
