@@ -206,9 +206,15 @@ const CreateReviewForm = ({
                   id="comment"
                   placeholder="Комментарий"
                   {...register('comment', commentRule)}
-                  className={`${errors.comment && 'border-red-500 bg-red-100 focus-visible:border-red-500'}`}
+                  style={{
+                    overflowWrap: 'anywhere',
+                    wordBreak: 'break-word',
+                  }}
+                  className={`min-h-24 max-h-35 resize-none overflow-y-auto whitespace-pre-wrap ${
+                      errors.comment &&
+                      'border-red-500 bg-red-100 focus-visible:border-red-500'
+                  }`}
               />
-
               {errors.comment && (
                   <p className="text-red-500 text-sm">{errors.comment.message}</p>
               )}
