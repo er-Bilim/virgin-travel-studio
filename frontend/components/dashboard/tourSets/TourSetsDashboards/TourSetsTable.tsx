@@ -4,38 +4,38 @@ import { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Plus,
-  Calendar as CalendarIcon,
   X,
   Eye,
   Edit,
   Trash2,
   Loader,
+    Download
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
-import { ru } from 'date-fns/locale';
 import type { DateRange } from 'react-day-picker';
 
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Calendar } from '@/components/ui/calendar';
 import { Badge } from '@/components/ui/badge';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
 import { useDeleteTourSet, useTourSets } from '@/lib/hooks/tourSets';
 import type { TourSetType } from '@/types/tourSets';
-import { getTourSetsColumns } from '@/components/dashboard/shared/data-table/columns/createColumnInTable/tour-sets-columns';
+import {
+  getStatusBadge,
+  getTourSetsColumns
+} from '@/components/dashboard/shared/data-table/columns/createColumnInTable/tour-sets-columns';
 import { DataTable } from '@/components/dashboard/shared/data-table/data-table';
 import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog/ConfirmDialog';
-import { cn } from '@/lib/utils';
+import { downloadBlobFile, isJsonBlob, parseBlobError} from '@/lib/utils';
 import {
   headerRowClassName,
   rowClassName,
   tableClassName,
 } from '@/lib/constants';
+import { reportsTourSet} from "@/services/reports";
+import type {BlobError} from "@/types/error";
+import {toast} from "sonner";
+import {DateRangePicker} from "@/components/dashboard/shared/date-range-picker/DateRangePicker";
 
 interface Props {
   tourId: string;
@@ -104,8 +104,34 @@ export default function TourSetsTable({
     setPage(1);
   };
 
+  const handleReport = async (id: string) => {
+    try {
+      const res = await reportsTourSet(id);
+
+      downloadBlobFile({
+        blob: res.data,
+        disposition: res.headers?.["content-disposition"],
+        filename: "report.xlsx"
+      });
+
+    }catch (e: unknown) {
+      const err = e as BlobError;
+
+      const data = err.response?.data;
+
+      if (data && isJsonBlob(data)) {
+        const parsed = await parseBlobError(data);
+        toast.error(parsed.message ?? parsed.error ?? "Ошибка");
+        return;
+      }
+
+      toast.error("Неизвестная ошибка при генерации отчёта");
+    }
+  }
+
   const columns = useMemo(() => {
     const allColumns = getTourSetsColumns({
+      onReport: (set) => handleReport(set._id),
       onView: (set) =>
         router.push(`${baseToursPath}/${tourId}/groups/${set._id}`),
       onEdit: (set) =>
@@ -128,44 +154,6 @@ export default function TourSetsTable({
 
     return allColumns;
   }, [userRole, baseToursPath, router, tourId, windowWidth]);
-
-  const renderMobileStatus = (status: string) => {
-    switch (status) {
-      case 'OPEN':
-        return (
-          <Badge
-            variant="outline"
-            className="text-emerald-700 border-emerald-200 bg-emerald-50 text-[11px]"
-          >
-            Открыт
-          </Badge>
-        );
-      case 'CLOSED':
-        return (
-          <Badge
-            variant="outline"
-            className="text-amber-700 border-amber-200 bg-amber-50 text-[11px]"
-          >
-            Мест нет
-          </Badge>
-        );
-      case 'FINISHED':
-        return (
-          <Badge
-            variant="outline"
-            className="text-gray-600 border-gray-200 bg-gray-100 text-[11px]"
-          >
-            Завершен
-          </Badge>
-        );
-      default:
-        return (
-          <Badge variant="outline" className="text-[11px]">
-            {status}
-          </Badge>
-        );
-    }
-  };
 
   const totalPages = Math.ceil((data?.meta.total || 0) / 5);
 
@@ -192,49 +180,11 @@ export default function TourSetsTable({
               Период потока
             </label>
           </div>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  'w-full justify-start text-left font-normal bg-gray-50/50 rounded-xl border-gray-200 h-11 px-3 text-xs sm:text-sm',
-                  !dateRange && 'text-muted-foreground',
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4 text-gray-400 shrink-0" />
-                <span className="truncate">
-                  {dateRange?.from ? (
-                    dateRange.to ? (
-                      <>
-                        {format(dateRange.from, 'dd.MM.yyyy', { locale: ru })} –{' '}
-                        {format(dateRange.to, 'dd.MM.yyyy', { locale: ru })}
-                      </>
-                    ) : (
-                      format(dateRange.from, 'dd.MM.yyyy', { locale: ru })
-                    )
-                  ) : (
-                    <span>Выберите диапазон дат</span>
-                  )}
-                </span>
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent
-              className="w-auto p-0 rounded-2xl shadow-lg border-gray-100"
-              align="start"
-            >
-              <Calendar
-                autoFocus
-                mode="range"
-                defaultMonth={dateRange?.from}
-                selected={dateRange}
-                onSelect={(range) => {
-                  setDateRange(range);
-                  setPage(1);
-                }}
-                numberOfMonths={isMobile ? 1 : 2}
-              />
-            </PopoverContent>
-          </Popover>
+          <DateRangePicker
+            value={dateRange}
+            onChange={setDateRange}
+            numberOfMonths={isMobile ? 1 : 2}
+            />
         </div>
 
         <div className="space-y-1.5 w-full">
@@ -286,7 +236,6 @@ export default function TourSetsTable({
                 key={set._id}
                 className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm space-y-3.5 relative overflow-hidden"
               >
-                {/* Верхняя строка: Даты и Статус */}
                 <div className="flex items-center justify-between border-b border-gray-50 pb-2.5">
                   <div className="flex items-center gap-1.5">
                     <span className="text-xs font-semibold text-gray-900">
@@ -302,7 +251,7 @@ export default function TourSetsTable({
                       </Badge>
                     )}
                   </div>
-                  {renderMobileStatus(set.status)}
+                  {getStatusBadge(set.status)}
                 </div>
 
                 <div className="flex justify-between items-start gap-4">
@@ -337,6 +286,14 @@ export default function TourSetsTable({
                 </div>
 
                 <div className="flex items-center justify-end gap-1 pt-2 border-t border-gray-50">
+                  <Button
+                      variant="ghost"
+                      size="icon"
+                      className="w-9 h-9 text-gray-500 rounded-xl hover:bg-gray-50"
+                      onClick={() => handleReport(set._id)}
+                  >
+                    <Download className="w-4 h-4" />
+                  </Button>
                   <Button
                     variant="ghost"
                     size="icon"

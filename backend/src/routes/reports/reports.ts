@@ -318,13 +318,22 @@ async function getTourRosterReport(req: Request, res: Response, next: NextFuncti
 
         const buffer = await workbook.xlsx.writeBuffer();
 
-        return res
-            .writeHead(200, {
-                'Content-Type':
-                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'Content-Disposition': 'attachment; filename="tour-roster.xlsx"',
-            })
-            .end(buffer);
+        res.setHeader(
+            'Access-Control-Expose-Headers',
+            'Content-Disposition'
+        );
+
+        res.setHeader(
+            'Content-Type',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        );
+
+        res.setHeader(
+            'Content-Disposition',
+            'attachment; filename="tour-roster.xlsx"'
+        );
+
+        return res.end(buffer);
     } catch (e) {
         next(e);
     }

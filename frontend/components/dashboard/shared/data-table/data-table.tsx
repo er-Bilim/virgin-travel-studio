@@ -97,7 +97,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="rounded-2xl border bg-white overflow-hidden">
-      <Table className={cn("w-full table-fixed", className)}>
+      <Table className={cn("w-full", className)}>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow
