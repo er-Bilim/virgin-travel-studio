@@ -57,18 +57,20 @@ export const getNewsColumns = ({
             </button>
           </DialogTrigger>
 
-          <DialogContent className="flex items-center justify-center">
+          <DialogContent className="max-w-4xl flex flex-col items-center">
             <DialogHeader>
               <DialogTitle className="sr-only">
                 Просмотр изображения
               </DialogTitle>
             </DialogHeader>
 
-            <img
-              src={imageUrl + news.image}
-              alt={news.title}
-              className="max-h-125 rounded-xl object-cover"
-            />
+            <div className="flex items-center justify-center">
+              <img
+                  src={imageUrl + news.image}
+                  alt={news.title}
+                  className="max-h-[80vh] w-auto rounded-xl object-contain"
+              />
+            </div>
           </DialogContent>
         </Dialog>
       );

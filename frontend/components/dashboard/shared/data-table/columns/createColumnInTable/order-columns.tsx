@@ -3,12 +3,9 @@ import type {ColumnDef} from '@tanstack/react-table';
 import {
   createActionsColumn
 } from '@/components/dashboard/shared/data-table/columns/createActionsColumn';
-import {
-  ORDER_STATUS_LABELS,
-  ORDER_STATUS_STYLES,
-  OrderStatus
-} from '@/lib/constants';
+
 import {Badge} from '@/components/ui/badge';
+import {ORDER_STATUS_LABELS, ORDER_STATUS_STYLES, type OrderStatus} from "@/lib/constants";
 
 
 export const getOrdersColumns = ({
