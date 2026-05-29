@@ -29,33 +29,42 @@ ordersRouter.get(
 
       const skip = (page - 1) * limit;
 
-      // if (user.role === 'MANAGER') {
-      //   if (view === 'my') {
-      //     query.managerId = user._id;
-      //   } else {
-      //     query.status = 'NEW';
-      //     query.managerId = null;
-      //   }
-      // }
-      const allowed: OrderStatus[] = [
-        'NEW',
-        'IN_PROGRESS',
-        'CONTRACT_PENDING',
-        'COMPLETED',
-        'REJECTED',
+       const allowed: OrderStatus[] = [
+           'NEW',
+         'IN_PROGRESS',
+         'CONTRACT_PENDING',
+         'COMPLETED',
+         'REJECTED',
       ];
 
-      if (typeof status === 'string') {
-        if (!allowed.includes(status as OrderStatus)) {
-          return res.status(400).send({ error: 'Недопустимый статус' });
+      if (user.role === 'MANAGER') {
+        if (view === 'my') {
+          query.managerId = user._id;
+
+          if (typeof status === 'string') {
+            if (!allowed.includes(status as OrderStatus)) {
+              return res.status(400).send({ error: 'Недопустимый статус' })
+            }
+            query.status = status as OrderStatus;
+          }
         }
-        query.status = status as OrderStatus;
+        if (view !== 'my') {
+          query.status = 'NEW'
+          query.managerId = null;
+        }
       }
 
       if (user.role === 'ADMIN') {
+        if (typeof status === 'string') {
+          if (!allowed.includes(status as OrderStatus)) {
+            return res.status(400).send({ error: 'Недопустимый статус' });
+          }
+          query.status = status as OrderStatus;
+        }
+
         if (typeof managerId === 'string') {
           if (!mongoose.Types.ObjectId.isValid(managerId)) {
-            return res.status(400).send({ error: 'Неверный ID менеджера' });
+            return res.status(400).send({ error: 'Неверный ID менеджера' })
           }
           query.managerId = new mongoose.Types.ObjectId(managerId);
         }

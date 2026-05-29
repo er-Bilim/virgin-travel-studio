@@ -5,7 +5,11 @@ import {
   getOrdersColumns
 } from '@/components/dashboard/shared/data-table/columns/createColumnInTable/order-columns';
 import {useMemo, useState} from 'react';
-import {useDeleteOrder, useOrders} from '@/lib/hooks/orderHooks';
+import {
+  useDeleteOrder,
+  useOrders,
+  useUpdateOrder
+} from '@/lib/hooks/orderHooks';
 import {useManagers} from '@/lib/hooks/managerHook';
 import {
   Select,
@@ -14,13 +18,19 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-import Link from 'next/link';
-import {Loader, Plus} from 'lucide-react';
-import {usePathname, useRouter, useSearchParams, useParams} from 'next/navigation';
+import {Loader} from 'lucide-react';
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams
+} from 'next/navigation';
 import {Button} from '@/components/ui/button';
 import {useUser} from '@/lib/hooks/authHooks';
 import {toast} from 'sonner';
 import {ORDER_STATUS_LABELS, OrderStatus} from '@/lib/constants';
+import {OrderTabs} from '@/components/dashboard/orders/OrderTabs';
+import {Spinner} from '@/components/ui/spinner';
 
 export default function OrderTable () {
   const { id } = useParams();
@@ -31,6 +41,7 @@ export default function OrderTable () {
   const limit = Number(searchParams.get('limit') ?? 10);
   const page = Number(searchParams.get('page') ?? 1);
   const status = (searchParams.get('status') as OrderStatus) || undefined;
+  const currentTab = searchParams.get('tab') ?? 'my';
 
   const [selectedManagerId, setSelectedManagerId] = useState<string | undefined>(id as string);
 
@@ -39,8 +50,7 @@ export default function OrderTable () {
 
     if (val === 'all') {
       params.delete('status');
-    }
-    else {
+    } else {
       params.set('status', val);
     }
 
@@ -54,24 +64,65 @@ export default function OrderTable () {
     router.push(`${pathname}?${params.toString()}`);
   };
 
+  const onChangeTab = (tabValue: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('tab', tabValue);
+    params.set('page', '1');
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
   const {data: user} = useUser();
     const {
       mutate: delOrder,
       isPending,
     } = useDeleteOrder();
 
+    const { mutate: updateOrder } = useUpdateOrder();
+
+
   const columns = useMemo(
     () =>
       getOrdersColumns({
+        role: user?.role,
+        currentTab,
         onView: (order) => router.push(`leads/${order._id}`),
         onDelete: (order) => delOrder(order._id, {
           onError: () => {
             toast.error("Ошибка при удалениии");
           }
         }),
+        onTake: (order) => {
+          updateOrder({
+            id: order._id,
+            data: {
+              managerId: user?._id,
+              status: OrderStatus.IN_PROGRESS
+            }
+          })
+        }
       }),
-    [],
+    [user?.role, delOrder, router, user?._id, updateOrder, currentTab],
   );
+
+  const queryParams = useMemo(() => {
+    const params: { view?: string, managerId?: string } = {};
+
+    if (user?.role === 'MANAGER') {
+      params.view = currentTab;
+    }
+
+    if (user?.role === 'ADMIN') {
+      if (currentTab === 'my') {
+        params.managerId = user?._id;
+      }
+
+      if (currentTab === 'all') {
+        params.managerId = selectedManagerId;
+      }
+    }
+
+    return params;
+  },[user?.role, currentTab, user?._id, selectedManagerId]);
 
   const {
     data: managers = [],
@@ -79,7 +130,17 @@ export default function OrderTable () {
     isError: managerError,
   } = useManagers();
 
-   const { data, isLoading, error, refetch } = useOrders({ page, limit, managerId: selectedManagerId, status });
+   const {
+     data,
+     isLoading,
+     error,
+     refetch
+   } = useOrders({
+     page,
+     limit,
+     status,
+     ...queryParams
+   });
 
 if (isPending) {
   return (
@@ -91,7 +152,6 @@ if (isPending) {
   );
 }
 
-
   return (
     <>
       <div className="p-8 rounded-3xl space-y-8 bg-gray-50 min-h-screen">
@@ -99,9 +159,12 @@ if (isPending) {
           <h1 className="text-3xl font-bold tracking-tight text-[#1E2B6D]">
             Заявки
           </h1>
+
+          <OrderTabs onChangeTab={onChangeTab} currentTab={currentTab} role={user?.role} />
+
           <div className="flex items-center gap-4">
-            {user?.role === 'ADMIN' && (
-              <>
+
+            {(user?.role !== 'MANAGER' || (user?.role === 'MANAGER' && currentTab === 'my')) &&
                 <Select value={status ?? 'all'} onValueChange={onChangeStatus}>
                   <SelectTrigger className="w-[180px] bg-white">
                     <SelectValue placeholder="Все статусы" />
@@ -110,13 +173,16 @@ if (isPending) {
                   <SelectContent>
                     <SelectItem value="all">Все статусы</SelectItem>
                     {Object.values(OrderStatus).map((status) => (
-                      <SelectItem key={status} value={status}>
-                        {ORDER_STATUS_LABELS[status]}
-                      </SelectItem>
+                        <SelectItem key={status} value={status}>
+                          {ORDER_STATUS_LABELS[status]}
+                        </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
+            }
 
+            {user?.role === 'ADMIN' && currentTab === 'all' && (
+              <>
                 {!id && (
                   <Select
                     value={selectedManagerId}
@@ -149,15 +215,10 @@ if (isPending) {
               </>
             )}
 
-            <Link href="leads/new">
-              <Button className="bg-[#1E2B6D] hover:bg-[#162356]">
-                <Plus className="w-4 h-4 mr-2" /> Добавить заявку
-              </Button>
-            </Link>
           </div>
         </div>
         {isLoading ? (
-          <div className="p-8 text-center text-gray-500">Загрузка туров...</div>
+          <Spinner />
         ) : error ? (
           <div className="p-12 text-center space-y-4">
             <p className="text-[#1E2B6D] font-bold">
