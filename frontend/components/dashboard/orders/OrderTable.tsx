@@ -30,6 +30,7 @@ import {useUser} from '@/lib/hooks/authHooks';
 import {toast} from 'sonner';
 import {ORDER_STATUS_LABELS, OrderStatus} from '@/lib/constants';
 import {OrderTabs} from '@/components/dashboard/orders/OrderTabs';
+import {Spinner} from '@/components/ui/spinner';
 
 export default function OrderTable () {
   const { id } = useParams();
@@ -49,8 +50,7 @@ export default function OrderTable () {
 
     if (val === 'all') {
       params.delete('status');
-    }
-    else {
+    } else {
       params.set('status', val);
     }
 
@@ -218,7 +218,7 @@ if (isPending) {
           </div>
         </div>
         {isLoading ? (
-          <div className="p-8 text-center text-gray-500">Загрузка туров...</div>
+          <Spinner />
         ) : error ? (
           <div className="p-12 text-center space-y-4">
             <p className="text-[#1E2B6D] font-bold">
