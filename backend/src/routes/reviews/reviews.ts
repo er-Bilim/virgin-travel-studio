@@ -178,7 +178,7 @@ reviewsRouter.patch(
 
       try {
         const { id } = req.params;
-        const { rating, comment, companyReply } = req.body;
+        const { rating, comment, companyReply, clientName } = req.body;
 
         const review = await Review.findById(id);
 
@@ -188,6 +188,15 @@ reviewsRouter.patch(
         }
 
         const updateData: Partial<ReviewFields> = {};
+
+        if (clientName !== undefined) {
+          if (typeof clientName !== 'string' || clientName.trim() === '') {
+            await deleteImage(currentFilePath);
+            return res.status(400).send({ error: 'Имя клиента обязательно' });
+          }
+
+          updateData.clientName = clientName.trim();
+        }
 
         if (rating !== undefined) {
           const numericRating = Number(rating);

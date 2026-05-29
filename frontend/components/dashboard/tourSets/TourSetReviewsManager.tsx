@@ -200,7 +200,7 @@ const TourSetReviewsManager = ({ tourId }: Props) => {
                                                 updateReview({
                                                     id: review._id,
                                                     data: {
-                                                        companyReply: null,
+                                                        companyReply: '',
                                                     },
                                                 })
                                             }

@@ -156,21 +156,23 @@ const CreateReviewForm = ({
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="flex flex-col gap-8">
-            <Controller
-                control={control}
-                name="rating"
-                rules={ratingRule}
-                render={({ field, fieldState }) => (
-                    <Rating
-                        value={field.value}
-                        onChangeStarValue={field.onChange}
-                        isDisabled={false}
-                        ratingOptions={ratingOptions}
-                        className="mt-2"
-                        error={fieldState.error?.message}
-                    />
-                )}
-            />
+            <div className="min-h-24">
+              <Controller
+                  control={control}
+                  name="rating"
+                  rules={ratingRule}
+                  render={({ field, fieldState }) => (
+                      <Rating
+                          value={field.value}
+                          onChangeStarValue={field.onChange}
+                          isDisabled={false}
+                          ratingOptions={ratingOptions}
+                          className="mt-2"
+                          error={fieldState.error?.message}
+                      />
+                  )}
+              />
+            </div>
 
             <div className="flex flex-col gap-2">
               <label
