@@ -142,7 +142,7 @@ const NewsList = () => {
               {news.allNews[0].tags.map((tag, index) => (
                 <span
                   key={tag + index}
-                  className="text-xs capitalize bg-slate-100 px-3 py-1 rounded-xl font-semibold text-[var(--cyan-800)]"
+                  className="text-xs capitalize bg-slate-100 px-3 py-1 rounded-xl font-semibold text-cyan-500"
                 >
                   {tag}
                 </span>
@@ -203,7 +203,7 @@ const NewsList = () => {
                       {singleNews.tags.map((tag, index) => (
                         <span
                           key={tag + index}
-                          className="text-xs capitalize bg-slate-100 px-3 py-1 rounded-xl font-semibold text-[var(--cyan-800)] mt-3"
+                          className="text-xs capitalize bg-slate-100 px-3 py-1 rounded-xl font-semibold text-cyan-500 mt-3"
                         >
                           {tag}
                         </span>
