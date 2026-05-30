@@ -22,8 +22,7 @@ const NewsList = () => {
   const [tag, setTag] = useState<string | null | undefined>(null);
   const {
     data: news,
-    isLoading: newsLoading,
-    isFetching: newsFetching,
+    isPending: newsPending,
     isError: newsError,
   } = useNews({ page, limit, tags: tag });
 
@@ -39,7 +38,7 @@ const NewsList = () => {
     setPage(page);
   };
 
-  if (newsLoading || newsFetching) {
+  if (newsPending) {
     return <NewsSkeleton />;
   }
 
