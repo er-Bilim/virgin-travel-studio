@@ -187,6 +187,7 @@ export default function ToursManagePage() {
                   headerRowClassName={headerRowClassName}
                   rowClassName={rowClassName}
                   className={tableClassName}
+                  onRowClick={(tour) => router.push(`${path}/${tour._id}`)}
               />
           )}
         </div>

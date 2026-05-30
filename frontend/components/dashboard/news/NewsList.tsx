@@ -203,6 +203,7 @@ export default function NewsList() {
         headerRowClassName={headerRowClassName}
         rowClassName={rowClassName}
         className={tableClassName}
+        onRowClick={(news) => setView(news)}
       />
 
       {meta && news && news.length > 0 && (
