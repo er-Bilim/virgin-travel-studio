@@ -9,8 +9,10 @@ export default function PublicLayout({
   return (
     <>
       <Header />
-      <main className="flex-1">
-        <div className="max-w-[1400px] mx-auto px-[10px] md:px-[20px]">{children}</div>
+      <main className="flex-1 overflow-x-hidden">
+        <div className="max-w-[1400px] mx-auto px-[10px] md:px-[20px]">
+          {children}
+        </div>
       </main>
       <Footer />
     </>
