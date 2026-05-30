@@ -21,9 +21,10 @@ jobs:
         uses: qodo-ai/pr-agent@main
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: "placeholder-to-bypass-check"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CONFIG.MODEL: "anthropic/claude-haiku-4-5-20251001"
-          CONFIG.FALLBACK_MODELS: '["anthropic/claude-haiku-4-5-20251001"]'
+          CONFIG.MODEL: "claude-3-5-haiku-20241022" 
+          CONFIG.FALLBACK_MODELS: '["claude-3-5-haiku-20241022"]'
           CONFIG.CUSTOM_MODEL_MAX_TOKENS: "200000"
           GITHUB_ACTION_CONFIG.AUTO_DESCRIBE: "true"
           GITHUB_ACTION_CONFIG.AUTO_REVIEW: "true"
