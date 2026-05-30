@@ -82,11 +82,46 @@ export default function Home() {
       </div>
 
       <div>
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6">
-          {tours.map((tour) => (
-            <PublicTourCard key={tour._id} tour={tour} tourSets={tourSets} />
-          ))}
-        </div>
+          {showLoading && (
+            <p className="my-10 text-center text-lg font-semibold">
+              Загрузка туров...
+            </p>
+          )}
+          {showError && (
+            <div className="my-10 text-center">
+              <p className="mb-4 text-lg font-semibold text-red-500">
+                Не удалось загрузить туры
+              </p>
+
+              <button
+                type="button"
+                className="rounded-2xl border px-5 py-3 font-semibold"
+                onClick={handleRefetch}
+              >
+                Повторить
+              </button>
+            </div>
+          )}
+
+          {!showLoading && !showError && (
+        <>
+          {tours.length === 0 ? (
+            <p className="my-10 text-center text-gray-500">
+              Сейчас нет опубликованных туров.
+            </p>
+          ) : (
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6">
+              {tours.map((tour) => (
+                <PublicTourCard
+                  key={tour._id}
+                  tour={tour}
+                  tourSets={tourSets}
+                />
+              ))}
+            </div>
+          )}
+          </>
+          )}
 
         <div className="text-center my-5">
           <Link href="/tours">
