@@ -81,7 +81,7 @@ export function PaginationCustom({ page, totalPage, onChange }: Props) {
                 onClick={(e) => handlePageClick(e, p)}
                 isActive={page === p}
                 className={cn(
-                  page === p && 'bg-navy-800 text-white border-cyan-800',
+                  page === p && 'bg-[var(--navy-900)] text-white border-[var(--navy-900)]',
                 )}
               >
                 {p}
