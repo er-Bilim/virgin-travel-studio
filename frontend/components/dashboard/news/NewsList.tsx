@@ -65,7 +65,7 @@ export default function NewsList() {
     isLoading,
     isError,
     refetch: refetchNews,
-  } = useNews(page, limit, searchNewsWithDelay, statusFilter, authorFilter);
+  } = useNews({page, limit, searchText: searchNewsWithDelay, isPublished: statusFilter, authorId: authorFilter});
   const {mutate: deleteNews, isPending: isDeleting} = useDeleteNews();
   const {mutate: togglePublicate} = usePublicateNews();
   const news = newsData?.allNews;
