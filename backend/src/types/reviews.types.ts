@@ -9,6 +9,7 @@ export interface ReviewFields {
   isModerated: boolean;
   createdAt: Date;
   updatedAt: Date;
+  companyReply?: string | null;
 }
 
 export type ReviewDocument = HydratedDocument<ReviewFields>;
