@@ -1,5 +1,5 @@
 import axiosApi from '@/lib/axiosApi';
-import type { NewsFields, NewsMutation, NewsData, INews, INewsTags } from '@/types/news';
+import type { NewsFields, NewsMutation, NewsData, INews, GetNewsParams } from '@/types/news';
 
 export const createNews = async (data: NewsMutation) => {
   const formData = new FormData();
@@ -26,15 +26,17 @@ export const createNews = async (data: NewsMutation) => {
   return response.data;
 };
 
-export const getNews = async (
-  page: number,
-  limit: number,
-  searchText?: string,
-  isPublished?: string,
-  authorId?: string,
-): Promise<NewsData> => {
+export const getNews = async ({
+  page,
+  limit,
+  searchText,
+  isPublished,
+  authorId,
+  tags,
+}: GetNewsParams): Promise<NewsData> => {
   const params: Record<string, string | undefined | number> = {};
 
+  if (tags) params.tags = tags;
   if (searchText) params.searchTitle = searchText;
   if (isPublished && isPublished !== 'all') params.isPublished = isPublished;
   if (authorId && authorId !== 'all') params.authorId = authorId;
@@ -50,10 +52,10 @@ export const getNewsById = async (newsId: string) => {
   return data;
 };
 
-export const getNewsTags = async (): Promise<INewsTags> => {
-  const { data } = await axiosApi.get<INewsTags>('/news/tags')
+export const getNewsTags = async (): Promise<string[]> => {
+  const { data } = await axiosApi.get<string[]>('/news/tags');
   return data;
-}
+};
 
 export const deleteNews = async (id: string) => {
   const response = await axiosApi.delete<{ message: string }>(`/news/${id}`);

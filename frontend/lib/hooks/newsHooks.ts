@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 import type { AxiosError } from 'axios';
 import type { GlobalError } from '@/types/error';
 import type { UseFormSetError } from 'react-hook-form';
-import type { NewsMutation } from '@/types/news';
+import type { GetNewsParams, NewsMutation } from '@/types/news';
 import { getNewsById } from '@/services/news';
 
 const useCreateNews = (setError: UseFormSetError<NewsMutation>) => {
@@ -61,10 +61,10 @@ const useCreateNews = (setError: UseFormSetError<NewsMutation>) => {
 };
 export default useCreateNews;
 
-export const useNews = (page: number, limit: number, searchTitle?: string, isPublished?: string, authorId?: string) => {
+export const useNews = ({page, limit, searchText, isPublished, authorId, tags}: GetNewsParams) => {
   return useQuery({
-    queryKey: ['news', page, limit, searchTitle, isPublished, authorId],
-    queryFn: () => getNews(page, limit, searchTitle, isPublished, authorId),
+    queryKey: ['news', page, limit, searchText, isPublished, authorId, tags],
+    queryFn: () => getNews({page, limit, searchText, isPublished, authorId, tags}),
   });
 };
 
