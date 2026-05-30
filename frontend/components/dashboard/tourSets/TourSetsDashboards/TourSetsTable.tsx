@@ -111,7 +111,8 @@ export default function TourSetsTable({
       downloadBlobFile({
         blob: res.data,
         disposition: res.headers?.["content-disposition"],
-        filename: "report.xlsx"
+        filename: "report.xlsx",
+        defaultName: "report.xlsx",
       });
 
     }catch (e: unknown) {

@@ -38,6 +38,7 @@ export default function ManagersPage() {
                 blob: res.data,
                 disposition: res.headers?.["content-disposition"],
                 filename: "report.xlsx",
+                defaultName: "report.xlsx",
             });
 
             setDateRange(undefined);

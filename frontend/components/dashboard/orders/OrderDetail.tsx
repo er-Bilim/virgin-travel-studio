@@ -7,7 +7,7 @@ import { useUser } from '@/lib/hooks/authHooks';
 import { useOneOrder } from '@/lib/hooks/orderHooks';
 import { Button } from '@/components/ui/button';
 import { useDeleteOrder } from '@/lib/hooks/orderHooks';
-import { Trash2, ArrowLeft } from 'lucide-react';
+import {Trash2, ArrowLeft, Download} from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -16,11 +16,16 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
+import {useModalStore} from "@/lib/stores/modalStore";
+import {Modal} from "@/components/shared/Modal";
+import ContractForm from "@/components/dashboard/orders/ContractForm";
 
 export default function OrderDetail() {
   const { id } = useParams();
   const router = useRouter();
   const user = useUser().data;
+
+  const { openModal } = useModalStore();
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -105,7 +110,19 @@ export default function OrderDetail() {
               <Trash2 className="w-4 h-4" />
             </Button>
           )}
+          {order.status === 'CONTRACT_PENDING' && (
+              <Button
+                  className="bg-[#1E2B6D] hover:bg-[#162356] cursor-pointer"
+                  onClick={() => openModal('contractModal')}
+              >
+                <Download className="w-4 h-4 mr-2" /> Генерировать контракт
+              </Button>
+          )}
         </div>
+
+        <Modal id="contractModal" title="Впишите данные">
+          <ContractForm orderId={order._id} />
+        </Modal>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 items-start text-lg border-b border-gray-200 pb-4 mt-18">
           <h2 className="md:col-span-2text-xl border-b border-gray-100 pb-2">
