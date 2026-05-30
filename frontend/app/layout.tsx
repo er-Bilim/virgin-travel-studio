@@ -1,8 +1,12 @@
-import type { Metadata } from 'next';
-import { Montserrat } from 'next/font/google';
-import { Toaster } from '@/components/ui/sonner';
+import type {Metadata} from 'next';
+import {Montserrat} from 'next/font/google';
+import {Toaster} from '@/components/ui/sonner';
 import './globals.css';
 import Providers from '@/providers/providers';
+import dayjs from 'dayjs';
+import 'dayjs/locale/ru';
+
+dayjs.locale('ru');
 
 const montserrat = Montserrat({
   variable: '--font-montserrat',

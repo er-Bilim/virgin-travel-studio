@@ -13,7 +13,7 @@ import {
   StyledInput,
   StyledTextarea,
 } from '@/components/shared/form/field-styles';
-import { useCreateReview } from '@/lib/hooks/reviewHooks';
+import { useCreateReview, useUpdateReview } from '@/lib/hooks/reviewHooks';
 import PhotoDropzone from '@/components/shared/PhotoDropzone';
 import { useState } from 'react';
 import { CheckCircle } from 'lucide-react';
@@ -22,12 +22,25 @@ import ReviewerBadge from '../ReviewerBadge';
 
 interface Props {
   tourId?: string;
+  initialData?: Partial<IReviewMutation>;
+  reviewId?: string;
+  isEditing?: boolean;
+  onSuccess?: () => void;
 }
 
-const CreateReviewForm = ({ tourId }: Props) => {
-  const [clientName, setClientName] = useState<string | null>(null)
+const CreateReviewForm = ({
+                            tourId,
+                            initialData,
+                            reviewId,
+                            isEditing = false,
+                            onSuccess,
+                          }: Props) => {
+  const [clientName, setClientName] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState<boolean>(false);
+
   const { mutate, isPending: loadingReview } = useCreateReview();
+  const { mutate: updateMutate, isPending: updatingReview } =
+      useUpdateReview();
 
   const ratingOptions = [
     {
@@ -57,9 +70,9 @@ const CreateReviewForm = ({ tourId }: Props) => {
   ];
 
   const defaultValues: IReviewMutation = {
-    clientName: '',
-    rating: 0,
-    comment: '',
+    clientName: initialData?.clientName || '',
+    rating: initialData?.rating || 0,
+    comment: initialData?.comment || '',
     image: null,
   };
 
@@ -69,152 +82,188 @@ const CreateReviewForm = ({ tourId }: Props) => {
     formState: { errors },
     reset,
     control,
-    getValues
   } = useForm<IReviewMutation>({ defaultValues });
 
-  
-
   const onSubmit = (data: IReviewMutation) => {
-
-    setClientName(getValues('clientName'));
+    setClientName(data.clientName);
 
     const newData = {
       ...data,
-      tourId: tourId,
+      tourId,
     };
 
-    try {
-      mutate(newData, {
-        onSuccess: () => {
-          setSubmitted(true);
-          reset({
-            rating: 0,
-            comment: '',
-            image: null,
-          });
-        },
-      });
-    } catch (error) {
-      console.error(error);
+    if (isEditing && reviewId) {
+      updateMutate(
+          {
+            id: reviewId,
+            data: newData,
+          },
+          {
+            onSuccess: () => {
+              onSuccess?.();
+            },
+          },
+      );
+
+      return;
     }
+
+    mutate(newData, {
+      onSuccess: () => {
+        setSubmitted(true);
+
+        reset({
+          clientName: '',
+          rating: 0,
+          comment: '',
+          image: null,
+        });
+
+        onSuccess?.();
+      },
+    });
   };
 
-  if (submitted) {
+  if (submitted && !isEditing) {
     return (
-      <div className="rounded-2xl border border-border bg-card p-8 text-center">
-        <CheckCircle className="mx-auto mb-3 size-12 text-green-400" />
-        <h3 className="text-lg font-medium text-foreground">
-          Спасибо за отзыв!
-        </h3>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Он появится на странице после модерации
-        </p>
-        <div className="mt-5">
-          <ReviewerBadge name={clientName} />
+        <div className="rounded-2xl border border-border bg-card p-8 text-center">
+          <CheckCircle className="mx-auto mb-3 size-12 text-green-400" />
+          <h3 className="text-lg font-medium text-foreground">
+            Спасибо за отзыв!
+          </h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Он появится на странице после модерации
+          </p>
+          <div className="mt-5">
+            <ReviewerBadge name={clientName} />
+          </div>
         </div>
-      </div>
     );
   }
 
   return (
-    <div className="bg-[var(--card)] border-1 border-[var(--border)] p-7 rounded-4xl">
-      <h3 className="font-semibold text-[var(--card-foreground)] text-2xl">
-        Оставьте ваш отзыв
-      </h3>
-      <p className="text-[var(--card-foreground)] mt-2">
-        Поделитесь впечатлениями – это поможет другим путешественникам выбрать
-        тур
-      </p>
+      <div className="bg-[var(--card)] border-1 border-[var(--border)] p-7 rounded-4xl">
+        <h3 className="font-semibold text-[var(--card-foreground)] text-2xl">
+          {isEditing ? 'Редактировать отзыв' : 'Оставьте ваш отзыв'}
+        </h3>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex flex-col gap-8">
-          <Controller
-            control={control}
-            name="rating"
-            rules={ratingRule}
-            render={({ field, fieldState }) => (
-              <Rating
-                value={field.value}
-                onChangeStarValue={field.onChange}
-                isDisabled={false}
-                ratingOptions={ratingOptions}
-                className="mt-2"
-                error={fieldState.error?.message}
+        {!isEditing && (
+            <p className="text-[var(--card-foreground)] mt-2">
+              Поделитесь впечатлениями – это поможет другим путешественникам выбрать
+              тур
+            </p>
+        )}
+
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="flex flex-col gap-8">
+            <div className="min-h-24">
+              <Controller
+                  control={control}
+                  name="rating"
+                  rules={ratingRule}
+                  render={({ field, fieldState }) => (
+                      <Rating
+                          value={field.value}
+                          onChangeStarValue={field.onChange}
+                          isDisabled={false}
+                          ratingOptions={ratingOptions}
+                          className="mt-2"
+                          error={fieldState.error?.message}
+                      />
+                  )}
               />
-            )}
-          />
-          <div className="flex flex-col gap-2">
-            <label
-              htmlFor="clientName"
-              className="text-[var(--card-foreground)] text-sm font-semibold"
-            >
-              Имя
-            </label>
-            <StyledInput
-              id="clientName"
-              placeholder="Имя"
-              {...register('clientName', clientNameRule)}
-              className={`${errors.clientName && 'border-red-500 bg-red-100 focus-visible:border-red-500'}`}
-            />
-            {errors.clientName && (
-              <p className="text-red-500 text-sm">
-                {errors.clientName.message}
-              </p>
-            )}
+            </div>
 
-            <label
-              htmlFor="comment"
-              className="text-[var(--card-foreground)] text-sm font-semibold"
-            >
-              Комментарий
-            </label>
-            <StyledTextarea
-              id="comment"
-              placeholder="Комментарий"
-              {...register('comment', commentRule)}
-              className={`${errors.comment && 'border-red-500 bg-red-100 focus-visible:border-red-500'}`}
-            />
-            {errors.comment && (
-              <p className="text-red-500 text-sm">{errors.comment.message}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="image">
-              <p className="text-[var(--card-foreground)] text-sm font-semibold flex gap-1">
-                Фото
-                <span className="text-gray-500 font-normal">
+            <div className="flex flex-col gap-2">
+              <label
+                  htmlFor="clientName"
+                  className="text-[var(--card-foreground)] text-sm font-semibold"
+              >
+                Имя
+              </label>
+
+              <StyledInput
+                  id="clientName"
+                  placeholder="Имя"
+                  {...register('clientName', clientNameRule)}
+                  className={`${errors.clientName && 'border-red-500 bg-red-100 focus-visible:border-red-500'}`}
+              />
+
+              {errors.clientName && (
+                  <p className="text-red-500 text-sm">
+                    {errors.clientName.message}
+                  </p>
+              )}
+
+              <label
+                  htmlFor="comment"
+                  className="text-[var(--card-foreground)] text-sm font-semibold"
+              >
+                Комментарий
+              </label>
+
+              <StyledTextarea
+                  id="comment"
+                  placeholder="Комментарий"
+                  {...register('comment', commentRule)}
+                  style={{
+                    overflowWrap: 'anywhere',
+                    wordBreak: 'break-word',
+                  }}
+                  className={`min-h-24 max-h-35 resize-none overflow-y-auto whitespace-pre-wrap ${
+                      errors.comment &&
+                      'border-red-500 bg-red-100 focus-visible:border-red-500'
+                  }`}
+              />
+              {errors.comment && (
+                  <p className="text-red-500 text-sm">{errors.comment.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="image">
+                <p className="text-[var(--card-foreground)] text-sm font-semibold flex gap-1">
+                  Фото
+                  <span className="text-gray-500 font-normal">
                   – необязательно
                 </span>
-              </p>
-            </label>
-            <Controller
-              control={control}
-              name="image"
-              render={({ field, fieldState }) => (
-                <PhotoDropzone
-                  id="image"
+                </p>
+              </label>
+
+              <Controller
+                  control={control}
                   name="image"
-                  className="mt-2"
-                  value={field.value}
-                  onFile={(file) => field.onChange(file)}
-                  error={fieldState.error?.message}
-                />
-              )}
-            />
+                  render={({ field, fieldState }) => (
+                      <PhotoDropzone
+                          id="image"
+                          name="image"
+                          className="mt-2"
+                          value={field.value}
+                          onFile={(file) => field.onChange(file)}
+                          error={fieldState.error?.message}
+                      />
+                  )}
+              />
+            </div>
+
+            <Button
+                className="cursor-pointer h-12 rounded-3xl bg-[var(--primary)]"
+                type="submit"
+                disabled={loadingReview || updatingReview}
+            >
+              {isEditing ? 'Сохранить изменения' : 'Оставить отзыв'}
+              {(loadingReview || updatingReview) && <Spinner />}
+            </Button>
           </div>
-          <Button
-            className="cursor-pointer h-12 rounded-3xl bg-[var(--primary)]"
-            type="submit"
-            disabled={loadingReview}
-          >
-            Оставить отзыв {loadingReview && <Spinner />}
-          </Button>
-        </div>
-        <p className="text-[var(--card-foreground)] mt-6 text-center font-semibold text-sm">
-          Пожалуйста, не забудьте поставить оценку звёздами – это обязательно!
-        </p>
-      </form>
-    </div>
+
+          {!isEditing && (
+              <p className="text-[var(--card-foreground)] mt-6 text-center font-semibold text-sm">
+                Пожалуйста, не забудьте поставить оценку звёздами – это
+                обязательно!
+              </p>
+          )}
+        </form>
+      </div>
   );
 };
 
