@@ -37,6 +37,7 @@ type DataTableProps<TData, TValue> = {
 
     headerRowClassName?: string;
     rowClassName?: string | ((row: TData) => string);
+    onRowClick?: (row: TData) => void;
 };
 
 export function DataTable<TData, TValue>({
@@ -48,6 +49,7 @@ export function DataTable<TData, TValue>({
                                              className,
                                              headerRowClassName,
                                              rowClassName,
+                                             onRowClick
 }: DataTableProps<TData, TValue>) {
   const page = pagination?.page ?? 1;
   const pageSize = pagination?.pageSize ?? 10;
@@ -129,7 +131,11 @@ export function DataTable<TData, TValue>({
                     return (
                         <TableRow
                             key={row.id}
-                            className={rowClass}
+                            className={cn(
+                                rowClass,
+                                onRowClick && "cursor-pointer hover:bg-muted/50"
+                            )}
+                            onClick={() => onRowClick?.(row.original)}
                         >
                             {row.getVisibleCells().map((cell) => (
                                 <TableCell key={cell.id}>
