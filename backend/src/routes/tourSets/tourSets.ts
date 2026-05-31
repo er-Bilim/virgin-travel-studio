@@ -19,10 +19,17 @@ tourSetsRouter.get('/', authOrNot, async (req, res, next) => {
     const query: {
       status?: TourSetStatus | { $ne: TourSetStatus };
       tourId?:
-        | mongoose.Types.ObjectId
-        | string
-        | { $in: mongoose.Types.ObjectId[] };
-      price?: { $lte: number };
+          | mongoose.Types.ObjectId
+          | string
+          | { $in: mongoose.Types.ObjectId[] };
+      $expr?: {
+        $lte: [
+          {
+            $ifNull: ['$discountPrice', '$price'];
+          },
+          number,
+        ];
+      };
       startDate?: { $gte: Date } | { $gte: Date; $lte: Date };
     } = {};
 
@@ -76,8 +83,16 @@ tourSetsRouter.get('/', authOrNot, async (req, res, next) => {
 
     if (typeof maxPrice === 'string' && maxPrice.trim() !== '') {
       const parsedMaxPrice = Number(maxPrice);
+
       if (!Number.isNaN(parsedMaxPrice)) {
-        query.price = { $lte: parsedMaxPrice };
+        query.$expr = {
+          $lte: [
+            {
+              $ifNull: ['$discountPrice', '$price'],
+            },
+            parsedMaxPrice,
+          ],
+        };
       }
     }
 
