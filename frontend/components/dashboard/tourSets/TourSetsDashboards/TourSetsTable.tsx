@@ -375,6 +375,7 @@ export default function TourSetsTable({
             headerRowClassName={headerRowClassName}
             rowClassName={rowClassName}
             className={tableClassName}
+            onRowClick={(set) => router.push(`${baseToursPath}/${tourId}/groups/${set._id}`)}
           />
         </div>
       )}

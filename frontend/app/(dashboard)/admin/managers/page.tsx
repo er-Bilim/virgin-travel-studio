@@ -125,6 +125,7 @@ export default function ManagersPage() {
           headerRowClassName={headerRowClassName}
           rowClassName={rowClassName}
           className={tableClassName}
+          onRowClick={(user) => route.push(`managers/${user._id}`)}
       />
 
         <ConfirmDialog
