@@ -2,15 +2,7 @@
 
 import { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
-import {
-  Plus,
-  X,
-  Eye,
-  Edit,
-  Trash2,
-  Loader,
-    Download
-} from 'lucide-react';
+import { Plus, X, Eye, Edit, Trash2, Loader, Download } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import type { DateRange } from 'react-day-picker';
@@ -22,20 +14,21 @@ import { useDeleteTourSet, useTourSets } from '@/lib/hooks/tourSets';
 import type { TourSetType } from '@/types/tourSets';
 import {
   getStatusBadge,
-  getTourSetsColumns
+  getTourSetsColumns,
 } from '@/components/dashboard/shared/data-table/columns/createColumnInTable/tour-sets-columns';
 import { DataTable } from '@/components/dashboard/shared/data-table/data-table';
 import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog/ConfirmDialog';
-import { downloadBlobFile, isJsonBlob, parseBlobError} from '@/lib/utils';
+import { downloadBlobFile, isJsonBlob, parseBlobError } from '@/lib/utils';
 import {
   headerRowClassName,
   rowClassName,
   tableClassName,
 } from '@/lib/constants';
-import { reportsTourSet} from "@/services/reports";
-import type {BlobError} from "@/types/error";
-import {toast} from "sonner";
-import {DateRangePicker} from "@/components/dashboard/shared/date-range-picker/DateRangePicker";
+import { reportsTourSet } from '@/services/reports';
+import type { BlobError } from '@/types/error';
+import { toast } from 'sonner';
+import { DateRangePicker } from '@/components/dashboard/shared/date-range-picker/DateRangePicker';
+import { PaginationCustom } from '@/components/pagination/PaginationCustom';
 
 interface Props {
   tourId: string;
@@ -110,24 +103,23 @@ export default function TourSetsTable({
 
       downloadBlobFile({
         blob: res.data,
-        disposition: res.headers?.["content-disposition"],
-        filename: "report.xlsx"
+        disposition: res.headers?.['content-disposition'],
+        filename: 'report.xlsx',
       });
-
-    }catch (e: unknown) {
+    } catch (e: unknown) {
       const err = e as BlobError;
 
       const data = err.response?.data;
 
       if (data && isJsonBlob(data)) {
         const parsed = await parseBlobError(data);
-        toast.error(parsed.message ?? parsed.error ?? "Ошибка");
+        toast.error(parsed.message ?? parsed.error ?? 'Ошибка');
         return;
       }
 
-      toast.error("Неизвестная ошибка при генерации отчёта");
+      toast.error('Неизвестная ошибка при генерации отчёта');
     }
-  }
+  };
 
   const columns = useMemo(() => {
     const allColumns = getTourSetsColumns({
@@ -184,7 +176,7 @@ export default function TourSetsTable({
             value={dateRange}
             onChange={setDateRange}
             numberOfMonths={isMobile ? 1 : 2}
-            />
+          />
         </div>
 
         <div className="space-y-1.5 w-full">
@@ -287,10 +279,10 @@ export default function TourSetsTable({
 
                 <div className="flex items-center justify-end gap-1 pt-2 border-t border-gray-50">
                   <Button
-                      variant="ghost"
-                      size="icon"
-                      className="w-9 h-9 text-gray-500 rounded-xl hover:bg-gray-50"
-                      onClick={() => handleReport(set._id)}
+                    variant="ghost"
+                    size="icon"
+                    className="w-9 h-9 text-gray-500 rounded-xl hover:bg-gray-50"
+                    onClick={() => handleReport(set._id)}
                   >
                     <Download className="w-4 h-4" />
                   </Button>
@@ -334,28 +326,13 @@ export default function TourSetsTable({
           )}
 
           {totalPages > 1 && (
-            <div className="flex items-center justify-between p-2 bg-white border border-gray-100 rounded-xl shadow-sm">
-              <Button
-                variant="ghost"
-                size="sm"
-                disabled={page === 1}
-                onClick={() => setPage((p) => Math.max(p - 1, 1))}
-                className="text-xs font-semibold rounded-lg"
-              >
-                Назад
-              </Button>
-              <span className="text-xs font-medium text-gray-500">
-                Страница {page} из {totalPages}
-              </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                disabled={page >= totalPages}
-                onClick={() => setPage((p) => p + 1)}
-                className="text-xs font-semibold rounded-lg"
-              >
-                Вперед
-              </Button>
+            <div className="p-2 flex justify-center">
+              <PaginationCustom
+                page={page}
+                limit={5}
+                totalPage={totalPages}
+                onChange={setPage}
+              />
             </div>
           )}
         </div>
