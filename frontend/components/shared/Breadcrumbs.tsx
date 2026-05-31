@@ -8,6 +8,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { Fragment } from 'react/jsx-runtime';
+import { cn } from '@/lib/utils';
 
 interface Crumb {
   label: string;
@@ -16,11 +17,12 @@ interface Crumb {
 
 interface Props {
   items: Crumb[];
+  className?: string;
 }
 
-export function Breadcrumbs({ items }: Props) {
+export function Breadcrumbs({ items, className }: Props) {
   return (
-    <Breadcrumb className="mb-4">
+    <Breadcrumb className={cn("mb-4", className)}>
       <BreadcrumbList>
         {items.map((item, index) => {
           const isLast = index === items.length - 1;

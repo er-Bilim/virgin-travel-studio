@@ -4,10 +4,9 @@ import {
   PaginationEllipsis,
   PaginationItem,
   PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
 } from '@/components/ui/pagination';
-
+import { cn } from '@/lib/utils';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const getPaginationRange = (currentPage: number, totalPages: number) => {
   const delta = 2; // Сколько страниц показывать до и после текущей
@@ -60,14 +59,16 @@ export function PaginationCustom({ page, totalPage, onChange }: Props) {
   return (
     <Pagination>
       <PaginationContent>
-        <PaginationItem>
-          <PaginationPrevious
+        <PaginationItem className="border-1 rounded-lg me-2">
+          <PaginationLink
             href="#"
             onClick={(e) => handlePageClick(e, page - 1)}
             className={
               page <= 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'
             }
-          />
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </PaginationLink>
         </PaginationItem>
 
         {paginationRange.map((p, index) => (
@@ -79,6 +80,9 @@ export function PaginationCustom({ page, totalPage, onChange }: Props) {
                 href="#"
                 onClick={(e) => handlePageClick(e, p)}
                 isActive={page === p}
+                className={cn(
+                  page === p && 'bg-[var(--navy-900)] text-white border-[var(--navy-900)]',
+                )}
               >
                 {p}
               </PaginationLink>
@@ -86,8 +90,8 @@ export function PaginationCustom({ page, totalPage, onChange }: Props) {
           </PaginationItem>
         ))}
 
-        <PaginationItem>
-          <PaginationNext
+        <PaginationItem className="border-1 rounded-lg ms-2">
+          <PaginationLink
             href="#"
             onClick={(e) => handlePageClick(e, page + 1)}
             className={
@@ -95,7 +99,9 @@ export function PaginationCustom({ page, totalPage, onChange }: Props) {
                 ? 'pointer-events-none opacity-50'
                 : 'cursor-pointer'
             }
-          />
+          >
+            <ChevronRight className="h-4 w-4" />
+          </PaginationLink>
         </PaginationItem>
       </PaginationContent>
     </Pagination>

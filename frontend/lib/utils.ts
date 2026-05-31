@@ -85,3 +85,8 @@ export const downloadBlobFile = (params: {
 
   window.URL.revokeObjectURL(url);
 }
+
+export const truncateText = (text: string, maxLength: number) => {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength) + '...';
+}
