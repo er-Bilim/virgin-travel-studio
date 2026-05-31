@@ -2,9 +2,12 @@ import express from 'express';
 import auth, {type RequestWithUser} from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
 import Order from '@/model/order/Order.js';
-import type {OrderStatus} from '@/types/orders.types.js';
+import type {OrderStatus, PassportPayload, PopulatedOrder} from '@/types/orders.types.js';
 import mongoose from 'mongoose';
 import validateObjectId from '@/middlewares/validateObjectId.js';
+import type {ContractData} from "@/types/contracts.types.js";
+import {buildContractHTML} from "@/utils/contracts/buildContractHTML.js";
+import {getBrowser} from "@/lib/puppeteer.js";
 
 const ordersRouter = express.Router();
 
@@ -258,6 +261,93 @@ ordersRouter.delete(
     } catch (e) {
       next(e);
     }
+});
+
+ordersRouter.post(
+    '/:id/generate-contract',
+    auth,
+    permit('ADMIN', 'MANAGER'),
+    validateObjectId(), async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const body  = req.body as PassportPayload;
+
+    const {
+      passportNumber,
+      passportIssuedBy,
+      passportIssueDate,
+      birthDate,
+    } = body;
+
+    const requiredFields = [
+      passportNumber,
+      passportIssuedBy,
+      passportIssueDate,
+      birthDate,
+    ];
+
+    if (requiredFields.some(v => !v || v.trim() === '')) {
+      return res.status(400).send({ error: 'Не все данные указаны' });
+    }
+
+    const order = await Order.findById(id).populate({
+      path: 'tourSetId',
+      populate: { path: 'tourId' },
+    }).populate('managerId', 'fullName phone').lean<PopulatedOrder>();
+
+    if (!order) return res.status(404).send({error: 'Заявка не найдена.'});
+
+    if (order.status !== "CONTRACT_PENDING") return res.status(400).send({error: 'Контракт недоступен для генерации только в состоянии CONTRACT_PENDING'});
+
+    const contractData: ContractData = {
+      client: {
+        name: order.clientName,
+        phone: order.clientPhone,
+        passportNumber,
+        passportIssuedBy,
+        passportIssueDate,
+        birthDate,
+      },
+      tour: {
+        title: order.tourSetId?.tourId?.title,
+        startDate: order.tourSetId?.startDate,
+        endDate: order.tourSetId?.endDate,
+        price: order.tourSetId?.price,
+        hotel: order.tourSetId?.hotelName,
+      },
+      manager: {
+        name: order.managerId?.fullName,
+        phone: order.managerId?.phone,
+      },
+    };
+
+    const browser = await getBrowser();
+    const page = await browser.newPage();
+
+    try {
+      await page.setContent(buildContractHTML(contractData), {
+        waitUntil: 'load',
+      });
+
+      const pdfBuffer = await page.pdf({
+        format: 'A4',
+        printBackground: true,
+      });
+
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader(
+          'Content-Disposition',
+          `attachment; filename=contract.pdf`
+      );
+
+      return res.end(pdfBuffer);
+
+    } finally {
+      await page.close();
+    }
+  }catch (e) {
+    next(e);
+  }
 });
 
 export default ordersRouter;
