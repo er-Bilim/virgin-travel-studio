@@ -60,4 +60,11 @@ export interface OrderPostType {
     tourSetId: string;
     clientPhone: string;
     clientName: string;
-} 
+}
+
+export interface ContractFormValues {
+  passportNumber: string;
+  passportIssuedBy: string;
+  passportIssueDate: string;
+  birthDate: string;
+}

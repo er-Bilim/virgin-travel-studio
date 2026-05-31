@@ -34,6 +34,7 @@ export default function Manager() {
                 blob: res.data,
                 disposition: res.headers?.["content-disposition"],
                 filename: "report.xlsx",
+                defaultName: "report.xlsx",
             });
 
             setDateRange(undefined);

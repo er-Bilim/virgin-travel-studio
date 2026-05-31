@@ -28,3 +28,12 @@ export type NewsData = {
   allNews: NewsFields[];
   metadata: MetaType
 }
+
+export interface GetNewsParams {
+  page: number;
+  limit: number;
+  searchText?: string;
+  isPublished?: string;
+  authorId?: string;
+  tags?: string | null;
+}

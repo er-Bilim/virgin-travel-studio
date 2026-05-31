@@ -1,9 +1,10 @@
 import axiosApi from '@/lib/axiosApi';
 import type {
-  OrderMutationType,
-  OrderPostType,
-  OrderType,
-  PaginatedOrdersResponse
+    ContractFormValues,
+    OrderMutationType,
+    OrderPostType,
+    OrderType,
+    PaginatedOrdersResponse
 } from '@/types/order';
 
 export const getOrders = async (
@@ -37,3 +38,10 @@ export const updateOrder = async (id: string, data: OrderMutationType) => {
 export const deleteOrder = async (id: string) => {
   await axiosApi.delete(`/orders/${id}`);
 };
+
+export const createContractOrder = async (id: string, data: ContractFormValues) => {
+    const result = await axiosApi.post(`/orders/${id}/generate-contract`, data, {
+        responseType: 'blob',
+    });
+    return result.data;
+}

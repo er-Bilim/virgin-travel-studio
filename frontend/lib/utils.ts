@@ -69,19 +69,30 @@ export const downloadBlobFile = (params: {
   blob: Blob;
   filename?: string;
   disposition?: string;
+  defaultName?: string;
 }) => {
   const url = window.URL.createObjectURL(params.blob);
 
   const link = document.createElement("a");
   link.href = url;
 
-  link.download = params.disposition?.match(/filename="(.+)"/)?.[1] ??
+  const extracted =
+      params.disposition?.match(/filename="?(.+?)"?$/)?.[1];
+
+  link.download =
+      extracted ??
       params.filename ??
-      "file.xlsx";
+      params.defaultName ??
+      "download";
 
   document.body.appendChild(link);
   link.click();
   link.remove();
 
   window.URL.revokeObjectURL(url);
+}
+
+export const truncateText = (text: string, maxLength: number) => {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength) + '...';
 }

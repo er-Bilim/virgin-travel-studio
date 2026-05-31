@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
+@plugin "tailwind-scrollbar";
 
 body {
   font-family: var(--font-montserrat), sans-serif;
@@ -50,27 +51,35 @@ body {
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  --color-cyan-800: var(--cyan-800);
+  --color-cyan-400: var(--cyan-400);
+  --color-cyan-300: var(--cyan-300);
+  --color-cyan-200: var(--cyan-200);
+  --color-navy-900: var(--navy-900);
+  --color-navy-800: var(--navy-800);
+  --color-navy-700: var(--navy-700);
+  --color-silver: var(--silver);
 }
 
 :root {
   --navy-900: #010b1a;
   --navy-800: #031633;
   --navy-700: #07224d;
+  --cyan-800: #1a9fb8;
   --cyan-400: #3fe6ff;
   --cyan-300: #4befff;
   --cyan-200: #67f2ff;
   --silver: #c8d2dc;
 
-  --card: #FFFFFF;
+  --card: #ffffff;
   --card-foreground: #031633;
-  --muted-foreground: #5B6B7C;
+  --muted-foreground: #5b6b7c;
   --border: #cad2db;
-  --bg-muted: #F8FAFC;
-  --input: #F8FAFC;
+  --bg-muted: #f8fafc;
+  --input: #f8fafc;
   --primary: #031633;
-  --primary-foreground: #FFFFFF;
-  --ring: #1A9FB8;
-
+  --primary-foreground: #ffffff;
+  --ring: #1a9fb8;
 
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
