@@ -7,7 +7,7 @@ import Tour from './model/tour/Tour.js';
 import TourSet from './model/tourSet/TourSet.js';
 import Order from './model/order/Order.js';
 import Review from './model/review/Review.js';
-import {generateId} from '@/utils/id/generateId.js';
+import {generateId} from './utils/id/generateId.js';
 
 const run = async () => {
   await mongoose.connect(config.db);
