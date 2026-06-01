@@ -6,20 +6,28 @@ import {
   deleteTour,
   togglePublish,
   getTourById,
+  getTourCategories,
 } from '@/services/tours';
 import { toast } from 'sonner';
-import type { TourMutation } from '@/types/tour';
+import type { GetToursParams, TourMutation } from '@/types/tour';
 
 export const useTours = (
-    page: number,
-    limit: number,
-    categoryId?: string,
-    search?: string,
-    isPublished?: string,
+{  page,
+  limit,
+  categoryId,
+  search,
+  isPublished} : GetToursParams
 ) => {
   return useQuery({
     queryKey: ['tours', page, limit, categoryId, search, isPublished],
-    queryFn: () => getTours(page, limit, categoryId, search, isPublished),
+    queryFn: () => getTours({page, limit, categoryId, search, isPublished}),
+  });
+};
+
+export const useGetTourCategories = () => {
+  return useQuery({
+    queryKey: ['tours', 'categories'],
+    queryFn: () => getTourCategories(),
   });
 };
 

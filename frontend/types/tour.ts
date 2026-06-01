@@ -30,3 +30,11 @@ export interface TourMutation {
   baseAdvantages: string[];
   images: File[];
 }
+
+export interface GetToursParams {
+  page: number,
+  limit: number,
+  categoryId?: string,
+  search?: string,
+  isPublished?: string,
+}
