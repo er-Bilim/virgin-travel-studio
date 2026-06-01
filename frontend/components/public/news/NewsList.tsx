@@ -3,7 +3,7 @@
 import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 import { useGetNewsTags, useNews } from '@/lib/hooks/newsHooks';
 import { toast } from 'sonner';
-import TagFilter from './TagFilter';
+import TagFilter from '@/components/shared/TagFilter';
 import { imageUrl, isDev } from '@/lib/constants';
 import Image from 'next/image';
 import CONTENT_PLACEHOLDER from '@/assets/placeholders/content_placeholder.png';
@@ -113,7 +113,7 @@ const NewsList = () => {
           ))}
         </div>
       ) : (
-        <TagFilter tags={tags} className="mt-8" setTag={setTag} />
+        <TagFilter tags={tags} className="mt-8" setTag={setTag} title='темы' mainTag='все новости' href="news"/>
       )}
 
       <article className="group grid grid-cols-[20fr_1fr] gap-6 mt-10 border-t pt-10">
