@@ -43,7 +43,10 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
       query.category = req.query.category;
     }
 
-    if (typeof req.query.search === 'string' && req.query.search.trim() !== '') {
+    if (
+      typeof req.query.search === 'string' &&
+      req.query.search.trim() !== ''
+    ) {
       query.title = {
         $regex: escapeRegex(req.query.search.trim()),
         $options: 'i',
@@ -79,6 +82,31 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
     });
   } catch (e) {
     next(e);
+  }
+});
+
+toursRouter.get('/categories', async (_req, res, next) => {
+  try {
+    const categories = await Tour.aggregate([
+      { $match: { isPublished: true } },
+      { $group: { _id: '$category' } },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'category',
+        },
+      },
+      { $unwind: '$category' },
+      { $replaceRoot: { newRoot: '$category' } },
+      { $project: { title: 1 } },
+    ]);
+
+
+    return res.json(categories.map((category) => category.title));
+  } catch (error) {
+    next(error);
   }
 });
 
