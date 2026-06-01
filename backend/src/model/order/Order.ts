@@ -7,6 +7,11 @@ const OrderSchema = new Schema({
         ref: "TourSet",
         required: [true, 'ID тура обязателен'],
     },
+    visibleId: {
+        type: String,
+        unique: true,
+        required: true,
+    },
     clientName: {
         type: String,
         required: [true, 'Имя клиента обязательно'],

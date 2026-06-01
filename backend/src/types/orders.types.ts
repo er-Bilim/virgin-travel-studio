@@ -1,10 +1,11 @@
 import {Document, Types} from 'mongoose';
-import type {TourSetFields} from "@/types/tourSets.types.js";
+import type {TourSetFields} from '@/types/tourSets.types.js';
 
 export type OrderStatus = 'NEW' | 'IN_PROGRESS' | 'CONTRACT_PENDING' | 'COMPLETED' | 'REJECTED';
 
 export interface IOrder extends Document {
   tourSetId: Types.ObjectId;
+  visibleId: string;
   clientName: string;
   clientPhone: string;
   status: OrderStatus;

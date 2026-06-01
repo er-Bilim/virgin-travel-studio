@@ -2,12 +2,17 @@ import express from 'express';
 import auth, {type RequestWithUser} from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
 import Order from '@/model/order/Order.js';
-import type {OrderStatus, PassportPayload, PopulatedOrder} from '@/types/orders.types.js';
+import type {
+  OrderStatus,
+  PassportPayload,
+  PopulatedOrder
+} from '@/types/orders.types.js';
 import mongoose from 'mongoose';
 import validateObjectId from '@/middlewares/validateObjectId.js';
-import type {ContractData} from "@/types/contracts.types.js";
-import {buildContractHTML} from "@/utils/contracts/buildContractHTML.js";
-import {getBrowser} from "@/lib/puppeteer.js";
+import type {ContractData} from '@/types/contracts.types.js';
+import {buildContractHTML} from '@/utils/contracts/buildContractHTML.js';
+import {getBrowser} from '@/lib/puppeteer.js';
+import {generateId} from '@/utils/id/generateId.js';
 
 const ordersRouter = express.Router();
 
@@ -149,10 +154,21 @@ ordersRouter.post('/', async (req, res, next) => {
       return res.status(400).send({ error: 'Отсутствуют обязательные поля' });
     }
 
+    let visibleId = null;
+    let isUnique = false;
+
+    while (!isUnique) {
+      visibleId = `ORDER-${generateId(6,3)}`;
+      const existing = await Order.findOne({ visibleId });
+
+      if (!existing) isUnique = true;
+    }
+
     const newOrder = new Order({
       tourSetId,
       clientName,
       clientPhone,
+      visibleId,
     });
 
     await newOrder.save();
