@@ -1,7 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
-@plugin "tailwind-scrollbar";
 
 body {
   font-family: var(--font-montserrat), sans-serif;

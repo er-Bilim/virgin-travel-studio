@@ -30,7 +30,7 @@ const TagFilter = ({ tags, className, setTag }: Props) => {
         <p className="text-sm text-gray-400 uppercase font-semibold">темы:</p>
         <ul
           role="list"
-          className="flex gap-2 overflow-x-auto pb-4 capitalize scrollbar-thin scrollbar-thumb-navy-900 scrollbar-track-transparent"
+          className="flex gap-2 overflow-x-auto pb-4 capitalize"
         >
           <li>
             <Link
