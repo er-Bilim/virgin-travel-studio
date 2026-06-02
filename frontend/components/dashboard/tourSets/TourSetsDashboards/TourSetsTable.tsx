@@ -325,6 +325,17 @@ export default function TourSetsTable({
               </div>
             ))
           )}
+
+          {totalPages > 1 && (
+            <div className="p-2 flex justify-center">
+              <PaginationCustom
+                page={page}
+                limit={5}
+                totalPage={totalPages}
+                onChange={setPage}
+              />
+            </div>
+          )}
         </div>
       ) : (
         <div className="w-full overflow-x-auto rounded-2xl border border-gray-100 bg-white">

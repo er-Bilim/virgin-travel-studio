@@ -27,7 +27,6 @@ export const getToursColumns = ({
     header: 'Фото',
     cell: ({ row }) => <TourImageCell tour={row.original} />,
   },
-
   {
     accessorKey: 'title',
     header: 'Название',
@@ -43,13 +42,21 @@ export const getToursColumns = ({
       </div>
     ),
   },
-
   {
     accessorKey: 'category',
     header: 'Категория',
-    cell: ({ row }) => row.original.category?.title || '—',
+    cell: ({ row }) => {
+      const categoryTitle = row.original.category?.title || '—';
+      return (
+        <div
+          className="max-w-[130px] truncate text-gray-600 font-medium"
+          title={categoryTitle}
+        >
+          {categoryTitle}
+        </div>
+      );
+    },
   },
-
   {
     accessorKey: 'status',
     header: 'Статус',
@@ -61,8 +68,8 @@ export const getToursColumns = ({
           variant="outline"
           className={
             isPublished
-              ? 'bg-[#1E2B6D] text-white border-[#1E2B6D]'
-              : 'bg-gray-100 text-gray-600 border-gray-200'
+              ? 'bg-[#1E2B6D] text-white border-[#1E2B6D] whitespace-nowrap'
+              : 'bg-gray-100 text-gray-600 border-gray-200 whitespace-nowrap'
           }
         >
           {isPublished ? 'Опубликовано' : 'Не опубликовано'}
@@ -70,7 +77,6 @@ export const getToursColumns = ({
       );
     },
   },
-
   createActionsColumn<TourType>({
     actions: [
       {
@@ -78,22 +84,18 @@ export const getToursColumns = ({
         label: 'Просмотр',
         onClick: onView,
       },
-
       {
         id: 'toggle-publish',
         label: (tour) =>
           tour.isPublished ? 'Снять с публикации' : 'Опубликовать',
-
         onClick: onTogglePublish,
         className: 'text-blue-600',
       },
-
       {
         id: 'edit',
         label: 'Редактирование',
         onClick: onEdit,
       },
-
       {
         id: 'delete',
         label: 'Удалить',

@@ -7,6 +7,7 @@ import Tour from './model/tour/Tour.js';
 import TourSet from './model/tourSet/TourSet.js';
 import Order from './model/order/Order.js';
 import Review from './model/review/Review.js';
+import {generateId} from './utils/id/generateId.js';
 
 const run = async () => {
   await mongoose.connect(config.db);
@@ -466,6 +467,7 @@ const run = async () => {
     await Order.create([
       {
         tourSetId: ts1._id,
+        visibleId: `ORDER-${generateId(6, 3)}`,
         clientName: 'Иван Иванов',
         clientPhone: '+996555123456',
         status: 'NEW',
@@ -473,6 +475,7 @@ const run = async () => {
       },
       {
         tourSetId: ts2._id,
+        visibleId: `ORDER-${generateId(6, 3)}`,
         clientName: 'Виталий Тар',
         clientPhone: '79001112233',
         status: 'IN_PROGRESS',
@@ -480,6 +483,7 @@ const run = async () => {
       },
       {
         tourSetId: ts1._id,
+        visibleId: `ORDER-${generateId(6, 3)}`,
         clientName: 'Виктор Петров',
         clientPhone: '+996700123987',
         status: 'REJECTED',
@@ -488,6 +492,7 @@ const run = async () => {
       },
       {
         tourSetId: ts5._id,
+        visibleId: `ORDER-${generateId(6, 3)}`,
         clientName: 'Ольга Новикова',
         clientPhone: '+996999000111',
         status: 'CONTRACT_PENDING',
@@ -495,6 +500,7 @@ const run = async () => {
       },
       {
         tourSetId: ts2._id,
+        visibleId: `ORDER-${generateId(6, 3)}`,
         clientName: 'Сергей Васильев',
         clientPhone: '+79112223344',
         status: 'COMPLETED',
@@ -502,6 +508,7 @@ const run = async () => {
       },
       {
         tourSetId: ts2._id,
+        visibleId: `ORDER-${generateId(6, 3)}`,
         clientName: 'Клиент которого не обработали',
         clientPhone: '+79112223347',
         status: 'NEW',
