@@ -26,7 +26,7 @@ export const getOrdersColumns = ({
   onTake: (order: OrderType) => void;
 }): ColumnDef<OrderType>[] => [
   {
-    accessorKey: '_id',
+    accessorKey: 'visibleId',
     header: 'ID',
     meta: { className: 'hidden xl:table-cell' },
   },
