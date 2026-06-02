@@ -21,6 +21,11 @@ export interface TourType {
   rating: number;
   ratingCount: number;
   isPublished: boolean;
+  isHot: boolean;
+  minPrice: number;
+  hotelLocation: string[];
+  minFreeSeats: number;
+  durationDays: number;
 }
 
 export interface TourMutation {
