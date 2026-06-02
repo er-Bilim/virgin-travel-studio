@@ -5,6 +5,7 @@ import { imagesUpload } from '@/middlewares/multer.js';
 import Tour from '@/model/tour/Tour.js';
 import mongoose from 'mongoose';
 import validateObjectId from '@/middlewares/validateObjectId.js';
+import TourSet from '@/model/tourSet/TourSet.js';
 
 const toursRouter = express.Router();
 
@@ -63,11 +64,104 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
       }
     }
 
-    const tours = await Tour.find(query)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .populate('category', 'title');
+    const tours = await Tour.aggregate([
+      { $match: query },
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'category',
+          foreignField: '_id',
+          as: 'category',
+        },
+      },
+      {
+        $lookup: {
+          from: 'toursets',
+          localField: '_id',
+          foreignField: 'tourId',
+          as: 'tourSets',
+        },
+      },
+      { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } },
+      { $unwind: { path: '$tourSet', preserveNullAndEmptyArrays: true } },
+      {
+        $addFields: {
+          isHot: {
+            $anyElementTrue: {
+              $map: {
+                input: '$tourSets',
+                as: 'tour_set',
+                in: '$$tour_set.isHot',
+              },
+            },
+          },
+          minPrice: { $min: '$tourSets.price' },
+          hotelLocation: {
+            $map: {
+              input: '$tourSets',
+              as: 'tour_set',
+              in: '$$tour_set.hotelLocation',
+            },
+          },
+          minFreeSeats: {
+            $min: {
+              $map: {
+                input: '$tourSets',
+                as: 'tour_set',
+                in: {
+                  $subtract: [
+                    '$$tour_set.totalSeats',
+                    '$$tour_set.bookedSeats',
+                  ],
+                },
+              },
+            },
+          },
+          durationDays: {
+            $cond: {
+              if: { $gt: [{ $size: '$tourSets' }, 0] },
+              then: {
+                $ceil: {
+                  $divide: [
+                    {
+                      $subtract: [
+                        { $arrayElemAt: ['$tourSets.endDate', 0] },
+                        { $arrayElemAt: ['$tourSets.startDate', 0] },
+                      ],
+                    },
+                    1000 * 60 * 60 * 24,
+                  ],
+                },
+              },
+              else: null,
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          title: 1,
+          description: 1,
+          images: 1,
+          baseAdventages: 1,
+          isPublished: 1,
+          rating: 1,
+          ratingCount: 1,
+          isHot: 1,
+          hotelLocation: 1,
+          minFreeSeats: 1,
+          minPrice: 1,
+          durationDays: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          'category._id': 1,
+          'category.title': 1,
+        },
+      },
+    ]);
 
     const totalTours = await Tour.countDocuments(query);
 
@@ -102,7 +196,6 @@ toursRouter.get('/categories', async (_req, res, next) => {
       { $replaceRoot: { newRoot: '$category' } },
       { $project: { title: 1 } },
     ]);
-
 
     return res.json(categories.map((category) => category.title));
   } catch (error) {
