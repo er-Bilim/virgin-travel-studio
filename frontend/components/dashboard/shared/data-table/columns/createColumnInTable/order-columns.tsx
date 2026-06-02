@@ -15,9 +15,9 @@ import dayjs from 'dayjs';
 export const getOrdersColumns = ({
   onView,
   onDelete,
-    role,
-    currentTab,
-    onTake
+  role,
+  currentTab,
+  onTake,
 }: {
   role?: string;
   onView: (order: OrderType) => void;
@@ -28,28 +28,32 @@ export const getOrdersColumns = ({
   {
     accessorKey: '_id',
     header: 'ID',
+    meta: { className: 'hidden xl:table-cell' },
   },
   {
     accessorKey: 'createdAt',
     header: 'Дата создания',
+    meta: { className: 'hidden 2xl:table-cell' },
     cell: ({ getValue }) => {
       const rawDate = getValue<string>();
       return dayjs(rawDate).format('DD.MM.YYYY (HH:mm)');
-    }
+    },
   },
-    ...(role === 'ADMIN' ? [
-      {
-        accessorKey: 'managerId',
-        header: 'Менеджер',
-        cell: ({ getValue } : CellContext<OrderType, unknown>) => {
-          const manager = getValue() as { fullName: string } | null;
-          if (!manager) {
-            return 'Не назначен';
-          }
-          return manager.fullName;
-        }
-      }
-    ]
+  ...(role === 'ADMIN'
+    ? [
+        {
+          accessorKey: 'managerId',
+          header: 'Менеджер',
+          meta: { className: 'hidden sm:table-cell' },
+          cell: ({ getValue }: CellContext<OrderType, unknown>) => {
+            const manager = getValue() as { fullName: string } | null;
+            if (!manager) {
+              return 'Не назначен';
+            }
+            return manager.fullName;
+          },
+        },
+      ]
     : []),
   {
     accessorKey: 'clientName',
@@ -63,36 +67,37 @@ export const getOrdersColumns = ({
     accessorKey: 'status',
     header: 'Статус',
     cell: ({ row }) => {
-    const status = row.original.status as OrderStatus;
-    return (
-      <Badge className={`${ORDER_STATUS_STYLES[status]} border-0 font-medium`}>
-        {ORDER_STATUS_LABELS[status] ?? status}
-      </Badge>
-    );
-  }
+      const status = row.original.status as OrderStatus;
+      return (
+        <Badge
+          className={`${ORDER_STATUS_STYLES[status]} border-0 font-medium`}
+        >
+          {ORDER_STATUS_LABELS[status] ?? status}
+        </Badge>
+      );
+    },
   },
   createActionsColumn<OrderType>({
     actions: [
-       ...(currentTab !== 'all'
-      ? [
-          {
-            id: 'view',
-            label: 'Просмотр',
-            onClick: onView,
-          },
-        ]
-      : []),
+      ...(currentTab !== 'all'
+        ? [
+            {
+              id: 'view',
+              label: 'Просмотр',
+              onClick: onView,
+            },
+          ]
+        : []),
 
-        ...(currentTab === 'all'
-      ? [
-          {
-            id: 'take',
-            label: 'Взять заявку',
-            onClick: onTake,
-          },
-        ]
-      : []),
-
+      ...(currentTab === 'all'
+        ? [
+            {
+              id: 'take',
+              label: 'Взять заявку',
+              onClick: onTake,
+            },
+          ]
+        : []),
       {
         id: 'delete',
         label: 'Удалить',
@@ -102,5 +107,4 @@ export const getOrdersColumns = ({
     ],
   }),
 ];
-
 

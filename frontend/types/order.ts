@@ -42,7 +42,7 @@ export interface PaginatedOrdersResponse {
     total: number;
     page: number;
     limit: number;
-    totalPage: number;
+    totalPages: number;
   }
 }
 

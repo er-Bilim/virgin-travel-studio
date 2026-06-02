@@ -151,7 +151,6 @@ export default function ToursManagePage() {
             onConfirm={confirmDelete}
         />
 
-        <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
           {isLoading ? (
               <div className="p-8 text-center text-gray-500">Загрузка туров...</div>
           ) : isError ? (
@@ -180,8 +179,8 @@ export default function ToursManagePage() {
                   isLoading={isLoading}
                   pagination={{
                     page,
-                    pageSize: 10,
-                    total: data?.meta.total || 0,
+                    limit: 10,
+                    totalPages: data?.meta.totalPages || 0,
                     onPageChange: setPage
                   }}
                   headerRowClassName={headerRowClassName}
@@ -190,7 +189,6 @@ export default function ToursManagePage() {
                   onRowClick={(tour) => router.push(`${path}/${tour._id}`)}
               />
           )}
-        </div>
       </div>
   );
 }
