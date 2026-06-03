@@ -7,11 +7,11 @@ import { TourImageCell } from '@/components/dashboard/shared/data-table/columnCo
 import { TooltipCustom } from '@/components/ui/tooltip-custom';
 
 type Props = {
-    onView: (tour: TourType) => void;
-    onDelete: (tour: TourType) => void;
-    onTogglePublish: (tour: TourType) => void;
-    onEdit: (tour: TourType) => void;
-    visible: boolean;
+  onView: (tour: TourType) => void;
+  onDelete: (tour: TourType) => void;
+  onTogglePublish: (tour: TourType) => void;
+  onEdit: (tour: TourType) => void;
+  visible: boolean;
 };
 
 export const getToursColumns = ({
@@ -56,66 +56,53 @@ export const getToursColumns = ({
         </div>
       );
     },
+  },
+  {
+    accessorKey: 'status',
+    header: 'Статус',
+    cell: ({ row }) => {
+      const isPublished = row.original.isPublished;
 
-    {
-        accessorKey: 'category',
-        header: 'Категория',
-        cell: ({ row }) => row.original.category?.title || '—',
+      return (
+        <Badge
+          variant="outline"
+          className={
+            isPublished
+              ? 'bg-[#1E2B6D] text-white border-[#1E2B6D] whitespace-nowrap'
+              : 'bg-gray-100 text-gray-600 border-gray-200 whitespace-nowrap'
+          }
+        >
+          {isPublished ? 'Опубликовано' : 'Не опубликовано'}
+        </Badge>
+      );
     },
-
-    {
-        accessorKey: 'status',
-        header: 'Статус',
-        cell: ({ row }) => {
-            const isPublished = row.original.isPublished;
-
-            return (
-                <Badge
-                    variant="outline"
-                    className={
-                        isPublished
-                            ? 'bg-[#1E2B6D] text-white border-[#1E2B6D]'
-                            : 'bg-gray-100 text-gray-600 border-gray-200'
-                    }
-                >
-                    {isPublished ? 'Опубликовано' : 'Не опубликовано'}
-                </Badge>
-            );
-        },
-    },
-
-    createActionsColumn<TourType>({
-        actions: [
-            {
-                id: 'view',
-                label: 'Просмотр',
-                onClick: onView,
-            },
-
-            {
-                id: 'toggle-publish',
-                label: (tour) =>
-                    tour.isPublished
-                        ? 'Снять с публикации'
-                        : 'Опубликовать',
-
-                onClick: onTogglePublish,
-                className: 'text-blue-600',
-            },
-
-            {
-                id: 'edit',
-                label: 'Редактирование',
-                onClick: onEdit,
-            },
-
-            {
-                id: 'delete',
-                label: 'Удалить',
-                onClick: onDelete,
-                className: 'text-red-600',
-                hidden: () => !visible,
-            },
-        ],
-    }),
+  },
+  createActionsColumn<TourType>({
+    actions: [
+      {
+        id: 'view',
+        label: 'Просмотр',
+        onClick: onView,
+      },
+      {
+        id: 'toggle-publish',
+        label: (tour) =>
+          tour.isPublished ? 'Снять с публикации' : 'Опубликовать',
+        onClick: onTogglePublish,
+        className: 'text-blue-600',
+      },
+      {
+        id: 'edit',
+        label: 'Редактирование',
+        onClick: onEdit,
+      },
+      {
+        id: 'delete',
+        label: 'Удалить',
+        onClick: onDelete,
+        className: 'text-red-600',
+        hidden: () => !visible,
+      },
+    ],
+  }),
 ];
