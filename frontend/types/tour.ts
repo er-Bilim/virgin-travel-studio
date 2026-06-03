@@ -6,7 +6,7 @@ export interface TourCategoryType {
   isPublished: boolean;
 }
 
-export type TourCategory = Omit<TourCategoryType, "isPublished">
+export type TourCategory = Omit<TourCategoryType, 'isPublished'>
 
 export interface ToursGetResponse {
   tours: TourType[];

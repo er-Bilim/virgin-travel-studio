@@ -54,6 +54,7 @@ const buildTourFormData = (data: TourMutation) => {
   if (data.images && data.images.length > 0) {
     data.images.forEach((file: File) => formData.append('images', file));
   }
+  
   return formData;
 };
 
