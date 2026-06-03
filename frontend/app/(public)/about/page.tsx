@@ -41,20 +41,20 @@ const AboutPage = () => {
     ];
 
     return (
-        <main className="min-h-screen overflow-hidden bg-[#F7F8F4] text-[#0F172A]">
+        <main className="min-h-screen bg-background text-foreground">
             <section className="relative px-6 py-24 md:py-32">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.35),transparent_32%),radial-gradient(circle_at_85%_20%,rgba(30,43,109,0.16),transparent_28%)]" />
-                <div className="absolute left-8 top-16 hidden h-24 w-24 rounded-full border border-[#1E2B6D]/20 md:block" />
-                <div className="absolute bottom-10 right-12 hidden h-40 w-40 rounded-full bg-[#1E2B6D]/10 md:block" />
+                <div className="absolute left-8 top-16 hidden h-24 w-24 rounded-full border border-navy-700/20 md:block" />
+                <div className="absolute bottom-10 right-12 hidden h-40 w-40 rounded-full bg-navy-700/10 md:block" />
 
                 <div className="relative mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
                     <section>
 
-                        <h1 className="max-w-3xl text-5xl font-black leading-[1.05] text-[#1E2B6D] md:text-7xl">
+                        <h1 className="max-w-3xl text-5xl font-black leading-[1.05] text-navy-700 md:text-7xl">
                             Путешествия, которые начинаются с доверия
                         </h1>
 
-                        <p className="mt-7 max-w-2xl text-base leading-8 text-gray-600 md:text-lg">
+                        <p className="mt-7 max-w-2xl text-base leading-8 text-muted-foreground md:text-lg">
                             Virgin Travel помогает выбрать тур без лишнего стресса:
                             посмотреть детали поездки, сравнить предложения, узнать важную
                             информацию и сделать первый шаг к новому путешествию.
@@ -63,7 +63,7 @@ const AboutPage = () => {
                         <div className="mt-9 flex flex-wrap gap-4">
                             <Link
                                 href="/tours"
-                                className="inline-flex items-center gap-2 rounded-full bg-[#1E2B6D] px-7 py-3 text-sm font-bold text-white shadow-lg shadow-[#1E2B6D]/20 transition hover:-translate-y-0.5 hover:bg-[#162356]"
+                                className="inline-flex items-center gap-2 rounded-full bg-navy-700 px-7 py-3 text-sm font-bold text-primary-foreground shadow-lg transition hover:-translate-y-0.5 hover:bg-navy-800"
                             >
                                 Смотреть туры
                                 <ArrowRight size={18} />
@@ -71,7 +71,7 @@ const AboutPage = () => {
 
                             <Link
                                 href="/"
-                                className="inline-flex items-center gap-2 rounded-full border border-[#1E2B6D]/15 bg-white px-7 py-3 text-sm font-bold text-[#1E2B6D] transition hover:-translate-y-0.5 hover:border-[#1E2B6D]/40"
+                                className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-7 py-3 text-sm font-bold text-navy-700 transition hover:-translate-y-0.5"
                             >
                                 На главную
                             </Link>
@@ -80,16 +80,16 @@ const AboutPage = () => {
 
                     <aside className="relative">
                         <div className="absolute -left-4 -top-4 h-24 w-24 rounded-3xl bg-yellow-400/70 blur-2xl" />
-                        <div className="relative rounded-[2.5rem] bg-[#1E2B6D] p-6 text-white shadow-2xl shadow-[#1E2B6D]/25">
+                        <div className="relative rounded-[2.5rem] bg-navy-700 p-6 text-white shadow-2xl shadow-navy-700/25">
                             <div className="rounded-[2rem] border border-white/15 bg-white/10 p-6 backdrop-blur">
                                 <div className="mb-8 flex items-center justify-between">
-                                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-yellow-400 text-[#1E2B6D]">
+                                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-yellow-400 text-navy-700">
                                         <Plane size={28} />
                                     </div>
 
                                     <span className="rounded-full bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white/80">
-                    Travel studio
-                  </span>
+                                        Travel studio
+                                    </span>
                                 </div>
 
                                 <h2 className="text-3xl font-black leading-tight">
@@ -108,9 +108,9 @@ const AboutPage = () => {
                                             key={step}
                                             className="flex items-center gap-3 rounded-2xl bg-white/10 p-4"
                                         >
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-yellow-400 text-sm font-black text-[#1E2B6D]">
-                        {index + 1}
-                      </span>
+                                            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-yellow-400 text-sm font-black text-navy-700">
+                                                {index + 1}
+                                            </span>
 
                                             <span className="text-sm font-semibold">{step}</span>
                                         </div>
@@ -132,11 +132,11 @@ const AboutPage = () => {
                                 key={item.title}
                                 className="group rounded-[2rem] border border-gray-100 bg-white p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
                             >
-                                <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1E2B6D]/10 text-[#1E2B6D] transition group-hover:bg-[#1E2B6D] group-hover:text-white">
+                                <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1E2B6D]/10 text-navy-700 transition group-hover:bg-navy-800 group-hover:text-white">
                                     <Icon size={26} />
                                 </div>
 
-                                <h2 className="text-2xl font-black text-[#1E2B6D]">
+                                <h2 className="text-2xl font-black text-navy-700">
                                     {item.title}
                                 </h2>
 
@@ -152,14 +152,14 @@ const AboutPage = () => {
             <section className="mx-auto grid max-w-6xl gap-8 px-6 py-16 lg:grid-cols-[0.9fr_1.1fr]">
                 <aside className="relative overflow-hidden rounded-[2.5rem] bg-white p-8 shadow-sm">
                     <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-yellow-300/40" />
-                    <div className="absolute -bottom-20 -left-20 h-56 w-56 rounded-full bg-[#1E2B6D]/10" />
+                    <div className="absolute -bottom-20 -left-20 h-56 w-56 rounded-full bg-navy-700/10" />
 
                     <div className="relative">
-                        <div className="mb-8 flex h-16 w-16 items-center justify-center rounded-3xl bg-[#1E2B6D] text-white">
+                        <div className="mb-8 flex h-16 w-16 items-center justify-center rounded-3xl bg-navy-700 text-white">
                             <MapPinned size={30} />
                         </div>
 
-                        <h2 className="text-3xl font-black leading-tight text-[#1E2B6D]">
+                        <h2 className="text-3xl font-black leading-tight text-navy-700">
                             Мы делаем выбор тура понятнее
                         </h2>
 
@@ -171,7 +171,7 @@ const AboutPage = () => {
                     </div>
                 </aside>
 
-                <article className="rounded-[2.5rem] bg-[#1E2B6D] p-8 text-white shadow-xl shadow-[#1E2B6D]/20">
+                <article className="rounded-[2.5rem] bg-navy-700 p-8 text-white shadow-xl shadow-navy-700/20">
                     <p className="text-sm font-bold uppercase tracking-[0.3em] text-yellow-300">
                         Наша идея
                     </p>
@@ -211,11 +211,11 @@ const AboutPage = () => {
                 <div className="overflow-hidden rounded-[2.5rem] bg-white shadow-sm">
                     <div className="grid lg:grid-cols-[1fr_360px]">
                         <article className="p-8 md:p-12">
-                            <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#1E2B6D]">
+                            <p className="text-sm font-bold uppercase tracking-[0.3em] text-navy-700">
                                 Почему нам доверяют
                             </p>
 
-                            <h2 className="mt-4 text-4xl font-black text-[#1E2B6D]">
+                            <h2 className="mt-4 text-4xl font-black text-navy-700">
                                 Мы рядом на каждом этапе путешествия
                             </h2>
 
@@ -229,7 +229,7 @@ const AboutPage = () => {
                                     (text) => (
                                         <div
                                             key={text}
-                                            className="rounded-2xl border border-gray-100 p-4 text-sm font-bold text-[#1E2B6D]"
+                                            className="rounded-2xl border border-gray-100 p-4 text-sm font-bold text-navy-700"
                                         >
                                             <Star
                                                 size={18}
