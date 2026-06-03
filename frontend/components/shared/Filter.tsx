@@ -12,6 +12,7 @@ interface Props<K extends string> {
   href: string;
   mainTag: string;
   title?: string;
+  searchParamsName: string;
 }
 
 const chipStyles =
@@ -22,9 +23,9 @@ const activeChip = 'bg-primary text-primary-foreground';
 const inactiveChip =
   'bg-muted text-foreground border border-border hover:bg-accent';
 
-const Filter = <K extends string>({ tags, className, setTag, href, mainTag, title, labelKey}: Props<K>) => {
+const Filter = <K extends string>({ tags, className, setTag, href, mainTag, title, labelKey, searchParamsName}: Props<K>) => {
   const searchParams = useSearchParams();
-  const activeTag = searchParams.get('tags');
+  const activeTag = searchParams.get(searchParamsName);
 
   const getTag = (tag: string | null) => {
     setTag(tag);
@@ -56,7 +57,7 @@ const Filter = <K extends string>({ tags, className, setTag, href, mainTag, titl
             return (
               <li key={tag[labelKey]} className="shrink-0">
                 <Link
-                  href={`news?tags=${encodeURIComponent(tag[labelKey])}`}
+                  href={`${href}?${searchParamsName}=${encodeURIComponent(tag[labelKey])}`}
                   aria-current={isActive && 'true'}
                   onClick={() => getTag(tag[labelKey])}
                   className={cn(
