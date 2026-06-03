@@ -36,6 +36,7 @@ import { reportsTourSet} from "@/services/reports";
 import type {BlobError} from "@/types/error";
 import {toast} from "sonner";
 import {DateRangePicker} from "@/components/dashboard/shared/date-range-picker/DateRangePicker";
+import {PaginationCustom} from "@/components/pagination/PaginationCustom";
 
 interface Props {
   tourId: string;
