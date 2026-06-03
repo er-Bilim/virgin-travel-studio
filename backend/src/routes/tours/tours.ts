@@ -5,7 +5,6 @@ import { imagesUpload } from '@/middlewares/multer.js';
 import Tour from '@/model/tour/Tour.js';
 import mongoose from 'mongoose';
 import validateObjectId from '@/middlewares/validateObjectId.js';
-import TourSet from '@/model/tourSet/TourSet.js';
 
 const toursRouter = express.Router();
 
@@ -16,6 +15,7 @@ const escapeRegex = (value: string) => {
 toursRouter.get('/', authOrNot, async (req, res, next) => {
   const { user } = req as RequestWithUser;
   const isAdminOrManager = user?.role === 'ADMIN' || user?.role === 'MANAGER';
+  const category = req.query.category as string;
 
   try {
     const rawPage = Number.parseInt(req.query.page as string, 10);
@@ -38,10 +38,10 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
     }
 
     if (typeof req.query.category === 'string') {
-      if (!mongoose.Types.ObjectId.isValid(req.query.category)) {
+      if (!mongoose.Types.ObjectId.isValid(category)) {
         return res.status(400).send({ error: 'Неверный category ID' });
       }
-      query.category = req.query.category;
+      query.category = category;
     }
 
     if (
@@ -99,27 +99,7 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
             },
           },
           minPrice: { $min: '$tourSets.price' },
-          hotelLocation: {
-            $map: {
-              input: '$tourSets',
-              as: 'tour_set',
-              in: '$$tour_set.hotelLocation',
-            },
-          },
-          minFreeSeats: {
-            $min: {
-              $map: {
-                input: '$tourSets',
-                as: 'tour_set',
-                in: {
-                  $subtract: [
-                    '$$tour_set.totalSeats',
-                    '$$tour_set.bookedSeats',
-                  ],
-                },
-              },
-            },
-          },
+          hotelLocation: { $arrayElemAt: ['$tourSets.hotelLocation', 0] },
           durationDays: {
             $cond: {
               if: { $gt: [{ $size: '$tourSets' }, 0] },
@@ -139,6 +119,9 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
               else: null,
             },
           },
+          nextStartDate: {
+            $min: '$tourSets.startDate',
+          },
         },
       },
       {
@@ -152,9 +135,9 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
           ratingCount: 1,
           isHot: 1,
           hotelLocation: 1,
-          minFreeSeats: 1,
           minPrice: 1,
           durationDays: 1,
+          nextStartDate: 1,
           createdAt: 1,
           updatedAt: 1,
           'category._id': 1,
@@ -193,11 +176,10 @@ toursRouter.get('/categories', async (_req, res, next) => {
         },
       },
       { $unwind: '$category' },
-      { $replaceRoot: { newRoot: '$category' } },
-      { $project: { title: 1 } },
+      { $project: { title: "$category.title" } },
     ]);
 
-    return res.json(categories.map((category) => category.title));
+    return res.json(categories);
   } catch (error) {
     next(error);
   }
