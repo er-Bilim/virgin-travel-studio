@@ -33,7 +33,7 @@ export function createActionsColumn<T>({
             const data = row.original;
 
             return (
-                <div className="flex justify-end w-full pr-2">
+                <div className="flex justify-end w-full pr-2" onClick={(e) => e.stopPropagation()}>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0">
