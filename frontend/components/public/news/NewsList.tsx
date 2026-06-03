@@ -113,7 +113,7 @@ const NewsList = () => {
           ))}
         </div>
       ) : (
-        <Filter tags={tags} className="mt-8" setTag={setTag} title='темы' mainTag='все новости' href="news"/>
+        <Filter tags={tags} labelKey='tag' className="mt-8" setTag={setTag} title='темы' mainTag='все новости' href="news"/>
       )}
 
       <article className="group grid grid-cols-[20fr_1fr] gap-6 mt-10 border-t pt-10">
