@@ -1,23 +1,24 @@
-import type {NewsFields} from "@/types/news";
-import type {ColumnDef} from "@tanstack/react-table";
-import {format} from "date-fns";
-import {Badge} from "@/components/ui/badge";
+import type {NewsFields} from '@/types/news';
+import type {ColumnDef} from '@tanstack/react-table';
+import {format} from 'date-fns';
+import {Badge} from '@/components/ui/badge';
 import {
   createActionsColumn
-} from "@/components/dashboard/shared/data-table/columns/createActionsColumn";
+} from '@/components/dashboard/shared/data-table/columns/createActionsColumn';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger
-} from "@/components/ui/dialog";
-import {imageUrl} from "@/lib/constants";
+} from '@/components/ui/dialog';
+import {imageUrl} from '@/lib/constants';
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider, TooltipTrigger
-} from "@/components/ui/tooltip";
+  TooltipProvider,
+  TooltipTrigger
+} from '@/components/ui/tooltip';
 
 type Props = {
   onView: (tour: NewsFields) => void;
@@ -105,15 +106,14 @@ export const getNewsColumns = ({
   {
     accessorKey: 'author',
     header: 'Автор',
-    cell: ({row}) => (
-      row.original.author.fullName
-    )
+    meta: { className: 'hidden lg:table-cell' },
+    cell: ({row}) => row.original.author.fullName,
   },
   {
     accessorKey: 'createdAt',
     header: 'Дата',
-    cell: ({row}) =>
-      format(new Date(row.original.createdAt), 'dd.MM.yyyy'),
+    meta: { className: 'hidden lg:table-cell' },
+    cell: ({row}) => format(new Date(row.original.createdAt), 'dd.MM.yyyy'),
   },
   {
     accessorKey: 'status',

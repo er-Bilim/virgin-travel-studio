@@ -1,23 +1,23 @@
 'use client';
 
-import type { ColumnDef } from '@tanstack/react-table';
+import type {ColumnDef} from '@tanstack/react-table';
 import {
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
+    flexRender,
+    getCoreRowModel,
+    useReactTable
 } from '@tanstack/react-table';
 
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow
 } from '@/components/ui/table';
-import {Button} from "@/components/ui/button";
-import {ChevronLeft, ChevronRight, Loader} from "lucide-react";
-import {cn} from "@/lib/utils";
+import {Button} from '@/components/ui/button';
+import {ChevronLeft, ChevronRight, Loader} from 'lucide-react';
+import {cn} from '@/lib/utils';
 
 type DataTableProps<TData, TValue> = {
   columns: ColumnDef<TData, TValue>[];
@@ -39,6 +39,12 @@ type DataTableProps<TData, TValue> = {
     rowClassName?: string | ((row: TData) => string);
     onRowClick?: (row: TData) => void;
 };
+
+declare module '@tanstack/react-table' {
+  interface ColumnMeta<TData, TValue> {
+    className?: string;
+  }
+}
 
 export function DataTable<TData, TValue>({
                                              columns,
@@ -99,7 +105,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="rounded-2xl border bg-white overflow-hidden">
-      <Table className={cn("w-full", className)}>
+      <Table className={cn("w-full table-fixed", className)}>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow
@@ -107,7 +113,10 @@ export function DataTable<TData, TValue>({
                 className={headerRowClassName}
             >
               {headerGroup.headers.map((header) => (
-                <TableHead key={header.id}>
+                <TableHead
+                    key={header.id}
+                    className={cn(header.column.columnDef.meta?.className)}
+                >
                   {header.isPlaceholder
                     ? null
                     : flexRender(
@@ -138,7 +147,10 @@ export function DataTable<TData, TValue>({
                             onClick={() => onRowClick?.(row.original)}
                         >
                             {row.getVisibleCells().map((cell) => (
-                                <TableCell key={cell.id}>
+                                <TableCell
+                                    key={cell.id}
+                                    className={cn(cell.column.columnDef.meta?.className)}
+                                >
                                     {flexRender(
                                         cell.column.columnDef.cell,
                                         cell.getContext()
