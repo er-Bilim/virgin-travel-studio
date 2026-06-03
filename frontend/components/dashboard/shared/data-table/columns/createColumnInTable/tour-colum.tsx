@@ -55,8 +55,8 @@ export const getToursColumns = ({
           {categoryTitle}
         </div>
       );
-    },
-
+    }
+  },
     {
         accessorKey: 'category',
         header: 'Категория',
