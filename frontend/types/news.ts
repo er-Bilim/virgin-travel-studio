@@ -37,3 +37,7 @@ export interface GetNewsParams {
   authorId?: string;
   tags?: string | null;
 }
+
+export interface NewsTag {
+  tag: string
+}

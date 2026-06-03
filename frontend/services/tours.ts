@@ -1,6 +1,8 @@
 import axiosApi from '@/lib/axiosApi';
+
 import type {
   GetToursParams,
+  TourCategory,
   TourMutation,
   ToursGetResponse,
   TourType,
@@ -20,7 +22,7 @@ export const getTours = async ({
 
   if (categoryId) params.append('category', categoryId);
   if (search) params.append('search', search);
-  if (isPublished) params.append('isPublished', isPublished);
+  if (isPublished) params.append('isPublished', String(isPublished));
 
   const res = await axiosApi.get<ToursGetResponse>(
     `/tours?${params.toString()}`,
@@ -34,8 +36,8 @@ export const getTourById = async (id: string): Promise<TourType> => {
   return res.data;
 };
 
-export const getTourCategories = async (): Promise<string[]> => {
-  const { data } = await axiosApi.get<string[]>('/tours/categories');
+export const getTourCategories = async (): Promise<TourCategory[]> => {
+  const { data } = await axiosApi.get<TourCategory[]>('/tours/categories');
   return data;
 };
 
