@@ -32,6 +32,7 @@ import type { TourType } from '@/types/tour';
 import { Badge } from '@/components/ui/badge';
 import { TourImageCell } from '@/components/dashboard/shared/data-table/columnComponent/TourImageCell';
 import { PaginationCustom } from '@/components/pagination/PaginationCustom';
+import { toast } from 'sonner';
 
 export default function ToursManagePage() {
   const router = useRouter();
@@ -111,6 +112,13 @@ export default function ToursManagePage() {
     if (tourToDelete) {
       deleteTour(tourToDelete, {
         onSuccess: () => setTourToDelete(null),
+        onError: (error) => {
+          setTourToDelete(null);
+
+          const serverError =
+            error.response?.data?.error || 'Произошла ошибка при удалении тура';
+          toast.error(serverError, { duration: 5000 });
+        },
       });
     }
   };
