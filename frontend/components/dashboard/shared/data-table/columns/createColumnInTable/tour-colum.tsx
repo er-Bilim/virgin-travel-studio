@@ -42,39 +42,40 @@ export const getToursColumns = ({
       </div>
     ),
   },
-  {
-    accessorKey: 'category',
-    header: 'Категория',
-    cell: ({ row }) => {
-      const categoryTitle = row.original.category?.title || '—';
-      return (
-        <div
-          className="max-w-[130px] truncate text-gray-600 font-medium"
-          title={categoryTitle}
-        >
-          {categoryTitle}
-        </div>
-      );
+    {
+        accessorKey: 'category',
+        header: 'Категория',
+        cell: ({row}) => {
+            const categoryTitle = row.original.category?.title || '—';
+            return (
+                <div
+                    className="max-w-[130px] truncate text-gray-600 font-medium"
+                    title={categoryTitle}
+                >
+                    {categoryTitle}
+                </div>
+            );
+        },
     },
-  },
-  {
-    accessorKey: 'status',
-    header: 'Статус',
-    cell: ({ row }) => {
-      const isPublished = row.original.isPublished;
+    {
+        accessorKey: 'status',
+        header: 'Статус',
+        cell: ({ row }) => {
+            const isPublished = row.original.isPublished;
 
-      return (
-        <Badge
-          variant="outline"
-          className={
-            isPublished
-              ? 'bg-[#1E2B6D] text-white border-[#1E2B6D] whitespace-nowrap'
-              : 'bg-gray-100 text-gray-600 border-gray-200 whitespace-nowrap'
-          }
-        >
-          {isPublished ? 'Опубликовано' : 'Не опубликовано'}
-        </Badge>
-      );
+            return (
+                <Badge
+                    variant="outline"
+                    className={
+                        isPublished
+                            ? 'bg-[#1E2B6D] text-white border-[#1E2B6D]'
+                            : 'bg-gray-100 text-gray-600 border-gray-200'
+                    }
+                >
+                    {isPublished ? 'Опубликовано' : 'Не опубликовано'}
+                </Badge>
+            );
+        },
     },
   },
   createActionsColumn<TourType>({
