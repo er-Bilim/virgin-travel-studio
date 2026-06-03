@@ -5,6 +5,7 @@ import { imagesUpload } from '@/middlewares/multer.js';
 import Tour from '@/model/tour/Tour.js';
 import mongoose from 'mongoose';
 import validateObjectId from '@/middlewares/validateObjectId.js';
+import TourSet from '@/model/tourSet/TourSet.js';
 
 const toursRouter = express.Router();
 
@@ -43,7 +44,10 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
       query.category = req.query.category;
     }
 
-    if (typeof req.query.search === 'string' && req.query.search.trim() !== '') {
+    if (
+      typeof req.query.search === 'string' &&
+      req.query.search.trim() !== ''
+    ) {
       query.title = {
         $regex: escapeRegex(req.query.search.trim()),
         $options: 'i',
@@ -229,6 +233,17 @@ toursRouter.delete(
     const { id } = req.params;
 
     try {
+      const hasLinks = await TourSet.exists({
+        tourId: new mongoose.Types.ObjectId(id as string),
+      });
+
+      if (hasLinks) {
+        return res.status(400).send({
+          error:
+            'Невозможно удалить тур, так как к нему привязаны активные потоки туров.',
+        });
+      }
+
       const result = await Tour.deleteOne({ _id: id });
       if (!result.deletedCount) {
         return res.status(404).send({ error: 'Тур не найден' });
