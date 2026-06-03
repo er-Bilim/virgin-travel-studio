@@ -2,14 +2,8 @@ import type { ColumnDef } from '@tanstack/react-table';
 import type { TourSetType } from '@/types/tourSets';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
-import { Info } from 'lucide-react';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
 import { createActionsColumn } from '@/components/dashboard/shared/data-table/columns/createActionsColumn';
+import { TooltipCustom } from '@/components/ui/tooltip-custom';
 
 export const getStatusBadge = (status: string) => {
   switch (status) {
@@ -58,11 +52,11 @@ type Props = {
 };
 
 export const getTourSetsColumns = ({
-                                     onView,
-                                     onEdit,
-                                     onDelete,
-                                     canDelete,
-                                     onReport
+  onView,
+  onEdit,
+  onDelete,
+  canDelete,
+  onReport,
 }: Props): ColumnDef<TourSetType>[] => [
   {
     header: 'Старт',
@@ -98,24 +92,9 @@ export const getTourSetsColumns = ({
     cell: ({ row }) => {
       const name = row.original.hotelName;
       return (
-        <TooltipProvider delayDuration={150}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span className="font-medium text-gray-900 pb-0.5 block truncate max-w-[110px] md:max-w-[150px] lg:max-w-[220px] cursor-help border-b border-dotted border-gray-400 w-fit whitespace-normal break-words">
-                {name}
-              </span>
-            </TooltipTrigger>
-            <TooltipContent
-              side="top"
-              className="bg-[#1E2B6D] text-white max-w-xs rounded-xl p-3 shadow-md border-none"
-            >
-              <div className="flex gap-2 items-start">
-                <Info className="w-4 h-4 mt-0.5 shrink-0 text-cyan-400" />
-                <p className="text-xs font-medium leading-relaxed">{name}</p>
-              </div>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <TooltipCustom title={name}>
+          <span>{name}</span>
+        </TooltipCustom>
       );
     },
   },
@@ -153,7 +132,7 @@ export const getTourSetsColumns = ({
   },
   createActionsColumn<TourSetType>({
     actions: [
-      { id: 'report', label: 'Отчет по потоку тура', onClick: onReport},
+      { id: 'report', label: 'Отчет по потоку тура', onClick: onReport },
       { id: 'view', label: 'Просмотреть', onClick: onView },
       { id: 'edit', label: 'Редактировать', onClick: onEdit },
       {

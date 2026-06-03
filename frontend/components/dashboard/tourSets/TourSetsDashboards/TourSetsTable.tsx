@@ -103,9 +103,9 @@ export default function TourSetsTable({
 
       downloadBlobFile({
         blob: res.data,
-        disposition: res.headers?.["content-disposition"],
-        filename: "report.xlsx",
-        defaultName: "report.xlsx",
+        disposition: res.headers?.['content-disposition'],
+        filename: 'report.xlsx',
+        defaultName: 'report.xlsx',
       });
     } catch (e: unknown) {
       const err = e as BlobError;
@@ -344,16 +344,23 @@ export default function TourSetsTable({
             columns={columns}
             isLoading={isLoading}
             isError={isError}
-            pagination={{
-              page,
-              pageSize: 5,
-              total: data?.meta.total || 0,
-              onPageChange: setPage,
-            }}
             headerRowClassName={headerRowClassName}
             rowClassName={rowClassName}
             className={tableClassName}
-            onRowClick={(set) => router.push(`${baseToursPath}/${tourId}/groups/${set._id}`)}
+            onRowClick={(set) =>
+              router.push(`${baseToursPath}/${tourId}/groups/${set._id}`)
+            }
+          />
+        </div>
+      )}
+
+      {data?.meta && data?.tourSets && data.tourSets.length > 0 && (
+        <div className="my-8">
+          <PaginationCustom
+            page={page}
+            limit={data.meta.limit || 5}
+            totalPage={data.meta.totalPages || totalPages}
+            onChange={setPage}
           />
         </div>
       )}
