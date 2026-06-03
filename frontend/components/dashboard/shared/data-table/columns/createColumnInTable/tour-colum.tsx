@@ -58,12 +58,6 @@ export const getToursColumns = ({
         },
     },
     {
-        accessorKey: 'category',
-        header: 'Категория',
-        cell: ({ row }) => row.original.category?.title || '—',
-    },
-
-    {
         accessorKey: 'status',
         header: 'Статус',
         cell: ({ row }) => {
