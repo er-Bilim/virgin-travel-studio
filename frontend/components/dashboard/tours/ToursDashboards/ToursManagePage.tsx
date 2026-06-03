@@ -32,6 +32,12 @@ import type { TourType } from '@/types/tour';
 import { Badge } from '@/components/ui/badge';
 import { TourImageCell } from '@/components/dashboard/shared/data-table/columnComponent/TourImageCell';
 import { PaginationCustom } from '@/components/pagination/PaginationCustom';
+import { toast } from 'sonner';
+import axios from 'axios';
+
+interface BackendError {
+  error: string;
+}
 
 export default function ToursManagePage() {
   const router = useRouter();
@@ -110,7 +116,20 @@ export default function ToursManagePage() {
   const confirmDelete = () => {
     if (tourToDelete) {
       deleteTour(tourToDelete, {
-        onSuccess: () => setTourToDelete(null),
+        onSuccess: () => {
+          setTourToDelete(null);
+          toast.success('Тур успешно удален');
+        },
+        onError: (error: unknown) => {
+          let serverError = 'Произошла ошибка при удалении тура';
+
+          if (axios.isAxiosError<BackendError>(error)) {
+            serverError = error.response?.data?.error || serverError;
+          }
+
+          toast.error(serverError);
+          setTourToDelete(null);
+        },
       });
     }
   };
@@ -174,59 +193,6 @@ export default function ToursManagePage() {
               <Plus className="w-4 h-4 mr-2" /> Добавить тур
             </Button>
           </Link>
-        </div>
-
-        <ConfirmDialog
-          open={!!tourToDelete}
-          title="Вы уверенны что хотите удалить тур?"
-          description="Это действие нельзя отменить"
-          loading={isDeleting}
-          confirmText="Удалить"
-          onCancel={() => setTourToDelete(null)}
-          onConfirm={confirmDelete}
-        />
-
-        <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
-          {isLoading ? (
-            <div className="p-8 text-center text-gray-500">
-              Загрузка туров...
-            </div>
-          ) : isError ? (
-            <div className="p-12 text-center space-y-4">
-              <p className="text-[#1E2B6D] font-bold">
-                Не удалось загрузить список туров
-              </p>
-              <p className="text-xs text-[#64748B] max-w-xs mx-auto">
-                Проверьте интернет-соединение или попробуйте перезагрузить
-                данные вручную.
-              </p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => refetch()}
-                className="mt-2 border-gray-200 text-[#1E2B6D]"
-              >
-                Повторить попытку
-              </Button>
-            </div>
-          ) : (
-            <DataTable
-              data={data?.tours || []}
-              isError={isError}
-              columns={columns}
-              isLoading={isLoading}
-              pagination={{
-                page,
-                pageSize: 10,
-                total: data?.meta.total || 0,
-                onPageChange: setPage,
-              }}
-              headerRowClassName={headerRowClassName}
-              rowClassName={rowClassName}
-              className={tableClassName}
-              onRowClick={(tour) => router.push(`${path}/${tour._id}`)}
-            />
-          )}
         </div>
       </div>
 
@@ -351,22 +317,47 @@ export default function ToursManagePage() {
           )}
         </div>
       ) : (
-        <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
-          <DataTable
-            data={data?.tours || []}
-            isError={isError}
-            columns={columns}
-            isLoading={isLoading}
-            pagination={{
-              page,
-              pageSize: 10,
-              total: data?.meta.total || 0,
-              onPageChange: setPage,
-            }}
-            headerRowClassName={headerRowClassName}
-            rowClassName={rowClassName}
-            className={tableClassName}
-          />
+        <div>
+          {isLoading ? (
+            <div className="p-8 text-center text-gray-500 flex items-center justify-center gap-2">
+              <Loader className="animate-spin w-4 h-4" /> Загрузка туров...
+            </div>
+          ) : isError ? (
+            <div className="p-12 text-center space-y-4">
+              <p className="text-[#1E2B6D] font-bold">
+                Не удалось загрузить список туров
+              </p>
+              <p className="text-xs text-[#64748B] max-w-xs mx-auto">
+                Проверьте интернет-соединение или попробуйте перезагрузить
+                данные вручную.
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => refetch()}
+                className="mt-2 border-gray-200 text-[#1E2B6D]"
+              >
+                Повторить попытку
+              </Button>
+            </div>
+          ) : (
+            <DataTable
+              data={data?.tours || []}
+              isError={isError}
+              columns={columns}
+              isLoading={isLoading}
+              pagination={{
+                page,
+                pageSize: 10,
+                total: data?.meta.total || 0,
+                onPageChange: setPage,
+              }}
+              headerRowClassName={headerRowClassName}
+              rowClassName={rowClassName}
+              className={tableClassName}
+              onRowClick={(tour) => router.push(`${path}/${tour._id}`)}
+            />
+          )}
         </div>
       )}
     </div>
