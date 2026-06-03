@@ -33,6 +33,9 @@ import {
 } from "@/components/ui/select";
 import {useUsers} from "@/lib/hooks/userHooks";
 import {PaginationCustom} from "@/components/pagination/PaginationCustom";
+import {useModalStore} from "@/lib/stores/modalStore";
+import {Modal} from "@/components/shared/Modal";
+import NewsDetailedInfo from "@/components/dashboard/news/NewsDetailedInfo";
 
 export default function NewsList() {
   const [searchNews, setSearchNews] = useState("");
@@ -78,14 +81,18 @@ export default function NewsList() {
 
   const [newsToDelete, setNewsToDelete] = useState<string | null>(null);
   const [editingNewsId, setEditingNewsId] = useState<string | null>(null);
-  const [, setView] = useState<NewsFields | null>(null);
+  const [view, setView] = useState<NewsFields | null>(null);
+  const { openModal } = useModalStore();
 
   const columns = useMemo(() => getNewsColumns({
-    onView: (news: NewsFields) => setView(news),
+    onView: (news: NewsFields) => {
+      setView(news);
+      openModal("detailedNews");
+    },
     onDelete: (news: NewsFields) => setNewsToDelete(news._id),
     onEdit: (news: NewsFields) => setEditingNewsId(news._id),
     onTogglePublish: (news: NewsFields) => togglePublicate(news._id),
-  }), [togglePublicate]);
+  }), [togglePublicate, openModal]);
 
   const confirmDelete = () => {
     if (newsToDelete) {
@@ -203,7 +210,10 @@ export default function NewsList() {
         headerRowClassName={headerRowClassName}
         rowClassName={rowClassName}
         className={tableClassName}
-        onRowClick={(news) => setView(news)}
+        onRowClick={(news) => {
+          setView(news);
+          openModal("detailedNews")}
+      }
       />
 
       {meta && news && news.length > 0 && (
@@ -216,6 +226,12 @@ export default function NewsList() {
           />
         </div>
       )}
+
+      <Modal id="detailedNews" title="Детальная информация о новости">
+        <div className="max-h-[90vh] overflow-y-auto">
+          {view && <NewsDetailedInfo oneNews={view} />}
+        </div>
+      </Modal>
 
       <ConfirmDialog
         open={!!newsToDelete}
