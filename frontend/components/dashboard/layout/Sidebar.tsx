@@ -30,7 +30,7 @@ const Sidebar = () => {
     };
 
     return (
-        <aside className="hidden w-72 border-r border-gray-200 bg-white lg:flex lg:flex-col">
+        <aside className="hidden w-72 sticky top-0 border-r border-gray-200 bg-white lg:flex lg:flex-col h-dvh">
             <div className="border-b border-gray-200 px-6 py-5">
                 <Link href={roleDashboardPaths[user.role]} className="flex items-center gap-3">
                     <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#1E2B6D] text-xl font-bold text-white">
@@ -49,7 +49,7 @@ const Sidebar = () => {
                 </Link>
             </div>
 
-            <div className="flex flex-1 flex-col justify-between">
+            <div className="flex flex-1 flex-col justify-between overflow-y-auto">
                 <nav className="flex flex-col gap-2 p-4">
                     {filteredItems.map((item) => {
                         const Icon = item.icon;

@@ -40,7 +40,7 @@ export function createActionsColumn<T>({
         });
 
         return (
-          <div className="w-full">
+            <div className="w-full" onClick={(e) => e.stopPropagation()}>
             {/* 1. ВАРИАНТ ДЛЯ ДЕСКТОПА: Виден только на экранах md и выше (md:flex) */}
             <div className="hidden sm:flex justify-end w-full pr-2">
               <DropdownMenu>
