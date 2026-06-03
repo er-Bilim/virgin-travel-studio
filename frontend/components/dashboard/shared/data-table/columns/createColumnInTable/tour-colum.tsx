@@ -42,21 +42,21 @@ export const getToursColumns = ({
       </div>
     ),
   },
-  {
-    accessorKey: 'category',
-    header: 'Категория',
-    cell: ({ row }) => {
-      const categoryTitle = row.original.category?.title || '—';
-      return (
-        <div
-          className="max-w-[130px] truncate text-gray-600 font-medium"
-          title={categoryTitle}
-        >
-          {categoryTitle}
-        </div>
-      );
+    {
+        accessorKey: 'category',
+        header: 'Категория',
+        cell: ({row}) => {
+            const categoryTitle = row.original.category?.title || '—';
+            return (
+                <div
+                    className="max-w-[130px] truncate text-gray-600 font-medium"
+                    title={categoryTitle}
+                >
+                    {categoryTitle}
+                </div>
+            );
+        },
     },
-
     {
         accessorKey: 'category',
         header: 'Категория',
