@@ -113,7 +113,7 @@ export default function OrderManageForm({ initialValues, orderId }: Props) {
             control={control}
             name="status"
             render={({ field }) => {
-              const currentStepIndex = statusList
+              const currentStepIndex = statusList && field.value
                 ? statusList.indexOf(field.value)
                 : -1;
               // Проверяем, является ли текущий статус статусом отклонения
