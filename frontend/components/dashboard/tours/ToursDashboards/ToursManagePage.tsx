@@ -151,7 +151,6 @@ export default function ToursManagePage() {
             onConfirm={confirmDelete}
         />
 
-        <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
           {isLoading ? (
               <div className="p-8 text-center text-gray-500">Загрузка туров...</div>
           ) : isError ? (

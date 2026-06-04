@@ -12,65 +12,91 @@ import {
 import type {TableAction} from "@/types/helpersComponent";
 
 type ActionsProps<T> = {
-    actions: TableAction<T>[];
+  meta?: ColumnDef<T, unknown>['meta'];
+  actions: TableAction<T>[];
 };
 
 export function createActionsColumn<T>({
+                                           meta,
                                            actions,
                                        }: ActionsProps<T>): ColumnDef<T> {
     return {
-        id: "actions",
-        size: 50,
-        minSize: 50,
-        maxSize: 50,
+      id: 'actions',
+      size: 50,
+      meta,
+      minSize: 50,
+      maxSize: 50,
 
-        header: () => (
-            <div className="text-right w-full pr-2">
-                Действия
+      header: () => <div className="text-right w-full pr-2">Действия</div>,
+      cell: ({ row }) => {
+        const data = row.original;
+
+        // Сначала фильтруем только видимые экшены 
+        const visibleActions = actions.filter((action) => {
+          if (typeof action.hidden === 'function') {
+            return !action.hidden(data);
+          }
+          return !action.hidden;
+        });
+
+        return (
+            <div className="w-full" onClick={(e) => e.stopPropagation()}>
+            {/* 1. ВАРИАНТ ДЛЯ ДЕСКТОПА: Виден только на экранах md и выше (md:flex) */}
+            <div className="hidden sm:flex justify-end w-full pr-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-8 w-8 p-0">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Действия</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+
+                  {visibleActions.map((action) => {
+                    const label =
+                      typeof action.label === 'function'
+                        ? action.label(data)
+                        : action.label;
+
+                    return (
+                      <DropdownMenuItem
+                        key={action.id}
+                        onClick={() => action.onClick(data)}
+                        className={action.className}
+                      >
+                        {label}
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-        ),
-        cell: ({ row }) => {
-            const data = row.original;
 
-            return (
-                <div className="flex justify-end w-full pr-2" onClick={(e) => e.stopPropagation()}>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
+            {/* 2. ВАРИАНТ ДЛЯ МОБИЛЬНЫХ: Скрыт на ПК (md:hidden), кнопки отображаются плиткой */}
+            <div className="flex flex-wrap gap-2 justify-end w-full sm:hidden">
+              {visibleActions.map((action) => {
+                const label =
+                  typeof action.label === 'function'
+                    ? action.label(data)
+                    : action.label;
 
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Действия</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-
-                        {actions.filter((action) => {
-                            if (typeof action.hidden === 'function') {
-                                return !action.hidden(data);
-                            }
-
-                            return !action.hidden;
-                        }).map((action) => {
-                            const label =
-                                typeof action.label === 'function'
-                                    ? action.label(data)
-                                    : action.label;
-
-                            return (
-                                <DropdownMenuItem
-                                    key={action.id}
-                                    onClick={() => action.onClick(data)}
-                                    className={action.className}
-                                >
-                                    {label}
-                                </DropdownMenuItem>
-                            );
-                        })}
-                    </DropdownMenuContent>
-                </DropdownMenu>
-                </div>
-            );
-        },
+                return (
+                  <Button
+                    key={action.id}
+                    size="sm"
+                    variant={action.id === 'delete' ? 'destructive' : 'outline'}
+                    className={`h-8 text-xs ${action.className ?? ''}`}
+                    onClick={() => action.onClick(data)}
+                  >
+                    {label}
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+        );
+      },
     };
 }

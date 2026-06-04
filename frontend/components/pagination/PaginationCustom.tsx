@@ -9,7 +9,10 @@ import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const getPaginationRange = (currentPage: number, totalPages: number) => {
-  const delta = 2; // Сколько страниц показывать до и после текущей
+  // Если страница всего одна, сразу возвращаем массив с одной кнопкой
+  if (totalPages <= 1) return [1];
+
+  const delta = 2;
   const range: number[] = [];
   const rangeWithDots: Array<number | '...'> = [];
 
@@ -19,7 +22,7 @@ const getPaginationRange = (currentPage: number, totalPages: number) => {
       i === totalPages ||
       (i >= currentPage - delta && i <= currentPage + delta)
     ) {
-      range.push(i); // (1, 10, 2, 3), (1, 10, 3, 4, 5, 6, 7 ),
+      range.push(i);
     }
   }
 
@@ -27,7 +30,7 @@ const getPaginationRange = (currentPage: number, totalPages: number) => {
   for (const i of range) {
     if (l) {
       if (i - l === 2) {
-        rangeWithDots.push(l + 1); // (1, ..., )
+        rangeWithDots.push(l + 1);
       } else if (i - l !== 1) {
         rangeWithDots.push('...');
       }
@@ -48,7 +51,6 @@ interface Props {
 
 export function PaginationCustom({ page, totalPage, onChange }: Props) {
   const paginationRange = getPaginationRange(page, totalPage);
-
   const handlePageClick = (e: React.MouseEvent, targetPage: number) => {
     e.preventDefault();
     if (targetPage >= 1 && targetPage <= totalPage) {
