@@ -1,0 +1,357 @@
+[
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5901",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b01",
+    "visibleId": "ORDER-2026-001",
+    "clientName": "Иван Иванов",
+    "clientPhone": "+996555123456",
+    "status": "NEW"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5902",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b02",
+    "visibleId": "ORDER-2026-002",
+    "clientName": "Виталий Тар",
+    "clientPhone": "79001112233",
+    "status": "IN_PROGRESS",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5903",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b01",
+    "visibleId": "ORDER-2026-003",
+    "clientName": "Виктор Петров",
+    "clientPhone": "+996700123987",
+    "status": "REJECTED",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02",
+    "rejectionReason": "Клиент передумал из-за изменения дат отпуска"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5904",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b05",
+    "visibleId": "ORDER-2026-004",
+    "clientName": "Ольга Новикова",
+    "clientPhone": "+996999000111",
+    "status": "CONTRACT_PENDING",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5905",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b02",
+    "visibleId": "ORDER-2026-005",
+    "clientName": "Сергей Васильев",
+    "clientPhone": "+79112223344",
+    "status": "COMPLETED",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5906",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b02",
+    "visibleId": "ORDER-2026-006",
+    "clientName": "Алексей Соколов",
+    "clientPhone": "+79112223347",
+    "status": "NEW"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5907",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b07",
+    "visibleId": "ORDER-2026-007",
+    "clientName": "Дмитрий Кузнецов",
+    "clientPhone": "+79057778899",
+    "status": "IN_PROGRESS",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5908",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b08",
+    "visibleId": "ORDER-2026-008",
+    "clientName": "Екатерина Смирнова",
+    "clientPhone": "+79031112244",
+    "status": "CONTRACT_PENDING",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5909",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b09",
+    "visibleId": "ORDER-2026-009",
+    "clientName": "Михаил Попов",
+    "clientPhone": "+79265556677",
+    "status": "COMPLETED",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5910",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b10",
+    "visibleId": "ORDER-2026-010",
+    "clientName": "Анна Лебедева",
+    "clientPhone": "+79998887766",
+    "status": "NEW"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5911",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b11",
+    "visibleId": "ORDER-2026-011",
+    "clientName": "Елена Козлова",
+    "clientPhone": "+996550111222",
+    "status": "IN_PROGRESS",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5912",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b12",
+    "visibleId": "ORDER-2026-012",
+    "clientName": "Павел Морозов",
+    "clientPhone": "+79093334455",
+    "status": "REJECTED",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02",
+    "rejectionReason": "Не устроила итоговая стоимость авиаперелета"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5913",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b13",
+    "visibleId": "ORDER-2026-013",
+    "clientName": "Татьяна Волкова",
+    "clientPhone": "+79152228899",
+    "status": "CONTRACT_PENDING",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5914",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b14",
+    "visibleId": "ORDER-2026-014",
+    "clientName": "Никита Соловьев",
+    "clientPhone": "+79854445566",
+    "status": "COMPLETED",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5915",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b15",
+    "visibleId": "ORDER-2026-015",
+    "clientName": "Мария Павлова",
+    "clientPhone": "+996777333444",
+    "status": "NEW"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5916",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b16",
+    "visibleId": "ORDER-2026-016",
+    "clientName": "Андрей Семенов",
+    "clientPhone": "+79216667788",
+    "status": "IN_PROGRESS",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5917",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b17",
+    "visibleId": "ORDER-2026-017",
+    "clientName": "Юлия Романова",
+    "clientPhone": "+79313334455",
+    "status": "CONTRACT_PENDING",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5918",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b18",
+    "visibleId": "ORDER-2026-018",
+    "clientName": "Сергей Федоров",
+    "clientPhone": "+79634448899",
+    "status": "REJECTED",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02",
+    "rejectionReason": "Отказ в выдаче заграничного паспорта в срок"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5919",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b20",
+    "visibleId": "ORDER-2026-019",
+    "clientName": "Наталья Воробьева",
+    "clientPhone": "+79051113322",
+    "status": "NEW"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5920",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b21",
+    "visibleId": "ORDER-2026-020",
+    "clientName": "Артем Сергеев",
+    "clientPhone": "+79124445577",
+    "status": "IN_PROGRESS",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5921",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b22",
+    "visibleId": "ORDER-2026-021",
+    "clientName": "Ольга Захарова",
+    "clientPhone": "+79821112233",
+    "status": "CONTRACT_PENDING",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5922",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b23",
+    "visibleId": "ORDER-2026-022",
+    "clientName": "Игорь Николаев",
+    "clientPhone": "+79038889900",
+    "status": "COMPLETED",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5923",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b24",
+    "visibleId": "ORDER-2026-023",
+    "clientName": "Валентина Егорова",
+    "clientPhone": "+79156665544",
+    "status": "NEW"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5924",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b26",
+    "visibleId": "ORDER-2026-024",
+    "clientName": "Александр Степанов",
+    "clientPhone": "+79257778811",
+    "status": "IN_PROGRESS",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5925",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b28",
+    "visibleId": "ORDER-2026-025",
+    "clientName": "Елена Никитина",
+    "clientPhone": "+79092225566",
+    "status": "CONTRACT_PENDING",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5926",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b30",
+    "visibleId": "ORDER-2026-026",
+    "clientName": "Максим Белов",
+    "clientPhone": "+79051114455",
+    "status": "COMPLETED",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5927",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b31",
+    "visibleId": "ORDER-2026-027",
+    "clientName": "Кристина Орлова",
+    "clientPhone": "+79101112233",
+    "status": "NEW"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5928",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b32",
+    "visibleId": "ORDER-2026-028",
+    "clientName": "Денис Борисов",
+    "clientPhone": "+79261113344",
+    "status": "IN_PROGRESS",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5929",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b34",
+    "visibleId": "ORDER-2026-029",
+    "clientName": "Яна Филатова",
+    "clientPhone": "+79168884433",
+    "status": "CONTRACT_PENDING",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5930",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b35",
+    "visibleId": "ORDER-2026-030",
+    "clientName": "Кирилл Мельников",
+    "clientPhone": "+79035551122",
+    "status": "REJECTED",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02",
+    "rejectionReason": "Отель встал в стоп-лист до момента оплаты"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5931",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b36",
+    "visibleId": "ORDER-2026-031",
+    "clientName": "Ангелина Савельева",
+    "clientPhone": "+79851110022",
+    "status": "NEW"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5932",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b37",
+    "visibleId": "ORDER-2026-032",
+    "clientName": "Роман Тарасов",
+    "clientPhone": "+79253335566",
+    "status": "IN_PROGRESS",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5933",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b38",
+    "visibleId": "ORDER-2026-033",
+    "clientName": "Юлия Калинина",
+    "clientPhone": "+79093339900",
+    "status": "CONTRACT_PENDING",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5934",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b39",
+    "visibleId": "ORDER-2026-034",
+    "clientName": "Григорий Поляков",
+    "clientPhone": "+79054445588",
+    "status": "COMPLETED",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5935",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b40",
+    "visibleId": "ORDER-2026-035",
+    "clientName": "Алена Гусева",
+    "clientPhone": "+79031114499",
+    "status": "NEW"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5936",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b01",
+    "visibleId": "ORDER-2026-036",
+    "clientName": "Егор Баранов",
+    "clientPhone": "+79165550099",
+    "status": "IN_PROGRESS",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5937",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b02",
+    "visibleId": "ORDER-2026-037",
+    "clientName": "Оксана Куликова",
+    "clientPhone": "+79261118877",
+    "status": "CONTRACT_PENDING",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5938",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b05",
+    "visibleId": "ORDER-2026-038",
+    "clientName": "Станислав Макаров",
+    "clientPhone": "+79153330011",
+    "status": "REJECTED",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02",
+    "rejectionReason": "Отказ от тура в связи с болезнью клиента"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5939",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b10",
+    "visibleId": "ORDER-2026-039",
+    "clientName": "Людмила Андреева",
+    "clientPhone": "+79991112233",
+    "status": "NEW"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5940",
+    "tourSetId": "60c72b2f9b1d8b2a3c4d5b15",
+    "visibleId": "ORDER-2026-040",
+    "clientName": "Владислав Беляев",
+    "clientPhone": "+79051118833",
+    "status": "COMPLETED",
+    "managerId": "60c72b2f9b1d8b2a3c4d5e02"
+  }
+]

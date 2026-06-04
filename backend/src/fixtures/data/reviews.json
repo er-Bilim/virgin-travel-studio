@@ -1,0 +1,402 @@
+[
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a01",
+    "clientName": "Mila Petković",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c01",
+    "rating": 5,
+    "comment": "Сервис круглосуточный, любая просьба выполнялась быстро. Отель на Бали превзошел все ожидания, обязательно вернемся через вашу турфирму!",
+    "image": "images/bali_three.webp",
+    "companyReply": "Спасибо большое за отзыв, Мила! Мы очень рады, что ваш отдых прошел идеально.",
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a02",
+    "clientName": "Arjun Mehta",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c01",
+    "rating": 4,
+    "comment": "Локация далековато от шумного центра, но это огромный плюс для любителей тишины. Пляж чистый, завтраки сытные.",
+    "image": "images/bali_three.webp",
+    "companyReply": null,
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a03",
+    "clientName": "Petra Novotná",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c02",
+    "rating": 3,
+    "comment": "Спасибо за подбор тура, Пирамиды супер. Но отель в Гизе уставший, кондиционер сильно шумел ночью.",
+    "image": "images/egypt_2.png",
+    "companyReply": "Петра, приносим извинения за неудобства. Мы передали информацию партнерам для улучшения сервиса.",
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a04",
+    "clientName": "Chloe Dubois",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c03",
+    "rating": 5,
+    "comment": "Трудный подъем, но вид с Эльбруса перекрывает всю усталость! Гиды были очень профессиональны, постоянно контролировали наше состояние.",
+    "image": "images/elbrus_1.png",
+    "companyReply": "Поздравляем с вершиной, Хлоя! Вы невероятно смелая. Спасибо за доверие!",
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a05",
+    "clientName": "Ines Almeida",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c04",
+    "rating": 4,
+    "comment": "Уютный номер, удобная кровать, отличный душ. Расположение отеля в Стамбуле великолепное, все достопримечательности в шаговой доступности.",
+    "image": "images/stamb_1.png",
+    "companyReply": null,
+    "isModerated": false
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a06",
+    "clientName": "Sara Johansson",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c05",
+    "rating": 5,
+    "comment": "Мальдивы — это сказка! Вилла на воде, акулы плавают прямо под ногами. Спасибо за организацию романтического ужина на берегу.",
+    "image": "images/mald_2.png",
+    "companyReply": "Сара, спасибо за отзыв! Рады были стать частью вашего незабываемого праздника.",
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a07",
+    "clientName": "Hugo Lefebvre",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c06",
+    "rating": 2,
+    "comment": "В Сочи было слишком много людей, очереди на подъемники огромные. К турфирме претензий нет, но сам курорт перегружен.",
+    "image": null,
+    "companyReply": "Гуго, спасибо за обратную связь. Действительно, в пик сезона курорт перегружен. Рекомендуем в следующий раз поехать в феврале.",
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a08",
+    "clientName": "Camila Silva",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c07",
+    "rating": 5,
+    "comment": "Байкал прекрасен! Лед прозрачный, как стекло. Катались на коньках, ели уху, организация тура великолепная.",
+    "image": null,
+    "companyReply": null,
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a09",
+    "clientName": "Marco Bianchi",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c08",
+    "rating": 4,
+    "comment": "Рим прекрасен, но экскурсий было слишком много, под конец дня ноги просто отваливались. Зато увидели Колизей без очередей.",
+    "image": "images/stamb_2.png",
+    "companyReply": null,
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a10",
+    "clientName": "Yuki Sato",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c09",
+    "rating": 5,
+    "comment": "Париж покорил мое сердце. Отель очень аутентичный, завтраки с видом на Эйфелеву башню.",
+    "image": null,
+    "companyReply": null,
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a11",
+    "clientName": "Adrian Novak",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c10",
+    "rating": 4,
+    "comment": "Отличный семейный отдых на Пхукете. Детский клуб в отеле — спасение для родителей. Пляж чистый, море теплое.",
+    "image": "images/bali_one.jpg",
+    "companyReply": null,
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a12",
+    "clientName": "Oscar Lindberg",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c11",
+    "rating": 5,
+    "comment": "Хинкали, хачапури и домашнее вино — это было божественно. Грузия прекрасна своей душевностью. Организаторам огромное спасибо!",
+    "image": null,
+    "companyReply": "Оскар, рады, что гастротур пришелся вам по вкусу! Ждем вас в новых турах.",
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a13",
+    "clientName": "Marek Dvořák",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c12",
+    "rating": 5,
+    "comment": "Красные клены в Японии — это нечто нереальное. Очень проработанная программа, комфортные переезды на синкансэнах.",
+    "image": null,
+    "companyReply": null,
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a14",
+    "clientName": "Caleb Reyes",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c13",
+    "rating": 4,
+    "comment": "Красивая природа Карелии. Жили в купольном глэмпинге, спали под звездами. Из минусов — много комаров, берите репелленты.",
+    "image": null,
+    "companyReply": "Спасибо за совет, Калеб! В глэмпингах теперь всегда есть защитные средства для гостей.",
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a15",
+    "clientName": "Mateo Rossi",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c14",
+    "rating": 5,
+    "comment": "Алтай дикий и прекрасный. Кони спокойные, послушные. Походная баня у реки — это лучший финал долгого дня в седле.",
+    "image": "images/news_dagestan.jpg",
+    "companyReply": null,
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a16",
+    "clientName": "Hiroshi Tanaka",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c15",
+    "rating": 5,
+    "comment": "Подводный мир Филиппин шикарен. Видели черепах и огромный косяк сардин. Инструкторы очень опытные.",
+    "image": "images/mald_4.png",
+    "companyReply": null,
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a17",
+    "clientName": "Olivia Bennett",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c16",
+    "rating": 5,
+    "comment": "Настоящее приключение в Кении! Увидели львов на охоте и жирафов прямо у лоджа. Это стоит каждого потраченного рубля.",
+    "image": null,
+    "companyReply": "Оливия, благодарим! Сафари в Кении — это действительно уникальный опыт.",
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a18",
+    "clientName": "Clara Weber",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c17",
+    "rating": 4,
+    "comment": "Круиз по фьордам Норвегии — это невероятно красиво. Лайнер огромный, как плавучий город. Все очень цивилизованно.",
+    "image": "images/news_cruise.jpg",
+    "companyReply": null,
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a19",
+    "clientName": "Mia Larsen",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c18",
+    "rating": 4,
+    "comment": "В Исландии увидели северное сияние! Пейзажи как на Марсе. Тур физически сложный из-за ветра, но эмоции зашкаливают.",
+    "image": null,
+    "companyReply": null,
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a20",
+    "clientName": "Liam Walsh",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c20",
+    "rating": 5,
+    "comment": "Полет на шаре в Каппадокии — это лучшая вещь в моей жизни. Пещерный отель очень необычный, завтрак вкусный.",
+    "image": "images/stamb_1.png",
+    "companyReply": "Лиам, безумно рады! Каппадокия никого не оставляет равнодушным.",
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a21",
+    "clientName": "Nadia Said",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c21",
+    "rating": 5,
+    "comment": "Узбекистан удивил своей красотой. Самарканд сказочный, архитектура поражает величием. Местный плов — это шедевр.",
+    "image": "images/news_uzbekistan.jpeg",
+    "companyReply": null,
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a22",
+    "clientName": "Hannah Müller",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c22",
+    "rating": 4,
+    "comment": "Отличный отдых в Дубае. Отель на Пальме роскошный, сервис на высоте. Но летом очень жарко на улице.",
+    "image": null,
+    "companyReply": "Ханна, спасибо за отзыв! Летом в ОАЭ действительно жарко, рекомендуем планировать поездки с октября по апрель.",
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a23",
+    "clientName": "Pablo Garcia",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c23",
+    "rating": 5,
+    "comment": "Йога-ретрит в Гоа помог полностью отключиться от работы. Место уединенное, тихое, отличные преподаватели.",
+    "image": null,
+    "companyReply": null,
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a24",
+    "clientName": "Jamal Ahmed",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c24",
+    "rating": 4,
+    "comment": "Красивая природа Шри-Ланки. Поднялись на Сигирию — виды супер. Океан теплый, но волны довольно большие.",
+    "image": "images/bali_one.jpg",
+    "companyReply": null,
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a25",
+    "clientName": "Ethan Brooks",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c25",
+    "rating": 5,
+    "comment": "Камчатка — это другая планета. Восхождение на вулкан Авачинский было сложным, но мы справились. Икра вкуснейшая!",
+    "image": null,
+    "companyReply": "Итан, спасибо! Камчатка — это действительно направление для сильных духом.",
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a26",
+    "clientName": "Elena Popov",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c26",
+    "rating": 4,
+    "comment": "Залив Халонг во Вьетнаме очень красив. Круизная лодка чистая, программа насыщенная. Пляжи в Нячанге тоже хорошие.",
+    "image": null,
+    "companyReply": null,
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a27",
+    "clientName": "Henrik Berg",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c28",
+    "rating": 5,
+    "comment": "Марокко — это восточная сказка. Медина Феса — настоящий лабиринт. Ночевка в пустыне под звездами запомнится навсегда.",
+    "image": null,
+    "companyReply": null,
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a28",
+    "clientName": "Ravi Patel",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c29",
+    "rating": 5,
+    "comment": "Мачу-Пикчу в Перу — это невероятное место силы. Поднимались на поезде с панорамной крышей, виды потрясающие.",
+    "image": null,
+    "companyReply": "Спасибо за отзыв, Рави! Рады, что Перу оставило такие яркие впечатления.",
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a29",
+    "clientName": "Kira Sokolov",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c30",
+    "rating": 4,
+    "comment": "Уютный тур по Чехии. Замки красивые, Прага великолепна осенью. Порции в ресторанах просто огромные.",
+    "image": null,
+    "companyReply": null,
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a30",
+    "clientName": "Aisha Khan",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c31",
+    "rating": 5,
+    "comment": "Рио — город контрастов. Пляж Копакабана шикарен, волны супер. Статуя Христа очень впечатляет.",
+    "image": null,
+    "companyReply": null,
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a31",
+    "clientName": "Jonas Eriksson",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c32",
+    "rating": 5,
+    "comment": "Винодельни ЮАР предлагают потрясающие вина и виды. Кейптаун современный и безопасный, если соблюдать правила.",
+    "image": null,
+    "companyReply": null,
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a32",
+    "clientName": "Kenji Nakamura",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c33",
+    "rating": 5,
+    "comment": "Регата в Хорватии — это лучший активный отдых. Море чистейшее, каждый день новые острова и бухты. Научился ставить паруса!",
+    "image": null,
+    "companyReply": "Кенджи, гордимся вами! Ждем на новые морские маршруты.",
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a33",
+    "clientName": "Mateo Rossi",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c34",
+    "rating": 5,
+    "comment": "Зельден в Австрии — рай для лыжников. Трассы на ледниках в идеальном состоянии. Вечерние бары веселые.",
+    "image": null,
+    "companyReply": null,
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a34",
+    "clientName": "Freya Olsen",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c35",
+    "rating": 5,
+    "comment": "Древняя Петра поражает масштабом. Розовые скалы Вади-Рам выглядят точь-в-точь как Марс в кино.",
+    "image": "images/egypt_2.png",
+    "companyReply": null,
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a35",
+    "clientName": "Beatriz Lopes",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c36",
+    "rating": 4,
+    "comment": "Лемуры на Мадагаскаре очень забавные, подходят прямо в руки. Природа дикая, дороги плохие, но впечатления отличные.",
+    "image": null,
+    "companyReply": null,
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a36",
+    "clientName": "Selin Yilmaz",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c37",
+    "rating": 4,
+    "comment": "Которская бухта невероятно фотогенична. Горы спускаются прямо к воде. Котор очень уютный старинный город.",
+    "image": null,
+    "companyReply": null,
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a37",
+    "clientName": "Nora Hansen",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c38",
+    "rating": 5,
+    "comment": "Армения покорила своим гостеприимством. Монастырь Гегард в скале — удивительное по энергетике место.",
+    "image": "images/news_georgia.jpg",
+    "companyReply": "Нора, благодарим за душевный отзыв!",
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a38",
+    "clientName": "Saskia de Vries",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c39",
+    "rating": 4,
+    "comment": "Абрау-Дюрсо — красивое место, ухоженный парк у озера. Дегустация шампанского интересная, рекомендую.",
+    "image": null,
+    "companyReply": null,
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a39",
+    "clientName": "Matteo Conti",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c40",
+    "rating": 4,
+    "comment": "Мертвое море отлично расслабляет, вода держит сама. Лечебная грязь помогла коже. Отель хороший.",
+    "image": null,
+    "companyReply": null,
+    "isModerated": true
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5a40",
+    "clientName": "Anna Kowalski",
+    "tourId": "60c72b2f9b1d8b2a3c4d5c01",
+    "rating": 1,
+    "comment": "Худший отпуск! Шел дождь три дня, в номере были муравьи. Больше никогда сюда не приеду.",
+    "image": null,
+    "companyReply": "Анна, приносим извинения за испорченный отдых. С отелем проведена серьезная дезинсекция.",
+    "isModerated": false
+  }
+]
