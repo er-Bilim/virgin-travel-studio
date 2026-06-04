@@ -35,6 +35,12 @@ type DataTableProps<TData, TValue> = {
   onRowClick?: (row: TData) => void;
 };
 
+declare module '@tanstack/react-table' {
+  interface ColumnMeta<TData, TValue> {
+    className?: string;
+  }
+}
+
 export function DataTable<TData, TValue>({
                                              columns,
                                              data,

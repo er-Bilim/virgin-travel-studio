@@ -4,7 +4,7 @@ import Sidebar from '@/components/dashboard/layout/Sidebar';
 import MobileSidebar from '@/components/dashboard/layout/MobileSidebar';
 import MobileTopbar from '@/components/dashboard/layout/MobileTopbar';
 import ProtectedLayout from '@/middleware/ProtectedLayout';
-import { type ReactNode, useState} from "react";
+import {type ReactNode, useState} from 'react';
 
 type Props = {
     children: ReactNode;
@@ -16,7 +16,7 @@ const DashboardLayout = ({ children }: Props) => {
     return (
         <ProtectedLayout roles={['ADMIN', 'MANAGER']}>
             <div className="min-h-screen bg-[#F7F8F4]">
-                <div className="flex min-h-screen">
+                <div className="flex min-h-screen overflow-hidden">
                     <Sidebar />
 
                     <MobileSidebar
@@ -24,7 +24,7 @@ const DashboardLayout = ({ children }: Props) => {
                         onClose={() => setIsMobileSidebarOpen(false)}
                     />
 
-                    <div className="flex min-h-screen flex-1 flex-col">
+                    <div className="flex min-h-screen flex-1 flex-col min-w-0">
                         <MobileTopbar
                             onMenuClick={() => setIsMobileSidebarOpen(true)}
                         />
