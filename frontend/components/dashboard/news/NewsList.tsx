@@ -134,7 +134,20 @@ export default function NewsList() {
         onChange={(e) => setSearchNews(e.target.value)}
         placeholder="Поиск по названию..."
         className="pl-9 bg-white border-gray-300 focus-visible:ring-1 focus-visible:ring-offset-0 transition-colors focus-visible:border-primary h-8"
-      />
+      />{isError && (
+  <div className="my-10 text-center">
+    <p className="mb-4 text-lg font-semibold text-red-500">
+      Не удалось загрузить новости
+    </p>
+    <button
+      type="button"
+      className="rounded-2xl border px-5 py-3 font-semibold"
+      onClick={handleRefetch}
+    >
+      Повторить
+    </button>
+  </div>
+)}
     </div>
     <Select value={statusFilter} onValueChange={setStatusFilter}>
       <SelectTrigger className="w-full md:w-75 bg-white border-gray-300">
