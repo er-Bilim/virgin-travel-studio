@@ -179,8 +179,8 @@ export default function ToursManagePage() {
                   isLoading={isLoading}
                   pagination={{
                     page,
-                    pageSize: 10,
-                    total: data?.meta.total || 0,
+                    limit: 10,
+                    totalPages: data?.meta.totalPages || 0,
                     onPageChange: setPage
                   }}
                   headerRowClassName={headerRowClassName}
@@ -190,6 +190,5 @@ export default function ToursManagePage() {
               />
           )}
         </div>
-      </div>
   );
 }
