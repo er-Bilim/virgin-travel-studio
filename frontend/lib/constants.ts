@@ -159,25 +159,21 @@ export const itemsNavHeader = [
     {
         id: "tours",
         label: "Туры",
-        image:
-            "https://images.unsplash.com/photo-1501785888041-af3ef285b470",
     },
     {
         id: "dest",
         label: "Направления",
-        image:
-            "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+    },
+    {
+        id: "news",
+        label: "Новости",
     },
     {
         id: "about",
         label: "О нас",
-        image:
-            "https://images.unsplash.com/photo-1526779259212-939e64788e3c",
     },
     {
         id: "contacts",
         label: "Контакты",
-        image:
-            "https://images.unsplash.com/photo-1522202176988-66273c2fd55f",
     },
 ];
