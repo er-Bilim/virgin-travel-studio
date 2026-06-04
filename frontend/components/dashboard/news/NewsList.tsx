@@ -1,41 +1,42 @@
 "use client";
-import CreateNewsForm from "@/components/dashboard/news/CreateNewsForm";
-import {useDeleteNews, useNews, usePublicateNews} from "@/lib/hooks/newsHooks";
-import {Button} from "@/components/ui/button";
+import CreateNewsForm from '@/components/dashboard/news/CreateNewsForm';
+import {useDeleteNews, useNews, usePublicateNews} from '@/lib/hooks/newsHooks';
+import {Button} from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger
-} from "@/components/ui/dialog";
-import {useEffect, useMemo, useState} from "react";
+} from '@/components/ui/dialog';
+import {useEffect, useMemo, useState} from 'react';
 import {
   getNewsColumns
-} from "@/components/dashboard/shared/data-table/columns/createColumnInTable/new-column";
-import type {NewsFields} from "@/types/news";
-import {DataTable} from "@/components/dashboard/shared/data-table/data-table";
+} from '@/components/dashboard/shared/data-table/columns/createColumnInTable/new-column';
+import type {NewsFields} from '@/types/news';
+import {DataTable} from '@/components/dashboard/shared/data-table/data-table';
 import {
   ConfirmDialog
-} from "@/components/dashboard/ConfirmDialog/ConfirmDialog";
+} from '@/components/dashboard/ConfirmDialog/ConfirmDialog';
 import {
   headerRowClassName,
   rowClassName,
   tableClassName
-} from "@/lib/constants";
-import {Input} from "@/components/ui/input";
-import {Search} from "lucide-react";
+} from '@/lib/constants';
+import {Input} from '@/components/ui/input';
+import {Search} from 'lucide-react';
 import {
   Select,
-  SelectContent, SelectItem,
+  SelectContent,
+  SelectItem,
   SelectTrigger,
   SelectValue
-} from "@/components/ui/select";
-import {useUsers} from "@/lib/hooks/userHooks";
-import {PaginationCustom} from "@/components/pagination/PaginationCustom";
-import {useModalStore} from "@/lib/stores/modalStore";
-import {Modal} from "@/components/shared/Modal";
-import NewsDetailedInfo from "@/components/dashboard/news/NewsDetailedInfo";
+} from '@/components/ui/select';
+import {useUsers} from '@/lib/hooks/userHooks';
+import {PaginationCustom} from '@/components/pagination/PaginationCustom';
+import {useModalStore} from '@/lib/stores/modalStore';
+import {Modal} from '@/components/shared/Modal';
+import NewsDetailedInfo from '@/components/dashboard/news/NewsDetailedInfo';
 
 export default function NewsList() {
   const [searchNews, setSearchNews] = useState("");
@@ -121,10 +122,10 @@ export default function NewsList() {
     <div className="p-8 space-y-8 bg-gray-50 min-h-screen">
       <div className="flex flex-col gap-4">
   <div className="flex items-center justify-between">
-    <h1 className="text-3xl font-bold tracking-tight">Новости</h1>
+    <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Новости</h1>
     <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
       <DialogTrigger asChild>
-        <Button className="shrink-0">+ Добавить новость</Button>
+        <Button className="shrink-0 text-xs px-2 h-7 sm:text-sm sm:px-4 sm:h-9">+ Добавить новость</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl">
         <CreateNewsForm onSuccess={() => setIsCreateOpen(false)} />
@@ -132,7 +133,7 @@ export default function NewsList() {
     </Dialog>
   </div>
 
-  <div className="flex flex-col md:flex-row md:items-center gap-3">
+  <div className="flex flex-col lg:flex-row lg:items-center gap-3">
     <div className="relative w-full md:flex-1">
       <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
       <Input
@@ -156,7 +157,7 @@ export default function NewsList() {
 )}
     </div>
     <Select value={statusFilter} onValueChange={setStatusFilter}>
-      <SelectTrigger className="w-full md:w-75 bg-white border-gray-300">
+      <SelectTrigger className="w-full shrink-0 w-full lg:w-48 bg-white border-gray-300">
         <SelectValue placeholder="Статус" />
       </SelectTrigger>
       <SelectContent position="popper">
@@ -166,7 +167,7 @@ export default function NewsList() {
       </SelectContent>
     </Select>
     <Select value={authorFilter} onValueChange={setAuthorFilter} disabled={loadingUsers}>
-      <SelectTrigger className="w-full md:w-75 bg-white border-gray-300">
+      <SelectTrigger className="w-full shrink-0 w-full lg:w-48 bg-white border-gray-300">
         <SelectValue placeholder={loadingUsers ? "Загрузка..." : "Авторы"} />
       </SelectTrigger>
       <SelectContent position="popper">

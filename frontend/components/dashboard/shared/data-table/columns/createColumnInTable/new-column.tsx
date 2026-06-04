@@ -106,13 +106,13 @@ export const getNewsColumns = ({
   {
     accessorKey: 'author',
     header: 'Автор',
-    meta: { className: 'hidden lg:table-cell' },
+    meta: { className: 'hidden xl:table-cell' },
     cell: ({row}) => row.original.author.fullName,
   },
   {
     accessorKey: 'createdAt',
     header: 'Дата',
-    meta: { className: 'hidden lg:table-cell' },
+    meta: { className: 'hidden xl:table-cell' },
     cell: ({row}) => format(new Date(row.original.createdAt), 'dd.MM.yyyy'),
   },
   {
