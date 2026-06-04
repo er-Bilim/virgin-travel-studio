@@ -1,39 +1,41 @@
 "use client";
-import CreateNewsForm from '@/components/dashboard/news/CreateNewsForm';
-import {useDeleteNews, useNews, usePublicateNews} from '@/lib/hooks/newsHooks';
-import {Button} from '@/components/ui/button';
+import CreateNewsForm from "@/components/dashboard/news/CreateNewsForm";
+import {useDeleteNews, useNews, usePublicateNews} from "@/lib/hooks/newsHooks";
+import {Button} from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger
-} from '@/components/ui/dialog';
-import {useEffect, useMemo, useState} from 'react';
+} from "@/components/ui/dialog";
+import {useEffect, useMemo, useState} from "react";
 import {
   getNewsColumns
-} from '@/components/dashboard/shared/data-table/columns/createColumnInTable/new-column';
-import type {NewsFields} from '@/types/news';
-import {DataTable} from '@/components/dashboard/shared/data-table/data-table';
+} from "@/components/dashboard/shared/data-table/columns/createColumnInTable/new-column";
+import type {NewsFields} from "@/types/news";
+import {DataTable} from "@/components/dashboard/shared/data-table/data-table";
 import {
   ConfirmDialog
-} from '@/components/dashboard/ConfirmDialog/ConfirmDialog';
+} from "@/components/dashboard/ConfirmDialog/ConfirmDialog";
 import {
   headerRowClassName,
   rowClassName,
   tableClassName
-} from '@/lib/constants';
-import {Input} from '@/components/ui/input';
-import {Search} from 'lucide-react';
+} from "@/lib/constants";
+import {Input} from "@/components/ui/input";
+import {Search} from "lucide-react";
 import {
   Select,
-  SelectContent,
-  SelectItem,
+  SelectContent, SelectItem,
   SelectTrigger,
   SelectValue
-} from '@/components/ui/select';
-import {useUsers} from '@/lib/hooks/userHooks';
-import {PaginationCustom} from '@/components/pagination/PaginationCustom';
+} from "@/components/ui/select";
+import {useUsers} from "@/lib/hooks/userHooks";
+import {PaginationCustom} from "@/components/pagination/PaginationCustom";
+import {useModalStore} from "@/lib/stores/modalStore";
+import {Modal} from "@/components/shared/Modal";
+import NewsDetailedInfo from "@/components/dashboard/news/NewsDetailedInfo";
 
 export default function NewsList() {
   const [searchNews, setSearchNews] = useState("");
@@ -79,15 +81,19 @@ export default function NewsList() {
 
   const [newsToDelete, setNewsToDelete] = useState<string | null>(null);
   const [editingNewsId, setEditingNewsId] = useState<string | null>(null);
-  const [, setView] = useState<NewsFields | null>(null);
+  const [view, setView] = useState<NewsFields | null>(null);
+  const { openModal } = useModalStore();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const columns = useMemo(() => getNewsColumns({
-    onView: (news: NewsFields) => setView(news),
+    onView: (news: NewsFields) => {
+      setView(news);
+      openModal("detailedNews");
+    },
     onDelete: (news: NewsFields) => setNewsToDelete(news._id),
     onEdit: (news: NewsFields) => setEditingNewsId(news._id),
     onTogglePublish: (news: NewsFields) => togglePublicate(news._id),
-  }), [togglePublicate]);
+  }), [togglePublicate, openModal]);
 
   const confirmDelete = () => {
     if (newsToDelete) {
@@ -191,16 +197,18 @@ export default function NewsList() {
       )}
 
       <DataTable
-          data={news || []}
-          columns={columns}
-          isError={isError}
-          isLoading={isLoading}
-          headerRowClassName={headerRowClassName}
-          rowClassName={rowClassName}
-          className={tableClassName}
-          onRowClick={(news) => setView(news)}
+        data={news || []}
+        columns={columns}
+        isError={isError}
+        isLoading={isLoading}
+        headerRowClassName={headerRowClassName}
+        rowClassName={rowClassName}
+        className={tableClassName}
+        onRowClick={(news) => {
+          setView(news);
+          openModal("detailedNews")}
+      }
       />
-
 
       {meta && news && news.length > 0 && (
         <div className="my-8">
@@ -212,6 +220,12 @@ export default function NewsList() {
           />
         </div>
       )}
+
+      <Modal id="detailedNews" title="Детальная информация о новости">
+        <div className="max-h-[90vh] overflow-y-auto">
+          {view && <NewsDetailedInfo oneNews={view} />}
+        </div>
+      </Modal>
 
       <ConfirmDialog
         open={!!newsToDelete}

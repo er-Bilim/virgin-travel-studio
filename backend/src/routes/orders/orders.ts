@@ -94,7 +94,6 @@ ordersRouter.get(
           .skip(skip)
           .limit(limit)
           .lean();
-
       const calculatedPages = Math.ceil(totalOrders / limit);
       const totalPages = calculatedPages === 0 ? 1 : calculatedPages;
 
