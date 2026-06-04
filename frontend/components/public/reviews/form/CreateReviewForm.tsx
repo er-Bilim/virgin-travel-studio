@@ -142,7 +142,7 @@ const CreateReviewForm = ({
   }
 
   return (
-      <div className="bg-[var(--card)] border-1 border-[var(--border)] p-7 rounded-4xl">
+      <div className="bg-[var(--card)] border-1 border-[var(--border)] p-5 rounded-4xl">
         <h3 className="font-semibold text-[var(--card-foreground)] text-2xl">
           {isEditing ? 'Редактировать отзыв' : 'Оставьте ваш отзыв'}
         </h3>
@@ -155,7 +155,7 @@ const CreateReviewForm = ({
         )}
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-6">
             <div className="min-h-24">
               <Controller
                   control={control}
@@ -257,7 +257,7 @@ const CreateReviewForm = ({
           </div>
 
           {!isEditing && (
-              <p className="text-[var(--card-foreground)] mt-6 text-center font-semibold text-sm">
+              <p className="text-[var(--card-foreground)] mt-1 md:mt-6 text-center font-semibold text-sm">
                 Пожалуйста, не забудьте поставить оценку звёздами – это
                 обязательно!
               </p>

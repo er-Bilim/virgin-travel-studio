@@ -24,7 +24,7 @@ export default function TourGallery({ images, title }: Props) {
 
   return (
     <div className="w-full max-w-[1440px] mx-auto">
-      <div className="relative md:aspect-[21/9] w-full overflow-hidden rounded-3xl">
+      <div className="relative aspect-[4/3] md:aspect-[21/9] w-full overflow-hidden rounded-3xl">
         <Image
           src={imageUrl + images[activeIdx]}
           alt={`${title} — фото ${activeIdx + 1}`}
