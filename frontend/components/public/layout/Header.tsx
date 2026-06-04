@@ -43,8 +43,8 @@ export default function Header() {
         <div>
           <div className="mx-auto flex h-20 max-w-[1400px] items-center px-[20px] justify-between">
 
-            <Link href="/" className="flex items-center gap-2 leading-none">
-              <Image src={iconLogo} className="h-6 w-auto" alt="Открыть меню" /><Logo/>
+            <Link href="/" className="flex items-center gap-2 leading-none"  aria-label="На главную страницу Virgin Travel Studio" >
+              <Image src={iconLogo} className="h-6 w-auto" alt="Логотип Virgin Travel Studio" /><Logo/>
             </Link>
 
             <div className="hidden [@media(min-width:1100px)]:flex items-center">

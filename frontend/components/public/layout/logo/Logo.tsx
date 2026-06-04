@@ -6,6 +6,8 @@ export default function Logo() {
             viewBox="0 0 320 60"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
+            role="img"
+            aria-label="Логотип Virgin Travel Studio"
         >
             <defs>
                 <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
