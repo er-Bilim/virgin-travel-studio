@@ -12,27 +12,9 @@ import Logo from "@/components/public/layout/logo/Logo";
 
 export default function Header() {
   const [hidden, setHidden] = useState(false);
-  const [open, setOpen] = useState(false);
 
 
   const pathname = usePathname();
-
-  useEffect(() => {
-    if (!open) return;
-
-    const prevOverflow = document.body.style.overflow;
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
-    };
-
-    document.body.style.overflow = 'hidden';
-    window.addEventListener('keydown', onKeyDown);
-
-    return () => {
-      document.body.style.overflow = prevOverflow;
-      window.removeEventListener('keydown', onKeyDown);
-    };
-  }, [open]);
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -108,8 +90,7 @@ export default function Header() {
 
               <button
                   title="Связаться с нами"
-                  aria-label="Открыть меню навигации"
-                  onClick={() => setOpen(true)}
+                  aria-label="Связаться с нами"
                   className="
                   cursor-pointer
       p-2 rounded-full
