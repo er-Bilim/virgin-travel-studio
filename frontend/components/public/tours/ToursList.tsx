@@ -37,11 +37,15 @@ const ToursList = () => {
     data: toursData,
     isError: isToursError,
     refetch: refetchTours,
-  } = useTours({ page, limit: toursLimitPag, isPublished: true, categoryId, sort });
+  } = useTours({
+    page,
+    limit: toursLimitPag,
+    isPublished: true,
+    categoryId,
+    sort,
+  });
 
-  const {
-    data: categories,
-  } = useGetTourCategories();
+  const { data: categories } = useGetTourCategories();
 
   const meta = toursData?.meta;
 
@@ -58,7 +62,7 @@ const ToursList = () => {
     return (
       <section className="mx-auto max-w-[640px] px-4 py-16 text-center">
         <div className="mb-5 inline-flex size-18 items-center justify-center rounded-full bg-cyan-50 text-cyan-900">
-          <WifiOff className="size-8" aria-hidden />
+          <WifiOff className="size-8" aria-hidden="true" />
         </div>
 
         <h2 className="mb-2 text-2xl font-semibold text-foreground">
@@ -76,16 +80,16 @@ const ToursList = () => {
             onClick={handleRefetch}
             className="inline-flex rounded-xl border-1 items-center px-4 py-3 cursor-pointer border-[var(--primary)] bg-[var(--primary)] text-cyan-50 hover:bg-indigo-900 hover:text-indigo-50 duration-400"
           >
-            <RefreshCw className="size-4 mr-1.5" />
+            <RefreshCw className="size-4 mr-1.5" aria-hidden="true" />
             Повторить
           </button>
-          <button
-            type="button"
+          <Link
+            href="/"
             className="inline-flex rounded-xl border-1 items-center px-4 py-3 cursor-pointer border-[var(--primary)] bg-cyan-50 text-cyan-900 hover:bg-cyan-100 hover:text-cyan-900 duration-400"
           >
-            <House className="size-4 mr-1.5" />
-            <Link href="/">На главную</Link>
-          </button>
+            <House className="size-4 mr-1.5" aria-hidden="true" />
+            На главную
+          </Link>
         </div>
       </section>
     );
@@ -136,7 +140,7 @@ const ToursList = () => {
             searchParamsName="categories"
           />
         )}
-        <Sort options={SORT_OPTIONS} setSort={setSort}/>
+        <Sort options={SORT_OPTIONS} setSort={setSort} />
       </div>
 
       {toursData && (
@@ -160,9 +164,11 @@ const ToursList = () => {
           role="list"
           className="grid grid-cols-1 gap-[22px] sm:grid-cols-2 lg:grid-cols-3"
         >
-          {toursData && toursData.tours.length > 0 && toursData.tours.map((tour) => (
-            <PublicTourCard tour={tour} key={tour._id} />
-          ))}
+          {toursData &&
+            toursData.tours.length > 0 &&
+            toursData.tours.map((tour) => (
+              <PublicTourCard tour={tour} key={tour._id} />
+            ))}
         </ul>
       </section>
 

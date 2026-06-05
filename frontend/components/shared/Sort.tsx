@@ -62,6 +62,7 @@ const Sort = ({ options, setSort }: Props) => {
                   <div className="flex items-center gap-2">
                     {Icon && (
                       <Icon
+                        aria-hidden="true"
                         className={cn(
                           'size-3.5 text-cyan-800',
                         )}

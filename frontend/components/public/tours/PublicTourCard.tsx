@@ -75,14 +75,14 @@ const PublicTourCard = ({ tour }: Props) => {
                 </h3>
 
                 <p className="text-sm text-muted-foreground inline-flex gap-2 mt-3 mb-3">
-                  <MapPin size={16} />
+                  <MapPin size={16} aria-hidden="true"/>
                   <span>{tour.hotelLocation}</span>
                 </p>
               </div>
 
               <div className="flex gap-3.5 text-xs text-muted-foreground mb-4">
                 <p className="inline-flex items-center gap-1">
-                  <Calendar1 size={16} />
+                  <Calendar1 size={16} aria-hidden="true"/>
                   <span className="font-semibold">{tour.durationDays}</span>
                   <span>
                     {pluralize(tour.durationDays, 'день', 'дня', 'дней')}
@@ -100,7 +100,7 @@ const PublicTourCard = ({ tour }: Props) => {
                     itemProp="reviewCount"
                     content={String(tour.ratingCount)}
                   />
-                  <Star className="stroke-2 stroke-yellow-400 text-yellow-400 size-4" />
+                  <Star className="stroke-2 stroke-yellow-400 text-yellow-400 size-4" aria-hidden="true"/>
                   <span className="font-semibold">{tour.rating}</span>
                 </p>
               </div>
