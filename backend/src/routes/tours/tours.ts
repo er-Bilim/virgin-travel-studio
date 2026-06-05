@@ -7,6 +7,8 @@ import mongoose from 'mongoose';
 import validateObjectId from '@/middlewares/validateObjectId.js';
 import parseSort from '@/lib/sort.js';
 import TourSet from '@/model/tourSet/TourSet.js';
+import type { AggregatedTour, AggregatedTours } from '@/types/tour.types.js';
+import type { ICategory } from '@/types/category.types.js';
 
 const toursRouter = express.Router();
 
@@ -67,7 +69,7 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
       }
     }
 
-    const tours = await Tour.aggregate([
+    const tours: AggregatedTours[] = await Tour.aggregate([
       { $match: query },
       { $skip: skip },
       { $limit: limit },
@@ -166,7 +168,7 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
 
 toursRouter.get('/categories', async (_req, res, next) => {
   try {
-    const categories = await Tour.aggregate([
+    const categories: ICategory[] = await Tour.aggregate([
       { $match: { isPublished: true } },
       { $group: { _id: '$category' } },
       {
@@ -194,9 +196,33 @@ toursRouter.get(
   async (req, res, next) => {
     try {
       const { id } = req.params;
-      const { user } = req as RequestWithUser;
+      const { user } = req as RequestWithUser;      
 
-      const tour = await Tour.findById(id).populate('category');
+      const tours: AggregatedTour[] = await Tour.aggregate([
+        { $match: { _id: new mongoose.Types.ObjectId(id as string) } },
+        { $lookup: {
+          from: 'categories',
+          localField: 'category',
+          foreignField: '_id',
+          as: 'category'
+        } },
+        {
+          $unwind: {
+            path: "$category",
+            preserveNullAndEmptyArrays: true
+          }
+        },
+        {
+          $lookup: {
+            from: 'toursets',
+            localField: '_id',
+            foreignField: 'tourId',
+            as: 'tourSets',
+          }
+        }
+      ])
+
+      const tour: AggregatedTour | undefined = tours[0]
 
       if (!tour) {
         return res.status(404).send({ error: 'Тур не найден' });
