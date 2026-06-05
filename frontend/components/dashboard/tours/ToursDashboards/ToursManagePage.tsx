@@ -86,6 +86,13 @@ export default function ToursManagePage() {
     if (tourToDelete) {
       deleteTour(tourToDelete, {
         onSuccess: () => setTourToDelete(null),
+        onError: (error) => {
+          setTourToDelete(null);
+
+          const serverError =
+            error.response?.data?.error || 'Произошла ошибка при удалении тура';
+          toast.error(serverError, { duration: 5000 });
+        },
       });
     }
   };

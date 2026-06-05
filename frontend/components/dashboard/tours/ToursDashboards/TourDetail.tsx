@@ -20,6 +20,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import TourSetsTable from '@/components/dashboard/tourSets/TourSetsDashboards/TourSetsTable';
+import { toast } from 'sonner';
 
 export default function TourDetails() {
   const { id } = useParams();
@@ -41,6 +42,13 @@ export default function TourDetails() {
       onSuccess: () => {
         setIsDeleteDialogOpen(false);
         router.push(`${baseToursPath}`);
+      },
+      onError: (error) => {
+        setIsDeleteDialogOpen(false);
+
+        const serverError =
+          error.response?.data?.error || 'Произошла ошибка при удалении тура';
+        toast.error(serverError, { duration: 5000 });
       },
     });
   };

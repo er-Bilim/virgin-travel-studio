@@ -2,11 +2,11 @@ import axiosApi from '@/lib/axiosApi';
 import type { TourMutation, ToursGetResponse, TourType } from '@/types/tour';
 
 export const getTours = async (
-    page = 1,
-    limit = 10,
-    categoryId?: string,
-    search?: string,
-    isPublished?: string,
+  page = 1,
+  limit = 10,
+  categoryId?: string,
+  search?: string,
+  isPublished?: string,
 ): Promise<ToursGetResponse> => {
   const params = new URLSearchParams({
     page: page.toString(),
@@ -18,7 +18,7 @@ export const getTours = async (
   if (isPublished) params.append('isPublished', isPublished);
 
   const res = await axiosApi.get<ToursGetResponse>(
-      `/tours?${params.toString()}`,
+    `/tours?${params.toString()}`,
   );
 
   return res.data;
@@ -68,8 +68,9 @@ export const updateTour = async (
   return res.data.tour;
 };
 
-export const deleteTour = async (id: string): Promise<void> => {
-  await axiosApi.delete(`/tours/${id}`);
+export const deleteTour = async (id: string) => {
+  const res = await axiosApi.delete<{ message: string }>(`/tours/${id}`);
+  return res.data;
 };
 
 export const togglePublish = async (
