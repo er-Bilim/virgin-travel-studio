@@ -8,7 +8,8 @@ interface Props<K extends string> {
   tags: FilterItem<K>[];
   labelKey: K
   className?: string;
-  setTag: (tag: string | null) => void;
+  setTag?: (tag: string | null) => void;
+  setId?: (id?: string | null) => void;
   href: string;
   mainTag: string;
   title?: string;
@@ -23,29 +24,40 @@ const activeChip = 'bg-primary text-primary-foreground';
 const inactiveChip =
   'bg-muted text-foreground border border-border hover:bg-accent';
 
-const Filter = <K extends string>({ tags, className, setTag, href, mainTag, title, labelKey, searchParamsName}: Props<K>) => {
+const Filter = <K extends string>({ tags, className, setTag, setId, href, mainTag, title, labelKey, searchParamsName}: Props<K>) => {
   const searchParams = useSearchParams();
   const activeTag = searchParams.get(searchParamsName);
 
   const getTag = (tag: string | null) => {
-    setTag(tag);
+    if (setTag) {
+      setTag(tag)
+    }
   };
+
+  const getId = (id?: string | null) => {
+    if (setId) {
+      setId(id);
+    }
+  }
 
   return (
     <nav aria-label="Фильтр по темам" className={cn(className)}>
-      <div className="flex flex-row gap-5 items-center ">
+      <div className="flex flex-row gap-5 items-center">
         {title && <p className="text-sm text-gray-400 uppercase font-semibold">{title}</p>}
         <ul
           role="list"
           aria-label={labelKey}
-          className="flex gap-2 overflow-x-auto pb-4 capitalize"
+          className="flex gap-2 overflow-x-auto capitalize"
         >
           <li>
             <Link
               href={href}
               aria-current={!activeTag && 'true'}
               className={cn(chipStyles, !activeTag ? activeChip : inactiveChip)}
-              onClick={() => getTag(null)}
+              onClick={() => {
+                getTag(null)
+                getId(null)
+              }}
             >
               {mainTag}
             </Link>
@@ -59,7 +71,10 @@ const Filter = <K extends string>({ tags, className, setTag, href, mainTag, titl
                 <Link
                   href={`${href}?${searchParamsName}=${encodeURIComponent(tag[labelKey])}`}
                   aria-current={isActive && 'true'}
-                  onClick={() => getTag(tag[labelKey])}
+                  onClick={() => {
+                    getTag(tag[labelKey])
+                    getId(tag?._id)
+                  }}
                   className={cn(
                     chipStyles,
                     isActive ? activeChip : inactiveChip,
