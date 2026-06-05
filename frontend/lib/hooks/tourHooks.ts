@@ -16,11 +16,12 @@ export const useTours = (
   limit,
   categoryId,
   search,
-  isPublished} : GetToursParams
+  isPublished,
+  sort} : GetToursParams
 ) => {
   return useQuery({
-    queryKey: ['tours', page, limit, categoryId, search, isPublished],
-    queryFn: () => getTours({page, limit, categoryId, search, isPublished}),
+    queryKey: ['tours', page, limit, categoryId, search, isPublished, sort],
+    queryFn: () => getTours({page, limit, categoryId, search, isPublished, sort}),
   });
 };
 

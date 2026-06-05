@@ -14,19 +14,19 @@ export const getTours = async ({
   categoryId,
   search,
   isPublished,
+  sort
 }: GetToursParams): Promise<ToursGetResponse> => {
-  const params = new URLSearchParams({
-    page: page.toString(),
-    limit: limit.toString(),
-  });
+  const params: Record<string, string | undefined | number> = {};
 
-  if (categoryId) params.append('category', categoryId);
-  if (search) params.append('search', search);
-  if (isPublished) params.append('isPublished', String(isPublished));
+  if (categoryId) params.category = categoryId;
+  if (sort) params.sort = sort;
+  if (search) params.search = search;
+  if (isPublished) params.isPublished = String(isPublished);
 
-  const res = await axiosApi.get<ToursGetResponse>(
-    `/tours?${params.toString()}`,
-  );
+  params.page = Number(page);
+  params.limit = Number(limit);
+
+  const res = await axiosApi.get<ToursGetResponse>(`/tours`, { params });
 
   return res.data;
 };
@@ -54,7 +54,7 @@ const buildTourFormData = (data: TourMutation) => {
   if (data.images && data.images.length > 0) {
     data.images.forEach((file: File) => formData.append('images', file));
   }
-  
+
   return formData;
 };
 

@@ -15,6 +15,7 @@ export interface ToursGetResponse {
 
 export interface TourType {
   _id: string;
+  tourSetID: string;
   title: string;
   description: string;
   images: string[];
@@ -44,4 +45,5 @@ export interface GetToursParams {
   categoryId?: string | null,
   search?: string,
   isPublished?: boolean,
+  sort?: string | null;
 }
