@@ -13,12 +13,7 @@ import {
   DialogTrigger
 } from '@/components/ui/dialog';
 import {imageUrl} from '@/lib/constants';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from '@/components/ui/tooltip';
+import { TooltipCustom } from '@/components/ui/tooltip-custom';
 
 type Props = {
   onView: (tour: NewsFields) => void;
@@ -82,18 +77,9 @@ export const getNewsColumns = ({
     header: 'Название',
     cell: ({row}) => (
       <div className="flex flex-col">
-        <TooltipProvider>
-          <Tooltip delayDuration={300}>
-            <TooltipTrigger asChild>
-              <div className="w-full max-w-60 truncate cursor-help hover:text-gray-900 transition-colors">
-                {row.original.title}
-              </div>
-            </TooltipTrigger>
-            <TooltipContent className="max-w-xs bg-slate-900 text-white border-none rounded-md p-2 shadow-md">
-              <p className="text-xs break-words leading-relaxed">{row.original.title}</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <TooltipCustom title={row.original.title}>
+          <span>{row.original.title}</span>
+        </TooltipCustom>
 
         {!row.original.isPublished && (
           <span className="text-[10px] text-gray-400 uppercase">
