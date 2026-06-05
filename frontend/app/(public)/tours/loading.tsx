@@ -35,8 +35,8 @@ const ToursLoading = () => {
           role="list"
           className="grid grid-cols-1 gap-[22px] sm:grid-cols-2 lg:grid-cols-3"
         >
-          {Array.from({ length: 10 }).map((_, index) => (
-            <li key={index}>
+          {Array.from({ length: 10 }, (_, index) => `skeleton-${index}`).map((id) => (
+            <li key={id}>
               <TourCardSkeleton />
             </li>
           ))}

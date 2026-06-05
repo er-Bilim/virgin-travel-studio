@@ -143,13 +143,13 @@ const ToursList = () => {
         <Sort options={SORT_OPTIONS} setSort={setSort} />
       </div>
 
-      {toursData && (
+      {toursData && meta && (
         <div className="mb-5 text-sm text-muted-foreground flex flex-row gap-1">
           <span className="capitalize">найдено</span>
           <p className="font-semibold inline-flex gap-1 text-[var(--primary)]">
-            <span>{toursData.tours.length}</span>
+            <span>{meta.total}</span>
             <span>
-              {pluralize(toursData.tours.length, 'тур', 'тура', 'туров')}
+              {pluralize(meta.total, 'тур', 'тура', 'туров')}
             </span>
           </p>
         </div>
