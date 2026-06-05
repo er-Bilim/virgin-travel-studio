@@ -4,39 +4,38 @@ import Sidebar from '@/components/dashboard/layout/Sidebar';
 import MobileSidebar from '@/components/dashboard/layout/MobileSidebar';
 import MobileTopbar from '@/components/dashboard/layout/MobileTopbar';
 import ProtectedLayout from '@/middleware/ProtectedLayout';
-import {type ReactNode, useState} from 'react';
+import { type ReactNode, useState } from 'react';
 
 type Props = {
-    children: ReactNode;
+  children: ReactNode;
 };
 
 const DashboardLayout = ({ children }: Props) => {
-    const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
-    return (
-        <ProtectedLayout roles={['ADMIN', 'MANAGER']}>
-            <div className="min-h-screen bg-[#F7F8F4]">
-                <div className="flex min-h-screen overflow-hidden">
-                    <Sidebar />
+  return (
+    <ProtectedLayout roles={['ADMIN', 'MANAGER']}>
+      <div className="min-h-screen bg-[#F7F8F4]">
 
-                    <MobileSidebar
-                        open={isMobileSidebarOpen}
-                        onClose={() => setIsMobileSidebarOpen(false)}
-                    />
+        <Sidebar />
 
-                    <div className="flex min-h-screen flex-1 flex-col min-w-0">
-                        <MobileTopbar
-                            onMenuClick={() => setIsMobileSidebarOpen(true)}
-                        />
+        <MobileSidebar
+          open={isMobileSidebarOpen}
+          onClose={() => setIsMobileSidebarOpen(false)}
+        />
 
-                        <main className="flex-1 p-4 md:p-6 lg:p-8">
-                            {children}
-                        </main>
-                    </div>
-                </div>
-            </div>
-        </ProtectedLayout>
-    );
+        <div className="flex flex-col min-w-0 lg:pl-72">
+          <MobileTopbar
+            onMenuClick={() => setIsMobileSidebarOpen(true)}
+          />
+
+          <main className="flex-1 p-4 md:p-6 lg:p-8">
+            {children}
+          </main>
+        </div>
+      </div>
+    </ProtectedLayout>
+  );
 };
 
 export default DashboardLayout;
