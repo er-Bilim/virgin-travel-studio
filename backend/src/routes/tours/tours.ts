@@ -5,6 +5,7 @@ import { imagesUpload } from '@/middlewares/multer.js';
 import Tour from '@/model/tour/Tour.js';
 import mongoose from 'mongoose';
 import validateObjectId from '@/middlewares/validateObjectId.js';
+import parseSort from '@/lib/sort.js';
 
 const toursRouter = express.Router();
 
@@ -15,9 +16,9 @@ const escapeRegex = (value: string) => {
 toursRouter.get('/', authOrNot, async (req, res, next) => {
   const { user } = req as RequestWithUser;
   const isAdminOrManager = user?.role === 'ADMIN' || user?.role === 'MANAGER';
-  const category = req.query.category as string;
 
   try {
+    const sort = parseSort(req.query.sort);
     const rawPage = Number.parseInt(req.query.page as string, 10);
     const rawLimit = Number.parseInt(req.query.limit as string, 10);
 
@@ -29,7 +30,7 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
 
     const query: {
       isPublished?: boolean;
-      category?: string;
+      category?: mongoose.Types.ObjectId;
       title?: { $regex: string; $options: string };
     } = {};
 
@@ -38,10 +39,11 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
     }
 
     if (typeof req.query.category === 'string') {
-      if (!mongoose.Types.ObjectId.isValid(category)) {
+      if (!mongoose.Types.ObjectId.isValid(req.query.category)) {
         return res.status(400).send({ error: 'Неверный category ID' });
       }
-      query.category = category;
+
+      query.category = new mongoose.Types.ObjectId(req.query.category);
     }
 
     if (
@@ -66,7 +68,6 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
 
     const tours = await Tour.aggregate([
       { $match: query },
-      { $sort: { createdAt: -1 } },
       { $skip: skip },
       { $limit: limit },
       {
@@ -144,6 +145,7 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
           'category.title': 1,
         },
       },
+      { $sort: sort },
     ]);
 
     const totalTours = await Tour.countDocuments(query);
@@ -176,7 +178,7 @@ toursRouter.get('/categories', async (_req, res, next) => {
         },
       },
       { $unwind: '$category' },
-      { $project: { title: "$category.title" } },
+      { $project: { title: '$category.title' } },
     ]);
 
     return res.json(categories);
