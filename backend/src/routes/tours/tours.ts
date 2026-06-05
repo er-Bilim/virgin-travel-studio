@@ -5,6 +5,7 @@ import { imagesUpload } from '@/middlewares/multer.js';
 import Tour from '@/model/tour/Tour.js';
 import mongoose from 'mongoose';
 import validateObjectId from '@/middlewares/validateObjectId.js';
+import parseSort from '@/lib/sort.js';
 import TourSet from '@/model/tourSet/TourSet.js';
 
 const toursRouter = express.Router();
@@ -18,6 +19,7 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
   const isAdminOrManager = user?.role === 'ADMIN' || user?.role === 'MANAGER';
 
   try {
+    const sort = parseSort(req.query.sort);
     const rawPage = Number.parseInt(req.query.page as string, 10);
     const rawLimit = Number.parseInt(req.query.limit as string, 10);
 
@@ -29,7 +31,7 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
 
     const query: {
       isPublished?: boolean;
-      category?: string;
+      category?: mongoose.Types.ObjectId;
       title?: { $regex: string; $options: string };
     } = {};
 
@@ -41,7 +43,8 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
       if (!mongoose.Types.ObjectId.isValid(req.query.category)) {
         return res.status(400).send({ error: 'Неверный category ID' });
       }
-      query.category = req.query.category;
+
+      query.category = new mongoose.Types.ObjectId(req.query.category);
     }
 
     if (
@@ -64,11 +67,86 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
       }
     }
 
-    const tours = await Tour.find(query)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .populate('category', 'title');
+    const tours = await Tour.aggregate([
+      { $match: query },
+      { $skip: skip },
+      { $limit: limit },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'category',
+          foreignField: '_id',
+          as: 'category',
+        },
+      },
+      {
+        $lookup: {
+          from: 'toursets',
+          localField: '_id',
+          foreignField: 'tourId',
+          as: 'tourSets',
+        },
+      },
+      { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } },
+      {
+        $addFields: {
+          isHot: {
+            $anyElementTrue: {
+              $map: {
+                input: '$tourSets',
+                as: 'tour_set',
+                in: '$$tour_set.isHot',
+              },
+            },
+          },
+          minPrice: { $min: '$tourSets.price' },
+          hotelLocation: { $arrayElemAt: ['$tourSets.hotelLocation', 0] },
+          durationDays: {
+            $cond: {
+              if: { $gt: [{ $size: '$tourSets' }, 0] },
+              then: {
+                $ceil: {
+                  $divide: [
+                    {
+                      $subtract: [
+                        { $arrayElemAt: ['$tourSets.endDate', 0] },
+                        { $arrayElemAt: ['$tourSets.startDate', 0] },
+                      ],
+                    },
+                    1000 * 60 * 60 * 24,
+                  ],
+                },
+              },
+              else: null,
+            },
+          },
+          nextStartDate: {
+            $min: '$tourSets.startDate',
+          },
+        },
+      },
+      {
+        $project: {
+          title: 1,
+          description: 1,
+          images: 1,
+          baseAdventages: 1,
+          isPublished: 1,
+          rating: 1,
+          ratingCount: 1,
+          isHot: 1,
+          hotelLocation: 1,
+          minPrice: 1,
+          durationDays: 1,
+          nextStartDate: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          'category._id': 1,
+          'category.title': 1,
+        },
+      },
+      { $sort: sort },
+    ]);
 
     const totalTours = await Tour.countDocuments(query);
 
@@ -83,6 +161,29 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
     });
   } catch (e) {
     next(e);
+  }
+});
+
+toursRouter.get('/categories', async (_req, res, next) => {
+  try {
+    const categories = await Tour.aggregate([
+      { $match: { isPublished: true } },
+      { $group: { _id: '$category' } },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'category',
+        },
+      },
+      { $unwind: '$category' },
+      { $project: { title: '$category.title' } },
+    ]);
+
+    return res.json(categories);
+  } catch (error) {
+    next(error);
   }
 });
 

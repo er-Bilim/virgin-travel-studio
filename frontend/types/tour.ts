@@ -6,6 +6,8 @@ export interface TourCategoryType {
   isPublished: boolean;
 }
 
+export type TourCategory = Omit<TourCategoryType, 'isPublished'>
+
 export interface ToursGetResponse {
   tours: TourType[];
   meta: MetaType;
@@ -21,6 +23,11 @@ export interface TourType {
   rating: number;
   ratingCount: number;
   isPublished: boolean;
+  isHot: boolean;
+  minPrice: number;
+  hotelLocation: string;
+  nextStartDate: string;
+  durationDays: number;
 }
 
 export interface TourMutation {
@@ -29,4 +36,13 @@ export interface TourMutation {
   category: string;
   baseAdvantages: string[];
   images: File[];
+}
+
+export interface GetToursParams {
+  page: number,
+  limit: number,
+  categoryId?: string | null,
+  search?: string,
+  isPublished?: boolean,
+  sort?: string | null;
 }

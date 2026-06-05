@@ -1,25 +1,32 @@
 import axiosApi from '@/lib/axiosApi';
-import type { TourMutation, ToursGetResponse, TourType } from '@/types/tour';
 
-export const getTours = async (
+import type {
+  GetToursParams,
+  TourCategory,
+  TourMutation,
+  ToursGetResponse,
+  TourType,
+} from '@/types/tour';
+
+export const getTours = async ({
   page = 1,
   limit = 10,
-  categoryId?: string,
-  search?: string,
-  isPublished?: string,
-): Promise<ToursGetResponse> => {
-  const params = new URLSearchParams({
-    page: page.toString(),
-    limit: limit.toString(),
-  });
+  categoryId,
+  search,
+  isPublished,
+  sort
+}: GetToursParams): Promise<ToursGetResponse> => {
+  const params: Record<string, string | undefined | number> = {};
 
-  if (categoryId) params.append('category', categoryId);
-  if (search) params.append('search', search);
-  if (isPublished) params.append('isPublished', isPublished);
+  if (categoryId) params.category = categoryId;
+  if (sort) params.sort = sort;
+  if (search) params.search = search;
+  if (isPublished) params.isPublished = String(isPublished);
 
-  const res = await axiosApi.get<ToursGetResponse>(
-    `/tours?${params.toString()}`,
-  );
+  params.page = Number(page);
+  params.limit = Number(limit);
+
+  const res = await axiosApi.get<ToursGetResponse>(`/tours`, { params });
 
   return res.data;
 };
@@ -27,6 +34,11 @@ export const getTours = async (
 export const getTourById = async (id: string): Promise<TourType> => {
   const res = await axiosApi.get<TourType>(`/tours/${id}`);
   return res.data;
+};
+
+export const getTourCategories = async (): Promise<TourCategory[]> => {
+  const { data } = await axiosApi.get<TourCategory[]>('/tours/categories');
+  return data;
 };
 
 const buildTourFormData = (data: TourMutation) => {
@@ -42,6 +54,7 @@ const buildTourFormData = (data: TourMutation) => {
   if (data.images && data.images.length > 0) {
     data.images.forEach((file: File) => formData.append('images', file));
   }
+
   return formData;
 };
 

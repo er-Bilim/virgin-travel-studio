@@ -105,7 +105,12 @@ newsRouter.get(
 newsRouter.get('/tags', async (_req, res, next) => {
   try {
     const tags = await News.distinct('tags', { isPublished: true });
-    return res.json(tags);
+    const tagsArray: { tag: string }[] = tags.map((tag) => {
+      return {
+        tag,
+      };
+    });
+    return res.json(tagsArray);
   } catch (error) {
     next(error);
   }

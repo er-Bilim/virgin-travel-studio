@@ -96,3 +96,14 @@ export const truncateText = (text: string, maxLength: number) => {
   if (text.length <= maxLength) return text;
   return text.slice(0, maxLength) + '...';
 }
+
+export const pluralize = (number: number, one: string, few: string, many: string): string => {
+  const absoluteNum: number = Math.abs(number) % 100;
+  const lastAbsoluteNum: number = absoluteNum % 10;
+
+  if (absoluteNum > 10 && absoluteNum < 20) return `${many}`;
+  if (lastAbsoluteNum === 1) return `${one}`;
+  if (lastAbsoluteNum >= 2 && lastAbsoluteNum <= 4) return `${few}`;
+
+  return `${many}`
+}

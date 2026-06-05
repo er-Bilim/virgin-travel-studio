@@ -3,7 +3,7 @@
 import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 import { useGetNewsTags, useNews } from '@/lib/hooks/newsHooks';
 import { toast } from 'sonner';
-import TagFilter from './TagFilter';
+import Filter from '@/components/shared/Filter';
 import { imageUrl, isDev } from '@/lib/constants';
 import Image from 'next/image';
 import CONTENT_PLACEHOLDER from '@/assets/placeholders/content_placeholder.png';
@@ -108,12 +108,21 @@ const NewsList = () => {
 
       {tagsLoading ? (
         <div className="flex flex-row gap-2 mt-8">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className="h-8 w-20 rounded-xl" />
+          {Array.from({ length: 5 }).map((_, index) => (
+            <Skeleton key={index} className="h-8 w-20 rounded-xl" />
           ))}
         </div>
       ) : (
-        <TagFilter tags={tags} className="mt-8" setTag={setTag} />
+        <Filter
+          tags={tags}
+          labelKey="tag"
+          className="mt-8"
+          setTag={setTag}
+          title="темы"
+          mainTag="все новости"
+          href="news"
+          searchParamsName="tags"
+        />
       )}
 
       <article className="group grid grid-cols-[20fr_1fr] gap-6 mt-10 border-t pt-10">
