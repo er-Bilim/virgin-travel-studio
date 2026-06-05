@@ -23,6 +23,7 @@ import {
   formatToReadablePrice,
   getDayMonth,
   getYearFullNumber,
+  pluralize,
 } from '@/lib/utils';
 import SeatsIndicator from '@/components/shared/SeatsIndicator';
 import { buildTourInquiryMessage, openWhatsApp } from '@/lib/whatsapp';
@@ -132,7 +133,7 @@ export default function TourSetPage() {
         <Dot className="stroke-1 size-4" />
         <p className="font-semibold flex gap-1">
           {tour.ratingCount > 0 ? tour.ratingCount : 'нет'}
-          <span className="font-normal">отзывов</span>
+          <span className="font-normal">{pluralize(tour.ratingCount, 'отзыв', 'отзыва', 'отзывов')}</span>
         </p>
       </div>
     );
