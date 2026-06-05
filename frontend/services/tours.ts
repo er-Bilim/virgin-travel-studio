@@ -81,8 +81,9 @@ export const updateTour = async (
   return res.data.tour;
 };
 
-export const deleteTour = async (id: string): Promise<void> => {
-  await axiosApi.delete(`/tours/${id}`);
+export const deleteTour = async (id: string) => {
+  const res = await axiosApi.delete<{ message: string }>(`/tours/${id}`);
+  return res.data;
 };
 
 export const togglePublish = async (

@@ -10,6 +10,8 @@ import {
 } from '@/services/tours';
 import { toast } from 'sonner';
 import type { GetToursParams, TourMutation } from '@/types/tour';
+import type { AxiosError } from 'axios';
+import type { GlobalError } from '@/types/error';
 
 export const useTours = (
 {  page,
@@ -70,7 +72,7 @@ export const useTogglePublish = () => {
 
 export const useDeleteTour = () => {
   const queryClient = useQueryClient();
-  return useMutation({
+  return useMutation<{ message: string }, AxiosError<GlobalError>, string>({
     mutationFn: deleteTour,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tours'] });

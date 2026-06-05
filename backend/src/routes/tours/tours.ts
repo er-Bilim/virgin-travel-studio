@@ -334,6 +334,17 @@ toursRouter.delete(
     const { id } = req.params;
 
     try {
+      const hasLinks = await TourSet.exists({
+        tourId: new mongoose.Types.ObjectId(id as string),
+      });
+
+      if (hasLinks) {
+        return res.status(400).send({
+          error:
+            'Невозможно удалить тур, так как к нему привязаны активные потоки туров.',
+        });
+      }
+
       const result = await Tour.deleteOne({ _id: id });
       if (!result.deletedCount) {
         return res.status(404).send({ error: 'Тур не найден' });

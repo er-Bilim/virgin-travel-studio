@@ -43,6 +43,7 @@ export const TourImageCell = ({ tour }: TourImageCellProps) => {
     }
 
     return (
+      <div onClick={(e) => e.stopPropagation()} className="w-fit inline-block">
         <Dialog>
             <DialogTrigger asChild>
                 <button
@@ -81,5 +82,6 @@ export const TourImageCell = ({ tour }: TourImageCellProps) => {
                 )}
             </DialogContent>
         </Dialog>
+      </div>
     );
 };

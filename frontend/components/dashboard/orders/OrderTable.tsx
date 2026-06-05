@@ -28,7 +28,7 @@ import {
 import {Button} from '@/components/ui/button';
 import {useUser} from '@/lib/hooks/authHooks';
 import {toast} from 'sonner';
-import {ORDER_STATUS_LABELS, OrderStatus} from '@/lib/constants';
+import {headerRowClassName, ORDER_STATUS_LABELS, OrderStatus, rowClassName, tableClassName} from '@/lib/constants';
 import {OrderTabs} from '@/components/dashboard/orders/OrderTabs';
 import {Spinner} from '@/components/ui/spinner';
 
@@ -154,32 +154,38 @@ if (isPending) {
 
   return (
     <>
-      <div className="p-8 rounded-3xl space-y-8 bg-gray-50 min-h-screen">
-        <div className="flex items-center justify-between">
+      <div className="p-2 py-4 md:p-8 rounded-3xl space-y-8 bg-gray-50 min-h-screen">
+        <div className="flex flex-wrap sm:justify-between gap-4 items-center">
           <h1 className="text-3xl font-bold tracking-tight text-[#1E2B6D]">
             Заявки
           </h1>
 
-          <OrderTabs onChangeTab={onChangeTab} currentTab={currentTab} role={user?.role} />
+          <div className="md:col-start-2">
+            <OrderTabs
+              onChangeTab={onChangeTab}
+              currentTab={currentTab}
+              role={user?.role}
+            />
+          </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap justify-start">
+            {(user?.role !== 'MANAGER' ||
+              (user?.role === 'MANAGER' && currentTab === 'my')) && (
+              <Select value={status ?? 'all'} onValueChange={onChangeStatus}>
+                <SelectTrigger className="w-[180px] bg-white">
+                  <SelectValue placeholder="Все статусы" />
+                </SelectTrigger>
 
-            {(user?.role !== 'MANAGER' || (user?.role === 'MANAGER' && currentTab === 'my')) &&
-                <Select value={status ?? 'all'} onValueChange={onChangeStatus}>
-                  <SelectTrigger className="w-[180px] bg-white">
-                    <SelectValue placeholder="Все статусы" />
-                  </SelectTrigger>
-
-                  <SelectContent>
-                    <SelectItem value="all">Все статусы</SelectItem>
-                    {Object.values(OrderStatus).map((status) => (
-                        <SelectItem key={status} value={status}>
-                          {ORDER_STATUS_LABELS[status]}
-                        </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-            }
+                <SelectContent>
+                  <SelectItem value="all">Все статусы</SelectItem>
+                  {Object.values(OrderStatus).map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {ORDER_STATUS_LABELS[status]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
 
             {user?.role === 'ADMIN' && currentTab === 'all' && (
               <>
@@ -214,7 +220,6 @@ if (isPending) {
                 )}
               </>
             )}
-
           </div>
         </div>
         {isLoading ? (
@@ -241,10 +246,13 @@ if (isPending) {
           <DataTable
             columns={columns}
             data={data?.orders || []}
+            headerRowClassName={headerRowClassName}
+            rowClassName={rowClassName}
+            className={tableClassName}
             pagination={{
               page: page,
-              pageSize: limit,
-              total: data?.meta.total ?? 0,
+              limit: limit,
+              totalPages: data?.meta.totalPages ?? 0,
               onPageChange: onChangePage,
             }}
           />

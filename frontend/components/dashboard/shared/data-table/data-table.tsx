@@ -6,7 +6,8 @@ import {
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-
+import type { PaginationType } from '@/types/pagination';
+import { PaginationCustom } from '@/components/pagination/PaginationCustom';
 import {
   Table,
   TableBody,
@@ -15,8 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {Button} from "@/components/ui/button";
-import {ChevronLeft, ChevronRight, Loader} from "lucide-react";
+import { Loader } from "lucide-react";
 import {cn} from "@/lib/utils";
 
 type DataTableProps<TData, TValue> = {
@@ -26,19 +26,20 @@ type DataTableProps<TData, TValue> = {
   isLoading?: boolean;
   isError?: boolean;
 
-  pagination?: {
-    page: number;
-    pageSize: number;
-    total: number;
-    onPageChange: (page: number) => void;
-  };
+  pagination?: PaginationType;
 
-    className?: string;
+  className?: string;
 
-    headerRowClassName?: string;
-    rowClassName?: string | ((row: TData) => string);
-    onRowClick?: (row: TData) => void;
+  headerRowClassName?: string;
+  rowClassName?: string | ((row: TData) => string);
+  onRowClick?: (row: TData) => void;
 };
+
+declare module '@tanstack/react-table' {
+  interface ColumnMeta<TData, TValue> {
+    className?: string;
+  }
+}
 
 export function DataTable<TData, TValue>({
                                              columns,
@@ -51,26 +52,11 @@ export function DataTable<TData, TValue>({
                                              rowClassName,
                                              onRowClick
 }: DataTableProps<TData, TValue>) {
-  const page = pagination?.page ?? 1;
-  const pageSize = pagination?.pageSize ?? 10;
-  const totalPages = pagination ? Math.max(1, Math.ceil(pagination.total / pageSize)) : 1;
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-
-    manualPagination: true,
-
-    state: {
-      pagination: {
-        pageIndex: page - 1,
-        pageSize,
-      },
-    },
-
-    pageCount: totalPages,
   });
-
   if (isLoading) {
     return (
         <div className="rounded-2xl border bg-white">
@@ -98,97 +84,90 @@ export function DataTable<TData, TValue>({
   }
 
   return (
-    <div className="rounded-2xl border bg-white overflow-hidden">
-      <Table className={cn("w-full", className)}>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow
-                key={headerGroup.id}
-                className={headerRowClassName}
-            >
-              {headerGroup.headers.map((header) => (
-                <TableHead key={header.id}>
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
-                </TableHead>
-              ))}
-            </TableRow>
-          ))}
-        </TableHeader>
+    <>
+      <div className="rounded-2xl border bg-white overflow-hidden">
+        <Table className={cn('w-full', className)}>
+          <TableHeader className="max-sm:hidden">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id} className={headerRowClassName}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead
+                    key={header.id}
+                    className={cn(header.column.columnDef.meta?.className)}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
 
-        <TableBody>
+          <TableBody>
             {table.getRowModel().rows.length ? (
-                table.getRowModel().rows.map((row) => {
-                    const rowClass =
-                        typeof rowClassName === 'function'
-                            ? rowClassName(row.original)
-                            : rowClassName;
+              table.getRowModel().rows.map((row) => {
+                const rowClass =
+                  typeof rowClassName === 'function'
+                    ? rowClassName(row.original)
+                    : rowClassName;
 
-                    return (
-                        <TableRow
-                            key={row.id}
-                            className={cn(
-                                rowClass,
-                                onRowClick && "cursor-pointer hover:bg-muted/50"
-                            )}
-                            onClick={() => onRowClick?.(row.original)}
+                return (
+                  <TableRow
+                    key={row.id}
+                    className={cn(
+                      rowClass,
+                      onRowClick && 'cursor-pointer hover:bg-muted/50',
+                      'max-sm:flex max-sm:flex-col max-sm:border-b max-sm:p-4 max-sm:gap-2',
+                    )}
+                    onClick={() => onRowClick?.(row.original)}
+                  >
+                    {row.getVisibleCells().map((cell) => {
+                      const headerLabel =
+                        typeof cell.column.columnDef.header === 'string'
+                          ? cell.column.columnDef.header
+                          : cell.column.id;
+
+                      return (
+                        <TableCell
+                          key={cell.id}
+                          data-label={headerLabel}
+                          className={cn(
+                            'truncate max-w-0',
+                            cell.column.columnDef.meta?.className,
+                            'max-sm:flex max-sm:justify-between max-sm:max-w-full max-sm:p-0',
+                            'max-sm:before:content-[attr(data-label)] max-sm:before:font-medium max-sm:before:text-muted-foreground max-sm:before:shrink-0 max-sm:before:mr-4',
+                          )}
                         >
-                            {row.getVisibleCells().map((cell) => (
-                                <TableCell key={cell.id}>
-                                    {flexRender(
-                                        cell.column.columnDef.cell,
-                                        cell.getContext()
-                                    )}
-                                </TableCell>
-                            ))}
-                        </TableRow>
-                    );
-                })
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                );
+              })
             ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length}>Нет данных</TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+              <TableRow>
+                <TableCell colSpan={columns.length}>Нет данных</TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
       {pagination && (
-          <div className="px-4 py-3 border-t flex items-center justify-between">
-            <div className="text-sm text-gray-500 font-medium">
-              Страница <span>{page}</span> из{" "}
-              <span>{totalPages}</span>
-            </div>
-
-            <div className="flex gap-2">
-              <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={page === 1}
-                  onClick={() =>
-                      pagination.onPageChange(page - 1)
-                  }
-              >
-                <ChevronLeft className="w-4 h-4 mr-1" />
-                Назад
-              </Button>
-
-              <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={page >= totalPages}
-                  onClick={() =>
-                      pagination.onPageChange(page + 1)
-                  }
-              >
-                Вперед
-                <ChevronRight className="w-4 h-4 ml-1" />
-              </Button>
-            </div>
-          </div>
+        <PaginationCustom
+          page={pagination.page}
+          limit={pagination.limit}
+          totalPage={Number(pagination.totalPages)}
+          onChange={pagination.onPageChange}
+        />
       )}
-    </div>
+    </>
   );
 }
