@@ -154,7 +154,7 @@ if (isPending) {
 
   return (
     <>
-      <div className="p-2 py-4 md:p-8 rounded-3xl space-y-8 bg-gray-50 min-h-screen">
+      <div className="p-2 py-4 md:p-8 rounded-3xl space-y-8 bg-gray-50">
         <div className="flex flex-wrap sm:justify-between gap-4 items-center">
           <h1 className="text-3xl font-bold tracking-tight text-[#1E2B6D]">
             Заявки

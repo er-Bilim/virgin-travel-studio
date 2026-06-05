@@ -24,7 +24,7 @@ import {
   tableClassName
 } from '@/lib/constants';
 import {Input} from '@/components/ui/input';
-import {Search} from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -119,13 +119,15 @@ export default function NewsList() {
   };
 
   return (
-    <div className="p-8 space-y-8 bg-gray-50 min-h-screen">
+    <div className="p-8 space-y-8 bg-gray-50">
       <div className="flex flex-col gap-4">
   <div className="flex items-center justify-between">
-    <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Новости</h1>
+    <h1 className="text-3xl font-bold tracking-tight text-[#1E2B6D]">Новости</h1>
     <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
       <DialogTrigger asChild>
-        <Button className="shrink-0 text-xs px-2 h-7 sm:text-sm sm:px-4 sm:h-9">+ Добавить новость</Button>
+        <Button className="bg-[#1E2B6D] hover:bg-[#162356]">
+          <Plus className="w-4 h-4 mr-2" /> Добавить новость
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl">
         <CreateNewsForm onSuccess={() => setIsCreateOpen(false)} />
