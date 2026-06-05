@@ -15,7 +15,6 @@ export interface ToursGetResponse {
 
 export interface TourType {
   _id: string;
-  tourSetID: string;
   title: string;
   description: string;
   images: string[];

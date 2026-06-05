@@ -6,6 +6,7 @@ import Tour from '@/model/tour/Tour.js';
 import mongoose from 'mongoose';
 import validateObjectId from '@/middlewares/validateObjectId.js';
 import parseSort from '@/lib/sort.js';
+import TourSet from '@/model/tourSet/TourSet.js';
 
 const toursRouter = express.Router();
 
@@ -87,7 +88,6 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
         },
       },
       { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } },
-      { $unwind: { path: '$tourSet', preserveNullAndEmptyArrays: true } },
       {
         $addFields: {
           isHot: {
