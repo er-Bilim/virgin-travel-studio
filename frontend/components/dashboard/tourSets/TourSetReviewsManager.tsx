@@ -1,7 +1,7 @@
 'use client';
 
 import {useState} from 'react';
-import {Edit, MessageSquareReply, Plus, Star, Trash2} from 'lucide-react';
+import {MessageSquareReply, Plus, Star, Trash2} from 'lucide-react';
 
 import {Button} from '@/components/ui/button';
 import {Modal} from '@/components/shared/Modal';
@@ -24,13 +24,11 @@ type Props = {
 };
 
 const ADD_REVIEW_MODAL_ID = 'add-tour-review-modal';
-const EDIT_REVIEW_MODAL_ID = 'edit-tour-review-modal';
 const REPLY_MODAL_ID = 'reply-tour-review-modal';
 
 const TourSetReviewsManager = ({tourId}: Props) => {
   const {openModal, closeModal} = useModalStore();
 
-  const [reviewToEdit, setReviewToEdit] = useState<IReview | null>(null);
   const [reviewToDelete, setReviewToDelete] = useState<IReview | null>(null);
   const [replyReview, setReplyReview] = useState<IReview | null>(null);
   const [replyText, setReplyText] = useState('');
@@ -38,11 +36,6 @@ const TourSetReviewsManager = ({tourId}: Props) => {
   const {data: reviews = [], isLoading, isError} = useAdminReviews(tourId);
   const {mutate: deleteReview, isPending: isDeleting} = useDeleteReview();
   const {mutate: updateReview, isPending: updatingReply} = useUpdateReview();
-
-  const handleEdit = (review: IReview) => {
-    setReviewToEdit(review);
-    openModal(EDIT_REVIEW_MODAL_ID);
-  };
 
   const handleReply = (review: IReview) => {
     setReplyReview(review);
@@ -158,17 +151,6 @@ const TourSetReviewsManager = ({tourId}: Props) => {
 
                   <Button
                     type="button"
-                    variant="outline"
-                    size="sm"
-                    className="w-full min-[450px]:w-auto"
-                    onClick={() => handleEdit(review)}
-                  >
-                    <Edit className="mr-1 h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                    Редактировать
-                  </Button>
-
-                  <Button
-                    type="button"
                     variant="destructive"
                     size="sm"
                     className="w-full min-[450px]:w-auto"
@@ -237,28 +219,6 @@ const TourSetReviewsManager = ({tourId}: Props) => {
           tourId={tourId}
           onSuccess={closeModal}
         />
-      </Modal>
-
-      <Modal
-        id={EDIT_REVIEW_MODAL_ID}
-        title="Редактировать отзыв"
-      >
-        {reviewToEdit && (
-          <CreateReviewForm
-            tourId={tourId}
-            reviewId={reviewToEdit._id}
-            isEditing
-            initialData={{
-              clientName: reviewToEdit.clientName,
-              rating: reviewToEdit.rating,
-              comment: reviewToEdit.comment,
-            }}
-            onSuccess={() => {
-              closeModal();
-              setReviewToEdit(null);
-            }}
-          />
-        )}
       </Modal>
 
       <Modal
