@@ -7,8 +7,9 @@ import {
 } from '@/services/categories';
 import type {AxiosError} from 'axios';
 import type {GlobalError} from '@/types/error';
+import type {TourCategoryType} from "@/types/tour";
 
-export const useCategories = ({page, limit}:{
+export const useCategories = ({page, limit}: {
   page?: number,
   limit?: number
 } = {}) => {
@@ -21,7 +22,9 @@ export const useCategories = ({page, limit}:{
 export const useCreateCategory = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<TourCategoryType | { message: string },
+    AxiosError<GlobalError>,
+    { title: string }>({
     mutationFn: createCategory,
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['categories']});

@@ -80,8 +80,10 @@ export default function CategoriesManagePage() {
           reset();
           toast.success('Категория успешно создана');
         },
-        onError: () => {
-          toast.error("Не удалось создать категорию");
+        onError: (error) => {
+          const serverError =
+            error.response?.data?.error || 'Не удалось создать категорию';
+          toast.error(serverError);
         },
       },
     );

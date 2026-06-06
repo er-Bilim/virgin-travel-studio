@@ -45,10 +45,6 @@ categoriesRouter.get('/', async (req, res) => {
 
   const categories = await Category.find().skip(skip).limit(limit);
 
-  if (!categories) {
-    return res.status(404).send({error: "categories not found"});
-  }
-
   const categoriesTotal = await Category.countDocuments();
   return res.send({
     categories: categories,
