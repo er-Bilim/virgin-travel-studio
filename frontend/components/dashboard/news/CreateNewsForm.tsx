@@ -72,9 +72,6 @@ export default function CreateNewsForm({
       tags: form.tags.map((tag) => tag.value),
     };
 
-    console.log(preparedForm);
-    
-
     if (isEdit && editedId) {
       const newForm = { ...preparedForm };
       if (!form.image) {
