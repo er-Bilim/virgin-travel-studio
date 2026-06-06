@@ -1,26 +1,31 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
-import { Plus, Loader2 } from 'lucide-react';
+import {useMemo, useState} from 'react';
+import {useForm} from 'react-hook-form';
+import {toast} from 'sonner';
+import {Loader2, Plus} from 'lucide-react';
 import {
   useCategories,
   useCreateCategory,
-  useToggleCategoryPublish,
   useDeleteCategory,
+  useToggleCategoryPublish,
 } from '@/lib/hooks/categoryHooks';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import {Input} from '@/components/ui/input';
+import {Button} from '@/components/ui/button';
 import {
   headerRowClassName,
   inputClass,
   rowClassName,
   tableClassName,
 } from '@/lib/constants';
-import { getCategoryColumns } from '@/components/dashboard/shared/data-table/columns/createColumnInTable/category-column';
-import { DataTable } from '@/components/dashboard/shared/data-table/data-table';
-import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog/ConfirmDialog';
+import {
+  getCategoryColumns
+} from '@/components/dashboard/shared/data-table/columns/createColumnInTable/category-column';
+import {DataTable} from '@/components/dashboard/shared/data-table/data-table';
+import {
+  ConfirmDialog
+} from '@/components/dashboard/ConfirmDialog/ConfirmDialog';
+import {PaginationCustom} from "@/components/pagination/PaginationCustom";
 
 interface CategoryFormInput {
   title: string;
@@ -28,17 +33,29 @@ interface CategoryFormInput {
 
 export default function CategoriesManagePage() {
   const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
+  const [page, setPage] = useState<number>(1);
+  const limit = 10;
 
-  const { data: categories, isLoading, isError } = useCategories();
-  const { mutate: createCategory, isPending: isCreating } = useCreateCategory();
-  const { mutate: togglePublish } = useToggleCategoryPublish();
-  const { mutate: deleteCategory, isPending: isDeleting } = useDeleteCategory();
+  const {
+    data: categoriesData,
+    isLoading,
+    isError,
+    refetch: categoryRefetch
+  } = useCategories({
+    page,
+    limit
+  });
+  const categories = categoriesData?.categories;
+  const meta = categoriesData?.meta;
+  const {mutate: createCategory, isPending: isCreating} = useCreateCategory();
+  const {mutate: togglePublish} = useToggleCategoryPublish();
+  const {mutate: deleteCategory, isPending: isDeleting} = useDeleteCategory();
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: {errors},
   } = useForm<CategoryFormInput>({
     defaultValues: {
       title: '',
@@ -57,16 +74,14 @@ export default function CategoriesManagePage() {
 
   const onCreateSubmit = (data: CategoryFormInput) => {
     createCategory(
-      { title: data.title.trim() },
+      {title: data.title.trim()},
       {
         onSuccess: () => {
           reset();
           toast.success('Категория успешно создана');
         },
-        onError: (error: any) => {
-          const serverError =
-            error.response?.data?.error || 'Не удалось создать категорию';
-          toast.error(serverError);
+        onError: () => {
+          toast.error("Не удалось создать категорию");
         },
       },
     );
@@ -84,10 +99,19 @@ export default function CategoriesManagePage() {
 
           const serverError =
             error.response?.data?.error || 'Произошла ошибка при удалении';
-          toast.error(serverError, { duration: 5000 });
+          toast.error(serverError, {duration: 5000});
         },
       });
     }
+  };
+
+  const handlePageChange = (page: number) => {
+    setPage(page);
+    window.scrollTo(0, 0);
+  }
+
+  const handleRefetch = async () => {
+    await categoryRefetch();
   };
 
   return (
@@ -146,6 +170,32 @@ export default function CategoriesManagePage() {
         rowClassName={rowClassName}
         className={tableClassName}
       />
+
+      {isError && (
+        <div className="my-10 text-center">
+          <p className="mb-4 text-lg font-semibold text-red-500">
+            Не удалось загрузить категории
+          </p>
+          <button
+            type="button"
+            className="rounded-2xl border px-5 py-3 font-semibold"
+            onClick={handleRefetch}
+          >
+            Повторить
+          </button>
+        </div>
+      )}
+
+      {meta && categories && categories.length > 0 && (
+        <div className="my-8">
+          <PaginationCustom
+            page={page}
+            limit={meta.limit}
+            totalPage={meta.totalPages}
+            onChange={handlePageChange}
+          />
+        </div>
+      )}
 
       <ConfirmDialog
         open={!!categoryToDelete}

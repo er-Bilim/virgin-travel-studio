@@ -9,13 +9,13 @@ import Tour from '@/model/tour/Tour.js';
 const categoriesRouter = express.Router();
 
 categoriesRouter.post('/', auth, permit('ADMIN', 'MANAGER'), async (req, res, next) => {
-  const { title } = req.body;
+  const {title} = req.body;
   if (typeof title !== 'string' || title.trim() === '') {
-    return res.status(400).send({ error: 'Название обязательно' });
+    return res.status(400).send({error: 'Название обязательно'});
   }
 
   try {
-    const newCategory = new Category({ title: title.trim() });
+    const newCategory = new Category({title: title.trim()});
     await newCategory.save();
     return res.send(newCategory);
   } catch (e) {
@@ -36,8 +36,29 @@ categoriesRouter.post('/', auth, permit('ADMIN', 'MANAGER'), async (req, res, ne
 });
 
 categoriesRouter.get('/', async (req, res) => {
-  const result = await Category.find();
-  return res.send(result);
+  const rawPage = Number.parseInt(req.query.page as string, 10);
+  const rawLimit = Number.parseInt(req.query.limit as string, 10);
+  const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
+  const limit =
+    Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(50, rawLimit) : 10;
+  const skip = (page - 1) * limit;
+
+  const categories = await Category.find().skip(skip).limit(limit);
+
+  if (!categories) {
+    return res.status(404).send({error: "categories not found"});
+  }
+
+  const categoriesTotal = await Category.countDocuments();
+  return res.send({
+    categories: categories,
+    meta: {
+      total: categoriesTotal,
+      limit: limit,
+      page: page,
+      totalPages: Math.ceil(categoriesTotal / limit),
+    },
+  });
 });
 
 categoriesRouter.patch(
@@ -46,12 +67,12 @@ categoriesRouter.patch(
   permit('ADMIN', 'MANAGER'),
   validateObjectId(),
   async (req, res, next) => {
-    const { id } = req.params;
+    const {id} = req.params;
 
     try {
       const category = await Category.findById(id);
       if (!category) {
-        return res.status(404).send({ error: 'Категория не найдена' });
+        return res.status(404).send({error: 'Категория не найдена'});
       }
 
       category.isPublished = !category.isPublished;
@@ -70,7 +91,7 @@ categoriesRouter.delete(
   permit('ADMIN', 'MANAGER'),
   validateObjectId(),
   async (req, res, next) => {
-    const { id } = req.params;
+    const {id} = req.params;
 
     try {
       const tourWithCategory = await Tour.findOne({
@@ -84,11 +105,11 @@ categoriesRouter.delete(
         });
       }
 
-      const { deletedCount } = await Category.deleteOne({ _id: id });
+      const {deletedCount} = await Category.deleteOne({_id: id});
       if (!deletedCount) {
-        return res.status(404).send({ error: 'Категория не найдена' });
+        return res.status(404).send({error: 'Категория не найдена'});
       }
-      return res.send({ message: 'Категория успешно удалена' });
+      return res.send({message: 'Категория успешно удалена'});
     } catch (e) {
       console.log(e);
       next(e);

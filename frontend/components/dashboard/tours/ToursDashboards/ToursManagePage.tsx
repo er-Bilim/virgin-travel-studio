@@ -1,16 +1,16 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import Link from 'next/link';
-import { Plus, Search } from 'lucide-react';
+import {Plus, Search} from 'lucide-react';
 import {
-  useTours,
   useDeleteTour,
   useTogglePublish,
+  useTours,
 } from '@/lib/hooks/tourHooks';
-import { useCategories } from '@/lib/hooks/categoryHooks';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import {useCategories} from '@/lib/hooks/categoryHooks';
+import {Button} from '@/components/ui/button';
+import {Input} from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -23,12 +23,17 @@ import {
   rowClassName,
   tableClassName,
 } from '@/lib/constants';
-import { useUser } from '@/lib/hooks/authHooks';
-import { usePathname, useRouter } from 'next/navigation';
-import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog/ConfirmDialog';
-import { DataTable } from '@/components/dashboard/shared/data-table/data-table';
-import { getToursColumns } from '@/components/dashboard/shared/data-table/columns/createColumnInTable/tour-colum';
-import type { TourType } from '@/types/tour';
+import {useUser} from '@/lib/hooks/authHooks';
+import {usePathname, useRouter} from 'next/navigation';
+import {
+  ConfirmDialog
+} from '@/components/dashboard/ConfirmDialog/ConfirmDialog';
+import {DataTable} from '@/components/dashboard/shared/data-table/data-table';
+import {
+  getToursColumns
+} from '@/components/dashboard/shared/data-table/columns/createColumnInTable/tour-colum';
+import type {TourType} from '@/types/tour';
+import {toast} from "sonner";
 
 export default function ToursManagePage() {
   const router = useRouter();
@@ -51,14 +56,17 @@ export default function ToursManagePage() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  const { data: categories } = useCategories();
+  const { data: categoriesData } = useCategories();
+  const categories = categoriesData?.categories
 
   const { data, isLoading, isError, refetch } = useTours(
-    page,
-    10,
-    categoryId === 'all' ? undefined : categoryId,
-    debouncedSearch || undefined,
-    publishStatus === 'all' ? undefined : publishStatus,
+    {
+      page,
+      limit: 10,
+      categoryId: categoryId === 'all' ? undefined : categoryId,
+      search: debouncedSearch || undefined,
+      isPublished: publishStatus === 'all' ? undefined : publishStatus,
+    }
   );
 
   const { mutate: deleteTour, isPending: isDeleting } = useDeleteTour();

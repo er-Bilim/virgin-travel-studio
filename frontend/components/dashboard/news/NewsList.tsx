@@ -24,7 +24,7 @@ import {
   tableClassName
 } from '@/lib/constants';
 import {Input} from '@/components/ui/input';
-import { Plus, Search } from 'lucide-react';
+import {Plus, Search} from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -69,7 +69,13 @@ export default function NewsList() {
     isLoading,
     isError,
     refetch: refetchNews,
-  } = useNews({page, limit, searchText: searchNewsWithDelay, isPublished: statusFilter, authorId: authorFilter});
+  } = useNews({
+    page,
+    limit,
+    searchText: searchNewsWithDelay,
+    isPublished: statusFilter,
+    authorId: authorFilter
+  });
   const {mutate: deleteNews, isPending: isDeleting} = useDeleteNews();
   const {mutate: togglePublicate} = usePublicateNews();
   const news = newsData?.allNews;
@@ -83,7 +89,7 @@ export default function NewsList() {
   const [newsToDelete, setNewsToDelete] = useState<string | null>(null);
   const [editingNewsId, setEditingNewsId] = useState<string | null>(null);
   const [view, setView] = useState<NewsFields | null>(null);
-  const { openModal } = useModalStore();
+  const {openModal} = useModalStore();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const columns = useMemo(() => getNewsColumns({
@@ -121,83 +127,81 @@ export default function NewsList() {
   return (
     <div className="p-8 space-y-8 bg-gray-50">
       <div className="flex flex-col gap-4">
-  <div className="flex items-center justify-between">
-    <h1 className="text-3xl font-bold tracking-tight text-[#1E2B6D]">Новости</h1>
-    <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-      <DialogTrigger asChild>
-        <Button className="bg-[#1E2B6D] hover:bg-[#162356]">
-          <Plus className="w-4 h-4 mr-2" /> Добавить новость
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-2xl">
-        <CreateNewsForm onSuccess={() => setIsCreateOpen(false)} />
-      </DialogContent>
-    </Dialog>
-  </div>
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold tracking-tight text-[#1E2B6D]">Новости</h1>
+          <Dialog
+            open={isCreateOpen}
+            onOpenChange={setIsCreateOpen}
+          >
+            <DialogTrigger asChild>
+              <Button className="bg-[#1E2B6D] hover:bg-[#162356]">
+                <Plus className="w-4 h-4 mr-2" /> Добавить новость
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-2xl">
+              <CreateNewsForm onSuccess={() => setIsCreateOpen(false)} />
+            </DialogContent>
+          </Dialog>
+        </div>
 
-  <div className="flex flex-col lg:flex-row lg:items-center gap-3">
-    <div className="relative w-full md:flex-1">
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-      <Input
-        value={searchNews}
-        onChange={(e) => setSearchNews(e.target.value)}
-        placeholder="Поиск по названию..."
-        className="pl-9 bg-white border-gray-300 focus-visible:ring-1 focus-visible:ring-offset-0 transition-colors focus-visible:border-primary h-8"
-      />{isError && (
-  <div className="my-10 text-center">
-    <p className="mb-4 text-lg font-semibold text-red-500">
-      Не удалось загрузить новости
-    </p>
-    <button
-      type="button"
-      className="rounded-2xl border px-5 py-3 font-semibold"
-      onClick={handleRefetch}
-    >
-      Повторить
-    </button>
-  </div>
-)}
-    </div>
-    <Select value={statusFilter} onValueChange={setStatusFilter}>
-      <SelectTrigger className="w-full shrink-0 w-full lg:w-48 bg-white border-gray-300">
-        <SelectValue placeholder="Статус" />
-      </SelectTrigger>
-      <SelectContent position="popper">
-        <SelectItem value="all">Все статусы</SelectItem>
-        <SelectItem value="true">Опубликовано</SelectItem>
-        <SelectItem value="false">Не опубликовано</SelectItem>
-      </SelectContent>
-    </Select>
-    <Select value={authorFilter} onValueChange={setAuthorFilter} disabled={loadingUsers}>
-      <SelectTrigger className="w-full shrink-0 w-full lg:w-48 bg-white border-gray-300">
-        <SelectValue placeholder={loadingUsers ? "Загрузка..." : "Авторы"} />
-      </SelectTrigger>
-      <SelectContent position="popper">
-        <SelectItem value="all">Все авторы</SelectItem>
-        {users?.map((user) => (
-          <SelectItem key={user._id} value={user._id}>
-            {user.fullName}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  </div>
-</div>
-
-      {isError && (
-          <div className="my-10 text-center">
-            <p className="mb-4 text-lg font-semibold text-red-500">
-              Не удалось загрузить новости
-            </p>
-            <button
+        <div className="flex flex-col lg:flex-row lg:items-center gap-3">
+          <div className="relative w-full md:flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              value={searchNews}
+              onChange={(e) => setSearchNews(e.target.value)}
+              placeholder="Поиск по названию..."
+              className="pl-9 bg-white border-gray-300 focus-visible:ring-1 focus-visible:ring-offset-0 transition-colors focus-visible:border-primary h-8"
+            />{isError && (
+            <div className="my-10 text-center">
+              <p className="mb-4 text-lg font-semibold text-red-500">
+                Не удалось загрузить новости
+              </p>
+              <button
                 type="button"
                 className="rounded-2xl border px-5 py-3 font-semibold"
                 onClick={handleRefetch}
-            >
-              Повторить
-            </button>
+              >
+                Повторить
+              </button>
+            </div>
+          )}
           </div>
-      )}
+          <Select
+            value={statusFilter}
+            onValueChange={setStatusFilter}
+          >
+            <SelectTrigger className="w-full shrink-0 w-full lg:w-48 bg-white border-gray-300">
+              <SelectValue placeholder="Статус" />
+            </SelectTrigger>
+            <SelectContent position="popper">
+              <SelectItem value="all">Все статусы</SelectItem>
+              <SelectItem value="true">Опубликовано</SelectItem>
+              <SelectItem value="false">Не опубликовано</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select
+            value={authorFilter}
+            onValueChange={setAuthorFilter}
+            disabled={loadingUsers}
+          >
+            <SelectTrigger className="w-full shrink-0 w-full lg:w-48 bg-white border-gray-300">
+              <SelectValue placeholder={loadingUsers ? "Загрузка..." : "Авторы"} />
+            </SelectTrigger>
+            <SelectContent position="popper">
+              <SelectItem value="all">Все авторы</SelectItem>
+              {users?.map((user) => (
+                <SelectItem
+                  key={user._id}
+                  value={user._id}
+                >
+                  {user.fullName}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
 
       <DataTable
         data={news || []}
@@ -209,8 +213,9 @@ export default function NewsList() {
         className={tableClassName}
         onRowClick={(news) => {
           setView(news);
-          openModal("detailedNews")}
-      }
+          openModal("detailedNews")
+        }
+        }
       />
 
       {meta && news && news.length > 0 && (
@@ -224,7 +229,10 @@ export default function NewsList() {
         </div>
       )}
 
-      <Modal id="detailedNews" title="Детальная информация о новости">
+      <Modal
+        id="detailedNews"
+        title="Детальная информация о новости"
+      >
         <div className="max-h-[90vh] overflow-y-auto">
           {view && <NewsDetailedInfo oneNews={view} />}
         </div>
