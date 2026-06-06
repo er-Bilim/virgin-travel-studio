@@ -166,24 +166,24 @@ export const rowClassName =
   'hover:bg-blue-50/40 transition-colors border-b border-gray-100 first:rounded-t-2xl last:rounded-b-2xl';
 
 export const itemsNavHeader = [
-    {
-        id: "tours",
-        label: "Туры",
-    },
-    {
-        id: "dest",
-        label: "Направления",
-    },
-    {
-        id: "news",
-        label: "Новости",
-    },
-    {
-        id: "about",
-        label: "О нас",
-    },
-    {
-        id: "contacts",
-        label: "Контакты",
-    },
+  {
+    id: 'tours',
+    label: 'Туры',
+  },
+  {
+    id: 'tourSets',
+    label: 'Направления',
+  },
+  {
+    id: 'news',
+    label: 'Новости',
+  },
+  {
+    id: 'about',
+    label: 'О нас',
+  },
+  {
+    id: 'contacts',
+    label: 'Контакты',
+  },
 ];
