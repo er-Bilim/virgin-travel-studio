@@ -25,11 +25,18 @@ export const createFormData = (data: object): FormData => {
   return formData;
 };
 
-export const formatDateToWords = (date: string): string => {
+export const formatDateToWords = (date: string, isSlice?: true): string => {
   dayjs.locale('ru');
   const formatDate = dayjs(date);
 
   const monthName = formatDate.format('MMMM');
+
+  if (isSlice) {
+    const sliceMonthName: string = monthName.slice(0, 3);
+
+    return sliceMonthName;
+  }
+
   return monthName;
 };
 
