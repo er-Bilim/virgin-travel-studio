@@ -278,7 +278,7 @@ const TourDetailView = ({ id }: Props) => {
         </header>
       </section>
 
-      <div className="grid grid-cols-[1fr_420px] gap-6">
+      <div className="grid grid-cols-[1fr_420px] gap-6 mb-10">
         <div className="flex flex-col gap-6">
           <section aria-labelledby="description-title" className="mt-6">
             <h2 id="description-title" className="font-semibold text-[1.3rem]">
