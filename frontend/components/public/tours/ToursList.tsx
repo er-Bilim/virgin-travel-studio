@@ -173,7 +173,7 @@ const ToursList = () => {
       </section>
 
       {meta && toursData.tours.length > 0 && (
-        <div className="my-10 border-t pt-10">
+        <div className="my-10 border-t pt-6">
           <PaginationCustom
             page={page}
             limit={meta.limit}

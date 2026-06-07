@@ -36,7 +36,7 @@ export default function TourSets() {
     }
 
   return (
-    <section className="">
+    <section>
       {selectedTourSetId && isOrderOpen && (
         <OrderCard
           isOpen={isOrderOpen}
@@ -83,12 +83,14 @@ export default function TourSets() {
       </div>
 
       {meta && (
+          <div className="my-10 border-t pt-6">
         <PaginationCustom
           page={page}
           limit={meta.limit}
           totalPage={meta.totalPages}
           onChange={handlePageChange}
         />
+          </div>
       )}
     </section>
   );
