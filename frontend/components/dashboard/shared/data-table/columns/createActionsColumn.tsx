@@ -1,12 +1,12 @@
-import type { ColumnDef } from '@tanstack/react-table';
-import { Button } from '@/components/ui/button';
+import type {ColumnDef} from '@tanstack/react-table';
+import {Button} from '@/components/ui/button';
 import {
-  MoreHorizontal,
   Eye,
-  Pencil,
-  Trash2,
   Globe,
+  MoreHorizontal,
+  Pencil,
   SquarePlay,
+  Trash2
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -14,9 +14,9 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import type { TableAction } from '@/types/helpersComponent';
+import type {TableAction} from '@/types/helpersComponent';
 
 type ActionsProps<T> = {
   meta?: ColumnDef<T, unknown>['meta'];
@@ -100,7 +100,10 @@ export function createActionsColumn<T>({
                   return (
                     <DropdownMenuItem
                       key={action.id}
-                      onClick={() => action.onClick(data)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        action.onClick(data);
+                      }}
                       className={action.className}
                     >
                       {label}
@@ -124,7 +127,10 @@ export function createActionsColumn<T>({
                   size="icon"
                   variant={action.id === 'delete' ? 'destructive' : 'outline'}
                   className={`h-9 w-9 p-0 ${action.className ?? ''}`}
-                  onClick={() => action.onClick(data)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    action.onClick(data);
+                  }}
                   title={label}
                   aria-label={label}
                 >
