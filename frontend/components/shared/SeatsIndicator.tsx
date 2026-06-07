@@ -19,7 +19,7 @@ const SeatsIndicator = ({free, total, className}: Props) => {
   const level = getSeatsLevel(free, total);
   return (
     <span className={cn('font-semibold', styles[level], className)}>
-      {free === 0 ? 'Мест нет' : `${free} из ${total}`}
+      {free === 0 ? 'Мест нет' : `${free} из ${total} мест`}
     </span>
   );
 };
