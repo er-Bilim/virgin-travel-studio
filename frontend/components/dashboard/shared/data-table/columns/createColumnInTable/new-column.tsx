@@ -13,7 +13,7 @@ import {
   DialogTrigger
 } from '@/components/ui/dialog';
 import {imageUrl} from '@/lib/constants';
-import { TooltipCustom } from '@/components/ui/tooltip-custom';
+import {TooltipCustom} from '@/components/ui/tooltip-custom';
 
 type Props = {
   onView: (tour: NewsFields) => void;
@@ -43,6 +43,7 @@ export const getNewsColumns = ({
       }
 
       return (
+          <div onClick={(e) => e.stopPropagation()}>
         <Dialog>
           <DialogTrigger asChild>
             <button
@@ -69,6 +70,7 @@ export const getNewsColumns = ({
             </div>
           </DialogContent>
         </Dialog>
+              </div>
       );
     },
   },

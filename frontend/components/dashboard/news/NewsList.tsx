@@ -271,6 +271,7 @@ export default function NewsList() {
               }}
               editImage={editingNews.image}
               editedId={editingNews._id}
+              onSuccess={() => setEditingNewsId(null)}
             />
           )}
         </DialogContent>
