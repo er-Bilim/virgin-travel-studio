@@ -81,10 +81,12 @@ export default function Manager() {
     if (!managerToDelete) return
 
     deleteManager(managerToDelete, {
-      onSettled: () => {
+      onSuccess: () => {
         toast("Менеджер успешно удалён")
-        setManagerToDelete(null)
         router.push("/admin/managers")
+      },
+      onSettled: () => {
+        setManagerToDelete(null)
       }
     })
   };
