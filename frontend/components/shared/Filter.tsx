@@ -41,53 +41,60 @@ const Filter = <K extends string>({ tags, className, setTag, setId, href, mainTa
   }
 
   return (
-    <nav aria-label="Фильтр по темам" className={cn(className)}>
-      <div className="flex flex-row gap-5 items-center">
-        {title && <p className="text-sm text-gray-400 uppercase font-semibold">{title}</p>}
-        <ul
-          role="list"
-          aria-label={labelKey}
-          className="flex gap-2 overflow-x-auto capitalize"
-        >
-          <li>
-            <Link
-              href={href}
-              aria-current={!activeTag && 'true'}
-              className={cn(chipStyles, !activeTag ? activeChip : inactiveChip)}
-              onClick={() => {
-                getTag(null)
-                getId(null)
-              }}
-            >
-              {mainTag}
-            </Link>
-          </li>
+      <nav aria-label="Фильтр по темам" className={cn('w-full min-w-0', className)}>
+        <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:items-start">
+          {title && (
+              <p className="shrink-0 pt-2 text-sm text-gray-400 uppercase font-semibold">
+                {title}
+              </p>
+          )}
 
-          {tags.map((tag) => {
-            const isActive = tag[labelKey] === activeTag;
-
-            return (
-              <li key={tag[labelKey]} className="shrink-0">
-                <Link
-                  href={`${href}?${searchParamsName}=${encodeURIComponent(tag[labelKey])}`}
-                  aria-current={isActive && 'true'}
+          <ul
+              role="list"
+              aria-label={labelKey}
+              className="flex min-w-0 flex-wrap gap-2 capitalize"
+          >
+            <li className="shrink-0">
+              <Link
+                  href={href}
+                  aria-current={!activeTag && 'true'}
+                  className={cn(chipStyles, !activeTag ? activeChip : inactiveChip)}
                   onClick={() => {
-                    getTag(tag[labelKey])
-                    getId(tag?._id)
+                    getTag(null);
+                    getId(null);
                   }}
-                  className={cn(
-                    chipStyles,
-                    isActive ? activeChip : inactiveChip,
-                  )}
-                >
-                  {tag[labelKey]}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-    </nav>
+              >
+                {mainTag}
+              </Link>
+            </li>
+
+            {tags.map((tag) => {
+              const isActive = tag[labelKey] === activeTag;
+
+              return (
+                  <li key={tag[labelKey]} className="shrink-0">
+                    <Link
+                        href={`${href}?${searchParamsName}=${encodeURIComponent(
+                            tag[labelKey],
+                        )}`}
+                        aria-current={isActive && 'true'}
+                        onClick={() => {
+                          getTag(tag[labelKey]);
+                          getId(tag?._id);
+                        }}
+                        className={cn(
+                            chipStyles,
+                            isActive ? activeChip : inactiveChip,
+                        )}
+                    >
+                      {tag[labelKey]}
+                    </Link>
+                  </li>
+              );
+            })}
+          </ul>
+        </div>
+      </nav>
   );
 };
 

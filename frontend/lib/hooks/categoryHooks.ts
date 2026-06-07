@@ -1,27 +1,33 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query';
 import {
   getCategories,
   createCategory,
   toggleCategoryPublish,
   deleteCategory,
 } from '@/services/categories';
-import type { AxiosError } from 'axios';
-import type { GlobalError } from '@/types/error';
+import type {AxiosError} from 'axios';
+import type {GlobalError} from '@/types/error';
+import type {TourCategoryType} from "@/types/tour";
 
-export const useCategories = () => {
+export const useCategories = ({page, limit}: {
+  page?: number,
+  limit?: number
+} = {}) => {
   return useQuery({
-    queryKey: ['categories'],
-    queryFn: getCategories,
+    queryKey: ['categories', page, limit],
+    queryFn: () => getCategories({page, limit}),
   });
 };
 
 export const useCreateCategory = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<TourCategoryType | { message: string },
+    AxiosError<GlobalError>,
+    { title: string }>({
     mutationFn: createCategory,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({queryKey: ['categories']});
     },
   });
 };
@@ -32,7 +38,7 @@ export const useToggleCategoryPublish = () => {
   return useMutation({
     mutationFn: toggleCategoryPublish,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({queryKey: ['categories']});
     },
   });
 };
@@ -43,7 +49,7 @@ export const useDeleteCategory = () => {
   return useMutation<{ message: string }, AxiosError<GlobalError>, string>({
     mutationFn: deleteCategory,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({queryKey: ['categories']});
     },
   });
 };

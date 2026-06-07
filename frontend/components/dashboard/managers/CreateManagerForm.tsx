@@ -1,13 +1,14 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
+import {useForm} from 'react-hook-form';
 
-import { Eye, EyeOff } from 'lucide-react';
-import { useState } from 'react';
-import type { ManagerMutation } from '@/types/user';
-import { Input } from '@/components/ui/input';
-import { inputClass } from '@/lib/constants';
-import { useCreateManager } from '@/lib/hooks/managerHook';
+import {Eye, EyeOff} from 'lucide-react';
+import {useState} from 'react';
+import type {ManagerMutation} from '@/types/user';
+import {Input} from '@/components/ui/input';
+import {inputClass} from '@/lib/constants';
+import {useCreateManager} from '@/lib/hooks/managerHook';
+import {useModalStore} from "@/lib/stores/modalStore";
 
 export const CreateManagerForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -26,10 +27,14 @@ export const CreateManagerForm = () => {
     },
   });
   const { mutate, isPending } = useCreateManager(setError);
+  const { closeModal } = useModalStore();
 
   const onSubmit = (data: ManagerMutation) => {
     mutate(data, {
-      onSuccess: () => reset(),
+      onSuccess: () => {
+        reset()
+        closeModal();
+      },
     });
   };
 
