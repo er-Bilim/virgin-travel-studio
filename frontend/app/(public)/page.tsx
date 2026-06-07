@@ -1,8 +1,8 @@
 'use client';
 
 import PublicTourCard from '@/components/public/tours/PublicTourCard';
-import { useTours } from '@/lib/hooks/tourHooks';
-import { useTourSets } from '@/lib/hooks/tourSets';
+import {useTours} from '@/lib/hooks/tourHooks';
+import {useTourSets} from '@/lib/hooks/tourSets';
 import TourGroupCard from '@/components/tourGroup/tourGroupCard';
 import Link from 'next/link';
 
@@ -15,7 +15,7 @@ export default function Home() {
     isLoading: isToursLoading,
     isError: isToursError,
     refetch: refetchTours,
-  } = useTours(1, limit);
+  } = useTours({ limit});
 
   const {
     data: tourSetsData,
