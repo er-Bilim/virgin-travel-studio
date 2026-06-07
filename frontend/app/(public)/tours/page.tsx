@@ -1,7 +1,6 @@
 import ToursList from '@/components/public/tours/ToursList';
 import { queryConfig } from '@/lib/constants';
-import { getCategories } from '@/services/categories';
-import { getTours } from '@/services/tours';
+import { getTourCategories, getTours } from '@/services/tours';
 import {
   dehydrate,
   HydrationBoundary,
@@ -15,13 +14,13 @@ const Tours = async () => {
 
   await Promise.all([
     qc.prefetchQuery({
-      queryKey: ['tours', 1, toursLimitPag, null, null, true],
+      queryKey: ['tours', 1, toursLimitPag, null, undefined, true, undefined],
       queryFn: () =>
         getTours({ page: 1, limit: toursLimitPag, isPublished: true }),
     }),
     qc.prefetchQuery({
-      queryKey: ['categories'],
-      queryFn: () => getCategories(),
+      queryKey: ['tours', 'categories'],
+      queryFn: () => getTourCategories(),
     }),
   ]);
 

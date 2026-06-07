@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 import BasePhoto from '@/components/assets/lake.webp';
 import { imageUrl, isDev } from '@/lib/constants';
-import type { TourType } from '@/types/tour';
+import type { ITourWithTourSetFields} from '@/types/tour';
 import Image from 'next/image';
 import { ArrowRight, Calendar1, Flame, MapPin, Star } from 'lucide-react';
 import {
@@ -13,28 +13,20 @@ import {
 } from '@/lib/utils';
 
 type Props = {
-  tour: TourType;
+  tour: ITourWithTourSetFields;
 };
 
 const PublicTourCard = ({ tour }: Props) => {
   const image =
     tour.images.length > 0 ? imageUrl + tour.images[0] : BasePhoto.src;
 
-  // const availableTourSets = tourSets.filter(
-  //     (tourSet) =>
-  //         tourSet.tourId._id === tour._id &&
-  //         tourSet.status !== 'FINISHED',
-  // );
-
-  // const firstTourSet = availableTourSets[0];
-
   return (
     <>
-      <li>
-        <article itemScope itemType="https://schema.org/Product">
+      <li className="flex">
+        <article itemScope itemType="https://schema.org/Product" className="flex w-full">
           <Link
-            href={`/tour/${tour._id}`}
-            className="group block overflow-hidden rounded-2xl border border-border bg-card transition-all duration-200 hover:-translate-y-1  shadow-cyan-200 hover:shadow-[0_1px_10px_rgba(0,0,0,0.1)]"
+            href={`/tours/${tour._id}`}
+            className="group block flex flex-col w-full overflow-hidden rounded-2xl border border-border bg-card transition-all duration-200 hover:-translate-y-1  shadow-cyan-200 hover:shadow-[0_1px_10px_rgba(0,0,0,0.1)]"
           >
             <figure className="relative aspect-[4/3] overflow-hidden">
               <Image
@@ -126,7 +118,7 @@ const PublicTourCard = ({ tour }: Props) => {
                     content={String(tour.minPrice)}
                     className="block text-xl font-bold text-foreground"
                   >
-                    {formatToReadablePrice(tour.minPrice)}
+                    {formatToReadablePrice(tour.minPrice).price}
                   </span>
                 </div>
 
