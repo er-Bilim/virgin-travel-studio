@@ -184,13 +184,10 @@ body {
   height: 100%;
   background: linear-gradient(105deg, transparent, rgba(255,255,255,.9), transparent);
   transform: skewX(-20deg);
-  animation: gold-shine 4.5s ease-in-out infinite;
+  animation: gold-shine 3.5s ease-in-out infinite;
 }
 
 @keyframes gold-shine {
   0%, 70% { left: -130%; }
   100% { left: 170%; }
 }
-
-.advantage-check:nth-child(2)::after { animation-delay: 1.3s; }
-.advantage-check:nth-child(3)::after { animation-delay: 2.1s; }
