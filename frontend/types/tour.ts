@@ -45,7 +45,7 @@ export interface TourMutation {
 }
 
 export interface GetToursParams {
-  page: number,
+  page?: number,
   limit: number,
   categoryId?: string | null,
   search?: string,

@@ -14,6 +14,8 @@ import type { QueryClient } from '@tanstack/react-query';
 export const isDev = process.env.NODE_ENV === 'development';
 export const apiURL = process.env.NEXT_API_URL || 'http://localhost:8000/api';
 export const imageUrl = process.env.NEXT_IMAGE_URL || 'http://localhost:8000/';
+export const toursLimitPag = 10;
+
 
 export const queryConfig = {
   defaultOptions: {

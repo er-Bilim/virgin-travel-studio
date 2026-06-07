@@ -1,5 +1,5 @@
 import ToursList from '@/components/public/tours/ToursList';
-import { queryConfig } from '@/lib/constants';
+import {queryConfig, toursLimitPag} from '@/lib/constants';
 import { getCategories } from '@/services/categories';
 import { getTours } from '@/services/tours';
 import {
@@ -8,7 +8,6 @@ import {
   QueryClient,
 } from '@tanstack/react-query';
 
-export const toursLimitPag = 10;
 
 const Tours = async () => {
   const qc = new QueryClient(queryConfig);

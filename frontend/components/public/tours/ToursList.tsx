@@ -7,7 +7,6 @@ import PublicTourCard from '@/components/public/tours/PublicTourCard';
 import { useGetTourCategories, useTours } from '@/lib/hooks/tourHooks';
 import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 import Filter from '@/components/shared/Filter';
-import { toursLimitPag } from '@/app/(public)/tours/page';
 import { pluralize } from '@/lib/utils';
 import {
   ArrowBigDown,
@@ -20,6 +19,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import Sort from '@/components/shared/Sort';
+import {toursLimitPag} from "@/lib/constants";
 
 const SORT_OPTIONS = [
   { value: 'newest', label: 'Новые сверху', icon: CalendarPlus2 },
