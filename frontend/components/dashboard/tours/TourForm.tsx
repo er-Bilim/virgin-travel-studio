@@ -1,10 +1,10 @@
 'use client';
 
-import { useForm, Controller, useFieldArray } from 'react-hook-form';
-import { useRouter } from 'next/navigation';
-import { Plus, Trash2, Loader2 } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import {Controller, useFieldArray, useForm} from 'react-hook-form';
+import {useRouter} from 'next/navigation';
+import {Loader2, Plus, Trash2} from 'lucide-react';
+import {Input} from '@/components/ui/input';
+import {Textarea} from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -12,11 +12,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import MultiImageInput from '@/components/dashboard/MultiImageInput/MultiImageInput';
-import { inputClass } from '@/lib/constants';
-import { useCategories } from '@/lib/hooks/categoryHooks';
-import { useCreateTour, useUpdateTour } from '@/lib/hooks/tourHooks';
-import type { TourMutation } from '@/types/tour';
+import MultiImageInput
+  from '@/components/dashboard/MultiImageInput/MultiImageInput';
+import {inputClass} from '@/lib/constants';
+import {useCategories} from '@/lib/hooks/categoryHooks';
+import {useCreateTour, useUpdateTour} from '@/lib/hooks/tourHooks';
+import type {TourMutation} from '@/types/tour';
 
 interface Props {
   isEdit?: boolean;
@@ -26,11 +27,12 @@ interface Props {
 
 export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
   const router = useRouter();
-  const { data: categories, isLoading: isCatsLoading } = useCategories();
+  const { data: categoriesData, isLoading: isCatsLoading } = useCategories();
   const { mutate: createTour, isPending: isCreating } = useCreateTour();
   const { mutate: updateTour, isPending: isUpdating } = useUpdateTour();
 
   const isPending = isCreating || isUpdating;
+  const categories = categoriesData?.categories;
 
   const {
     register,
