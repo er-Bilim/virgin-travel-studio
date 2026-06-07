@@ -71,8 +71,6 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
 
     const tours: AggregatedTours[] = await Tour.aggregate([
       { $match: query },
-      { $skip: skip },
-      { $limit: limit },
       {
         $lookup: {
           from: 'categories',
@@ -127,6 +125,9 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
           },
         },
       },
+      { $sort: sort },
+      { $skip: skip },
+      { $limit: limit },
       {
         $project: {
           title: 1,
@@ -147,7 +148,6 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
           'category.title': 1,
         },
       },
-      { $sort: sort },
     ]);
 
     const totalTours = await Tour.countDocuments(query);
@@ -196,21 +196,23 @@ toursRouter.get(
   async (req, res, next) => {
     try {
       const { id } = req.params;
-      const { user } = req as RequestWithUser;      
+      const { user } = req as RequestWithUser;
 
       const tours: AggregatedTour[] = await Tour.aggregate([
         { $match: { _id: new mongoose.Types.ObjectId(id as string) } },
-        { $lookup: {
-          from: 'categories',
-          localField: 'category',
-          foreignField: '_id',
-          as: 'category'
-        } },
+        {
+          $lookup: {
+            from: 'categories',
+            localField: 'category',
+            foreignField: '_id',
+            as: 'category',
+          },
+        },
         {
           $unwind: {
-            path: "$category",
-            preserveNullAndEmptyArrays: true
-          }
+            path: '$category',
+            preserveNullAndEmptyArrays: true,
+          },
         },
         {
           $lookup: {
@@ -218,11 +220,11 @@ toursRouter.get(
             localField: '_id',
             foreignField: 'tourId',
             as: 'tourSets',
-          }
-        }
-      ])
+          },
+        },
+      ]);
 
-      const tour: AggregatedTour | undefined = tours[0]
+      const tour: AggregatedTour | undefined = tours[0];
 
       if (!tour) {
         return res.status(404).send({ error: 'Тур не найден' });
