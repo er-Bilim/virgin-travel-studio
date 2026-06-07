@@ -76,68 +76,72 @@ export default function ManagersPage() {
         });
     };
 
-  return (
-    <div className="p-6 space-y-4">
-        <div className="flex items-center justify-between flex-wrap">
-            <h1 className="text-2xl font-bold">Менеджеры</h1>
-            <div className="flex items-center justify-center gap-2">
-                <Button
-                    className="bg-[#1E2B6D] hover:bg-[#162356]"
-                    onClick={() => openModal("createManager")}
-                >
-                    <Plus className="w-4 h-4 mr-2" /> Создать менеджера
-                </Button>
+    return (
+        <div className="min-h-screen bg-background p-4 space-y-6 sm:p-6 lg:p-8 lg:space-y-8">
+            <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                <h1 className="text-3xl font-bold tracking-tight text-[#1E2B6D]">
+                    Менеджеры
+                </h1>
 
-                <Button
-                    className="bg-[#1E2B6D] hover:bg-[#162356]"
-                    onClick={() => openModal("reportAllManagers")}
-                >
-                    <Download className="w-4 h-4 mr-2" /> Отчет по всем менеджерам
-                </Button>
+                <div className="flex w-full flex-col gap-2 sm:flex-row xl:w-auto">
+                    <Button
+                        className="w-full justify-center bg-[#1E2B6D] hover:bg-[#162356] sm:w-auto"
+                        onClick={() => openModal("createManager")}
+                    >
+                        <Plus className="w-4 h-4 mr-2" /> Создать менеджера
+                    </Button>
+
+                    <Button
+                        className="w-full justify-center gap-2 bg-[#1E2B6D] hover:bg-[#162356] sm:w-auto"
+                        onClick={() => openModal("reportAllManagers")}
+                    >
+                        <Download className="h-4 w-4 shrink-0" />
+                        <span>Отчет по всем менеджерам</span>
+                    </Button>
+                </div>
             </div>
-        </div>
 
-        <Modal id="reportAllManagers" title="Выберете даты для отчета">
-            <DateRangePicker
-                value={dateRange}
-                onChange={setDateRange}
-                disableFuture
+            <Modal id="reportAllManagers" title="Выберете даты для отчета">
+                <DateRangePicker
+                    value={dateRange}
+                    onChange={setDateRange}
+                    disableFuture
+                />
+                {errorReport && (
+                    <p className="text-sm text-red-500">{errorReport}</p>
+                )}
+                <Button
+                    className="w-full mt-4 bg-[#1E2B6D] hover:bg-[#162356]"
+                    onClick={downloadReport}
+                >
+                    Скачать отчет
+                </Button>
+            </Modal>
+
+            <Modal id="createManager" title="Создание менеджера">
+                <CreateManagerForm />
+            </Modal>
+
+            <DataTable
+                columns={columns}
+                data={data}
+                isLoading={isLoading}
+                isError={isError}
+                headerRowClassName={headerRowClassName}
+                rowClassName={rowClassName}
+                className={tableClassName}
+                onRowClick={(user) => route.push(`managers/${user._id}`)}
             />
-            {errorReport && (
-                <p className="text-sm text-red-500">{errorReport}</p>
-            )}
-            <Button
-                className="w-full mt-4 bg-[#1E2B6D] hover:bg-[#162356]"
-                onClick={downloadReport}
-            >
-                Скачать отчет
-            </Button>
-        </Modal>
 
-        <Modal id="createManager" title="Создание менеджера">
-            <CreateManagerForm />
-        </Modal>
-
-      <DataTable
-          columns={columns}
-          data={data}
-          isLoading={isLoading}
-          isError={isError}
-          headerRowClassName={headerRowClassName}
-          rowClassName={rowClassName}
-          className={tableClassName}
-          onRowClick={(user) => route.push(`managers/${user._id}`)}
-      />
-
-        <ConfirmDialog
-            open={!!managerToDelete}
-            title="Удалить менеджера?"
-            description="Это действие нельзя отменить"
-            loading={isDeleting}
-            confirmText="Удалить"
-            onCancel={() => setManagerToDelete(null)}
-            onConfirm={confirmDelete}
-        />
-    </div>
-  );
+            <ConfirmDialog
+                open={!!managerToDelete}
+                title="Удалить менеджера?"
+                description="Это действие нельзя отменить"
+                loading={isDeleting}
+                confirmText="Удалить"
+                onCancel={() => setManagerToDelete(null)}
+                onConfirm={confirmDelete}
+            />
+        </div>
+    );
 }
