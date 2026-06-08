@@ -36,9 +36,10 @@ type DataTableProps<TData, TValue> = {
 };
 
 declare module '@tanstack/react-table' {
-  interface ColumnMeta<TData, TValue> {
-    className?: string;
-  }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    interface ColumnMeta<TData, TValue> {
+        className?: string;
+    }
 }
 
 export function DataTable<TData, TValue>({
