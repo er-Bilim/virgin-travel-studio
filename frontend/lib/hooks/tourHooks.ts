@@ -1,17 +1,18 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {
-  getTours,
   createTour,
-  updateTour,
   deleteTour,
-  togglePublish,
+  getCountries,
   getTourById,
   getTourCategories,
+  getTours,
+  togglePublish,
+  updateTour
 } from '@/services/tours';
-import { toast } from 'sonner';
-import type { GetToursParams, TourMutation } from '@/types/tour';
-import type { AxiosError } from 'axios';
-import type { GlobalError } from '@/types/error';
+import {toast} from 'sonner';
+import type {GetToursParams, TourMutation} from '@/types/tour';
+import type {AxiosError} from 'axios';
+import type {GlobalError} from '@/types/error';
 
 export const useTours = (
 {  page,
@@ -19,13 +20,21 @@ export const useTours = (
   categoryId,
   search,
   isPublished,
+    countryCode,
   sort} : GetToursParams
 ) => {
   return useQuery({
-    queryKey: ['tours', page, limit, categoryId, search, isPublished, sort],
-    queryFn: () => getTours({page, limit, categoryId, search, isPublished, sort}),
+    queryKey: ['tours', page, limit, categoryId, search, isPublished, sort, countryCode,],
+    queryFn: () => getTours({page, limit, categoryId, search, isPublished, sort, countryCode,}),
   });
 };
+
+export const useCountries = () => {
+  return useQuery({
+    queryKey: ['countries'],
+    queryFn: getCountries,
+  });
+}
 
 export const useGetTourCategories = () => {
   return useQuery({

@@ -149,6 +149,7 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
           nextStartDate: 1,
           createdAt: 1,
           updatedAt: 1,
+          countryCode: 1,
           'category._id': 1,
           'category.title': 1,
         },
@@ -166,6 +167,16 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
         totalPages: Math.ceil(totalTours / limit),
       },
     });
+  } catch (e) {
+    next(e);
+  }
+});
+
+toursRouter.get('/countries', async (req, res, next) => {
+  try {
+    const countries = await Tour.distinct('countryCode')
+
+    res.send(countries.filter(Boolean).sort());
   } catch (e) {
     next(e);
   }

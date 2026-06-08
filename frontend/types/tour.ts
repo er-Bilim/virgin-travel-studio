@@ -1,5 +1,5 @@
-import type { MetaType } from "./meta";
-import type { TourSetType } from "./tourSets";
+import type {MetaType} from './meta';
+import type {TourSetType} from './tourSets';
 
 export interface TourCategoryType {
   _id: string;
@@ -23,6 +23,7 @@ export interface ToursGetResponse {
 export interface TourType {
   _id: string;
   title: string;
+  countryCode: string;
   description: string;
   images: string[];
   category: TourCategoryType;
@@ -30,6 +31,7 @@ export interface TourType {
   rating: number;
   ratingCount: number;
   isPublished: boolean;
+  createdAt: string;
 }
 
 export interface ITourWithTourSetFields extends TourType {
@@ -58,5 +60,6 @@ export interface GetToursParams {
   categoryId?: string | null,
   search?: string,
   isPublished?: string | boolean,
+  countryCode?: string | null,
   sort?: string | null;
 }
