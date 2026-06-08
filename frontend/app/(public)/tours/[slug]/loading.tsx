@@ -1,14 +1,16 @@
-import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const TourDetailLoading = () => {
   return (
     <>
       <section className="mt-10">
-        <Breadcrumbs
-          items={[{ label: 'Туры', href: '/tours' }, { label: '...' }]}
-          className="mb-10"
-        />
+        <nav className="mb-10 flex items-center gap-2" aria-hidden>
+          <Skeleton className="h-4 w-12 rounded" />
+          <span className="text-gray-300">›</span>
+          <Skeleton className="h-4 w-24 rounded" />
+          <span className="text-gray-300">›</span>
+          <Skeleton className="h-4 w-40 rounded" />
+        </nav>
 
         <Skeleton className="aspect-[21/9] w-full rounded-2xl" />
         <div className="mt-7">
