@@ -5,6 +5,7 @@ import {useTours} from '@/lib/hooks/tourHooks';
 import {useTourSets} from '@/lib/hooks/tourSets';
 import TourGroupCard from '@/components/tourGroup/tourGroupCard';
 import Link from 'next/link';
+import LatestNewsSection from "@/components/public/news/LatestNewsSection";
 
 
 export default function Home() {
@@ -18,16 +19,12 @@ export default function Home() {
   } = useTours({ limit});
 
   const {
-    data: tourSetsData,
     isLoading: isTourSetsLoading,
     isError: isTourSetsError,
     refetch: refetchTourSets,
   } = useTourSets({ page: 1, limit: 100 });
 
   const tours = toursData?.tours.filter((tour) => tour.isPublished) || [];
-  const tourSets =
-    tourSetsData?.tourSets.filter((tourSet) => tourSet.status !== 'FINISHED') ||
-    [];
 
   const isLoading = isToursLoading || isTourSetsLoading;
   const isError = isToursError || isTourSetsError;
@@ -130,6 +127,8 @@ export default function Home() {
           </Link>
         </div>
       </div>
+
+      <LatestNewsSection />
 
       <div className="mt-25 mb-15 flex flex-col items-center">
         <h2 className="font-black text-[#1E2B6D] text-2xl md:text-4xl">
