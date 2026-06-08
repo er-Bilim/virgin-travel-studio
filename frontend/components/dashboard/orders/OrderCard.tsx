@@ -15,8 +15,7 @@ import type { OrderPostType } from '@/types/order';
 import { useCreateOrder } from '@/lib/hooks/orderHooks';
 import { Calendar1, Tag, User, Phone, Send, ShieldCheck } from 'lucide-react';
 import {
-  getDayMonth,
-  formatDateToWords,
+  formatDayAndMonthWords,
   formatToReadablePrice,
 } from '@/lib/utils';
 import { X } from 'lucide-react';
@@ -74,6 +73,14 @@ const OrderCard = ({
 
   const priceInfo = formatToReadablePrice(price);
 
+  const { day: startDay, month: startMonth } = formatDayAndMonthWords(
+    startDate,
+  );
+
+  const { day: endDay, month: endMonth } = formatDayAndMonthWords(
+    endDate,
+  );
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
@@ -100,9 +107,9 @@ const OrderCard = ({
             <span className="inline-flex items-center gap-1.5 text-xs text-[var(--silver)]">
               <Calendar1 className="size-3.5 text-cyan-400" />
               <p className="font-semibold text-white">
-                <span className="after:content-['–'] after:ml-2">                {getDayMonth(startDate)} {formatDateToWords(startDate, true)}</span>
+                <span className="after:content-['–'] after:ml-2">{startMonth} {startDay}</span>
 
-                <span className="ms-2">{getDayMonth(endDate)} {formatDateToWords(endDate, true)}</span>
+                <span className="ms-2">{endMonth} {endDay}</span>
               </p>
             </span>
             <span className="inline-flex items-center gap-1.5 text-xs text-[var(--silver)]">

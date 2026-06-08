@@ -7,8 +7,7 @@ import { useGetSingleNews } from '@/lib/hooks/newsHooks';
 import { toast } from 'sonner';
 import {
   cn,
-  formatDateToWords,
-  getDayMonth,
+  formatDayAndMonthWords,
   getYearFullNumber,
 } from '../../../lib/utils';
 import { Clock, Dot } from 'lucide-react';
@@ -33,6 +32,8 @@ const NewsDetailView = ({ id }: Props) => {
   if (isError || !news) {
     return toast.error('Что-то пошло не так');
   }
+
+  const { day, month } = formatDayAndMonthWords(news.createdAt)
 
   const words: number = news.content.trim().split(/\s+/).length;
 
@@ -79,9 +80,9 @@ const NewsDetailView = ({ id }: Props) => {
                   <div>
                     <p className="flex gap-1 text-gray-500">
                       <span className="font-semibold">
-                        {getDayMonth(news.createdAt)}
+                        {day}
                       </span>
-                      <span>{formatDateToWords(news.createdAt)}</span>
+                      <span>{month}</span>
                       <span className="font-semibold">
                         {getYearFullNumber(news.createdAt)}
                       </span>

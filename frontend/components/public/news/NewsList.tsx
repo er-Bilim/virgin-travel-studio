@@ -8,7 +8,7 @@ import { imageUrl, isDev } from '@/lib/constants';
 import Image from 'next/image';
 import CONTENT_PLACEHOLDER from '@/assets/placeholders/content_placeholder.png';
 import Link from 'next/link';
-import { formatDateToWords, getDayMonth, truncateText } from '@/lib/utils';
+import { formatDayAndMonthWords, truncateText } from '@/lib/utils';
 import ClientAvatar from '@/components/shared/ClientAvatar';
 import { Dot, Newspaper } from 'lucide-react';
 import { useState } from 'react';
@@ -61,6 +61,8 @@ const NewsList = () => {
       </div>
     );
   }
+
+  const { day: mainNewsDay, month: mainNewsMonth } = formatDayAndMonthWords(news.allNews[0].createdAt)
 
   const renderPagination = () => {
     if (metadata) {
@@ -173,9 +175,9 @@ const NewsList = () => {
                 className="flex flex-row gap-1 text-sm text-gray-500"
               >
                 <span className="font-semibold">
-                  {getDayMonth(news.allNews[0].createdAt)}
+                  {mainNewsDay}
                 </span>
-                <span>{formatDateToWords(news.allNews[0].createdAt)}</span>
+                <span>{mainNewsMonth}</span>
               </time>
             </div>
           </div>
@@ -187,6 +189,7 @@ const NewsList = () => {
         className="grid grid-cols-1 gap-[40px] sm:grid-cols-2 lg:grid-cols-3 mt-10"
       >
         {news.allNews.map((singleNews, index) => {
+          const { day, month } = formatDayAndMonthWords(singleNews.createdAt)
           if (index !== 0) {
             return (
               <li key={singleNews._id}>
@@ -239,8 +242,8 @@ const NewsList = () => {
                         itemProp="datePublished"
                         className="flex flex-row gap-1"
                       >
-                        <span>{getDayMonth(singleNews.createdAt)}</span>
-                        <span>{formatDateToWords(singleNews.createdAt)}</span>
+                        <span>{day}</span>
+                        <span>{month}</span>
                       </time>
                     </footer>
                   </Link>

@@ -1,6 +1,6 @@
 import ClientAvatar from '@/components/shared/ClientAvatar';
 import Rating from '@/components/shared/Rating';
-import { formatDateToWords, getYearFullNumber } from '@/lib/utils';
+import { formatDayAndMonthWords, getYearFullNumber } from '@/lib/utils';
 import type { IReview } from '@/types/review';
 import ReviewPhoto from './ReviewPhoto';
 
@@ -9,6 +9,9 @@ interface Props {
 }
 
 const Review = ({ review }: Props) => {
+
+  const { day, month } = formatDayAndMonthWords(review.createdDate);
+
   return (
     <div className="border-1 border-[var(--border)] p-5 rounded-2xl bg-gray-50">
       <div className="flex flex-row items-center gap-3 justify-between">
@@ -17,7 +20,8 @@ const Review = ({ review }: Props) => {
           <div>
             <p>{review.clientName}</p>
             <p className="text-gray-500 text-sm flex gap-1">
-              <span>{formatDateToWords(review.createdDate)}</span>
+              <span>{day}</span>
+              <span>{month}</span>
               <span>{getYearFullNumber(review.createdDate)}</span>
             </p>
           </div>

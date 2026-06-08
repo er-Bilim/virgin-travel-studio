@@ -1,9 +1,8 @@
 import type { TourSetType } from '@/types/tourSets';
 import {
   cn,
-  formatDateToWords,
+  formatDayAndMonthWords,
   formatToReadablePrice,
-  getDayMonth,
 } from '../../../lib/utils';
 import {
   ArrowBigRight,
@@ -57,6 +56,17 @@ const TourSetCard = ({ tourSet, getTourSet, id }: Props) => {
 
   const isSelectedTourSet: boolean = tourSet._id === id;
 
+
+  const { day: startDay, month: startMonth } = formatDayAndMonthWords(
+    tourSet.startDate,
+    true,
+  );
+
+  const { day: endDay, month: endMonth } = formatDayAndMonthWords(
+    tourSet.endDate,
+    true,
+  );
+
   return (
     <div
       className={cn(
@@ -95,10 +105,10 @@ const TourSetCard = ({ tourSet, getTourSet, id }: Props) => {
                     isSelectedTourSet && 'text-cyan-400',
                   )}
                 >
-                  {formatDateToWords(tourSet.startDate, true)}
+                  {startMonth}
                 </span>
                 <span className="font-semibold text-2xl">
-                  {getDayMonth(tourSet.startDate)}
+                  {startDay}
                 </span>
               </p>
             </div>
@@ -116,10 +126,10 @@ const TourSetCard = ({ tourSet, getTourSet, id }: Props) => {
                     isSelectedTourSet && 'text-cyan-400',
                   )}
                 >
-                  {formatDateToWords(tourSet.endDate, true)}
+                  {endMonth}
                 </span>
                 <span className="font-semibold text-2xl">
-                  {getDayMonth(tourSet.endDate)}
+                  {endDay}
                 </span>
               </p>
             </div>
