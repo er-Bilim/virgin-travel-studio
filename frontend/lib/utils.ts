@@ -25,7 +25,7 @@ export const createFormData = (data: object): FormData => {
   return formData;
 };
 
-export const formatDayAndMonthWords = (date: string, isSlice?: true): {day: string, month: string} => {
+export const formatDayAndMonthWords = (date: string, isSlice?: boolean): {day: string, month: string} => {
   const formatDate = dayjs(date).locale('ru');
 
   const fullDate = formatDate.format('D MMMM');
