@@ -11,7 +11,7 @@ const formatDate = (date?: string | Date) => {
 };
 
 const formatPrice = (price?: number) => {
-    if (!price) return '________________';
+    if (price === undefined || price === null) return '________________';
 
     return new Intl.NumberFormat('ru-RU').format(price);
 };
@@ -103,6 +103,10 @@ export const buildContractHTML = (data: ContractData) => {
     .appendix {
       margin-top: 22px;
       page-break-before: always;
+    }
+    
+    .appendix-signatures {
+        margin-top: 36px;
     }
   </style>
 </head>
@@ -205,7 +209,7 @@ export const buildContractHTML = (data: ContractData) => {
       <p><strong>4. Стоимость тура:</strong> ${price} сомов.</p>
       <p><strong>5. Менеджер:</strong> ${valueOrLine(data.manager.name)}, тел: ${valueOrLine(data.manager.phone)}.</p>
 
-      <div class="top-line" style="margin-top: 36px;">
+      <div class="top-line appendix-signatures">
         <span>Исполнитель: __________________</span>
         <span>Заказчик: __________________</span>
       </div>
