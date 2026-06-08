@@ -14,7 +14,7 @@ import {
   BadgeCheck,
   MessageSquareDashed,
 } from 'lucide-react';
-import { OrderCard } from '@/components/dashboard/orders/OrderCard';
+import OrderCard from '@/components/dashboard/orders/OrderCard';
 import { useState } from 'react';
 import CreateReviewForm from '@/components/public/reviews/form/CreateReviewForm';
 import {
@@ -133,7 +133,9 @@ export default function TourSetPage() {
         <Dot className="stroke-1 size-4" />
         <p className="font-semibold flex gap-1">
           {tour.ratingCount > 0 ? tour.ratingCount : 'нет'}
-          <span className="font-normal">{pluralize(tour.ratingCount, 'отзыв', 'отзыва', 'отзывов')}</span>
+          <span className="font-normal">
+            {pluralize(tour.ratingCount, 'отзыв', 'отзыва', 'отзывов')}
+          </span>
         </p>
       </div>
     );
@@ -145,7 +147,11 @@ export default function TourSetPage() {
         <OrderCard
           isOpen={isOrderOpen}
           onClose={closeModalOrder}
-          tourSetId={data._id}
+          tourSetId={slug}
+          tourTitle={slug}
+          startDate={data.startDate}
+          endDate={data.endDate}
+          price={data.discountPrice ?? data.price}
         />
       )}
 
@@ -293,7 +299,7 @@ export default function TourSetPage() {
             <div className="flex flex-row gap-3 items-end mt-3 mb-4">
               {set.discountPrice && (
                 <p className="text-[var(--primary)] font-semibold text-2xl">
-                  {formatToReadablePrice(set.discountPrice)}
+                  {formatToReadablePrice(set.discountPrice).price}
                 </p>
               )}
               <p
@@ -304,7 +310,7 @@ export default function TourSetPage() {
                     : 'text-[var(--primary)] text-[1.5rem]',
                 )}
               >
-                {formatToReadablePrice(set.price)}
+                {formatToReadablePrice(set.price).price}
               </p>
             </div>
             {set.discountPrice && (

@@ -110,12 +110,11 @@ export default function Home() {
               Сейчас нет опубликованных туров.
             </p>
           ) : (
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6 items-stretch">
               {tours.map((tour) => (
                 <PublicTourCard
                   key={tour._id}
                   tour={tour}
-                  tourSets={tourSets}
                 />
               ))}
             </div>

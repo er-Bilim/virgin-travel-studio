@@ -1,10 +1,10 @@
-"use client";
+'use client';
 import { TourSetsCard } from '@/components/dashboard/tourSets/TourSetsCard';
-import { useState } from "react";
-import { useTourSets } from "@/lib/hooks/tourSets";
-import { OrderCard } from "@/components/dashboard/orders/OrderCard";
+import { useState } from 'react';
+import { useTourSets } from '@/lib/hooks/tourSets';
+import OrderCard from '@/components/dashboard/orders/OrderCard';
 import { PaginationCustom } from '@/components/pagination/PaginationCustom';
-
+import type { TourSetType } from '@/types/tourSets';
 
 export default function TourSets() {
   const [page, setPage] = useState(1);
@@ -15,33 +15,47 @@ export default function TourSets() {
     null,
   );
 
-  const { data: tourSetsData, isLoading, isError, refetch } = useTourSets({page, limit});
+  const {
+    data: tourSetsData,
+    isLoading,
+    isError,
+    refetch,
+  } = useTourSets({ page, limit });
 
-    const tourSets = tourSetsData?.tourSets || [];
-    const meta = tourSetsData?.meta;
+  const tourSets = tourSetsData?.tourSets || [];
+  const meta = tourSetsData?.meta;
 
-    const handlePageChange = (newPage: number) => {
-      setPage(newPage);
-      window.scrollTo(0, 0);
-    };
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    window.scrollTo(0, 0);
+  };
 
-    const openModalOrder = (id: string) => {
-      setSelectedTourSetId(id);
-      setIsOrderOpen(true);
-    };
+  const openModalOrder = (id: string) => {
+    setSelectedTourSetId(id);
+    setIsOrderOpen(true);
+  };
 
-    const closeModalOrder = () => {
-      setSelectedTourSetId(null);
-      setIsOrderOpen(false);
-    }
+  const closeModalOrder = () => {
+    setSelectedTourSetId(null);
+    setIsOrderOpen(false);
+  };
+
+  const selectedTourSet: TourSetType =
+    tourSets.find((tourSet) => tourSet._id === selectedTourSetId) ??
+    tourSets[0] ??
+    null;
 
   return (
     <section>
       {selectedTourSetId && isOrderOpen && (
         <OrderCard
           isOpen={isOrderOpen}
-          tourSetId={selectedTourSetId}
           onClose={closeModalOrder}
+          tourSetId={selectedTourSetId}
+          tourTitle={selectedTourSetId}
+          startDate={selectedTourSet.startDate}
+          endDate={selectedTourSet.endDate}
+          price={selectedTourSet.discountPrice ?? selectedTourSet.price}
         />
       )}
       <div className="col-span-2 py-2 mb-2">
@@ -76,21 +90,25 @@ export default function TourSets() {
           )}
           <div className="grid grid-cols-[repeat(auto-fill,minmax(350px,1fr))] gap-3">
             {tourSets.map((tourSet) => (
-              <TourSetsCard key={tourSet._id} tourSet={tourSet} openModal={openModalOrder} />
+              <TourSetsCard
+                key={tourSet._id}
+                tourSet={tourSet}
+                openModal={openModalOrder}
+              />
             ))}
           </div>
         </div>
       </div>
 
       {meta && (
-          <div className="my-10 border-t pt-6">
-        <PaginationCustom
-          page={page}
-          limit={meta.limit}
-          totalPage={meta.totalPages}
-          onChange={handlePageChange}
-        />
-          </div>
+        <div className="my-10 border-t pt-6">
+          <PaginationCustom
+            page={page}
+            limit={meta.limit}
+            totalPage={meta.totalPages}
+            onChange={handlePageChange}
+          />
+        </div>
       )}
     </section>
   );

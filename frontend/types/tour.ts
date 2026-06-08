@@ -1,4 +1,5 @@
 import type { MetaType } from "./meta";
+import type { TourSetType } from "./tourSets";
 
 export interface TourCategoryType {
   _id: string;
@@ -15,7 +16,7 @@ export interface CategoryTypeResponse {
 export type TourCategory = Omit<TourCategoryType, 'isPublished'>
 
 export interface ToursGetResponse {
-  tours: TourType[];
+  tours: ITourWithTourSetFields[];
   meta: MetaType;
 }
 
@@ -29,11 +30,18 @@ export interface TourType {
   rating: number;
   ratingCount: number;
   isPublished: boolean;
+}
+
+export interface ITourWithTourSetFields extends TourType {
   isHot: boolean;
   minPrice: number;
   hotelLocation: string;
   nextStartDate: string;
   durationDays: number;
+} 
+
+export interface ISingleTour extends TourType {
+  tourSets: TourSetType[]
 }
 
 export interface TourMutation {

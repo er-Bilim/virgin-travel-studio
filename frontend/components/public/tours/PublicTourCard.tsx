@@ -1,53 +1,43 @@
   import Link from 'next/link';
 
-  import BasePhoto from '@/components/assets/lake.webp';
-  import { imageUrl, isDev } from '@/lib/constants';
-  import type { TourType } from '@/types/tour';
-  import Image from 'next/image';
-  import { ArrowRight, Calendar1, Flame, MapPin, Star } from 'lucide-react';
-  import {
-    formatDateToWords,
-    formatToReadablePrice,
-    getDayMonth,
-    pluralize,
-  } from '@/lib/utils';
-  import type {TourSetType} from "@/types/tourSets";
+import BasePhoto from '@/components/assets/lake.webp';
+import { imageUrl, isDev } from '@/lib/constants';
+import type { ITourWithTourSetFields} from '@/types/tour';
+import Image from 'next/image';
+import { ArrowRight, Calendar1, Flame, MapPin, Star } from 'lucide-react';
+import {
+  formatDateToWords,
+  formatToReadablePrice,
+  getDayMonth,
+  pluralize,
+} from '@/lib/utils';
 
-  type Props = {
-    tour: TourType;
-    tourSets?: TourSetType[];
-  };
+type Props = {
+  tour: ITourWithTourSetFields;
+};
 
   const PublicTourCard = ({ tour }: Props) => {
     const image =
       tour.images.length > 0 ? imageUrl + tour.images[0] : BasePhoto.src;
 
-    // const availableTourSets = tourSets.filter(
-    //     (tourSet) =>
-    //         tourSet.tourId._id === tour._id &&
-    //         tourSet.status !== 'FINISHED',
-    // );
-
-    // const firstTourSet = availableTourSets[0];
-
-    return (
-      <>
-        <li>
-          <article itemScope itemType="https://schema.org/Product" className="h-full">
-            <Link
-              href={`/tours/${tour._id}`}
-              className="flex flex-col group block h-full overflow-hidden rounded-2xl border border-border bg-card transition-all duration-200 hover:-translate-y-1  shadow-cyan-200 hover:shadow-[0_1px_10px_rgba(0,0,0,0.1)]"
-            >
-              <figure className="relative aspect-[4/3] overflow-hidden">
-                <Image
-                  src={image}
-                  alt={tour.title}
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  unoptimized={isDev}
-                  itemProp="image"
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                />
+  return (
+    <>
+      <li className="flex">
+        <article itemScope itemType="https://schema.org/Product" className="flex w-full">
+          <Link
+            href={`/tours/${tour._id}`}
+            className="group block flex flex-col w-full overflow-hidden rounded-2xl border border-border bg-card transition-all duration-200 hover:-translate-y-1  shadow-cyan-200 hover:shadow-[0_1px_10px_rgba(0,0,0,0.1)]"
+          >
+            <figure className="relative aspect-[4/3] overflow-hidden">
+              <Image
+                src={image}
+                alt={tour.title}
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                unoptimized={isDev}
+                itemProp="image"
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
+              />
 
                 <span
                   itemProp="category"
@@ -120,17 +110,17 @@
                       content="https://schema.org/InStock"
                     />
 
-                    <span className="text-[12px] uppercase tracking-wider text-muted-foreground">
-                      от
-                    </span>
-                    <span
-                      itemProp="price"
-                      content={String(tour.minPrice)}
-                      className="block text-xl font-bold text-foreground"
-                    >
-                      {formatToReadablePrice(tour.minPrice)}
-                    </span>
-                  </div>
+                  <span className="text-[12px] uppercase tracking-wider text-muted-foreground">
+                    от
+                  </span>
+                  <span
+                    itemProp="price"
+                    content={String(tour.minPrice)}
+                    className="block text-xl font-bold text-foreground"
+                  >
+                    {formatToReadablePrice(tour.minPrice).price}
+                  </span>
+                </div>
 
                   <div className="text-sm text-gray-400 flex flex-col gap-1">
                     <span className="uppercase">ближайший</span>
