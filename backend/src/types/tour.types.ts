@@ -1,9 +1,10 @@
-import type { Document, Types } from "mongoose";
-import type { TourSetFields } from "./tourSets.types.js";
-import type { ICategory } from "./category.types.js";
+import type {Document, Types} from 'mongoose';
+import type {TourSetFields} from './tourSets.types.js';
+import type {ICategory} from './category.types.js';
 
 export interface ITour extends Document {
   title: string;
+  countryCode: string;
   description: string;
   images: string[];
   category: Types.ObjectId;

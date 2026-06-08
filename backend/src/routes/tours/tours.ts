@@ -1,14 +1,14 @@
 import express from 'express';
-import auth, { authOrNot, type RequestWithUser } from '@/middlewares/auth.js';
+import auth, {authOrNot, type RequestWithUser} from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
-import { imagesUpload } from '@/middlewares/multer.js';
+import {imagesUpload} from '@/middlewares/multer.js';
 import Tour from '@/model/tour/Tour.js';
 import mongoose from 'mongoose';
 import validateObjectId from '@/middlewares/validateObjectId.js';
 import parseSort from '@/lib/sort.js';
 import TourSet from '@/model/tourSet/TourSet.js';
-import type { AggregatedTour, AggregatedTours } from '@/types/tour.types.js';
-import type { ICategory } from '@/types/category.types.js';
+import type {AggregatedTour, AggregatedTours} from '@/types/tour.types.js';
+import type {ICategory} from '@/types/category.types.js';
 
 const toursRouter = express.Router();
 
@@ -32,6 +32,7 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
     const skip = (page - 1) * limit;
 
     const query: {
+      countryCode?: string;
       isPublished?: boolean;
       category?: mongoose.Types.ObjectId;
       title?: { $regex: string; $options: string };
@@ -39,6 +40,10 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
 
     if (!isAdminOrManager) {
       query.isPublished = true;
+    }
+
+    if (typeof req.query.countryCode === 'string' && req.query.countryCode.trim()) {
+      query.countryCode = req.query.countryCode.trim().toUpperCase();
     }
 
     if (typeof req.query.category === 'string') {
