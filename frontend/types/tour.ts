@@ -49,6 +49,7 @@ export interface ISingleTour extends TourType {
 export interface TourMutation {
   title: string;
   description: string;
+  countryCode: string;
   category: string;
   baseAdvantages: string[];
   images: File[];

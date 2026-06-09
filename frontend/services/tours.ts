@@ -53,6 +53,7 @@ const buildTourFormData = (data: TourMutation) => {
   const formData = new FormData();
   formData.append('title', data.title);
   formData.append('description', data.description);
+  formData.append('countryCode', data.countryCode);
   formData.append('category', data.category);
 
   data.baseAdvantages

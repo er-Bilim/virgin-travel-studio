@@ -1,4 +1,5 @@
 import mongoose, {Schema} from 'mongoose';
+import isValidCountry from '@/utils/countryCode/countryCode.js';
 
 const TourSchema = new Schema(
   {
@@ -13,6 +14,15 @@ const TourSchema = new Schema(
          uppercase: true,
          trim: true,
          match: [/^[A-Z]{2}$/, 'Код страны должен состоять из 2 букв'],
+         validate: {
+            validator: function (value: string) {
+                if (!isValidCountry(value)) {
+                    return false;
+                }
+                return true;
+            },
+            message: 'Код страны неверный, введите из списка'
+        }
      },
     description: {
       type: String,
