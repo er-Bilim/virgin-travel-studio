@@ -4,16 +4,12 @@ import type { TourSetType } from "./tourSets";
 export interface TourCategoryType {
   _id: string;
   title: string;
-  isPublished: boolean;
 }
 
 export interface CategoryTypeResponse {
   categories: TourCategoryType[];
   meta: MetaType;
 }
-
-
-export type TourCategory = Omit<TourCategoryType, 'isPublished'>
 
 export interface ToursGetResponse {
   tours: ITourWithTourSetFields[];

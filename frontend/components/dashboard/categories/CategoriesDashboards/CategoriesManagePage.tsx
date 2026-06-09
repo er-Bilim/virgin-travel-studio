@@ -8,7 +8,6 @@ import {
   useCategories,
   useCreateCategory,
   useDeleteCategory,
-  useToggleCategoryPublish,
 } from '@/lib/hooks/categoryHooks';
 import {Input} from '@/components/ui/input';
 import {Button} from '@/components/ui/button';
@@ -48,7 +47,6 @@ export default function CategoriesManagePage() {
   const categories = categoriesData?.categories;
   const meta = categoriesData?.meta;
   const {mutate: createCategory, isPending: isCreating} = useCreateCategory();
-  const {mutate: togglePublish} = useToggleCategoryPublish();
   const {mutate: deleteCategory, isPending: isDeleting} = useDeleteCategory();
 
   const {
@@ -66,10 +64,8 @@ export default function CategoriesManagePage() {
     () =>
       getCategoryColumns({
         onDelete: (category) => setCategoryToDelete(category._id),
-
-        onTogglePublish: (category) => togglePublish(category._id),
       }),
-    [togglePublish],
+    [],
   );
 
   const onCreateSubmit = (data: CategoryFormInput) => {
@@ -123,7 +119,7 @@ export default function CategoriesManagePage() {
           Управление категориями
         </h1>
         <p className="text-sm text-gray-500 mt-1">
-          Создание, публикация и удаление категорий для туров.
+          Создание и удаление категорий для туров
         </p>
       </div>
 

@@ -21,11 +21,6 @@ export const createCategory = async (data: { title: string }) => {
   return res.data;
 };
 
-export const toggleCategoryPublish = async (id: string) => {
-  const res = await axiosApi.patch<TourCategoryType>(`/categories/${id}`);
-  return res.data;
-};
-
 export const deleteCategory = async (id: string) => {
   const res = await axiosApi.delete<{ message: string }>(`/categories/${id}`);
   return res.data;
