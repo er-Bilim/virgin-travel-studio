@@ -1,18 +1,18 @@
 import express from 'express';
-import auth, {type RequestWithUser} from '@/middlewares/auth.js';
+import auth, { type RequestWithUser } from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
 import Order from '@/model/order/Order.js';
 import type {
   OrderStatus,
   PassportPayload,
-  PopulatedOrder
+  PopulatedOrder,
 } from '@/types/orders.types.js';
 import mongoose from 'mongoose';
 import validateObjectId from '@/middlewares/validateObjectId.js';
-import type {ContractData} from '@/types/contracts.types.js';
-import {buildContractHTML} from '@/utils/contracts/buildContractHTML.js';
-import {getBrowser} from '@/lib/puppeteer.js';
-import {generateId} from '@/utils/id/generateId.js';
+import type { ContractData } from '@/types/contracts.types.js';
+import { buildContractHTML } from '@/utils/contracts/buildContractHTML.js';
+import { getBrowser } from '@/lib/puppeteer.js';
+import { generateId } from '@/utils/id/generateId.js';
 
 const ordersRouter = express.Router();
 
@@ -33,16 +33,17 @@ ordersRouter.get(
       const rawPage = Number.parseInt(req.query.page as string, 10);
       const rawLimit = Number.parseInt(req.query.limit as string, 10);
       const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
-      const limit = Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(rawLimit, 50) : 10;
+      const limit =
+        Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(rawLimit, 50) : 10;
 
       const skip = (page - 1) * limit;
 
-       const allowed: OrderStatus[] = [
-           'NEW',
-         'IN_PROGRESS',
-         'CONTRACT_PENDING',
-         'COMPLETED',
-         'REJECTED',
+      const allowed: OrderStatus[] = [
+        'NEW',
+        'IN_PROGRESS',
+        'CONTRACT_PENDING',
+        'COMPLETED',
+        'REJECTED',
       ];
 
       if (user.role === 'MANAGER') {
@@ -51,13 +52,13 @@ ordersRouter.get(
 
           if (typeof status === 'string') {
             if (!allowed.includes(status as OrderStatus)) {
-              return res.status(400).send({ error: 'Недопустимый статус' })
+              return res.status(400).send({ error: 'Недопустимый статус' });
             }
             query.status = status as OrderStatus;
           }
         }
         if (view !== 'my') {
-          query.status = 'NEW'
+          query.status = 'NEW';
           query.managerId = null;
         }
       }
@@ -72,7 +73,7 @@ ordersRouter.get(
 
         if (typeof managerId === 'string') {
           if (!mongoose.Types.ObjectId.isValid(managerId)) {
-            return res.status(400).send({ error: 'Неверный ID менеджера' })
+            return res.status(400).send({ error: 'Неверный ID менеджера' });
           }
           query.managerId = new mongoose.Types.ObjectId(managerId);
         }
@@ -90,10 +91,10 @@ ordersRouter.get(
             select: 'title',
           },
         })
-          .sort({ createdAt: -1 })
-          .skip(skip)
-          .limit(limit)
-          .lean();
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean();
       const calculatedPages = Math.ceil(totalOrders / limit);
       const totalPages = calculatedPages === 0 ? 1 : calculatedPages;
 
@@ -104,7 +105,7 @@ ordersRouter.get(
           page,
           limit,
           totalPages,
-        }
+        },
       });
     } catch (e) {
       next(e);
@@ -137,7 +138,7 @@ ordersRouter.get(
         .sort({ createdAt: -1 })
         .lean();
 
-      if (!order) return res.status(404).send({error: 'Заявка не найдена'});
+      if (!order) return res.status(404).send({ error: 'Заявка не найдена' });
       res.send(order);
     } catch (e) {
       next(e);
@@ -157,7 +158,7 @@ ordersRouter.post('/', async (req, res, next) => {
     let isUnique = false;
 
     while (!isUnique) {
-      visibleId = `ORDER-${generateId(6,3)}`;
+      visibleId = `ORDER-${generateId(6, 3)}`;
       const existing = await Order.findOne({ visibleId });
 
       if (!existing) isUnique = true;
@@ -217,7 +218,7 @@ ordersRouter.patch(
       const order = await Order.findById(id);
 
       if (!order) return res.status(404).send({ error: 'Заявка не найдена' });
-      
+
       // if (
       //   order.managerId &&
       //   !order.managerId.equals(user._id)
@@ -230,7 +231,7 @@ ordersRouter.patch(
       order.managerId = user._id;
       if (clientName) order.clientName = clientName;
       if (clientPhone) order.clientPhone = clientPhone;
-      if (order.status === "NEW") order.status = 'IN_PROGRESS';
+      if (order.status === 'NEW') order.status = 'IN_PROGRESS';
       if (status) order.status = status as OrderStatus;
       if (rejectionReason) order.rejectionReason = rejectionReason;
 
@@ -256,12 +257,12 @@ ordersRouter.patch(
 );
 
 ordersRouter.delete(
-  '/:id', 
+  '/:id',
   auth,
-  permit('ADMIN', 'MANAGER'), 
+  permit('ADMIN', 'MANAGER'),
   validateObjectId(),
   async (req, res, next) => {
-  const {id} = req.params;
+    const { id } = req.params;
     try {
       const { deletedCount } = await Order.deleteOne({ _id: id as string });
       if (!deletedCount) {
@@ -276,93 +277,100 @@ ordersRouter.delete(
     } catch (e) {
       next(e);
     }
-});
+  },
+);
 
 ordersRouter.post(
-    '/:id/generate-contract',
-    auth,
-    permit('ADMIN', 'MANAGER'),
-    validateObjectId(), async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const body  = req.body as PassportPayload;
+  '/:id/generate-contract',
+  auth,
+  permit('ADMIN', 'MANAGER'),
+  validateObjectId(),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const body = req.body as PassportPayload;
 
-    const {
-      passportNumber,
-      passportIssuedBy,
-      passportIssueDate,
-      birthDate,
-    } = body;
+      const { passportNumber, passportIssuedBy, passportIssueDate, birthDate } =
+        body;
 
-    const requiredFields = [
-      passportNumber,
-      passportIssuedBy,
-      passportIssueDate,
-      birthDate,
-    ];
-
-    if (requiredFields.some(v => !v || v.trim() === '')) {
-      return res.status(400).send({ error: 'Не все данные указаны' });
-    }
-
-    const order = await Order.findById(id).populate({
-      path: 'tourSetId',
-      populate: { path: 'tourId' },
-    }).populate('managerId', 'fullName phone').lean<PopulatedOrder>();
-
-    if (!order) return res.status(404).send({error: 'Заявка не найдена.'});
-
-    if (order.status !== "CONTRACT_PENDING") return res.status(400).send({error: 'Контракт недоступен для генерации только в состоянии CONTRACT_PENDING'});
-
-    const contractData: ContractData = {
-      client: {
-        name: order.clientName,
-        phone: order.clientPhone,
+      const requiredFields = [
         passportNumber,
         passportIssuedBy,
         passportIssueDate,
         birthDate,
-      },
-      tour: {
-        title: order.tourSetId?.tourId?.title,
-        startDate: order.tourSetId?.startDate,
-        endDate: order.tourSetId?.endDate,
-        price: order.tourSetId?.price,
-        hotel: order.tourSetId?.hotelName,
-      },
-      manager: {
-        name: order.managerId?.fullName,
-        phone: order.managerId?.phone,
-      },
-    };
+      ];
 
-    const browser = await getBrowser();
-    const page = await browser.newPage();
+      if (requiredFields.some((v) => !v || v.trim() === '')) {
+        return res.status(400).send({ error: 'Не все данные указаны' });
+      }
 
-    try {
-      await page.setContent(buildContractHTML(contractData), {
-        waitUntil: 'load',
-      });
+      const order = await Order.findById(id)
+        .populate({
+          path: 'tourSetId',
+          populate: { path: 'tourId' },
+        })
+        .populate('managerId', 'fullName phone')
+        .lean<PopulatedOrder>();
 
-      const pdfBuffer = await page.pdf({
-        format: 'A4',
-        printBackground: true,
-      });
+      if (!order) return res.status(404).send({ error: 'Заявка не найдена.' });
 
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader(
+      if (order.status !== 'CONTRACT_PENDING')
+        return res
+          .status(400)
+          .send({
+            error:
+              'Контракт недоступен для генерации только в состоянии CONTRACT_PENDING',
+          });
+
+      const contractData: ContractData = {
+        client: {
+          name: order.clientName,
+          phone: order.clientPhone,
+          passportNumber,
+          passportIssuedBy,
+          passportIssueDate,
+          birthDate,
+        },
+        tour: {
+          title: order.tourSetId?.tourId?.title,
+          startDate: order.tourSetId?.startDate,
+          endDate: order.tourSetId?.endDate,
+          price: order.tourSetId?.price,
+          hotel: order.tourSetId?.hotelName,
+        },
+        manager: {
+          name: order.managerId?.fullName,
+          phone: order.managerId?.phone,
+        },
+      };
+
+      const browser = await getBrowser();
+      const page = await browser.newPage();
+
+      try {
+        await page.setContent(buildContractHTML(contractData), {
+          waitUntil: 'load',
+        });
+
+        const pdfBuffer = await page.pdf({
+          format: 'A4',
+          printBackground: true,
+        });
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader(
           'Content-Disposition',
-          `attachment; filename=contract.pdf`
-      );
+          `attachment; filename=contract.pdf`,
+        );
 
-      return res.end(pdfBuffer);
-
-    } finally {
-      await page.close();
+        return res.end(pdfBuffer);
+      } finally {
+        await page.close();
+      }
+    } catch (e) {
+      next(e);
     }
-  }catch (e) {
-    next(e);
-  }
-});
+  },
+);
 
 export default ordersRouter;
