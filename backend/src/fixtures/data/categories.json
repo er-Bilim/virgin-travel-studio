@@ -1,177 +1,142 @@
 [
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f01",
-    "title": "Экскурсионные",
-    "isPublished": true
+    "title": "Экскурсионные"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f02",
-    "title": "Оздоровительные",
-    "isPublished": true
+    "title": "Оздоровительные"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f03",
-    "title": "Пляжные",
-    "isPublished": true
+    "title": "Пляжные"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f04",
-    "title": "Гастрономические",
-    "isPublished": true
+    "title": "Гастрономические"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f05",
-    "title": "Горнолыжные",
-    "isPublished": true
+    "title": "Горнолыжные"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f06",
-    "title": "Активный отдых",
-    "isPublished": true
+    "title": "Активный отдых"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f07",
-    "title": "Круизы",
-    "isPublished": true
+    "title": "Круизы"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f08",
-    "title": "Семейные",
-    "isPublished": true
+    "title": "Семейные"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f09",
-    "title": "Шопинг туры",
-    "isPublished": false
+    "title": "Шопинг туры"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f10",
-    "title": "Свадебные",
-    "isPublished": true
+    "title": "Свадебные"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f11",
-    "title": "Экстремальные",
-    "isPublished": true
+    "title": "Экстремальные"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f12",
-    "title": "Паломнические",
-    "isPublished": false
+    "title": "Паломнические"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f13",
-    "title": "Экотуры",
-    "isPublished": true
+    "title": "Экотуры"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f14",
-    "title": "Фототуры",
-    "isPublished": true
+    "title": "Фототуры"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f15",
-    "title": "Исторические",
-    "isPublished": true
+    "title": "Исторические"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f16",
-    "title": "Сафари",
-    "isPublished": true
+    "title": "Сафари"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f17",
-    "title": "Автобусные",
-    "isPublished": true
+    "title": "Автобусные"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f18",
-    "title": "Детские",
-    "isPublished": false
+    "title": "Детские"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f19",
-    "title": "Индивидуальные",
-    "isPublished": true
+    "title": "Индивидуальные"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f20",
-    "title": "Романтические",
-    "isPublished": true
+    "title": "Романтические"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f21",
-    "title": "Дайвинг туры",
-    "isPublished": true
+    "title": "Дайвинг туры"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f22",
-    "title": "Выходного дня",
-    "isPublished": true
+    "title": "Выходного дня"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f23",
-    "title": "Студенческие",
-    "isPublished": false
+    "title": "Студенческие"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f24",
-    "title": "Новогодние",
-    "isPublished": true
+    "title": "Новогодние"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f25",
-    "title": "Корпоративные",
-    "isPublished": false
+    "title": "Корпоративные"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f26",
-    "title": "Рекламные туры",
-    "isPublished": false
+    "title": "Рекламные туры"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f27",
-    "title": "Обучающие",
-    "isPublished": false
+    "title": "Обучающие"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f28",
-    "title": "Йога туры",
-    "isPublished": true
+    "title": "Йога туры"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f29",
-    "title": "Горные восхождения",
-    "isPublished": true
+    "title": "Горные восхождения"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f30",
-    "title": "Велотуры",
-    "isPublished": true
+    "title": "Велотуры"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f31",
-    "title": "Сплавы",
-    "isPublished": true
+    "title": "Сплавы"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f32",
-    "title": "Этнографические",
-    "isPublished": true
+    "title": "Этнографические"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f33",
-    "title": "Кемпинги",
-    "isPublished": true
+    "title": "Кемпинги"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f34",
-    "title": "Походы",
-    "isPublished": true
+    "title": "Походы"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5f35",
-    "title": "Спа туры",
-    "isPublished": true
+    "title": "Спа туры"
   }
 ]

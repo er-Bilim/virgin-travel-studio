@@ -46,6 +46,7 @@ categoriesRouter.get('/', async (req, res) => {
   const categories = await Category.find().skip(skip).limit(limit);
 
   const categoriesTotal = await Category.countDocuments();
+  
   return res.send({
     categories: categories,
     meta: {
@@ -56,30 +57,6 @@ categoriesRouter.get('/', async (req, res) => {
     },
   });
 });
-
-categoriesRouter.patch(
-  '/:id',
-  auth,
-  permit('ADMIN', 'MANAGER'),
-  validateObjectId(),
-  async (req, res, next) => {
-    const {id} = req.params;
-
-    try {
-      const category = await Category.findById(id);
-      if (!category) {
-        return res.status(404).send({error: 'Категория не найдена'});
-      }
-
-      category.isPublished = !category.isPublished;
-      await category.save();
-      return res.send(category);
-    } catch (e) {
-      console.log(e);
-      next(e);
-    }
-  },
-);
 
 categoriesRouter.delete(
   '/:id',
