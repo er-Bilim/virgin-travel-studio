@@ -3,7 +3,7 @@ import axiosApi from '@/lib/axiosApi';
 import type {
   GetToursParams,
   ISingleTour,
-  TourCategory,
+  TourCategoryType,
   TourMutation,
   ToursGetResponse,
   TourType
@@ -39,8 +39,8 @@ export const getTourById = async (id: string): Promise<ISingleTour> => {
   return res.data;
 };
 
-export const getTourCategories = async (): Promise<TourCategory[]> => {
-  const { data } = await axiosApi.get<TourCategory[]>('/tours/categories');
+export const getTourCategories = async (): Promise<TourCategoryType[]> => {
+  const { data } = await axiosApi.get<TourCategoryType[]>('/tours/categories');
   return data;
 };
 

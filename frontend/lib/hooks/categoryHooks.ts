@@ -2,7 +2,6 @@ import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query';
 import {
   getCategories,
   createCategory,
-  toggleCategoryPublish,
   deleteCategory,
 } from '@/services/categories';
 import type {AxiosError} from 'axios';
@@ -26,17 +25,6 @@ export const useCreateCategory = () => {
     AxiosError<GlobalError>,
     { title: string }>({
     mutationFn: createCategory,
-    onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ['categories']});
-    },
-  });
-};
-
-export const useToggleCategoryPublish = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: toggleCategoryPublish,
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['categories']});
     },
