@@ -4,9 +4,10 @@ import {useEffect, useMemo, useState} from 'react';
 import Link from 'next/link';
 import {Plus, Search} from 'lucide-react';
 import {
+  useCountries,
   useDeleteTour,
   useTogglePublish,
-  useTours,
+  useTours
 } from '@/lib/hooks/tourHooks';
 import {useCategories} from '@/lib/hooks/categoryHooks';
 import {Button} from '@/components/ui/button';
@@ -16,15 +17,15 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from '@/components/ui/select';
 import {
   headerRowClassName,
   rowClassName,
-  tableClassName,
+  tableClassName
 } from '@/lib/constants';
 import {useUser} from '@/lib/hooks/authHooks';
-import {usePathname, useRouter} from 'next/navigation';
+import {usePathname, useRouter, useSearchParams} from 'next/navigation';
 import {
   ConfirmDialog
 } from '@/components/dashboard/ConfirmDialog/ConfirmDialog';
@@ -33,7 +34,7 @@ import {
   getToursColumns
 } from '@/components/dashboard/shared/data-table/columns/createColumnInTable/tour-colum';
 import type {TourType} from '@/types/tour';
-import {toast} from "sonner";
+import {toast} from 'sonner';
 
 export default function ToursManagePage() {
   const router = useRouter();
@@ -45,6 +46,8 @@ export default function ToursManagePage() {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [tourToDelete, setTourToDelete] = useState<string | null>(null);
 
+  const searchParams = useSearchParams();
+  const countryCode = searchParams.get('countryCode') ?? null;
   const path = usePathname();
 
   useEffect(() => {
@@ -66,8 +69,24 @@ export default function ToursManagePage() {
       categoryId: categoryId === 'all' ? undefined : categoryId,
       search: debouncedSearch || undefined,
       isPublished: publishStatus === 'all' ? undefined : publishStatus,
+      countryCode: countryCode === 'all' ? undefined : countryCode,
     }
   );
+
+  const {data: countries} = useCountries();
+
+  const onChangeCountryCode = (val: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (val === 'all') {
+      params.delete('countryCode');
+    } else {
+      params.set('countryCode', val);
+    }
+
+    setPage(1);
+    router.push(`${path}?${params.toString()}`);
+  };
 
   const { mutate: deleteTour, isPending: isDeleting } = useDeleteTour();
   const { mutate: togglePublish } = useTogglePublish();
@@ -164,6 +183,23 @@ export default function ToursManagePage() {
               <SelectItem value="all">Все статусы</SelectItem>
               <SelectItem value="true">Опубликованные</SelectItem>
               <SelectItem value="false">Черновики</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={countryCode ?? 'all'}
+            onValueChange={onChangeCountryCode}
+          >
+            <SelectTrigger className="w-full lg:w-48 bg-white border-gray-300">
+              <SelectValue placeholder="Все страны" />
+            </SelectTrigger>
+            <SelectContent position="popper">
+              <SelectItem value="all">Все страны</SelectItem>
+              {countries?.map((code) => (
+                <SelectItem key={code} value={code}>
+                  {code}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

@@ -1,4 +1,4 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose, {Schema} from 'mongoose';
 
 const TourSchema = new Schema(
   {
@@ -7,6 +7,13 @@ const TourSchema = new Schema(
       required: [true, 'Название тура обязательно для заполнения'],
       trim: true,
     },
+     countryCode: {
+        type: String,
+         required: [true, 'Код страны обязателен для заполнения'],
+         uppercase: true,
+         trim: true,
+         match: [/^[A-Z]{2}$/, 'Код страны должен состоять из 2 букв'],
+     },
     description: {
       type: String,
       required: [true, 'Описание тура обязательно для заполнения'],

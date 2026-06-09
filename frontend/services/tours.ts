@@ -6,7 +6,7 @@ import type {
   TourCategory,
   TourMutation,
   ToursGetResponse,
-  TourType,
+  TourType
 } from '@/types/tour';
 
 export const getTours = async ({
@@ -15,6 +15,7 @@ export const getTours = async ({
   categoryId,
   search,
   isPublished,
+    countryCode,
   sort
 }: GetToursParams): Promise<ToursGetResponse> => {
   const params: Record<string, string | undefined | number> = {};
@@ -23,6 +24,7 @@ export const getTours = async ({
   if (sort) params.sort = sort;
   if (search) params.search = search;
   if (isPublished) params.isPublished = String(isPublished);
+  if (countryCode) params.countryCode = countryCode;
 
   params.page = Number(page);
   params.limit = Number(limit);
@@ -40,6 +42,11 @@ export const getTourById = async (id: string): Promise<ISingleTour> => {
 export const getTourCategories = async (): Promise<TourCategory[]> => {
   const { data } = await axiosApi.get<TourCategory[]>('/tours/categories');
   return data;
+};
+
+export const getCountries = async (): Promise<string[]> => {
+  const res = await axiosApi.get<string[]>('/tours/countries');
+  return res.data || [];
 };
 
 const buildTourFormData = (data: TourMutation) => {

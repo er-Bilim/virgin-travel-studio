@@ -1,10 +1,15 @@
-import type { ColumnDef } from '@tanstack/react-table';
-import type { TourType } from '@/types/tour';
+import type {ColumnDef} from '@tanstack/react-table';
+import type {TourType} from '@/types/tour';
 
-import { createActionsColumn } from '@/components/dashboard/shared/data-table/columns/createActionsColumn';
-import { Badge } from '@/components/ui/badge';
-import { TourImageCell } from '@/components/dashboard/shared/data-table/columnComponent/TourImageCell';
-import { TooltipCustom } from '@/components/ui/tooltip-custom';
+import {
+    createActionsColumn
+} from '@/components/dashboard/shared/data-table/columns/createActionsColumn';
+import {Badge} from '@/components/ui/badge';
+import {
+    TourImageCell
+} from '@/components/dashboard/shared/data-table/columnComponent/TourImageCell';
+import {TooltipCustom} from '@/components/ui/tooltip-custom';
+import dayjs from 'dayjs';
 
 type Props = {
     onView: (tour: TourType) => void;
@@ -27,6 +32,23 @@ export const getToursColumns = ({
     header: 'Фото',
     cell: ({ row }) => <TourImageCell tour={row.original} />,
   },
+    {
+       accessorKey: 'countryCode',
+       header: 'Код страны',
+        cell: ({ row }) => (
+            <span className="font-medium text-[#1E2B6D]">
+                {row.original.countryCode || '—'}
+            </span>
+        ),
+    },
+    {
+        accessorKey: 'createdAt',
+        header: 'Дата создания',
+        cell: ({ getValue }) => {
+           const rawDate = getValue<string>();
+           return dayjs(rawDate).format('DD.MM.YYYY (HH:mm)');
+           },
+    },
   {
     accessorKey: 'title',
     header: 'Название',
