@@ -28,11 +28,11 @@ export function TourSetsCard({ tourSet, openModal }: Props) {
     <Card
       role="button"
       tabIndex={0}
-      onClick={() => router.push(`/tourSets/${tourSet._id}`)}
+      onClick={() => router.push(`/tours/${tourSet.tourId._id}`)}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          router.push(`/tourSets/${tourSet._id}`);
+          router.push(`/tours/${tourSet.tourId._id}`);
         }
       }}
       className="group relative mx-auto h-[420px] w-full overflow-hidden rounded-3xl border-0 bg-black text-white shadow-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)]"
