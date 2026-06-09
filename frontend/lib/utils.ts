@@ -25,27 +25,22 @@ export const createFormData = (data: object): FormData => {
   return formData;
 };
 
-export const formatDateToWords = (date: string, isSlice?: true): string => {
-  dayjs.locale('ru');
-  const formatDate = dayjs(date);
+export const formatDayAndMonthWords = (date: string, isSlice?: boolean): {day: string, month: string} => {
+  const formatDate = dayjs(date).locale('ru');
 
-  const monthName = formatDate.format('MMMM');
+  const fullDate = formatDate.format('D MMMM');
+  const [ day, month ] = fullDate.split(' ');
 
   if (isSlice) {
-    const sliceMonthName: string = monthName.slice(0, 3);
-
-    return sliceMonthName;
+    const sliceMonth: string = month.slice(0, 3);
+    return {
+      day,
+      month: sliceMonth
+    }
   }
 
-  return monthName;
-};
-
-export const getDayMonth = (date: string) => {
-  const formatDate = dayjs(date);
-
-  const day = formatDate.format('D');
-  return day;
-};
+  return { day, month }
+}
 
 export const getYearFullNumber = (date: string) => {
   const formatDate = dayjs(date);

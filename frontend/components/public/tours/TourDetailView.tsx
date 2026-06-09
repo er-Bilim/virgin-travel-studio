@@ -21,9 +21,8 @@ import {
 import { useState } from 'react';
 import CreateReviewForm from '@/components/public/reviews/form/CreateReviewForm';
 import {
-  formatDateToWords,
+  formatDayAndMonthWords,
   formatToReadablePrice,
-  getDayMonth,
   pluralize,
 } from '@/lib/utils';
 import SeatsIndicator from '@/components/shared/SeatsIndicator';
@@ -37,6 +36,7 @@ import { useTourById } from '@/lib/hooks/tourHooks';
 import TourSetCard from './TourSetCard';
 import type { TourSetType } from '@/types/tourSets';
 import OrderCard from '@/components/dashboard/orders/OrderCard';
+import TourDetailLoading from '@/app/(public)/tours/[slug]/loading';
 
 interface Props {
   id: string;
@@ -57,7 +57,7 @@ const TourDetailView = ({ id }: Props) => {
   } = useInfiniteReviews(id);
 
   if (isPending) {
-    return <Spinner />;
+    return <TourDetailLoading/>;
   }
 
   if (isError || !tour) {
@@ -80,6 +80,19 @@ const TourDetailView = ({ id }: Props) => {
       </div>
     );
   }
+
+  const { day: saleDeadlineDay, month: saleDeadlineMonth } =
+    formatDayAndMonthWords(selectedTourSet.saleDeadline, true);
+
+  const { day: startDay, month: startMonth } = formatDayAndMonthWords(
+    selectedTourSet.startDate,
+    true,
+  );
+
+  const { day: endDay, month: endMonth } = formatDayAndMonthWords(
+    selectedTourSet.endDate,
+    true,
+  );
 
   const freeSeats: number =
     selectedTourSet.totalSeats - selectedTourSet.bookedSeats;
@@ -199,8 +212,8 @@ const TourDetailView = ({ id }: Props) => {
           <div className="bg-red-500 text-white rounded-xl px-4 py-1 mt-4 inline-flex gap-1 text-sm font-semibold items-center">
             <BadgePercent className="size-4 stroke-3 me-1" />
             <span>Скидка до</span>
-            <span>{getDayMonth(selectedTourSet.saleDeadline)}</span>
-            <span>{formatDateToWords(selectedTourSet.saleDeadline, true)}</span>
+            <span>{saleDeadlineDay}</span>
+            <span>{saleDeadlineMonth}</span>
           </div>
         </div>
       );
@@ -446,20 +459,12 @@ const TourDetailView = ({ id }: Props) => {
                   </dt>
                   <dd className="font-semibold text-foreground flex gap-1">
                     <p className="after:content-['–'] after:ml-2 after:text-gray-500">
-                      <span className="me-1">
-                        {getDayMonth(selectedTourSet.startDate)}
-                      </span>
-                      <span>
-                        {formatDateToWords(selectedTourSet.startDate, true)}
-                      </span>
+                      <span className="me-1">{startDay}</span>
+                      <span>{startMonth}</span>
                     </p>
                     <p>
-                      <span className="me-1">
-                        {getDayMonth(selectedTourSet.endDate)}
-                      </span>
-                      <span>
-                        {formatDateToWords(selectedTourSet.endDate, true)}
-                      </span>
+                      <span className="me-1">{endDay}</span>
+                      <span>{endMonth}</span>
                     </p>
                   </dd>
                 </div>
@@ -495,7 +500,9 @@ const TourDetailView = ({ id }: Props) => {
                     <p>Отель</p>
                   </dt>
                   <dd className="font-semibold text-right">
-                    <span className="text-right">{selectedTourSet.hotelName}</span>
+                    <span className="text-right">
+                      {selectedTourSet.hotelName}
+                    </span>
                     <span className="block font-normal text-muted-foreground mt-0.5 text-right">
                       {selectedTourSet.hotelLocation}
                     </span>
