@@ -2,9 +2,10 @@
 
 import {Controller, useFieldArray, useForm} from 'react-hook-form';
 import {useRouter} from 'next/navigation';
-import {Loader2, Plus, Trash2} from 'lucide-react';
-import {Input} from '@/components/ui/input';
-import {Textarea} from '@/components/ui/textarea';
+import { Loader2, Plus, Trash2, ChevronsUpDown, Check } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { useState } from 'react';
 import {
   Select,
   SelectContent,
@@ -18,6 +19,22 @@ import {inputClass} from '@/lib/constants';
 import {useCategories} from '@/lib/hooks/categoryHooks';
 import {useCreateTour, useUpdateTour} from '@/lib/hooks/tourHooks';
 import type {TourMutation} from '@/types/tour';
+import countries from 'i18n-iso-countries';
+import ru from 'i18n-iso-countries/langs/ru.json';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from '@/components/ui/command';
+import { cn } from '@/lib/utils';
 
 interface Props {
   isEdit?: boolean;
@@ -33,6 +50,10 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
 
   const isPending = isCreating || isUpdating;
   const categories = categoriesData?.categories;
+  countries.registerLocale(ru);
+  const countryOptions = Object.entries(countries.getNames('ru')).map(
+    ([code, name]) => ({ code, name }),
+  );
 
   const {
     register,
@@ -44,6 +65,7 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
     defaultValues: initialValues || {
       title: '',
       description: '',
+      countryCode: '',
       category: '',
       baseAdvantages: [''],
       images: [],
@@ -158,6 +180,83 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
         {errors.description && (
           <p className="text-xs font-semibold text-red-500 pt-0.5">
             {errors.description.message}
+          </p>
+        )}
+      </div>
+
+      <div className="space-y-1">
+        <label className="text-sm font-medium text-gray-700">Страна</label>
+        <Controller
+          control={control}
+          name="countryCode"
+          rules={{ required: 'Выберите страну' }}
+          render={({ field }) => {
+            const [open, setOpen] = useState(false);
+
+            const selectedName = countryOptions.find(
+              (c) => c.code === field.value,
+            )?.name;
+
+            return (
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    disabled={isPending || isCatsLoading}
+                    className={cn(
+                      inputClass,
+                      'w-full justify-between font-normal',
+                      errors.countryCode && 'border-red-500 focus:ring-red-500',
+                      !field.value && 'text-muted-foreground',
+                    )}
+                  >
+                    {isCatsLoading ? (
+                      <span className="flex items-center gap-2 text-gray-400">
+                        <Loader2 className="w-4 h-4 animate-spin text-[#1E2B6D]" />
+                        Загрузка стран...
+                      </span>
+                    ) : (
+                      (selectedName ?? 'Выберите страну')
+                    )}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Введите название страны..." />
+                    <CommandEmpty>Страна не найдена</CommandEmpty>
+                    <CommandGroup className="max-h-64 overflow-y-auto">
+                      {countryOptions.map(({ code, name }) => (
+                        <CommandItem
+                          key={code}
+                          value={name}
+                          onSelect={() => {
+                            field.onChange(code);
+                            setOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              'mr-2 h-4 w-4',
+                              field.value === code
+                                ? 'opacity-100'
+                                : 'opacity-0',
+                            )}
+                          />
+                          {name}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            );
+          }}
+        />
+        {errors.countryCode && (
+          <p className="text-xs font-semibold text-red-500 pt-0.5">
+            {errors.countryCode.message}
           </p>
         )}
       </div>

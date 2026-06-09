@@ -267,7 +267,7 @@ toursRouter.post(
   imagesUpload.array('images', 5),
   async (req, res, next) => {
     try {
-      const { title, description, category, baseAdvantages } = req.body;
+      const { title, description, countryCode, category, baseAdvantages } = req.body;
 
       const parsedAdvantages: string[] =
         typeof baseAdvantages === 'string'
@@ -288,6 +288,7 @@ toursRouter.post(
       const tour = new Tour({
         title,
         description,
+        countryCode,
         category,
         images: imagePaths,
         baseAdvantages: parsedAdvantages,
@@ -320,11 +321,12 @@ toursRouter.patch(
       const tour = await Tour.findById(id);
       if (!tour) return res.status(404).send({ error: 'Тур не найден' });
 
-      const { title, description, category, baseAdvantages, isPublished } =
+      const { title, description, countryCode, category, baseAdvantages, isPublished } =
         req.body;
 
       if (title !== undefined) tour.title = title;
       if (description !== undefined) tour.description = description;
+      if (countryCode !== undefined) tour.countryCode = countryCode; 
 
       if (category) {
         if (!mongoose.Types.ObjectId.isValid(String(category))) {

@@ -33,9 +33,7 @@ export default function EditTour() {
     <div className="p-8">
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-bold text-[#1E2B6D]">
-            Редактирование
-          </h1>
+          <h1 className="text-2xl font-bold text-[#1E2B6D]">Редактирование</h1>
           <p className="text-gray-500 text-sm">ID тура: {id}</p>
         </div>
 
@@ -45,6 +43,7 @@ export default function EditTour() {
           initialValues={{
             title: tour.title,
             description: tour.description,
+            countryCode: tour.countryCode,
             category:
               tour.category && typeof tour.category === 'object'
                 ? tour.category._id
