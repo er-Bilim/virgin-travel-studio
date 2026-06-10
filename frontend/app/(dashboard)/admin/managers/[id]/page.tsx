@@ -6,22 +6,22 @@ import {
   UpdateManagerForm
 } from '@/components/dashboard/managers/UpdateManagerForm';
 import OrderTable from '@/components/dashboard/orders/OrderTable';
-import {Button} from "@/components/ui/button";
-import {Delete, Download} from "lucide-react";
-import {useModalStore} from "@/lib/stores/modalStore";
-import {Modal} from "@/components/shared/Modal";
+import {Button} from '@/components/ui/button';
+import {Delete, Download} from 'lucide-react';
+import {useModalStore} from '@/lib/stores/modalStore';
+import {Modal} from '@/components/shared/Modal';
 import {
   DateRangePicker
-} from "@/components/dashboard/shared/date-range-picker/DateRangePicker";
-import {useState} from "react";
-import type {DateRange} from "react-day-picker";
-import {reportsManager} from "@/services/reports";
-import {downloadBlobFile, isJsonBlob, parseBlobError} from "@/lib/utils";
-import type {BlobError} from "@/types/error";
+} from '@/components/dashboard/shared/date-range-picker/DateRangePicker';
+import {useState} from 'react';
+import type {DateRange} from 'react-day-picker';
+import {reportsManager} from '@/services/reports';
+import {downloadBlobFile, isJsonBlob, parseBlobError} from '@/lib/utils';
+import type {BlobError} from '@/types/error';
 import {
   ConfirmDialog
-} from "@/components/dashboard/ConfirmDialog/ConfirmDialog";
-import {toast} from "sonner";
+} from '@/components/dashboard/ConfirmDialog/ConfirmDialog';
+import {toast} from 'sonner';
 
 export default function Manager() {
   const {id} = useParams();

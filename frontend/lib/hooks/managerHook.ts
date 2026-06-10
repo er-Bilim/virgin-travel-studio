@@ -1,15 +1,23 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createManager, deleteManager, getManagers, updateManager } from '@/services/manager';
-import type { UseFormSetError } from 'react-hook-form';
-import type { IUser, ManagerMutation, ManagerUpdateMutation } from '@/types/user';
-import type { AxiosError } from 'axios';
-import { toast } from 'sonner';
-import type { GlobalError } from '@/types/error';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {
+  createManager,
+  deleteManager,
+  getManagers,
+  updateManager
+} from '@/services/manager';
+import type {UseFormSetError} from 'react-hook-form';
+import type {IUser, ManagerMutation, ManagerUpdateMutation} from '@/types/user';
+import type {AxiosError} from 'axios';
+import {toast} from 'sonner';
+import type {GlobalError} from '@/types/error';
 
-export const useManagers = () => {
+export const useManagers = (filters: {
+  fullName?: string;
+  status?: string;
+} = {}) => {
   return useQuery({
-    queryKey: ['managers'],
-    queryFn: getManagers,
+    queryKey: ['managers', filters],
+    queryFn:() => getManagers(filters),
   });
 };
 
