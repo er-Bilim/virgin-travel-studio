@@ -3,7 +3,7 @@ import permit from '@/middlewares/permit.js';
 import auth from '@/middlewares/auth.js';
 import User from '@/model/user/User.js';
 import mongoose from 'mongoose';
-import validateObjectId from "@/middlewares/validateObjectId.js";
+import validateObjectId from '@/middlewares/validateObjectId.js';
 
 const managersRouter = Router();
 
@@ -13,9 +13,22 @@ managersRouter.get(
   permit('ADMIN', 'MANAGER'),
   async (req, res, next) => {
     try {
-      const managers = await User.find({ role: 'MANAGER' }).sort({
-        createdAt: -1,
-      });
+        const query: {
+            fullName?: string;
+            status?: 'active' | 'banned';
+            role: 'MANAGER';
+        } = { role: 'MANAGER' };
+
+        if (typeof req.query.fullName === 'string') {
+            query.fullName = req.query.fullName;
+        }
+
+        if (req.query.status === 'active' || req.query.status === 'banned') {
+            query.status = req.query.status;
+        }
+
+      const managers = await User.find(query).sort({ createdAt: -1 });
+
       res.send(managers);
     } catch (e) {
       next(e);
