@@ -13,22 +13,19 @@ managersRouter.get(
   permit('ADMIN', 'MANAGER'),
   async (req, res, next) => {
     try {
-        const query: {
-            fullName?: string;
-            status?: 'active' | 'banned';
-            role: 'MANAGER';
-        } = { role: 'MANAGER' };
+      const query: {
+          role: 'MANAGER';
+          fullName?: { $regex: string; $options: string };
+          status?: 'active' | 'banned';
+      } = { role: 'MANAGER' };
 
-        if (typeof req.query.fullName === 'string') {
-            query.fullName = req.query.fullName;
-        }
+      if (typeof req.query.fullName === 'string' && req.query.fullName.trim()) {
+          query.fullName = { $regex: req.query.fullName.trim(), $options: 'i' };
+      }
 
-        if (req.query.status === 'active' || req.query.status === 'banned') {
-            query.status = req.query.status;
-        }
+      query.status = req.query.status === 'banned' ? 'banned' : 'active';
 
       const managers = await User.find(query).sort({ createdAt: -1 });
-
       res.send(managers);
     } catch (e) {
       next(e);
