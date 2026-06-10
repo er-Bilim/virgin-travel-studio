@@ -1,5 +1,5 @@
 import mongoose, {Schema} from 'mongoose';
-import isValidCountry from '@/utils/countryCode/countryCode.js';
+import isValidCountry from '../../utils/countryCode/countryCode.js';
 
 const TourSchema = new Schema(
   {
