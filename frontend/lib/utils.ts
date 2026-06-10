@@ -1,5 +1,5 @@
-import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import {type ClassValue, clsx} from 'clsx';
+import {twMerge} from 'tailwind-merge';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
 
@@ -120,4 +120,8 @@ export const pluralize = (
   if (lastAbsoluteNum >= 2 && lastAbsoluteNum <= 4) return `${few}`;
 
   return `${many}`;
+};
+
+export const formatDate = (date: string): string => {
+    return dayjs(date).locale('ru').format('D MMMM YYYY');
 };
