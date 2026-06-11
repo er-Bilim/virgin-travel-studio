@@ -6,6 +6,12 @@ import {
   Plane,
   Tags,
   Users,
+  Umbrella,
+  Castle,
+  Mountain,
+  UtensilsCrossed,
+  Sticker,
+  Baby
 } from 'lucide-react';
 
 import type { UserRole } from '@/types/user';
@@ -70,6 +76,15 @@ export type DashboardMenuItem = {
   roles: UserRole[];
   icon: LucideIcon;
 };
+
+export const CUSTOM_TOUR_ACTIVITIES = [
+  {value: 'beach', label: 'Пляж', icon: Umbrella},
+  {value: 'excursion', label: 'Экскурсии', icon: Castle},
+  {value: 'active', label: 'Актив', icon: Mountain},
+  {value: 'gastro', label: 'Гастро', icon: UtensilsCrossed},
+  {value: 'calm', label: 'Спокойствие', icon: Sticker},
+  {valie: 'kids', label: 'С детьми', icon: Baby}
+]
 
 export const dashboardMenuItems: DashboardMenuItem[] = [
   {
