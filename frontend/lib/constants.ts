@@ -6,6 +6,7 @@ import {
   Plane,
   Tags,
   Users,
+  FileUser,
 } from 'lucide-react';
 
 import type { UserRole } from '@/types/user';
@@ -107,6 +108,12 @@ export const dashboardMenuItems: DashboardMenuItem[] = [
     href: '/admin/leads',
     roles: ['ADMIN'],
     icon: FolderOpen,
+  },
+  {
+    label: 'Настройки',
+    href: '/admin/settings',
+    roles: ['ADMIN'],
+    icon: FileUser,
   },
   {
     label: 'Панель',
