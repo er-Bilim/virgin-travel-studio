@@ -70,10 +70,10 @@ export default function ManagersPage() {
         if (debouncedSearch) {
             params.set('fullName', debouncedSearch);
         } else {
-            params.delete('status');
+            params.delete('fullName');
         }
         route.push(`${pathname}?${params.toString()}`);
-    },[debouncedSearch, pathname, route, searchParams]);
+    },[debouncedSearch]);
 
     const downloadReport = async () => {
         try {

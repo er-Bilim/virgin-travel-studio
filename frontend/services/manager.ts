@@ -11,6 +11,11 @@ export const getManagers = async (filters: {
   return res.data;
 };
 
+export const getOneManager = async (managerId: string) => {
+  const res = await axiosApi.get<IUser>(`/managers/${managerId}`);
+  return res.data;
+};
+
 export const createManager = async (data: ManagerMutation): Promise<IUser> => {
   const res = await axiosApi.post<{ message: string; user: IUser }>(
     '/managers',

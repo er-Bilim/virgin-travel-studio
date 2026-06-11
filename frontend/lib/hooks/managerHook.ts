@@ -3,6 +3,7 @@ import {
   createManager,
   deleteManager,
   getManagers,
+  getOneManager,
   updateManager
 } from '@/services/manager';
 import type {UseFormSetError} from 'react-hook-form';
@@ -24,8 +25,7 @@ export const useManagers = (filters: {
 export const useOneManager = (id: string) => {
   return useQuery({
     queryKey: ['managers'],
-    queryFn: getManagers,
-    select: (data) => data.find((manager) => manager._id === id),
+    queryFn:() => getOneManager(id),
   });
 };
 

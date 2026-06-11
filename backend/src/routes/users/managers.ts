@@ -33,6 +33,30 @@ managersRouter.get(
   },
 );
 
+managersRouter.get('/:id',
+    auth,
+    permit('ADMIN', 'MANAGER'),
+    validateObjectId(),
+    async (req, res, next) => {
+    try {
+        const { id } = req.params;
+
+        const manager = await User.findById(id);
+
+        if (!manager) {
+            return res.status(404).send({ error: 'Пользователь не найден' });
+        }
+
+        if (manager.role !== 'MANAGER') {
+            return res.status(403).send({ error: 'Пользователь не является менеджером' });
+        }
+
+        res.send(manager);
+    } catch (e) {
+        next(e);
+    }
+});
+
 managersRouter.post('/', auth, permit('ADMIN'), async (req, res, next) => {
     try {
         const { phone } = req.body;
