@@ -148,11 +148,28 @@ ordersRouter.get(
 
 ordersRouter.post('/', async (req, res, next) => {
   try {
-    const { tourSetId, clientName, clientPhone } = req.body;
+    const { tourSetId, clientName, clientPhone, customTour } = req.body;
 
-    if (!tourSetId || !clientName || !clientPhone) {
+    const hasTourSet = Boolean(tourSetId);
+    const hasCustom = Boolean(customTour);
+
+    if (hasTourSet && hasCustom) {
+      return res
+        .status(400)
+        .send({ error: 'Заявка не может быть и стандартной, и кастомной' });
+    }
+
+    if (!hasTourSet && !hasCustom) {
+      return res
+        .status(400)
+        .send({ error: 'Нужен либо tourSetId, либо customTour' });
+    }
+
+    if (!clientName || !clientPhone) {
       return res.status(400).send({ error: 'Отсутствуют обязательные поля' });
     }
+
+    const type = hasTourSet ? 'STANDARD' : 'CUSTOM';
 
     let visibleId = null;
     let isUnique = false;
@@ -169,6 +186,8 @@ ordersRouter.post('/', async (req, res, next) => {
       clientName,
       clientPhone,
       visibleId,
+      type,
+      customTour,
     });
 
     await newOrder.save();
@@ -315,12 +334,10 @@ ordersRouter.post(
       if (!order) return res.status(404).send({ error: 'Заявка не найдена.' });
 
       if (order.status !== 'CONTRACT_PENDING')
-        return res
-          .status(400)
-          .send({
-            error:
-              'Контракт недоступен для генерации только в состоянии CONTRACT_PENDING',
-          });
+        return res.status(400).send({
+          error:
+            'Контракт недоступен для генерации только в состоянии CONTRACT_PENDING',
+        });
 
       const contractData: ContractData = {
         client: {

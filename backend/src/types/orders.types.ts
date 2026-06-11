@@ -1,9 +1,15 @@
-import {Document, Types} from 'mongoose';
-import type {TourSetFields} from '@/types/tourSets.types.js';
+import { Document, Types } from 'mongoose';
+import type { TourSetFields } from '@/types/tourSets.types.js';
 
-export type OrderStatus = 'NEW' | 'IN_PROGRESS' | 'CONTRACT_PENDING' | 'COMPLETED' | 'REJECTED';
+export type OrderStatus =
+  | 'NEW'
+  | 'IN_PROGRESS'
+  | 'CONTRACT_PENDING'
+  | 'COMPLETED'
+  | 'REJECTED';
 
 export interface IOrder extends Document {
+  type: 'STANDARD' | 'CUSTOM';
   tourSetId: Types.ObjectId;
   visibleId: string;
   clientName: string;
@@ -13,6 +19,13 @@ export interface IOrder extends Document {
   managerId?: Types.ObjectId | null;
   createdAt: Date;
   updatedAt: Date;
+  customTour?: {
+    countryCode?: string;
+    startDate?: Date;
+    endDate?: Date;
+    hotel?: string;
+    description?: string;
+  } | null;
 }
 
 export type PassportPayload = {
