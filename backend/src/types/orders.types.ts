@@ -25,6 +25,7 @@ export interface IOrder extends Document {
     endDate?: Date;
     hotel?: string;
     description?: string;
+    activities: string[];
   } | null;
 }
 
