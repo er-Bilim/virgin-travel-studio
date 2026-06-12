@@ -53,20 +53,30 @@ export interface OrderMutationType {
   managerId: string | null | undefined;
 }
 
+export interface OrderPostType {
+  tourSetId?: string;
+  clientPhone: string;
+  clientName: string;
+}
+
 export interface CustomTourMutation {
   countryCode: string;
   startDate: string;
   endDate: string;
   hotel: string;
   description?: string | null;
-  activities?: string | null,
+  clientName: string;
+  clientPhone: string;
 }
 
-export interface OrderPostType {
-  tourSetId: string;
-  clientPhone: string;
+type CustomTourType = Omit<CustomTourMutation, 'clientName' | 'clientPhone'> & {
+  activities: string[];
+};
+
+export interface CustomTourPost {
   clientName: string;
-  customTour?: CustomTourMutation
+  clientPhone: string;
+  customTour: CustomTourType;
 }
 
 export interface ContractFormValues {
@@ -76,4 +86,9 @@ export interface ContractFormValues {
   birthDate: string;
 }
 
-export type OrderStatus = 'NEW' | 'IN_PROGRESS' | 'CONTRACT_PENDING' | 'COMPLETED' | 'REJECTED';
+export type OrderStatus =
+  | 'NEW'
+  | 'IN_PROGRESS'
+  | 'CONTRACT_PENDING'
+  | 'COMPLETED'
+  | 'REJECTED';
