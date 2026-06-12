@@ -73,4 +73,5 @@ const ContactSettingsSchema = new Schema<ContactSettingsFields>(
   },
 );
 
-export const ContactSettings = model('ContactSettings', ContactSettingsSchema);
+const ContactSettings = model('ContactSettings', ContactSettingsSchema);
+export default ContactSettings;
