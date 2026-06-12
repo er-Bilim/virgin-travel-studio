@@ -1,0 +1,23 @@
+[{
+  "phone": "+996550555555",
+  "email": "travel-virgin@gmail.com",
+  "address": "г.Бишкек ул-Ахунбаева 89/1",
+  "whatsapp": "+996550555555",
+  "telegram": "virginTravel_telegram",
+  "instagram": "virginTravel_inst",
+  "facebook": "virginTravel_fb",
+  "workingHours": {
+    "weekdays": {
+      "from": "09:00",
+      "to": "18:00"
+    },
+    "saturday": {
+      "isClosed": false,
+      "from": "10:00",
+      "to": "15:00"
+    },
+    "sunday": {
+      "isClosed": true
+    }
+  }
+}]

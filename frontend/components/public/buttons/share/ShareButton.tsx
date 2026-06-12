@@ -1,11 +1,11 @@
 import { PiTelegramLogo } from 'react-icons/pi';
-import { FaWhatsapp } from 'react-icons/fa';
+import {FaInstagram, FaWhatsapp} from 'react-icons/fa';
 import { IoLinkOutline } from 'react-icons/io5';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
-export type SharePlatform = 'telegram' | 'whatsapp' | 'copy';
+export type SharePlatform = 'telegram' | 'whatsapp' | 'copy' | 'instagram';
 
 interface Props {
   platform: SharePlatform;
@@ -39,6 +39,14 @@ const PLATFORM_CONFIG: Record<
     label: 'Скопировать',
     Icon: IoLinkOutline,
   },
+  instagram: {
+    label: 'Instagram',
+    Icon: FaInstagram,
+    getHref: (url) => {
+      const username = url.replace('@', '').trim();
+      return `https://instagram.com/${username}`;
+    },
+  }
 };
 
 const ShareButton = ({
