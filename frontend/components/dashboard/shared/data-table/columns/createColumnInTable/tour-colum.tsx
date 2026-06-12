@@ -30,11 +30,17 @@ export const getToursColumns = ({
     id: 'image',
     size: 70,
     header: 'Фото',
+      meta: {
+          className: 'max-[1150px]:hidden',
+      },
     cell: ({ row }) => <TourImageCell tour={row.original} />,
   },
     {
-       accessorKey: 'countryCode',
-       header: 'Код страны',
+        accessorKey: 'countryCode',
+        header: 'Код страны',
+        meta: {
+            className: 'max-[700px]:hidden',
+        },
         cell: ({ row }) => (
             <span className="font-medium text-[#1E2B6D]">
                 {row.original.countryCode || '—'}
@@ -44,10 +50,24 @@ export const getToursColumns = ({
     {
         accessorKey: 'createdAt',
         header: 'Дата создания',
+        meta: {
+            className: 'max-[1370px]:hidden',
+        },
         cell: ({ getValue }) => {
-           const rawDate = getValue<string>();
-           return dayjs(rawDate).format('DD.MM.YYYY (HH:mm)');
-           },
+            const rawDate = getValue<string>();
+
+            return (
+                <>
+                    <span className="hidden min-[335px]:inline">
+                        {dayjs(rawDate).format('DD.MM.YYYY (HH:mm)')}
+                    </span>
+
+                    <span className="inline min-[335px]:hidden">
+                        {dayjs(rawDate).format('DD.MM.YYYY')}
+                    </span>
+                </>
+            );
+        },
     },
   {
     accessorKey: 'title',
@@ -90,8 +110,8 @@ export const getToursColumns = ({
                     variant="outline"
                     className={
                         isPublished
-                            ? 'bg-[#1E2B6D] text-white border-[#1E2B6D]'
-                            : 'bg-gray-100 text-gray-600 border-gray-200'
+                            ? 'whitespace-nowrap bg-[#1E2B6D] text-white border-[#1E2B6D]'
+                            : 'whitespace-nowrap bg-gray-100 text-gray-600 border-gray-200'
                     }
                 >
                     {isPublished ? 'Опубликовано' : 'Не опубликовано'}
