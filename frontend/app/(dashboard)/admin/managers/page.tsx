@@ -1,31 +1,79 @@
 'use client';
 
 import {useDeleteManager, useManagers} from '@/lib/hooks/managerHook';
-import {CreateManagerForm} from '@/components/dashboard/managers/CreateManagerForm';
+import {
+    CreateManagerForm
+} from '@/components/dashboard/managers/CreateManagerForm';
 import {DataTable} from '@/components/dashboard/shared/data-table/data-table';
-import {ConfirmDialog} from "@/components/dashboard/ConfirmDialog/ConfirmDialog";
-import {useMemo, useState} from "react";
-import {headerRowClassName, rowClassName, tableClassName} from "@/lib/constants";
-import {Button} from "@/components/ui/button";
-import {Modal} from "@/components/shared/Modal";
-import {useModalStore} from "@/lib/stores/modalStore";
-import { Download, Plus} from "lucide-react";
-import {getManagersColumns} from "@/components/dashboard/shared/data-table/columns/createColumnInTable/manager-colum";
-import {useRouter} from 'next/navigation';
-import {downloadBlobFile, isJsonBlob, parseBlobError} from "@/lib/utils";
-import {reportsManager} from "@/services/reports";
-import type {DateRange} from "react-day-picker";
-import type {BlobError} from "@/types/error";
-import {DateRangePicker} from "@/components/dashboard/shared/date-range-picker/DateRangePicker";
+import {
+    ConfirmDialog
+} from '@/components/dashboard/ConfirmDialog/ConfirmDialog';
+import {useEffect, useMemo, useState} from 'react';
+import {
+    headerRowClassName,
+    rowClassName,
+    tableClassName,
+    USER_STATUS_LABELS,
+    UserStatus
+} from '@/lib/constants';
+import {Button} from '@/components/ui/button';
+import {Modal} from '@/components/shared/Modal';
+import {useModalStore} from '@/lib/stores/modalStore';
+import {Download, Plus, Search} from 'lucide-react';
+import {
+    getManagersColumns
+} from '@/components/dashboard/shared/data-table/columns/createColumnInTable/manager-colum';
+import {usePathname, useRouter, useSearchParams} from 'next/navigation';
+import {downloadBlobFile, isJsonBlob, parseBlobError} from '@/lib/utils';
+import {reportsManager} from '@/services/reports';
+import type {DateRange} from 'react-day-picker';
+import type {BlobError} from '@/types/error';
+import {
+    DateRangePicker
+} from '@/components/dashboard/shared/date-range-picker/DateRangePicker';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from '@/components/ui/select';
+import {useDebounce} from 'use-debounce';
+import {Input} from '@/components/ui/input';
 
 export default function ManagersPage() {
     const route = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
     const [managerToDelete, setManagerToDelete] = useState<string | null>(null);
-    const { data = [], isLoading, isError } = useManagers();
     const { mutate: deleteManager, isPending: isDeleting  } = useDeleteManager();
     const { openModal } = useModalStore();
     const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
     const [errorReport, setErrorReport] = useState<string | null>(null);
+
+    const fullName = searchParams.get('fullName');
+    const status = searchParams.get('status') || undefined;
+
+    const [searchInput, setSearchInput] = useState<string>(fullName ?? '');
+    const [debouncedSearch] = useDebounce(searchInput, 400);
+
+    const onChangeStatus = (val: string) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('status', val);
+        route.push(`${pathname}?${params.toString()}`);
+    };
+
+    const { data = [], isLoading, isError } = useManagers({ fullName: fullName ?? undefined, status: status as UserStatus });
+
+    useEffect(() => {
+        const params = new URLSearchParams(searchParams.toString());
+        if (debouncedSearch) {
+            params.set('fullName', debouncedSearch);
+        } else {
+            params.delete('fullName');
+        }
+        route.push(`${pathname}?${params.toString()}`);
+    },[debouncedSearch]);
 
     const downloadReport = async () => {
         try {
@@ -98,6 +146,34 @@ export default function ManagersPage() {
                         <Download className="h-4 w-4 shrink-0" />
                         <span>Отчет по всем менеджерам</span>
                     </Button>
+                </div>
+            </div>
+
+            <div>
+                <div className='flex justify-end gap-2 items-center'>
+                    <div className="relative w-full md:flex-1">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Input
+                            value={searchInput}
+                            onChange={(e) => setSearchInput(e.target.value)}
+                            placeholder="Поиск по имени..."
+                            className="pl-9 bg-white border-gray-300 focus-visible:ring-1 focus-visible:ring-offset-0 transition-colors focus-visible:border-primary h-8"
+                        />
+                    </div>
+
+                    <Select value={status ?? 'active'} onValueChange={onChangeStatus}>
+                        <SelectTrigger className="w-[180px] bg-white">
+                            <SelectValue placeholder="Все статусы" />
+                        </SelectTrigger>
+
+                        <SelectContent>
+                            {Object.values(UserStatus).map((status) => (
+                                <SelectItem key={status} value={status}>
+                                    {USER_STATUS_LABELS[status]}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                 </div>
             </div>
 

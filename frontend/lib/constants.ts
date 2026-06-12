@@ -5,11 +5,11 @@ import {
   Newspaper,
   Plane,
   Tags,
-  Users,
+  Users
 } from 'lucide-react';
 
-import type { UserRole } from '@/types/user';
-import type { QueryClient } from '@tanstack/react-query';
+import type {UserRole} from '@/types/user';
+import type {QueryClient} from '@tanstack/react-query';
 
 export const isDev = process.env.NODE_ENV === 'development';
 export const apiURL = process.env.NEXT_API_URL || 'http://localhost:8000/api';
@@ -27,6 +27,21 @@ export const queryConfig = {
     },
   },
 } satisfies ConstructorParameters<typeof QueryClient>[0];
+
+export enum UserStatus {
+  BANNED = 'banned',
+  ACTIVE = 'active',
+}
+
+export const USER_STATUS_LABELS: Record<UserStatus, string> = {
+  [UserStatus.BANNED]: 'Заблокирован',
+  [UserStatus.ACTIVE]: 'Активен'
+}
+
+export const USER_STATUS_COLORS: Record<UserStatus, string> = {
+  [UserStatus.ACTIVE]: 'bg-green-100 text-green-700',
+  [UserStatus.BANNED]: 'bg-red-100 text-red-700',
+};
 
 export enum OrderStatus {
   NEW = 'NEW',

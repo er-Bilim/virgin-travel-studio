@@ -1,8 +1,18 @@
-import type { IUser, ManagerMutation, ManagerUpdateMutation } from '@/types/user';
+import type {IUser, ManagerMutation, ManagerUpdateMutation} from '@/types/user';
 import axiosApi from '@/lib/axiosApi';
 
-export const getManagers = async () => {
-  const res = await axiosApi.get<IUser[]>('/managers');
+export const getManagers = async (filters: {
+  fullName?: string;
+  status?: string;
+} = {}) => {
+  const res = await axiosApi.get<IUser[]>('/managers', {
+    params: filters,
+  });
+  return res.data;
+};
+
+export const getOneManager = async (managerId: string) => {
+  const res = await axiosApi.get<IUser>(`/managers/${managerId}`);
   return res.data;
 };
 
