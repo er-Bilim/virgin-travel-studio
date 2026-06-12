@@ -34,10 +34,10 @@ export default function Home() {
   const handleRefetch = () => {
     refetchTours();
     refetchTourSets();
-  };
+  };  
 
   return (
-    <section className="">
+    <section>
       <div className="relative left-1/2 -translate-x-1/2 w-screen h-[400px] md:h-[680px]">
         <video
           className="absolute inset-0 w-full h-full object-cover"
