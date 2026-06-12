@@ -34,7 +34,7 @@ const Filter = <K extends string>({ tags, className, setTag, setId, href, mainTa
 
   const filteredTags = useMemo(() => {
     return tags.filter((tag) =>
-        tag[labelKey].toLowerCase().includes(search.toLowerCase()),
+        (tag[labelKey] || '').toLowerCase().includes(search.toLowerCase()),
     );
   }, [tags, labelKey, search]);
 
@@ -74,12 +74,13 @@ const Filter = <K extends string>({ tags, className, setTag, setId, href, mainTa
                   setShowAll(false);
                 }}
                 placeholder="Поиск..."
+                aria-label="Поиск по тегам"
                 className="w-full max-w-[260px] rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
             />
 
             <ul
                 role="list"
-                aria-label={labelKey}
+                aria-label={title ? `Список: ${title}` : 'Список фильтров'}
                 className="flex min-w-0 flex-wrap gap-2 capitalize"
             >
               <li className="shrink-0">
