@@ -32,7 +32,7 @@ export const updateManager = async (id: string, data: ManagerUpdateMutation): Pr
   return res.data.user;
 };
 
-export const deleteManager = async (id: string) => {
-  const res = await axiosApi.delete(`/managers/${id}`);
+export const setStatusManager = async (id: string) => {
+  const res = await axiosApi.patch(`/managers/${id}`);
   return res.data;
 };

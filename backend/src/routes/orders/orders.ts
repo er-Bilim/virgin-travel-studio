@@ -216,6 +216,10 @@ ordersRouter.patch(
       const { clientName, clientPhone, status, rejectionReason } = req.body;
       const { user } = req as RequestWithUser;
 
+      if (user.status === 'banned') {
+        return res.status(401).send({ error: 'Менеджер забанен' });
+      }
+
       if (!mongoose.Types.ObjectId.isValid(id as string)) {
         return res.status(400).send({ error: 'Неверный ID' });
       }
@@ -237,15 +241,6 @@ ordersRouter.patch(
       const order = await Order.findById(id);
 
       if (!order) return res.status(404).send({ error: 'Заявка не найдена' });
-
-      // if (
-      //   order.managerId &&
-      //   !order.managerId.equals(user._id)
-      // ) {
-      //   return res
-      //     .status(403)
-      //     .send({ error: 'Вы не можете редактировать чужой заказ' });
-      // }
 
       order.managerId = user._id;
       if (clientName) order.clientName = clientName;
@@ -282,6 +277,12 @@ ordersRouter.delete(
   validateObjectId(),
   async (req, res, next) => {
     const { id } = req.params;
+    const { user } = req as RequestWithUser;
+    
+    if (user.status === 'banned') {
+      return res.status(401).send({ error: 'Менеджер недоступен' });
+    }
+
     try {
       const { deletedCount } = await Order.deleteOne({ _id: id as string });
       if (!deletedCount) {

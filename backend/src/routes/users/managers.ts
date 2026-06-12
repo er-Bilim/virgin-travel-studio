@@ -4,6 +4,7 @@ import auth from '@/middlewares/auth.js';
 import User from '@/model/user/User.js';
 import mongoose from 'mongoose';
 import validateObjectId from '@/middlewares/validateObjectId.js';
+import Order from '@/model/order/Order.js';
 
 const managersRouter = Router();
 
@@ -138,7 +139,7 @@ managersRouter.put('/:id', auth, permit('ADMIN'), validateObjectId(), async (req
   }
 });
 
-managersRouter.delete(
+managersRouter.patch(
     '/:id',
     auth,
     permit('ADMIN'),
@@ -156,9 +157,26 @@ managersRouter.delete(
             return res.status(400).send({ error: 'Пользователь не является менеджером' });
         }
 
-        await User.findByIdAndDelete(id);
+        if (user.status === 'active') {
+          user.status = 'banned'
+          await Order.updateMany(
+            {
+              managerId: user._id,
+              status: {
+                $in: ['NEW', 'IN_PROGRESS', 'CONTRACT_PENDING'],
+              },
+            },
+            {
+              $unset: { managerId: 1 },
+            },
+          );
 
-        res.send({ message: 'Менеджер успешно удалён' });
+        } else user.status = 'active'
+
+        await user.save()
+
+        const text = user.status === 'active' ? 'Разбанен' : 'Забанен'
+        res.send({ message: `Менеджер успешно ${text}` });
     } catch (e) {
         next(e);
     }

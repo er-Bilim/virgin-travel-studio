@@ -1,7 +1,7 @@
 import type {IUser} from '@/types/user';
 import type {ColumnDef} from '@tanstack/react-table';
 import {Button} from '@/components/ui/button';
-import {Eye, Trash2} from 'lucide-react';
+import { Eye, Lock, LockOpen } from 'lucide-react';
 import {
     USER_STATUS_COLORS,
     USER_STATUS_LABELS,
@@ -11,11 +11,11 @@ import {Badge} from '@/components/ui/badge';
 
 
 export const getManagersColumns = ({
-                                     onView,
-                                     onDelete,
-                                   }: {
+  onView,
+  onBanned,
+}: {
   onView: (user: IUser) => void;
-  onDelete: (user: IUser) => void;
+  onBanned: (user: IUser) => void;
 }): ColumnDef<IUser>[] => [
   {
     accessorKey: 'fullName',
@@ -25,28 +25,22 @@ export const getManagersColumns = ({
     accessorKey: 'phone',
     header: 'Телефон',
   },
-    {
+  {
     accessorKey: 'status',
     header: 'Статус',
-        cell: ({ row }) => {
-        const status = row.original.status as UserStatus;
-        return (
-            <Badge
-                className={`${USER_STATUS_COLORS[status]} border-0 font-medium`}
-            >
-                {USER_STATUS_LABELS[status] ?? status}
-            </Badge>
-        );
-    }
+    cell: ({ row }) => {
+      const status = row.original.status as UserStatus;
+      return (
+        <Badge className={`${USER_STATUS_COLORS[status]} border-0 font-medium`}>
+          {USER_STATUS_LABELS[status] ?? status}
+        </Badge>
+      );
+    },
   },
   {
-    header: () => (
-      <div className="flex justify-end w-full pr-2">
-        Действия
-      </div>
-    ),
+    header: () => <div className="flex justify-end w-full pr-2">Действия</div>,
     id: 'actions',
-    cell: ({row}) => {
+    cell: ({ row }) => {
       const set = row.original;
 
       return (
@@ -56,20 +50,24 @@ export const getManagersColumns = ({
             size="sm"
             onClick={(e) => {
               e.stopPropagation();
-              onView(set)
+              onView(set);
             }}
           >
             <Eye className="w-4 h-4" />
           </Button>
           <Button
-            variant="destructive"
+            variant={set.status === 'banned' ? 'outline' : 'destructive'}
             size="sm"
             onClick={(e) => {
               e.stopPropagation();
-              onDelete(set)
+              onBanned(set);
             }}
           >
-            <Trash2 className="w-4 h-4" />
+            {set.status === 'banned' ? (
+              <LockOpen className="w-4 h-4" />
+            ) : (
+              <Lock className="w-4 h-4" />
+            )}
           </Button>
         </div>
       );
