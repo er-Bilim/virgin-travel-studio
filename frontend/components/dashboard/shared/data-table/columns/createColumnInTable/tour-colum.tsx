@@ -54,14 +54,17 @@ export const getToursColumns = ({
             className: 'max-[1370px]:hidden',
         },
         cell: ({ getValue }) => {
-            const rawDate = getValue<string>();
+            const rawDate = getValue<string | undefined>();
+
+            if (!rawDate) {
+                return <span>—</span>;
+            }
 
             return (
                 <>
                     <span className="hidden min-[335px]:inline">
                         {dayjs(rawDate).format('DD.MM.YYYY (HH:mm)')}
                     </span>
-
                     <span className="inline min-[335px]:hidden">
                         {dayjs(rawDate).format('DD.MM.YYYY')}
                     </span>
