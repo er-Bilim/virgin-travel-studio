@@ -83,7 +83,7 @@ export const CUSTOM_TOUR_ACTIVITIES = [
   {value: 'active', label: 'Актив', icon: Mountain},
   {value: 'gastro', label: 'Гастро', icon: UtensilsCrossed},
   {value: 'calm', label: 'Спокойствие', icon: Sticker},
-  {valie: 'kids', label: 'С детьми', icon: Baby}
+  {value: 'kids', label: 'С детьми', icon: Baby}
 ]
 
 export const dashboardMenuItems: DashboardMenuItem[] = [
