@@ -132,17 +132,7 @@ export default function Home() {
       </section>
 
       <LatestNewsSection />
-
-      {/* <div>
-        <h2 className="text-3xl font-black text-navy-700 md:text-4xl">
-          Тур, которого ещё нет
-        </h2>
-        <p className="mt-3 max-w-xl text-muted-foreground">
-          Тур, которого ещё нет Расскажите, куда мечтаете поехать и когда – мы
-          создадим маршрут под вас.
-        </p>
-      </div> */}
-
+      
       <div className="mt-10 mb-15 flex flex-col items-center">
         <CustomTourCard />
       </div>
