@@ -217,7 +217,7 @@ ordersRouter.patch(
       const { user } = req as RequestWithUser;
 
       if (user.status === 'banned') {
-        return res.status(401).send({ error: 'Менеджер забанен' });
+        return res.status(403).send({ error: 'Менеджер забанен' });
       }
 
       if (!mongoose.Types.ObjectId.isValid(id as string)) {

@@ -209,10 +209,10 @@ export default function ManagersPage() {
 
         <ConfirmDialog
           open={!!managerToChange}
-          title={`${status !== 'banned' ? 'Забанить' : 'Разбанить'} менеджера?`}
+          title={`${data?.find((m) => m._id === managerToChange)?.status !== 'banned' ? 'Забанить' : 'Разбанить'} менеджера?`}
           description="Это действие нельзя отменить"
           loading={isChanging}
-          confirmText={`${status !== 'banned' ? 'Забанить' : 'Разбанить'}`}
+          confirmText={`${data?.find((m) => m._id === managerToChange)?.status !== 'banned' ? 'Забанить' : 'Разбанить'}`}
           onCancel={() => setManagerToChange(null)}
           onConfirm={confirmSetStatus}
         />
