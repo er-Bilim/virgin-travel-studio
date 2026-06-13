@@ -1,7 +1,13 @@
-import type {IUser} from "@/types/user";
-import type {ColumnDef} from "@tanstack/react-table";
-import {Button} from "@/components/ui/button";
-import {Eye, Trash2} from "lucide-react";
+import type {IUser} from '@/types/user';
+import type {ColumnDef} from '@tanstack/react-table';
+import {Button} from '@/components/ui/button';
+import {Eye, Trash2} from 'lucide-react';
+import {
+    USER_STATUS_COLORS,
+    USER_STATUS_LABELS,
+    UserStatus
+} from '@/lib/constants';
+import {Badge} from '@/components/ui/badge';
 
 
 export const getManagersColumns = ({
@@ -18,6 +24,20 @@ export const getManagersColumns = ({
   {
     accessorKey: 'phone',
     header: 'Телефон',
+  },
+    {
+    accessorKey: 'status',
+    header: 'Статус',
+        cell: ({ row }) => {
+        const status = row.original.status as UserStatus;
+        return (
+            <Badge
+                className={`${USER_STATUS_COLORS[status]} border-0 font-medium`}
+            >
+                {USER_STATUS_LABELS[status] ?? status}
+            </Badge>
+        );
+    }
   },
   {
     header: () => (

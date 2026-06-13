@@ -1,63 +1,104 @@
-import mongoose, {Schema, Types} from 'mongoose';
-import type {IOrder} from '@/types/orders.types.js';
+import mongoose, { Schema, Types } from 'mongoose';
+import type { IOrder } from '@/types/orders.types.js';
 
-const OrderSchema = new Schema({
+const OrderSchema = new Schema(
+  {
+    type: {
+      type: String,
+      enum: ['STANDARD', 'CUSTOM'],
+      default: 'STANDARD',
+      required: true,
+    },
+
     tourSetId: {
-        type: Types.ObjectId,
-        ref: "TourSet",
-        required: [true, 'ID тура обязателен'],
+      type: Types.ObjectId,
+      ref: 'TourSet',
+      required: function (this: IOrder) {
+        return this.type === 'STANDARD';
+      },
     },
     visibleId: {
-        type: String,
-        unique: true,
-        required: true,
+      type: String,
+      unique: true,
+      required: true,
     },
     clientName: {
-        type: String,
-        required: [true, 'Имя клиента обязательно'],
-        trim: true,
+      type: String,
+      required: [true, 'Имя клиента обязательно'],
+      trim: true,
     },
     clientPhone: {
-        type: String,
-        required: [true, 'Номер телефона обязателен'],
-        trim: true,
-        match: [/^\+?[0-9]{7,15}$/, 'Пожалуйста, введите корректный номер телефона']
+      type: String,
+      required: [true, 'Номер телефона обязателен'],
+      trim: true,
+      match: [
+        /^\+?[0-9]{7,15}$/,
+        'Пожалуйста, введите корректный номер телефона',
+      ],
     },
     status: {
-        type: String,
-        required: true,
-        enum: {
-            values: ['NEW', 'IN_PROGRESS', 'CONTRACT_PENDING', 'COMPLETED', 'REJECTED'],
-            message: 'Недопустимый статус'
-        },
-        default: 'NEW',
+      type: String,
+      required: true,
+      enum: {
+        values: [
+          'NEW',
+          'IN_PROGRESS',
+          'CONTRACT_PENDING',
+          'COMPLETED',
+          'REJECTED',
+        ],
+        message: 'Недопустимый статус',
+      },
+      default: 'NEW',
     },
     rejectionReason: {
-        type: String,
-        trim: true,
-        minLength: [3, 'Причина отказа должна быть не менее 3 символов'],
-        validate: {
-            validator: function (this: IOrder, value: string | null) {
-                if (this.status === 'REJECTED') {
-                    return value !== null && value.trim().length > 0;
-                }
-                return true;
-            },
-            message: 'Причина отказа обязательна, если установлен статус REJECTED'
-        }
+      type: String,
+      trim: true,
+      minLength: [3, 'Причина отказа должна быть не менее 3 символов'],
+      validate: {
+        validator: function (this: IOrder, value: string | null) {
+          if (this.status === 'REJECTED') {
+            return value !== null && value.trim().length > 0;
+          }
+          return true;
+        },
+        message: 'Причина отказа обязательна, если установлен статус REJECTED',
+      },
     },
     managerId: {
-        type: Types.ObjectId,
-        ref: "User",
+      type: Types.ObjectId,
+      ref: 'User',
     },
+
+    customTour: {
+      type: {
+        countryCode: {
+          type: String,
+          uppercase: true,
+          trim: true,
+          match: [/^[A-Z]{2}$/, 'Код страны в формате ISO (например KG, AE)'],
+        },
+        startDate: Date,
+        endDate: Date,
+        hotel: { type: String, trim: true },
+        description: { type: String, trim: true },
+      },
+      required: function (this: IOrder) {
+        return this.type === 'CUSTOM';
+      },
+      validate: {
+        validator: function (this: IOrder, value: unknown) {
+          if (this.type === 'STANDARD') return value == null;
+          return true;
+        },
+        message: 'Обычная заявка не должна содержать customTour',
+      },
     },
-     {
-        timestamps: true,
-     }
+  },
+  {
+    timestamps: true,
+  },
 );
-
-
-
 
 const Order = mongoose.model<IOrder>('Order', OrderSchema);
 export default Order;

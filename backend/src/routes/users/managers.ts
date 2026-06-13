@@ -3,7 +3,7 @@ import permit from '@/middlewares/permit.js';
 import auth from '@/middlewares/auth.js';
 import User from '@/model/user/User.js';
 import mongoose from 'mongoose';
-import validateObjectId from "@/middlewares/validateObjectId.js";
+import validateObjectId from '@/middlewares/validateObjectId.js';
 
 const managersRouter = Router();
 
@@ -13,15 +13,49 @@ managersRouter.get(
   permit('ADMIN', 'MANAGER'),
   async (req, res, next) => {
     try {
-      const managers = await User.find({ role: 'MANAGER' }).sort({
-        createdAt: -1,
-      });
+      const query: {
+          role: 'MANAGER';
+          fullName?: { $regex: string; $options: string };
+          status?: 'active' | 'banned';
+      } = { role: 'MANAGER' };
+
+      if (typeof req.query.fullName === 'string' && req.query.fullName.trim()) {
+          query.fullName = { $regex: req.query.fullName.trim(), $options: 'i' };
+      }
+
+      query.status = req.query.status === 'banned' ? 'banned' : 'active';
+
+      const managers = await User.find(query).sort({ createdAt: -1 });
       res.send(managers);
     } catch (e) {
       next(e);
     }
   },
 );
+
+managersRouter.get('/:id',
+    auth,
+    permit('ADMIN', 'MANAGER'),
+    validateObjectId(),
+    async (req, res, next) => {
+    try {
+        const { id } = req.params;
+
+        const manager = await User.findById(id);
+
+        if (!manager) {
+            return res.status(404).send({ error: 'Пользователь не найден' });
+        }
+
+        if (manager.role !== 'MANAGER') {
+            return res.status(403).send({ error: 'Пользователь не является менеджером' });
+        }
+
+        res.send(manager);
+    } catch (e) {
+        next(e);
+    }
+});
 
 managersRouter.post('/', auth, permit('ADMIN'), async (req, res, next) => {
     try {

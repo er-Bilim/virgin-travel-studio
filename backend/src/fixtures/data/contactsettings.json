@@ -1,0 +1,27 @@
+[
+  {
+    "phone": "+996703754456",
+    "email": "virgin.travel@agency.com",
+    "address": "г. Бишкек, ул. 7 апреля, д. 94, офис 305",
+    "whatsapp": "+996703754456",
+    "telegram": "@virgin_travel_studio",
+    "instagram": "virgin.travel.studio",
+    "facebook": "virgin.travel.studio",
+    "workingHours": {
+      "weekdays": {
+        "from": "09:00",
+        "to": "18:00"
+      },
+      "saturday": {
+        "isClosed": false,
+        "from": "10:00",
+        "to": "16:00"
+      },
+      "sunday": {
+        "isClosed": true,
+        "from": "",
+        "to": ""
+      }
+    }
+  }
+]
