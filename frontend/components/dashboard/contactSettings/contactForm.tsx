@@ -1,13 +1,12 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
+import { useController, useForm, type Control, type FieldErrors, type UseFormRegister, type UseFormWatch } from 'react-hook-form';
 import type { ContactSettingsFields } from '@/types/contactSettings';
 import { Input } from '@/components/ui/input';
 import { inputClass } from '@/lib/constants';
 import { mutateContacts, mutateCreateContacts } from '@/lib/hooks/contactSettings';
 import { Loader2 } from 'lucide-react';
 import { useContacts } from '@/lib/hooks/contactSettings';
-import { Button } from '@/components/ui/button';
 import { AlertDialog } from '@/components/ui/alert-dialog';
 import { Spinner } from '@/components/ui/spinner';
 
@@ -36,6 +35,9 @@ export default function ContactSettingsForm() {
   const {
     register,
     handleSubmit,
+    watch,
+    reset,
+    control,
     formState: { errors },
   } = useForm<ContactSettingsFields>({
     defaultValues: contactSettings || {},
@@ -48,7 +50,26 @@ export default function ContactSettingsForm() {
     : mutateContacts();
 
   const onSubmit = (data: ContactSettingsFields) => {
-    mutate(data);
+    const formattedData = { ...data };
+
+    if (formattedData.workingHours) {
+      if (formattedData.workingHours.saturday?.isClosed) {
+        formattedData.workingHours.saturday = {
+          isClosed: true,
+          from: '', 
+          to: '',
+        };
+      }
+
+      if (formattedData.workingHours.sunday?.isClosed) {
+        formattedData.workingHours.sunday = {
+          isClosed: true,
+          from: '', 
+          to: '',
+        };
+      }
+    }
+    mutate(formattedData);
   };
 
   const phoneValidate = (v?: string) => {
@@ -68,9 +89,13 @@ export default function ContactSettingsForm() {
       autoComplete="off"
     >
       {error && (
-        <AlertDialog>Ошибка при загрузке контактов, попробуйте ещё раз</AlertDialog>
+        <AlertDialog>
+          Ошибка при загрузке контактов, попробуйте ещё раз
+        </AlertDialog>
       )}
-      {isFetchingContacts && <Spinner className='absolute flex justify-center items-center inset-0 z-2'/>}
+      {isFetchingContacts && (
+        <Spinner className="absolute flex justify-center items-center inset-0 z-2" />
+      )}
       <div className="grid grid-cols-1 md:grid-cols-2 flex-1 gap-4">
         <Field label="Телефон:" error={errors.phone?.message}>
           <Input
@@ -186,20 +211,24 @@ export default function ContactSettingsForm() {
           <WeekendField
             label="Суббота"
             register={register}
+            watch={watch}
             errors={errors}
             field="saturday"
             isPending={isPending}
             inputClass={inputClass}
+            control={control}
           />
 
           {/* Воскресенье */}
           <WeekendField
             label="Воскресенье"
             register={register}
+            watch={watch}
             errors={errors}
             field="sunday"
             isPending={isPending}
             inputClass={inputClass}
+            control={control}
           />
         </div>
       </div>
@@ -221,53 +250,93 @@ export default function ContactSettingsForm() {
   );
 }
 
-// Отдельный компонент для субботы/воскресенья с чекбоксом "Выходной"
+interface WeekendFieldProps {
+  label: string;
+  register: UseFormRegister<ContactSettingsFields>;
+  watch: UseFormWatch<ContactSettingsFields>;
+  errors: FieldErrors<ContactSettingsFields>;
+  field: 'saturday' | 'sunday';
+  isPending: boolean;
+  inputClass: string;
+  control: Control<ContactSettingsFields>; 
+}
+
 function WeekendField({
   label,
   register,
+  watch,
   errors,
   field,
   isPending,
   inputClass,
-}: {
-  label: string;
-  register: any;
-  errors: any;
-  field: 'saturday' | 'sunday';
-  isPending: boolean;
-  inputClass: string;
-}) {
+  control, // <-- Забираем control
+}: WeekendFieldProps) {
+  const isClosed = watch(`workingHours.${field}.isClosed`);
+
+  // Подключаем контроллеры для полей времени
+  const { field: fromField } = useController({
+    name: `workingHours.${field}.from`,
+    control,
+  });
+
+  const { field: toField } = useController({
+    name: `workingHours.${field}.to`,
+    control,
+  });
 
   return (
-    <div className='pb-4'>
+    <div className="pb-4">
       <div className="flex items-center justify-between mb-2">
         <p className="text-xs text-gray-500">{label}</p>
         <label className="flex items-center gap-2 text-xs text-gray-500 cursor-pointer">
           <input
             type="checkbox"
-            {...register(`workingHours.${field}.isClosed`)}
+            {...register(`workingHours.${field}.isClosed`, {
+              // При клике на чекбокс на лету очищаем стейт RHF
+              onChange: (e) => {
+                if (e.target.checked) {
+                  fromField.onChange('');
+                  toField.onChange('');
+                }
+              },
+            })}
             disabled={isPending}
             className="rounded"
           />
           Выходной
         </label>
       </div>
+
       <div className="flex items-center gap-3">
         <Field label="С" error={errors.workingHours?.[field]?.from?.message}>
           <Input
-            {...register(`workingHours.${field}.from`)}
             type="time"
             className={inputClass}
-            disabled={isPending}
+            disabled={isPending || isClosed}
+            name={fromField.name}
+            onBlur={fromField.onBlur}
+            ref={fromField.ref}
+            value={isClosed ? '' : fromField.value || ''}
+            onChange={(e) => {
+              if (!isClosed) fromField.onChange(e.target.value);
+            }}
           />
         </Field>
+
         <span className="text-gray-400 mt-5">—</span>
+
         <Field label="До" error={errors.workingHours?.[field]?.to?.message}>
           <Input
-            {...register(`workingHours.${field}.to`)}
             type="time"
             className={inputClass}
-            disabled={isPending}
+            disabled={isPending || isClosed}
+            name={toField.name}
+            onBlur={toField.onBlur}
+            ref={toField.ref}
+            value={isClosed ? '' : toField.value || ''}
+            onChange={(e) => {
+              if (!isClosed) toField.onChange(e.target.value);
+            }}
           />
         </Field>
       </div>

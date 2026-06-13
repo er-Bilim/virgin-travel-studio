@@ -21,9 +21,9 @@ export default function Settings() {
           className="w-full justify-center bg-[#1E2B6D] hover:bg-[#162356] sm:w-auto"
           onClick={() => openModal('contactsForm')}
         >
-          Редактиировать
+          Редактировать
         </Button>
-        <Modal id="contactsForm" title='contacts'>
+        <Modal id="contactsForm" title="contacts">
           <ContactSettingsForm />
         </Modal>
       </div>

@@ -19,6 +19,7 @@ export const mutateContacts = () => {
     mutationFn: editContacts,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
+      
     },
   });
 };
