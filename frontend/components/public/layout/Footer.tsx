@@ -9,6 +9,7 @@ import {
     FaFacebook
 } from "react-icons/fa";
 
+
 export default function Footer() {
     return (
         <footer className="bg-[#1E2B6D] text-white">
