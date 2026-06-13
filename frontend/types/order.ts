@@ -63,7 +63,7 @@ export interface CustomTourMutation {
   countryCode: string;
   startDate: string;
   endDate: string;
-  hotel: string;
+  hotel?: string;
   description?: string | null;
   clientName: string;
   clientPhone: string;

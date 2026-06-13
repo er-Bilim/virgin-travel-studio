@@ -95,7 +95,7 @@ const OrderSchema = new Schema(
           type: Date,
           required: true,
         },
-        hotel: { type: String, trim: true, required: true, },
+        hotel: { type: String, trim: true },
         description: { type: String, trim: true },
         activities: [{ type: String, trim: true }]
       },
