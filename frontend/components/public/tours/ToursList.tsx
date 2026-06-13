@@ -21,11 +21,8 @@ import Link from 'next/link';
 import Sort from '@/components/shared/Sort';
 import {toursLimitPag} from "@/lib/constants";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
-import countriesLib from 'i18n-iso-countries';
-import ru from 'i18n-iso-countries/langs/ru.json';
 import CountryCombobox from "../../shared/CountryCombobox";
 
-countriesLib.registerLocale(ru);
 
 const SORT_OPTIONS = [
   { value: 'newest', label: 'Новые сверху', icon: CalendarPlus2 },
@@ -40,9 +37,11 @@ const ToursList = () => {
   const [sort, setSort] = useState<string | null | undefined>(null);
 
     const searchParams = useSearchParams();
-    const countryCode = searchParams.get('countryCode') ?? null;
+    const rawCountryCode = searchParams.get('countryCode');
     const path = usePathname();
     const router = useRouter();
+
+    const countryCode = rawCountryCode === 'all' ? undefined : rawCountryCode;
 
   const {
     data: toursData,
@@ -54,7 +53,7 @@ const ToursList = () => {
     isPublished: true,
     categoryId,
     sort,
-      countryCode: countryCode === 'all' ? undefined : countryCode,
+      countryCode: countryCode ?? undefined
   });
 
   const { data: categories } = useGetTourCategories();

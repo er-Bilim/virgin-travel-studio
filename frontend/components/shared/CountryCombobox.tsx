@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import {useMemo, useState} from 'react';
 import {Globe} from 'lucide-react';
 
 import countriesLib from 'i18n-iso-countries';
@@ -21,12 +21,14 @@ type Props = {
 export default function CountryCombobox({ value, onChange }: Props) {
     const [open, setOpen] = useState(false);
 
-    const countries = Object.keys(countriesLib.getAlpha2Codes());
+    const countryOptions = useMemo(() => {
+        const countries = Object.keys(countriesLib.getAlpha2Codes());
 
-    const countryOptions = countries.map((code) => ({
-        code,
-        name: countriesLib.getName(code, 'ru') ?? code,
-    }));
+        return countries.map((code) => ({
+            code,
+            name: countriesLib.getName(code, 'ru') ?? code,
+        }));
+    }, []);
 
     const selected = countryOptions.find((c) => c.code === value);
 
