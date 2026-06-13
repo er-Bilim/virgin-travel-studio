@@ -2,7 +2,17 @@
 
 import { useCreateOrder } from '@/lib/hooks/orderHooks';
 import type { CustomTourMutation, CustomTourPost } from '@/types/order';
-import { BadgeInfo, Calendar1, MapPinned, Route } from 'lucide-react';
+import {
+  BadgeInfo,
+  Calendar1,
+  Hotel,
+  MapPinned,
+  Phone,
+  Route,
+  Send,
+  ShieldCheck,
+  User,
+} from 'lucide-react';
 import { useState } from 'react';
 import { Controller, useForm, type SubmitHandler } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -14,18 +24,26 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import countries from '@/lib/countries';
-import { countryCodeRule, startDateRule } from './validation/customTourRules';
-import { StyledInput } from '../../form/field-styles';
+import {
+  clientNameRule,
+  countryCodeRule,
+  endDateRule,
+  startDateRule,
+  clientPhoneRule,
+} from './validation/customTourRules';
+import { StyledInput, StyledTextarea } from '../../form/field-styles';
 import { Calendar } from '@/components/ui/calendar';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
-import { cn, formatDayAndMonthWords } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import { CUSTOM_TOUR_ACTIVITIES } from '@/lib/constants';
+import { Spinner } from '@/components/ui/spinner';
+import { useWatch } from 'react-hook-form';
 
 const CustomTourForm = () => {
   const [activities, setActivities] = useState<string[]>([]);
@@ -34,10 +52,9 @@ const CustomTourForm = () => {
   const {
     register,
     handleSubmit,
-    formState: { errros },
+    formState: { errors },
     reset,
     control,
-    watch,
   } = useForm<CustomTourMutation>({ mode: 'onBlur' });
 
   const toggleActivity = (value: string) => {
@@ -72,16 +89,27 @@ const CustomTourForm = () => {
           position: 'top-center',
         }),
     });
+
+    reset({
+      countryCode: '',
+      startDate: '',
+      endDate: '',
+      hotel: '',
+      description: '',
+      clientName: '',
+      clientPhone: '',
+    });
+    setActivities([]);
   };
 
-  const startDateValue = watch('startDate');
+  const startDateValue = useWatch({ control, name: 'startDate' });
 
   const countryOptions = Object.entries(
     countries.getNames('ru', { select: 'official' }),
   )
     .map(([code, name]) => ({ code, name }))
     .sort((a, b) => a.name.localeCompare(b.name));
-    
+
   return (
     <section aria-label="custom-tour-title" className="mx-auto my-16 max-w-3xl">
       <article className="overflow-hidden rounded-3xl bg-card border">
@@ -106,8 +134,8 @@ const CustomTourForm = () => {
           <div className="mb-6 flex items-start gap-3 rounded-2xl border border-cyan-200 bg-cyan-50/50 p-4">
             <BadgeInfo className="mt-1 size-5 shrink-0 text-cyan-700" />
             <p className="text-sm leading-relaxed text-slate-600">
-              Заполните что знаете – остальное уточнит менеджер: проверит
-              возможность и посчитает стоимость. Вы ни к чему не обязаны.
+              Заполните что знаете. Остальное уточнит менеджер: проверит
+              возможность и посчитает стоимость. Вы ни к чему не обязаны
             </p>
           </div>
 
@@ -129,9 +157,13 @@ const CustomTourForm = () => {
                 rules={countryCodeRule}
                 render={({ field, fieldState }) => (
                   <>
-                    <Select>
+                    <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger
-                        className="cursor-pointer w-full rounded-xl border-[1.5px] border-slate-200 text-sm outline-none focus:border-cyan-700 focus:ring-4 focus:ring-cyan-700/10 px-5 py-6"
+                        onBlur={field.onBlur}
+                        className={cn(
+                          'cursor-pointer w-full rounded-xl border-[1.5px] border-slate-200 text-sm outline-none focus:border-cyan-700 focus:ring-4 focus:ring-cyan-700/10 px-5 py-6',
+                          fieldState.error && 'border-red-400',
+                        )}
                         id="countryCode"
                       >
                         <div className="inline-flex gap-2 items-center">
@@ -184,7 +216,10 @@ const CustomTourForm = () => {
                         <PopoverTrigger asChild>
                           <button
                             type="button"
-                            className="w-full rounded-xl border-[1.5px] border-slate-200 px-5 py-3.5 text-sm outline-none focus:border-cyan-700 focus:ring-4 focus:ring-cyan-700/10 flex items-center text-muted-foreground gap-2 cursor-pointer"
+                            className={cn(
+                              'w-full rounded-xl border-[1.5px] border-slate-200 px-5 py-3.5 text-sm outline-none focus:border-cyan-700 focus:ring-4 focus:ring-cyan-700/10 flex items-center text-muted-foreground gap-2 cursor-pointer',
+                              fieldState.error && 'border-red-400',
+                            )}
                           >
                             <Calendar1 className="stroke-1 size-4" />
                             {field.value ? (
@@ -221,22 +256,25 @@ const CustomTourForm = () => {
 
               <div>
                 <label
-                  htmlFor="startDate"
+                  htmlFor="endDate"
                   className="mb-2 block text-sm font-semibold text-[var(--navy-700)]"
                 >
                   по
                 </label>
                 <Controller
                   control={control}
-                  name="startDate"
-                  rules={startDateRule}
+                  name="endDate"
+                  rules={endDateRule}
                   render={({ field, fieldState }) => (
                     <>
                       <Popover>
                         <PopoverTrigger asChild>
                           <button
                             type="button"
-                            className="w-full rounded-xl border-[1.5px] border-slate-200 px-5 py-3.5 text-sm outline-none focus:border-cyan-700 focus:ring-4 focus:ring-cyan-700/10 flex items-center text-muted-foreground gap-2 cursor-pointer"
+                            className={cn(
+                              'w-full rounded-xl border-[1.5px] border-slate-200 px-5 py-3.5 text-sm outline-none focus:border-cyan-700 focus:ring-4 focus:ring-cyan-700/10 flex items-center text-muted-foreground gap-2 cursor-pointer',
+                              fieldState.error && 'border-red-400',
+                            )}
                           >
                             <Calendar1 className="stroke-1 size-4" />
                             {field.value ? (
@@ -244,7 +282,7 @@ const CustomTourForm = () => {
                                 locale: ru,
                               })
                             ) : (
-                              <span>Выберите дату начала</span>
+                              <span>Выберите дату конца</span>
                             )}
                           </button>
                         </PopoverTrigger>
@@ -255,7 +293,10 @@ const CustomTourForm = () => {
                               field.value ? new Date(field.value) : undefined
                             }
                             disabled={(date) =>
-                              date < new Date(new Date().setHours(0, 0, 0, 0))
+                              startDateValue
+                                ? date <= new Date(startDateValue)
+                                : date <
+                                  new Date(new Date().setHours(0, 0, 0, 0))
                             }
                             onSelect={(date) => field.onChange(date)}
                           />
@@ -272,6 +313,174 @@ const CustomTourForm = () => {
               </div>
             </div>
           </fieldset>
+
+          <fieldset className="mb-7 border-0 p-0">
+            <legend className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-400 sr-only">
+              Пожелания
+            </legend>
+            <div className="my-5 flex items-center gap-3">
+              <span className="h-px flex-1 bg-slate-100" />
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Пожелания (необязательно)
+              </p>
+              <span className="h-px flex-1 bg-slate-100" />
+            </div>
+
+            <div className="mb-4">
+              <label
+                htmlFor="hotel"
+                className="mb-2 block text-sm font-semibold text-[var(--navy-700)]"
+              >
+                Отель
+              </label>
+              <div>
+                <div className="relative">
+                  <Hotel className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+                  <StyledInput
+                    id="hotel"
+                    className={cn(
+                      'w-full rounded-xl border-[1.5px] border-slate-200 py-3 pl-11 pr-4 text-sm outline-none focus:border-cyan-700 focus:ring-4 focus:ring-cyan-700/10',
+                    )}
+                    placeholder="Название отеля"
+                    {...register('hotel')}
+                  />
+                </div>
+                {errors.hotel && (
+                  <p className="mt-1.5 text-xs text-red-500">
+                    {errors.hotel.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div role="group" aria-label="Что хотите от поездки">
+              <span className="mb-2 block text-sm font-semibold text-[var(--navy-700)]">
+                Что хотите от поездки
+              </span>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {CUSTOM_TOUR_ACTIVITIES.map((activity) => {
+                  const isActive = activities.includes(activity.value);
+                  const Icon = activity.icon;
+                  return (
+                    <button
+                      key={activity.value}
+                      type="button"
+                      onClick={() => toggleActivity(activity.value)}
+                      className={cn(
+                        'flex justify-center items-center gap-3 cursor-pointer rounded-xl border-[1.5px] px-3 py-2.5 text-sm font-medium transition',
+                        isActive
+                          ? 'border-cyan-700 bg-cyan-50 text-cyan-700'
+                          : 'border-slate-200 bg-white text-[var(--navy-700)] hover:border-cyan-700',
+                      )}
+                    >
+                      <Icon className="size-4" />
+                      <span>{activity.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <label
+                htmlFor="description"
+                className="mb-2 block text-sm font-semibold text-[var(--navy-700)]"
+              >
+                Комментарий
+              </label>
+              <StyledTextarea
+                id="description"
+                rows={4}
+                placeholder="Сколько человек, бюджет, что важно..."
+                className="w-full resize-none rounded-xl border-[1.5px] border-slate-200 px-4 py-3 text-sm outline-none focus:border-cyan-700 focus:ring-4 focus:ring-cyan-700/10"
+                {...register('description')}
+              />
+            </div>
+          </fieldset>
+
+          <fieldset className="border-0 p-0">
+            <legend className="sr-only">Контактные данные</legend>
+            <div className="my-5 flex items-center gap-3">
+              <span className="h-px flex-1 bg-slate-100" />
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Как с вами связаться
+              </p>
+              <span className="h-px flex-1 bg-slate-100" />
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label
+                  htmlFor="clientName"
+                  className="mb-2 block text-sm font-semibold text-[var(--navy-700)]"
+                >
+                  Ваше имя
+                </label>
+                <div>
+                  <div className="relative">
+                    <User className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+                    <StyledInput
+                      id="clientName"
+                      type="text"
+                      placeholder="Как к вам обращаться"
+                      className={cn(
+                        'w-full rounded-xl border-[1.5px] border-slate-200 py-3 pl-11 pr-4 text-sm outline-none focus:border-cyan-700 focus:ring-4 focus:ring-cyan-700/10',
+                        errors.clientName && 'border-red-400',
+                      )}
+                      {...register('clientName', clientNameRule)}
+                    />
+                  </div>
+                  {errors.clientName && (
+                    <p className="mt-2 text-xs text-red-500">
+                      {errors.clientName.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div>
+                <label
+                  htmlFor="clientPhone"
+                  className="mb-2 block text-sm font-semibold text-[var(--navy-700)]"
+                >
+                  Телефон
+                </label>
+                <div>
+                  <div className="relative">
+                    <Phone className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+                    <StyledInput
+                      id="clientPhone"
+                      type="text"
+                      placeholder="+996"
+                      className={cn(
+                        'w-full rounded-xl border-[1.5px] border-slate-200 py-3 pl-11 pr-4 text-sm outline-none focus:border-cyan-700 focus:ring-4 focus:ring-cyan-700/10',
+                        errors.clientPhone && 'border-red-400',
+                      )}
+                      {...register('clientPhone', clientPhoneRule)}
+                    />
+                  </div>
+                  {errors.clientPhone && (
+                    <p className="mt-2 text-xs text-red-500">
+                      {errors.clientPhone.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <button
+            type="submit"
+            disabled={isPending}
+            className="cursor-pointer mt-6 inline-flex w-full items-center justify-center gap-2.5 rounded-xl bg-[var(--navy-700)] py-4 text-[15px] font-semibold text-white transition hover:bg-[var(--navy-800)] disabled:opacity-60"
+          >
+            <Send className="size-[18px] text-cyan-400" />
+            Отправить заявку {isPending && <Spinner />}
+          </button>
+
+          <p className="mt-3.5 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+            <ShieldCheck className="size-4 text-cyan-700" />
+            Менеджер свяжется с вами в течение часа
+          </p>
         </form>
       </article>
     </section>
