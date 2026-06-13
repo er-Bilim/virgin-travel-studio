@@ -125,14 +125,14 @@ export default function ToursManagePage() {
   };
 
   return (
-    <div className="p-8 space-y-8 bg-gray-50">
+      <div className="space-y-8 bg-gray-50 p-8 max-[700px]:p-4 max-[480px]:p-3">
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold tracking-tight text-[#1E2B6D]">
             Туры
           </h1>
           <Link href={`${path}/new`}>
-            <Button className="bg-[#1E2B6D] hover:bg-[#162356]">
+            <Button className="whitespace-nowrap bg-[#1E2B6D] hover:bg-[#162356]">
               <Plus className="w-4 h-4 mr-2" /> Добавить тур
             </Button>
           </Link>
