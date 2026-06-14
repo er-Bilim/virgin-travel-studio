@@ -2,7 +2,7 @@ import express from 'express';
 import auth from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
 import mongoose from 'mongoose';
-import { ContactSettings } from '@/model/contactSettings/ContactSettings.js';
+import  ContactSettings  from '@/model/contactSettings/ContactSettings.js';
 
 const contactSettingsRouter = express.Router();
 
