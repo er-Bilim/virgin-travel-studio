@@ -1,9 +1,9 @@
-import { PiTelegramLogo } from 'react-icons/pi';
+import {PiTelegramLogo} from 'react-icons/pi';
 import {FaInstagram, FaWhatsapp} from 'react-icons/fa';
-import { IoLinkOutline } from 'react-icons/io5';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
+import {IoLinkOutline} from 'react-icons/io5';
+import {cn} from '@/lib/utils';
+import {Button} from '@/components/ui/button';
+import {toast} from 'sonner';
 
 export type SharePlatform = 'telegram' | 'whatsapp' | 'copy' | 'instagram';
 
@@ -11,6 +11,7 @@ interface Props {
   platform: SharePlatform;
   url: string;
   title: string;
+  number?: string;
   variant?: 'icon' | 'labeled';
   className?: string;
 }
@@ -20,7 +21,7 @@ const PLATFORM_CONFIG: Record<
   {
     label: string;
     Icon: typeof PiTelegramLogo;
-    getHref?: (url: string, title: string) => string;
+    getHref?: (url: string, title: string, isNeedNumber?: string) => string;
   }
 > = {
   telegram: {
@@ -32,8 +33,14 @@ const PLATFORM_CONFIG: Record<
   whatsapp: {
     label: 'Whatsapp',
     Icon: FaWhatsapp,
-    getHref: (url, title) =>
-      `https://wa.me/?text=${encodeURIComponent(title + ' ' + url)}`,
+    getHref: (url, title, number?) => {
+      if (number) {
+        const cleanPhone = number.replace(/\D/g, '');
+        return `https://wa.me/${cleanPhone}`;
+      } else {
+        return `https://wa.me/?text=${encodeURIComponent(title + ' ' + url)}`;
+      }
+    }
   },
   copy: {
     label: 'Скопировать',
@@ -50,12 +57,13 @@ const PLATFORM_CONFIG: Record<
 };
 
 const ShareButton = ({
-  platform,
-  url,
-  title,
-  variant = 'icon',
-  className,
-}: Props) => {
+                       platform,
+                       url,
+                       title,
+                       number,
+                       variant = 'icon',
+                       className,
+                     }: Props) => {
   const config = PLATFORM_CONFIG[platform];
   const Icon = config.Icon;
   const isIcon = variant === 'icon';
@@ -68,7 +76,10 @@ const ShareButton = ({
 
   const content = (
     <>
-      <Icon className="size-4" aria-hidden />
+      <Icon
+        className="size-4"
+        aria-hidden
+      />
       {!isIcon && <span>{config.label}</span>}
     </>
   );
@@ -77,7 +88,7 @@ const ShareButton = ({
     return (
       <Button {...buttonProps} asChild>
         <a
-          href={config.getHref(url, title)}
+          href={config.getHref(url, title, number)}
           target="_blank"
           rel="noopener noreferrer"
           aria-label={`Поделиться через ${config.label}`}
@@ -101,7 +112,7 @@ const ShareButton = ({
   async function handleNativeShare(url: string, title: string) {
     if (typeof navigator === 'undefined' || !navigator.share) return;
     try {
-      await navigator.share({ url, title });
+      await navigator.share({url, title});
     } catch (error) {
       console.error(error);
       throw error;
@@ -115,7 +126,9 @@ const ShareButton = ({
   const ariaLabel = platform === 'copy' ? 'Скопировать ссылку' : 'Поделиться';
 
   return (
-    <Button {...buttonProps} onClick={handler} aria-label={ariaLabel}>
+    <Button {...buttonProps} onClick={handler}
+            aria-label={ariaLabel}
+    >
       {content}
     </Button>
   );

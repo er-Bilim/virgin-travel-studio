@@ -1,10 +1,9 @@
 "use client";
 
-import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton"; // Импорт вашего скелетона
-import { Clock, Mail, MapPin, Phone, AlertTriangle } from "lucide-react";
-import { useGetContactsSettings } from "@/lib/hooks/contactSettingsHook";
+import {Breadcrumbs} from "@/components/shared/Breadcrumbs";
+import {Button} from "@/components/ui/button";
+import {Skeleton} from "@/components/ui/skeleton"; // Импорт вашего скелетона
+import {AlertTriangle, Clock, Mail, MapPin, Phone} from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -13,10 +12,11 @@ import {
 } from "@/components/ui/accordion";
 import ShareButton from "@/components/public/buttons/share/ShareButton";
 import Link from "next/link";
+import {useContacts} from "@/lib/hooks/contactSettings";
 
 
 export default function ContactsPage() {
-  const { data: settings, isLoading, isError } = useGetContactsSettings();
+  const { data: settings, isLoading, isError } = useContacts();
 
   if (isLoading) {
     return (
@@ -216,6 +216,7 @@ export default function ContactsPage() {
                     platform="whatsapp"
                     url={settings.whatsapp}
                     title="whatsapp"
+                    number={settings.phone}
                     variant="labeled"
                     className="w-full bg-slate-50 py-4 sm:py-5 text-xs md:text-sm"
                   />

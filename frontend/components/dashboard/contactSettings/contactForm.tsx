@@ -1,7 +1,7 @@
 'use client';
 
 import { useController, useForm, type Control, type FieldErrors, type UseFormRegister, type UseFormWatch } from 'react-hook-form';
-import type { ContactSettingsFields } from '@/types/contactSettings';
+import type { IContactSettings } from '@/types/contactSettings';
 import { Input } from '@/components/ui/input';
 import { inputClass } from '@/lib/constants';
 import { mutateContacts, mutateCreateContacts } from '@/lib/hooks/contactSettings';
@@ -36,10 +36,9 @@ export default function ContactSettingsForm() {
     register,
     handleSubmit,
     watch,
-    reset,
     control,
     formState: { errors },
-  } = useForm<ContactSettingsFields>({
+  } = useForm<IContactSettings>({
     defaultValues: contactSettings || {},
   });
 
@@ -49,7 +48,7 @@ export default function ContactSettingsForm() {
     ? mutateCreateContacts()
     : mutateContacts();
 
-  const onSubmit = (data: ContactSettingsFields) => {
+  const onSubmit = (data: IContactSettings) => {
     const formattedData = { ...data };
 
     if (formattedData.workingHours) {
@@ -252,13 +251,13 @@ export default function ContactSettingsForm() {
 
 interface WeekendFieldProps {
   label: string;
-  register: UseFormRegister<ContactSettingsFields>;
-  watch: UseFormWatch<ContactSettingsFields>;
-  errors: FieldErrors<ContactSettingsFields>;
+  register: UseFormRegister<IContactSettings>;
+  watch: UseFormWatch<IContactSettings>;
+  errors: FieldErrors<IContactSettings>;
   field: 'saturday' | 'sunday';
   isPending: boolean;
   inputClass: string;
-  control: Control<ContactSettingsFields>; 
+  control: Control<IContactSettings>;
 }
 
 function WeekendField({

@@ -11,7 +11,6 @@ import ContactSettings from '../model/contactSettings/ContactSettings.js';
 import path from "path";
 import fs from 'fs/promises';
 import {fileURLToPath} from "url";
-import {ContactSettings} from "../model/contactSettings/ContactSettings.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
