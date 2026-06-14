@@ -1,22 +1,22 @@
 import axiosApi from "@/lib/axiosApi"
-import type { ContactSettingsFields } from "@/types/contactSettings";
+import type { IContactSettings } from "@/types/contactSettings";
 
 export const fetchContacts = async () => {
   const result =
-  await axiosApi.get<ContactSettingsFields>('/contact-settings/');
+  await axiosApi.get<IContactSettings>('/contact-settings/');
   return result.data;
 }
 
-export const createContacts = async (data: ContactSettingsFields) => {
-  const result = await axiosApi.post<ContactSettingsFields>(
+export const createContacts = async (data: IContactSettings) => {
+  const result = await axiosApi.post<IContactSettings>(
     '/contact-settings/',
     data,
   );
   return result.data;
 };
 
-export const editContacts = async (data: ContactSettingsFields) => {
+export const editContacts = async (data: IContactSettings) => {
   const result =
-    await axiosApi.put<ContactSettingsFields>('/contact-settings/', data);
+    await axiosApi.put<IContactSettings>('/contact-settings/', data);
   return result.data;
 };

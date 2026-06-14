@@ -34,7 +34,7 @@ const run = async () => {
       'toursets',
       'orders',
       'reviews',
-      'contactsettings',
+      'contactsettings'
     ];
 
     for (const collectionName of collections) {
