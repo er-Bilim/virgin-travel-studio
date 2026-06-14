@@ -2,7 +2,7 @@
 
 import {Breadcrumbs} from "@/components/shared/Breadcrumbs";
 import {Button} from "@/components/ui/button";
-import {Skeleton} from "@/components/ui/skeleton"; // Импорт вашего скелетона
+import {Skeleton} from "@/components/ui/skeleton";
 import {AlertTriangle, Clock, Mail, MapPin, Phone} from "lucide-react";
 import {
   Accordion,
@@ -239,6 +239,7 @@ export default function ContactsPage() {
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2925.4324328728844!2d74.61403670572865!3d42.842601497319585!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x389eb6155450422d%3A0x86e26db7a8764927!2zODkg0YPQuy4g0JDRhdGD0L3QsdCw0LXQstCwLCDQkdC40YjQutC10LogNzIwMDIw!5e0!3m2!1sru!2skg!4v1781259264024!5m2!1sru!2skg"
               width="100%"
               height="100%"
+              title="Карта местоположения офиса"
               style={{ border: 0 }}
               allowFullScreen={false}
               loading="lazy"
