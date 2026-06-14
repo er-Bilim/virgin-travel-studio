@@ -124,6 +124,12 @@ export const dashboardMenuItems: DashboardMenuItem[] = [
     icon: FolderOpen,
   },
   {
+    label: 'Настройки',
+    href: '/admin/settings',
+    roles: ['ADMIN'],
+    icon: FileUser,
+  },
+  {
     label: 'Панель',
     href: '/manager/dashboard',
     roles: ['MANAGER'],

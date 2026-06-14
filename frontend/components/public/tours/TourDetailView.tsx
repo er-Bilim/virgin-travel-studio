@@ -2,41 +2,44 @@
 
 import TourGallery from '@/components/tourGallery/TourGallery';
 import {
-  Hotel,
-  Plane,
-  Flame,
-  Calendar1,
-  MapPin,
-  Star,
-  Dot,
-  MessageSquareDashed,
-  CalendarHeart,
   BadgePercent,
+  Calendar1,
+  CalendarHeart,
+  Check,
   Clock3,
-  UsersRound,
+  Dot,
+  Flame,
+  Hotel,
+  MapPin,
+  MessageSquareDashed,
+  Plane,
   Send,
   ShieldCog,
-  Check,
+  Star,
+  UsersRound
 } from 'lucide-react';
-import { useState } from 'react';
-import CreateReviewForm from '@/components/public/reviews/form/CreateReviewForm';
+import {useMemo, useState} from 'react';
+import CreateReviewForm
+  from '@/components/public/reviews/form/CreateReviewForm';
 import {
   formatDayAndMonthWords,
   formatToReadablePrice,
-  pluralize,
+  pluralize
 } from '@/lib/utils';
 import SeatsIndicator from '@/components/shared/SeatsIndicator';
-import { buildTourInquiryMessage, openWhatsApp } from '@/lib/whatsapp';
-import { FaWhatsapp } from 'react-icons/fa';
+import {buildTourInquiryMessage, openWhatsApp} from '@/lib/whatsapp';
+import {FaWhatsapp} from 'react-icons/fa';
 import Review from '@/components/public/reviews/Review';
-import { Spinner } from '@/components/ui/spinner';
-import { useInfiniteReviews } from '@/lib/hooks/reviewHooks';
-import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
-import { useTourById } from '@/lib/hooks/tourHooks';
+import {Spinner} from '@/components/ui/spinner';
+import {useInfiniteReviews} from '@/lib/hooks/reviewHooks';
+import {Breadcrumbs} from '@/components/shared/Breadcrumbs';
+import {useTourById} from '@/lib/hooks/tourHooks';
 import TourSetCard from './TourSetCard';
-import type { TourSetType } from '@/types/tourSets';
+import type {TourSetType} from '@/types/tourSets';
 import OrderCard from '@/components/dashboard/orders/OrderCard';
 import TourDetailLoading from '@/app/(public)/tours/[slug]/loading';
+import type {DateRange} from 'react-day-picker';
+import {DateRangePicker} from '@/components/shared/DateRangePicker';
 
 interface Props {
   id: string;
@@ -46,6 +49,19 @@ const TourDetailView = ({ id }: Props) => {
   const [isOrderOpen, setIsOrderOpen] = useState(false);
   const { data: tour, isPending, isError } = useTourById(id);
   const [selectedSetId, setSelectedSetId] = useState<string | null>(null);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+
+  const visibleTours = useMemo(() => {
+    if (!dateRange?.from) return tour?.tourSets;
+
+    return tour?.tourSets.filter((ts) => {
+      const start = new Date(ts.startDate);
+
+      if (dateRange.from && start < dateRange.from) return false;
+      if (dateRange.to && start > dateRange.to) return false;
+      return true;
+    });
+  },[tour?.tourSets, dateRange]);
 
   const {
     data: reviewsData,
@@ -383,17 +399,25 @@ const TourDetailView = ({ id }: Props) => {
             aria-labelledby="where-to-go-title"
             className="border-t border-border pt-10"
           >
-            <div className="flex items-center gap-3">
+            <div className="flex justify-between items-start gap-3">
               <h2
                 id="where-to-go-title"
                 className="font-semibold text-[1.3rem] mb-5"
               >
                 Когда поехать
               </h2>
+              <DateRangePicker
+                  value={dateRange}
+                  onChange={setDateRange}
+                  className="w-64"
+              />
             </div>
 
             <div className="flex flex-col gap-5">
-              {tour.tourSets.map((tourSet) => (
+              {dateRange?.from && visibleTours?.length === 0 &&
+                  <span>Заездов на эту дату не найдено</span>
+              }
+              {visibleTours?.map((tourSet) => (
                 <TourSetCard
                   key={tourSet._id}
                   tourSet={tourSet}

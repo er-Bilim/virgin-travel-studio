@@ -16,10 +16,7 @@ const TourSchema = new Schema(
          match: [/^[A-Z]{2}$/, 'Код страны должен состоять из 2 букв'],
          validate: {
             validator: function (value: string) {
-                if (!isValidCountry(value)) {
-                    return false;
-                }
-                return true;
+              return isValidCountry(value)
             },
             message: 'Код страны неверный, введите из списка'
         }

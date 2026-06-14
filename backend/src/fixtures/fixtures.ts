@@ -7,6 +7,7 @@ import Tour from '../model/tour/Tour.js';
 import TourSet from '../model/tourSet/TourSet.js';
 import Order from '../model/order/Order.js';
 import Review from '../model/review/Review.js';
+import ContactSettings from '../model/contactSettings/ContactSettings.js';
 import path from "path";
 import fs from 'fs/promises';
 import {fileURLToPath} from "url";
@@ -120,14 +121,14 @@ const run = async () => {
             console.log('Отзывы успешно созданы');
             break;
           case 'contactsettings':
-            const contactsSettingsData = await getJson(collectionName + '.json');
+            const contactSettingsData = await getJson(collectionName + '.json');
 
-            for (const contactSettingsData of contactsSettingsData) {
-              const contactSettings = new ContactSettings(contactSettingsData);
-              await contactSettings.save();
+            for (const settingData of contactSettingsData) {
+              const contactSetting = new ContactSettings(settingData);
+              await contactSetting.save();
             }
-            console.log('Контакты успешно созданы');
-            break
+            console.log('Настройки контактов успешно созданы');
+            break;
         }
 
       } catch (e) {

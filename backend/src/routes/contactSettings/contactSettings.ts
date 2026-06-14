@@ -2,19 +2,13 @@ import express from 'express';
 import auth from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
 import mongoose from 'mongoose';
-import { ContactSettings } from '@/model/contactSettings/ContactSettings.js';
+import  ContactSettings  from '@/model/contactSettings/ContactSettings.js';
 
 const contactSettingsRouter = express.Router();
 
 contactSettingsRouter.get('/', async (_req, res, next) => {
   try {
     const settings = await ContactSettings.findOne();
-
-    if (!settings) {
-      return res
-        .status(404)
-        .send({ error: 'Настройки контактов еще не инициализированы' });
-    }
 
     res.send(settings);
   } catch (e) {
