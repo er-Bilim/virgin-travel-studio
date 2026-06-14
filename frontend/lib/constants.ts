@@ -1,4 +1,5 @@
 import {
+  FileUser,
   FolderOpen,
   LayoutDashboard,
   type LucideIcon,
