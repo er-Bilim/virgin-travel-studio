@@ -1,10 +1,10 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {
   createManager,
-  deleteManager,
+  setStatusManager,
   getManagers,
   getOneManager,
-  updateManager
+  updateManager,
 } from '@/services/manager';
 import type {UseFormSetError} from 'react-hook-form';
 import type {IUser, ManagerMutation, ManagerUpdateMutation} from '@/types/user';
@@ -106,11 +106,11 @@ export const useUpdateManager = (setError: UseFormSetError<ManagerUpdateMutation
   });
 };
 
-export const useDeleteManager = () => {
+export const useSetStatusManager = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: deleteManager,
+    mutationFn: setStatusManager,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['managers'] });
     },

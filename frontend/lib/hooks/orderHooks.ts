@@ -8,6 +8,8 @@ import {
 } from '@/services/orders';
 import type {OrderMutationType} from '@/types/order';
 import {toast} from 'sonner';
+import type {AxiosError} from 'axios';
+import type {GlobalError} from '@/types/error';
 
 
 export const useOrders = (
@@ -53,6 +55,19 @@ export const useUpdateOrder = () => {
       queryClient.invalidateQueries({ queryKey: ['order', variables.id] });
       toast.success('Заявка обновлена');
     },
+    onError: (err: AxiosError<GlobalError>) => {
+      const data = err.response?.data;
+      if (!data) {
+        return toast.error(
+          'Вы не можете взять заявку, так как вы Забанены!',
+        );
+      }
+
+      toast.error(
+        data.error || 'Вы не можете взять заявку, так как вы Забанены!',
+        { position: 'top-center' },
+      );
+    }
   });
 };
 
