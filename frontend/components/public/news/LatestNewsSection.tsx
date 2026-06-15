@@ -1,10 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, CalendarDays } from 'lucide-react';
-import { useNews } from '@/lib/hooks/newsHooks';
-import { imageUrl } from '@/lib/constants';
-import { formatDayAndMonthWords, truncateText } from '@/lib/utils';
+import {ArrowRight, CalendarDays} from 'lucide-react';
+import {useNews} from '@/lib/hooks/newsHooks';
+import {imageUrl} from '@/lib/constants';
+import {formatDayAndMonthWords, truncateText} from '@/lib/utils';
 
 const LatestNewsSection = () => {
   const { data, isLoading, isError } = useNews({
@@ -34,7 +34,7 @@ const LatestNewsSection = () => {
     day: featuredDay,
     month: featuredMonth,
     year: featuredYear,
-  } = formatDayAndMonthWords(featured.createdAt);
+  } = formatDayAndMonthWords(featured.publishedAt);
 
   return (
     <section className="my-24">
@@ -120,7 +120,7 @@ const LatestNewsSection = () => {
           {news.map((singleNews, index) => {
             if (index !== 0) {
               const { day, month, year } = formatDayAndMonthWords(
-                singleNews.createdAt,
+                singleNews.publishedAt,
               );
 
               return (
