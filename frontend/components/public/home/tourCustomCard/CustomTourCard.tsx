@@ -1,34 +1,13 @@
 'use client';
 
+import { tags, steps } from '@/lib/customTour/constants';
 import {
-  MapPin,
-  Calendar,
-  User,
-  Car,
-  Building2,
-  Telescope,
   CalendarHeart,
   Route,
   Rocket,
 } from 'lucide-react';
+
 import Link from 'next/link'
-
-
-const steps = [
-  { title: 'Оставляете заявку', description: 'Куда, когда и что хотите' },
-  { title: 'Менеджер подбирает', description: 'Варианты отелей, рейсов, цены' },
-  { title: 'Согласуем маршрут', description: 'Дорабатываем под вас' },
-  { title: 'В путь!', description: 'Всё готово к поездке' },
-];
-
-const tags = [
-  { icon: MapPin, label: 'Любое направление' },
-  { icon: Calendar, label: 'Ваши даты' },
-  { icon: User, label: 'Личный менеджер' },
-  { icon: Car, label: 'Трансфер включён' },
-  { icon: Building2, label: 'Отель на выбор' },
-  { icon: Telescope, label: 'Экскурсии по желанию' },
-];
 
 const CustomTourCard = () => {
   return (
