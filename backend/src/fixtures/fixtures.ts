@@ -7,6 +7,7 @@ import Tour from '../model/tour/Tour.js';
 import TourSet from '../model/tourSet/TourSet.js';
 import Order from '../model/order/Order.js';
 import Review from '../model/review/Review.js';
+import ContactSettings from '../model/contactSettings/ContactSettings.js';
 import path from "path";
 import fs from 'fs/promises';
 import {fileURLToPath} from "url";
@@ -33,6 +34,7 @@ const run = async () => {
       'toursets',
       'orders',
       'reviews',
+      'contactsettings'
     ];
 
     for (const collectionName of collections) {
@@ -116,6 +118,15 @@ const run = async () => {
               await review.save();
             }
             console.log('Отзывы успешно созданы');
+            break;
+          case 'contactsettings':
+            const contactSettingsData = await getJson(collectionName + '.json');
+
+            for (const settingData of contactSettingsData) {
+              const contactSetting = new ContactSettings(settingData);
+              await contactSetting.save();
+            }
+            console.log('Настройки контактов успешно созданы');
             break;
         }
 

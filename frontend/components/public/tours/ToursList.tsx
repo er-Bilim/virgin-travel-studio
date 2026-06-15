@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import { PaginationCustom } from '@/components/pagination/PaginationCustom';
 import PublicTourCard from '@/components/public/tours/PublicTourCard';
-import { useGetTourCategories, useTours } from '@/lib/hooks/tourHooks';
+import {useGetTourCategories, useTours} from '@/lib/hooks/tourHooks';
 import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 import Filter from '@/components/shared/Filter';
 import { pluralize } from '@/lib/utils';
@@ -20,6 +20,9 @@ import {
 import Link from 'next/link';
 import Sort from '@/components/shared/Sort';
 import {toursLimitPag} from "@/lib/constants";
+import {usePathname, useRouter, useSearchParams} from "next/navigation";
+import CountryCombobox from "../../shared/CountryCombobox";
+
 
 const SORT_OPTIONS = [
   { value: 'newest', label: 'Новые сверху', icon: CalendarPlus2 },
@@ -33,6 +36,13 @@ const ToursList = () => {
   const [categoryId, setCategoryId] = useState<string | null | undefined>(null);
   const [sort, setSort] = useState<string | null | undefined>(null);
 
+    const searchParams = useSearchParams();
+    const rawCountryCode = searchParams.get('countryCode');
+    const path = usePathname();
+    const router = useRouter();
+
+    const countryCode = rawCountryCode === 'all' ? undefined : rawCountryCode;
+
   const {
     data: toursData,
     isError: isToursError,
@@ -43,6 +53,7 @@ const ToursList = () => {
     isPublished: true,
     categoryId,
     sort,
+      countryCode: countryCode ?? undefined
   });
 
   const { data: categories } = useGetTourCategories();
@@ -140,9 +151,56 @@ const ToursList = () => {
             searchParamsName="categories"
           />
         )}
-        <Sort options={SORT_OPTIONS} setSort={setSort} />
+          <div className="flex gap-2">
+              <Sort options={SORT_OPTIONS} setSort={setSort} />
+              <CountryCombobox
+                  value={countryCode}
+                  onChange={(val) => {
+                      const params = new URLSearchParams(searchParams.toString());
+
+                      if (!val) {
+                          params.delete('countryCode');
+                      } else {
+                          params.set('countryCode', val);
+                      }
+
+                      setPage(1);
+                      router.push(`${path}?${params.toString()}`);
+                  }}
+              />
+          </div>
       </div>
 
+        {!isToursError && toursData && toursData.tours.length === 0 && (
+            <>
+                <Breadcrumbs
+                    items={[
+                        { label: 'Главная', href: '/' },
+                        { label: 'Туры', href: '/tours' },
+                    ]}
+                    className="mt-10"
+                />
+
+                <section className="mx-auto max-w-[720px] px-4 py-20 text-center">
+                    <h2 className="mb-3 text-2xl font-semibold text-foreground">
+                        Такого тура пока нет
+                    </h2>
+
+                    <p className="mb-8 text-sm text-muted-foreground">
+                        Но вы можете создать его под себя — мы соберём маршрут под ваши пожелания.
+                    </p>
+
+                    <Link
+                        href="/tours/custom"
+                        className="inline-flex rounded-xl border-1 items-center px-5 py-3
+          border-[var(--primary)] bg-[var(--primary)] text-cyan-50
+          hover:bg-indigo-900 duration-300"
+                    >
+                        Создать кастомный тур
+                    </Link>
+                </section>
+            </>
+        )}
       {toursData && meta && (
         <div className="mb-5 text-sm text-muted-foreground flex flex-row gap-1">
           <span className="capitalize">найдено</span>

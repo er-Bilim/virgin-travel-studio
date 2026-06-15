@@ -1,13 +1,13 @@
 'use client';
-import {useParams, useRouter} from 'next/navigation';
-import {useDeleteManager, useOneManager} from '@/lib/hooks/managerHook';
+import {useParams} from 'next/navigation';
+import {useOneManager, useSetStatusManager} from '@/lib/hooks/managerHook';
 import {Spinner} from '@/components/ui/spinner';
 import {
   UpdateManagerForm
 } from '@/components/dashboard/managers/UpdateManagerForm';
 import OrderTable from '@/components/dashboard/orders/OrderTable';
 import {Button} from '@/components/ui/button';
-import {Delete, Download} from 'lucide-react';
+import {Delete, Download, Undo} from 'lucide-react';
 import {useModalStore} from '@/lib/stores/modalStore';
 import {Modal} from '@/components/shared/Modal';
 import {
@@ -21,14 +21,15 @@ import type {BlobError} from '@/types/error';
 import {
   ConfirmDialog
 } from '@/components/dashboard/ConfirmDialog/ConfirmDialog';
-import {toast} from 'sonner';
 
 export default function Manager() {
   const {id} = useParams();
-  const [managerToDelete, setManagerToDelete] = useState<string | null>(null);
-  const router = useRouter();
+  const [managerToChange, setManagerToChange] = useState<string | null>(null);
   const {data: manager, isLoading, error} = useOneManager(id as string);
-  const {mutate: deleteManager, isPending: isDeleting} = useDeleteManager();
+  const {
+    mutate: setStatusManager,
+    isPending: isChanging
+  } = useSetStatusManager();
   const {openModal} = useModalStore();
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [errorReport, setErrorReport] = useState<string | null>(null);
@@ -77,18 +78,12 @@ export default function Manager() {
     return <div>{error.message}</div>;
   }
 
-  const confirmDelete = () => {
-    if (!managerToDelete) return
+  const confirmSetStatus = () => {
+    if (!managerToChange) return;
 
-    deleteManager(managerToDelete, {
-      onSuccess: () => {
-        toast("Менеджер успешно удалён")
-        router.push("/admin/managers")
-      },
-      onSettled: () => {
-        setManagerToDelete(null)
-      }
-    })
+    setStatusManager(managerToChange, {
+      onSettled: () => setManagerToChange(null),
+    });
   };
 
   return (
@@ -97,10 +92,20 @@ export default function Manager() {
         <h1 className="text-2xl font-bold">Страница просмотра менеджера</h1>
         <div className="flex items-center gap-3">
           <Button
-            className="bg-destructive opacity-80 text-white hover:opacity-100"
-            onClick={() => setManagerToDelete(id as string)}
+            className={manager?.status !== 'banned' ? "bg-destructive opacity-80 text-white hover:opacity-100" : "bg-emerald-600 text-white hover:opacity-100"}
+            onClick={() => setManagerToChange(id as string)}
           >
-            <Delete className="w-4 h-4" /> Удалить менеджера <span className="block underline">{manager.fullName}</span>
+            {manager?.status !== 'banned' ? (
+                <>
+                  <Delete className="w-4 h-4" />Забанить <span className="block underline">{manager.fullName}</span>
+                </>
+              )
+              :
+              <>
+                <Undo className="w-4 h-4" />Разбанить <span className="block underline">{manager.fullName}</span>
+              </>
+            }
+
           </Button>
           <Button
             className="bg-[#1E2B6D] hover:bg-[#162356]"
@@ -136,13 +141,13 @@ export default function Manager() {
       </Modal>
 
       <ConfirmDialog
-        open={!!managerToDelete}
-        title="Удалить менеджера?"
+        open={!!managerToChange}
+        title={`${manager?.status !== 'banned' ? 'Забанить' : 'Разбанить'} менеджера?`}
         description="Это действие нельзя отменить"
-        loading={isDeleting}
-        confirmText="Удалить"
-        onCancel={() => setManagerToDelete(null)}
-        onConfirm={confirmDelete}
+        loading={isChanging}
+        confirmText={`${manager?.status !== 'banned' ? 'Забанить' : 'Разбанить'}`}
+        onCancel={() => setManagerToChange(null)}
+        onConfirm={confirmSetStatus}
       />
     </section>
   );
