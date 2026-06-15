@@ -3,16 +3,15 @@
 import iconLogo from '@/assets/Logo_favicon_32_32_2.png';
 import { useEffect, useState } from 'react';
 import clsx from 'clsx';
-import {HelpCircle} from 'lucide-react';
+import { HelpCircle } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { itemsNavHeader } from '@/lib/constants';
 import Image from 'next/image';
-import Logo from "@/components/public/layout/logo/Logo";
+import Logo from '@/components/public/layout/logo/Logo';
 
 export default function Header() {
   const [hidden, setHidden] = useState(false);
-
 
   const pathname = usePathname();
 
@@ -30,7 +29,6 @@ export default function Header() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
 
   return (
     <>
@@ -80,21 +78,18 @@ export default function Header() {
 
             <div className="flex items-center gap-3 basis-full sm:basis-auto">
               <Link
-                href="/"
+                href="/tours/custom"
                 className="
-                flex items-center justify-center
-                flex-1 sm:flex-initial
-                text-sm font-semibold
-                px-4 py-2
-                rounded-lg sm:rounded-full
-                border-2 sm:border
-                text-white
-                border-white/50
-                shadow-sm
-                transition-all duration-200
-                hover:shadow-md hover:scale-[1.02]
-                active:scale-95
-                "
+    hidden sm:flex items-center
+    text-sm font-semibold
+    px-4 py-2 rounded-full
+   text-white
+    border border-white/50
+    shadow-sm
+    transition-all duration-200
+    hover:shadow-md hover:scale-[1.02]
+    active:scale-95
+  "
               >
                 Собери свой тур
               </Link>
