@@ -36,7 +36,6 @@ export default function ContactSettingsForm() {
     register,
     handleSubmit,
     watch,
-    reset,
     control,
     formState: { errors },
   } = useForm<ContactSettingsFields>({
