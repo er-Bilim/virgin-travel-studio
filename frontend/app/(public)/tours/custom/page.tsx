@@ -18,7 +18,7 @@ const CustomTourPage = () => {
             <h1 className="mb-1 text-2xl font-extrabold tracking-tight text-[var(--navy-700)]">
               Составь свой тур
             </h1>
-            <p className="max-w-lg text-sm leading-relaxed text-muted-foregroun">
+            <p className="max-w-lg text-sm leading-relaxed text-muted-foreground">
               Расскажите о поездке мечты. Мы соберём маршрут специально для вас.
               Это заявка, а не бронь.
             </p>
