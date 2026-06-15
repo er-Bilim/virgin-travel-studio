@@ -5,7 +5,7 @@ import Review from '@/model/review/Review.js';
 import {imagesUpload} from '@/middlewares/multer.js';
 import auth from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
-import deleteImage from '@/utils/deleteImage.js';
+import deleteFile from '@/utils/deleteFile.js';
 import validateObjectId from '@/middlewares/validateObjectId.js';
 
 const reviewsRouter = express.Router();
@@ -20,21 +20,21 @@ reviewsRouter.post(
         const { clientName, tourId, rating, comment } = req.body;
 
         if (!clientName || !tourId || rating === undefined || !comment) {
-          await deleteImage(currentFilePath);
+          await deleteFile(currentFilePath);
           return res
               .status(400)
               .send({ error: 'Заполните все обязательные поля' });
         }
 
         if (!mongoose.Types.ObjectId.isValid(tourId)) {
-          await deleteImage(currentFilePath);
+          await deleteFile(currentFilePath);
           return res.status(400).send({ error: 'Неверный ID тура' });
         }
 
         const tour = await mongoose.model('Tour').findById(tourId);
 
         if (!tour) {
-          await deleteImage(currentFilePath);
+          await deleteFile(currentFilePath);
           return res.status(404).send({ error: 'Тур не найден' });
         }
 
@@ -56,7 +56,7 @@ reviewsRouter.post(
         });
       } catch (e) {
         if (e instanceof mongoose.Error.ValidationError) {
-          await deleteImage(currentFilePath);
+          await deleteFile(currentFilePath);
           return res
               .status(400)
               .send({ error: 'Ошибка валидации', details: e.errors });
@@ -183,7 +183,7 @@ reviewsRouter.patch(
       const review = await Review.findById(id);
 
       if (!review) {
-        await deleteImage(currentFilePath);
+        await deleteFile(currentFilePath);
         return res.status(404).send({ error: 'Отзыв не найден' });
       }
 
@@ -191,7 +191,7 @@ reviewsRouter.patch(
 
       if (clientName !== undefined) {
         if (typeof clientName !== 'string' || clientName.trim() === '') {
-          await deleteImage(currentFilePath);
+          await deleteFile(currentFilePath);
           return res.status(400).send({ error: 'Имя клиента обязательно' });
         }
 
@@ -206,7 +206,7 @@ reviewsRouter.patch(
           numericRating < 1 ||
           numericRating > 5
         ) {
-          await deleteImage(currentFilePath);
+          await deleteFile(currentFilePath);
 
           return res
             .status(400)
@@ -218,7 +218,7 @@ reviewsRouter.patch(
 
       if (comment !== undefined) {
         if (typeof comment !== 'string' || comment.trim() === '') {
-          await deleteImage(currentFilePath);
+          await deleteFile(currentFilePath);
 
           return res.status(400).send({ error: 'Комментарий обязателен' });
         }
@@ -245,7 +245,7 @@ reviewsRouter.patch(
       });
 
       if (req.file && previousImage && previousImage !== updateData.image) {
-        await deleteImage(previousImage);
+        await deleteFile(previousImage);
       }
 
       res.send({
@@ -253,7 +253,7 @@ reviewsRouter.patch(
         review: updatedReview,
       });
     } catch (e) {
-      await deleteImage(currentFilePath);
+      await deleteFile(currentFilePath);
 
       if (e instanceof mongoose.Error.ValidationError) {
         return res.status(400).send({
@@ -282,7 +282,7 @@ reviewsRouter.delete(
           return res.status(404).send({ error: 'Отзыв не найден' });
         }
 
-        await deleteImage(deletedReview.image);
+        await deleteFile(deletedReview.image);
         res.send({ message: 'Отзыв успешно удален' });
       } catch (e) {
         next(e);
