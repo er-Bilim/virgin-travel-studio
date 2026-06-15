@@ -1,22 +1,31 @@
 'use client';
 
-import PublicTourCard from '@/components/public/tours/PublicTourCard';
-import {useTours} from '@/lib/hooks/tourHooks';
-import {useTourSets} from '@/lib/hooks/tourSets';
-import TourGroupCard from '@/components/tourGroup/tourGroupCard';
 import Link from 'next/link';
-import LatestNewsSection from "@/components/public/news/LatestNewsSection";
-
+import PublicTourCard from '@/components/public/tours/PublicTourCard';
+import TourGroupCard from '@/components/tourGroup/tourGroupCard';
+import LatestNewsSection from '@/components/public/news/LatestNewsSection';
+import { Spinner } from '@/components/ui/spinner';
+import { useTours } from '@/lib/hooks/tourHooks';
+import { useTourSets } from '@/lib/hooks/tourSets';
+import { useHomepageSettings } from '@/lib/hooks/homepageSettingsHooks';
+import { imageUrl } from '@/lib/constants';
 
 export default function Home() {
   const limit = 4;
+
+  const {
+    data: settings,
+    isLoading: isSettingsLoading,
+    isError: isSettingsError,
+    refetch: refetchSettings,
+  } = useHomepageSettings();
 
   const {
     data: toursData,
     isLoading: isToursLoading,
     isError: isToursError,
     refetch: refetchTours,
-  } = useTours({ limit});
+  } = useTours({ limit });
 
   const {
     isLoading: isTourSetsLoading,
@@ -26,98 +35,96 @@ export default function Home() {
 
   const tours = toursData?.tours.filter((tour) => tour.isPublished) || [];
 
-  const isLoading = isToursLoading || isTourSetsLoading;
-  const isError = isToursError || isTourSetsError;
-  const showError = isError;
+  const isLoading = isToursLoading || isTourSetsLoading || isSettingsLoading;
+  const showError = isToursError || isTourSetsError || isSettingsError;
   const showLoading = !showError && isLoading;
 
   const handleRefetch = () => {
     refetchTours();
     refetchTourSets();
+    refetchSettings();
   };
 
+  const videoSource = settings?.hero?.videoUrl
+    ? `${imageUrl}${settings.hero.videoUrl}`
+    : 'http://localhost:8000/videos/default.mp4';
+
   return (
-    <section className="">
-      <div className="relative left-1/2 -translate-x-1/2 w-screen h-[400px] md:h-[680px]">
+    <section className="w-full">
+      <div className="relative left-1/2 -translate-x-1/2 w-screen h-[400px] md:h-[680px] bg-gradient-to-br from-[#1E2B6D] via-[#152054] to-[#0D153A]">
         <video
+          src={videoSource}
           className="absolute inset-0 w-full h-full object-cover"
           autoPlay
           muted
           loop
           playsInline
           poster="/images/poster.jpg"
-        >
-          <source
-            src="http://localhost:8000/videos/default.mp4"
-            type="video/mp4"
-          />
-          <source
-            src="http://localhost:8000/videos/default.webm"
-            type="video/webm"
-          />
-        </video>
+        />
 
         <div className="absolute inset-0 bg-black/40" />
 
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-white px-4">
-          <h1 className="text-3xl font-black md:text-5xl">
-            Путешествуй с нами
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-white px-4 text-center">
+          <h1 className="text-3xl font-black md:text-5xl max-w-4xl leading-tight">
+            {settings?.hero?.title || 'Путешествуй с нами'}
           </h1>
-          <p className="mt-4 max-w-2xl">
-            Наша компания занимается проектированием премиальных туров.
+          <p className="mt-4 max-w-2xl text-base md:text-lg opacity-90 whitespace-pre-line">
+            {settings?.hero?.subtitle ||
+              'Наша компания занимается проектированием премиальных туров.'}
           </p>
         </div>
       </div>
 
-      <div className="flex flex-col items-center mt-25 mb-15">
+      <div className="flex flex-col items-center mt-25 mb-15 text-center px-4">
         <h2 className="font-black text-[#1E2B6D] text-2xl md:text-4xl">
-          Популярные туры сейчас
+          {settings?.mainPopularTours?.title || 'Популярные туры сейчас'}
         </h2>
-        <p className="mt-4 max-w-2xl">
-          Готов к приключениям? Тогда выбирай подходящий тур и давай с нами.
+        <p className="mt-4 max-w-2xl text-gray-600 whitespace-pre-line">
+          {settings?.mainPopularTours?.subtitle ||
+            'Готов к приключениям? Тогда выбирай подходящий тур и давай с нами.'}
         </p>
       </div>
 
-      <div>
-          {showLoading && (
-            <p className="my-10 text-center text-lg font-semibold">
-              Загрузка туров...
+      <div className="px-4 max-w-7xl mx-auto w-full">
+        {showLoading && (
+          <div className="my-20 flex flex-col items-center justify-center gap-3">
+            <Spinner className="w-8 h-8 text-[#1E2B6D]" />
+            <p className="text-gray-500 text-sm font-medium">
+              Загрузка актуального контента...
             </p>
-          )}
-          {showError && (
-            <div className="my-10 text-center">
-              <p className="mb-4 text-lg font-semibold text-red-500">
-                Не удалось загрузить туры
+          </div>
+        )}
+
+        {showError && (
+          <div className="my-10 text-center">
+            <p className="mb-4 text-lg font-semibold text-red-500">
+              Не удалось загрузить данные
+            </p>
+            <button
+              type="button"
+              className="rounded-2xl border border-gray-200 bg-white px-6 py-2.5 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition"
+              onClick={handleRefetch}
+            >
+              Повторить попытку
+            </button>
+          </div>
+        )}
+
+        {!showLoading && !showError && (
+          <>
+            {tours.length === 0 ? (
+              <p className="my-10 text-center text-gray-500">
+                Сейчас нет опубликованных туров.
               </p>
-
-              <button
-                type="button"
-                className="rounded-2xl border px-5 py-3 font-semibold"
-                onClick={handleRefetch}
-              >
-                Повторить
-              </button>
-            </div>
-          )}
-
-          {!showLoading && !showError && (
-        <>
-          {tours.length === 0 ? (
-            <p className="my-10 text-center text-gray-500">
-              Сейчас нет опубликованных туров.
-            </p>
-          ) : (
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6 items-stretch">
-              {tours.map((tour) => (
-                <PublicTourCard
-                  key={tour._id}
-                  tour={tour}
-                />
-              ))}
-            </div>
-          )}
+            ) : (
+              <div className="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6 items-stretch">
+                {tours.map((tour) => (
+                  <PublicTourCard key={tour._id} tour={tour} />
+                ))}
+              </div>
+            )}
           </>
-          )}
+        )}
 
         <div className="text-center my-5">
           <Link href="/tours">
@@ -128,13 +135,16 @@ export default function Home() {
         </div>
       </div>
 
-      <LatestNewsSection />
+      <LatestNewsSection
+        title={settings?.mainLatestNews?.title}
+        subtitle={settings?.mainLatestNews?.subtitle}
+      />
 
-      <div className="mt-25 mb-15 flex flex-col items-center">
-        <h2 className="font-black text-[#1E2B6D] text-2xl md:text-4xl">
+      <div className="mt-25 mb-15 flex flex-col items-center px-4">
+        <h2 className="font-black text-[#1E2B6D] text-2xl md:text-4xl text-center">
           Хочешь свой кастомный тур?
         </h2>
-        <p className="mt-4 max-w-2xl">
+        <p className="mt-4 max-w-2xl text-gray-600 text-center mb-8">
           Тогда можешь составить его из возможных локаций, и укажи даты, а мы
           займемся организацией.
         </p>
