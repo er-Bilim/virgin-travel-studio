@@ -24,15 +24,6 @@ const LatestNewsSection = () => {
       </section>
     );
   }
-  if (isLoading) {
-    return (
-      <section className="my-24">
-        <p className="text-center text-muted-foreground">
-          Загрузка новостей...
-        </p>
-      </section>
-    );
-  }
 
   if (isError || news.length === 0) {
     return null;
@@ -184,89 +175,6 @@ const LatestNewsSection = () => {
         </div>
       </div>
     </section>
-    // <section className="my-24">
-    //   <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-    //     <div className="">
-    //       <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-cyan-800">
-    //         Журнал путешествий
-    //       </p>
-
-    //       <h2 className="text-3xl font-black text-navy-700 md:text-4xl">
-    //         Последние новости
-    //       </h2>
-
-    //       <p className="mt-3 max-w-xl text-muted-foreground">
-    //         Свежие обновления, полезные заметки и вдохновение для будущих
-    //         путешествий.
-    //       </p>
-    //     </div>
-
-    //     <Link
-    //       href="/news"
-    //       className="inline-flex items-center gap-2 rounded-2xl border border-border bg-card px-5 py-3 text-sm font-semibold text-navy-700 transition hover:border-cyan-600 hover:text-cyan-600"
-    //     >
-    //       Все новости
-    //     </Link>
-    //   </div>
-
-    //   <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-    //     {news.map((item, index) => (
-    //       <Link
-    //         key={item._id}
-    //         href={`/news/${item._id}`}
-    //         className={
-    //           index === 0
-    //             ? 'group overflow-hidden rounded-3xl border border-border bg-card transition hover:-translate-y-1 hover:shadow-xl md:col-span-2 lg:col-span22 lg:row-span-2'
-    //             : 'group overflow-hidden rounded-3xl border border-border bg-card transition hover:-translate-y-1 hover:shadow-xl'
-    //         }
-    //       >
-    //         <div className={index === 0 ? 'h-150' : 'h-34'}>
-    //           {item.image ? (
-    //             <img
-    //               src={imageUrl + item.image}
-    //               alt={item.title}
-    //               className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-    //             />
-    //           ) : (
-    //             <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">
-    //               Нет изображения
-    //             </div>
-    //           )}
-    //         </div>
-
-    //         <div className="p-5">
-    //           <div className="mb-3 flex items-center gap-2 text-xs text-muted-foreground">
-    //             <CalendarDays className="h-4 w-4" />
-    //             {formatDate(item.createdAt)}
-    //           </div>
-
-    //           <h3 className="line-clamp-2 text-lg font-bold text-navy-700">
-    //             {item.title}
-    //           </h3>
-
-    //           {index === 0 && (
-    //             <p className="mt-3 line-clamp-3 text-sm leading-6 text-muted-foreground">
-    //               {item.content}
-    //             </p>
-    //           )}
-
-    //           {item.tags.length > 0 && (
-    //             <div className="mt-4 flex flex-wrap gap-2">
-    //               {item.tags.slice(0, 2).map((tag) => (
-    //                 <span
-    //                   key={tag}
-    //                   className="rounded-full bg-muted px-3 py-1 text-xs font-semibold capitalize text-cyan-800"
-    //                 >
-    //                   {tag}
-    //                 </span>
-    //               ))}
-    //             </div>
-    //           )}
-    //         </div>
-    //       </Link>
-    //     ))}
-    //   </div>
-    // </section>
   );
 };
 

@@ -3,12 +3,12 @@
 import Link from 'next/link';
 import PublicTourCard from '@/components/public/tours/PublicTourCard';
 import LatestNewsSection from '@/components/public/news/LatestNewsSection';
-import { Spinner } from '@/components/ui/spinner';
 import { useTourSets } from '@/lib/hooks/tourSets';
 import { useHomepageSettings } from '@/lib/hooks/homepageSettingsHooks';
 import { imageUrl } from '@/lib/constants';
 import { ArrowRight } from 'lucide-react';
 import CustomTourCard from '@/components/public/home/tourCustomCard/CustomTourCard';
+import { useTours } from '@/lib/hooks/tourHooks';
 
 export default function Home() {
   const limit = 4;

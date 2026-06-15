@@ -37,10 +37,6 @@ export default function Header() {
           'sticky top-0 z-50 pb-2 w-full transition-transform duration-300 shadow-[0_2px_14px_rgba(0,0,0,0.06)] bg-[#1E2B6D]',
           hidden && '-translate-y-full',
         )}
-        className={clsx(
-          'sticky top-0 z-50 pb-2 w-full transition-transform duration-300 shadow-[0_2px_14px_rgba(0,0,0,0.06)] bg-[#1E2B6D]',
-          hidden && '-translate-y-full',
-        )}
       >
         <div>
           <div className="mx-auto flex min-h-20 max-w-[1400px] items-center px-[20px] py-3 justify-between flex-wrap gap-3">
