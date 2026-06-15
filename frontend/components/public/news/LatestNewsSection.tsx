@@ -9,7 +9,7 @@ import { formatDayAndMonthWords, truncateText } from '@/lib/utils';
 const LatestNewsSection = () => {
   const { data, isLoading, isError } = useNews({
     page: 1,
-    limit: 4,
+    limit: 5,
     isPublished: 'true',
   });
 
@@ -61,7 +61,7 @@ const LatestNewsSection = () => {
         </Link>
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-[1.5fr_1fr] relative">
+      <div className="grid items-stretch gap-5 lg:grid-cols-[1.5fr_1fr] relative">
         <div className="text-[var(--primary)] z-3 absolute top-5 left-5 uppercase text-sm bg-gray-100 rounded-xl py-1 px-4 font-semibold ">
           главное
         </div>
@@ -116,7 +116,7 @@ const LatestNewsSection = () => {
           </Link>
         )}
 
-        <div className="flex flex-col gap-5">
+        <div className="flex h-full flex-col gap-5">
           {news.map((singleNews, index) => {
             if (index !== 0) {
               const { day, month, year } = formatDayAndMonthWords(
@@ -127,14 +127,14 @@ const LatestNewsSection = () => {
                 <Link
                   key={singleNews._id}
                   href={`/news/${singleNews._id}`}
-                  className="group flex overflow-hidden rounded-3xl border border-border bg-card transition duration-300 hover:-translate-y-1 hover:border-cyan-500"
+                  className="group flex flex-1 overflow-hidden rounded-2xl border border-border bg-card transition duration-300 hover:-translate-y-1 hover:border-cyan-500"
                 >
                   <div className="w-30 shrink-0 overflow-hidden sm:w-50">
                     {singleNews.image ? (
                       <img
                         src={imageUrl + singleNews.image}
                         alt={singleNews.title}
-                        className="h-40 w-full object-cover transition duration-300 group-hover:scale-105"
+                        className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center bg-muted text-xs text-muted-foreground">
