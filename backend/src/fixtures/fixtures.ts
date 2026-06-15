@@ -12,6 +12,7 @@ import path from 'path';
 import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
 import HomepageSettings from '../model/homepageSettings/HomepageSettings.js';
+import Faq from '../model/faq/Faq.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,6 +38,7 @@ const run = async () => {
       'reviews',
       'contactsettings',
       'homepagesettings',
+      'faqs',
     ];
 
     for (const collectionName of collections) {
@@ -140,6 +142,14 @@ const run = async () => {
               await homepageSetting.save();
             }
             console.log('Настройки главной страницы успешно созданы');
+            break;
+          case 'faqs':
+            const faqsData = await getJson(collectionName + '.json');
+            for (const faqData of faqsData) {
+              const faq = new Faq(faqData);
+              await faq.save();
+            }
+            console.log('Вопросы FAQ успешно созданы');
             break;
         }
       } catch (e) {
