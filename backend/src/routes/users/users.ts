@@ -86,7 +86,6 @@ usersRouter.post('/sessions', async (req, res, next) => {
         const {phone, password} = req.body;
 
         const user = await User.findOne({phone}).select('+password');
-
         if (!user) {
             return res.status(401).send({
                 error: "Неверный логин или пароль"

@@ -2,18 +2,23 @@ import fs from 'fs/promises';
 import path from 'path';
 import config from '@/config.js';
 
-const deleteImage = async (
+const deleteFile = async (
   filePath: string | undefined | null,
 ): Promise<void> => {
   if (!filePath) return;
+
   const absolutePath = path.isAbsolute(filePath)
     ? filePath
     : path.join(config.publicPath, filePath);
+
   try {
     await fs.unlink(absolutePath);
   } catch (error) {
-    console.error(error);
+    const err = error as NodeJS.ErrnoException;
+
+    if (err.code !== 'ENOENT') {
+      console.error(`Ошибка при удалении файла ${absolutePath}:`, err);
+    }
   }
 };
-
-export default deleteImage;
+export default deleteFile;

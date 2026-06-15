@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { ArrowRight, CalendarDays } from 'lucide-react';
 import { useNews } from '@/lib/hooks/newsHooks';
@@ -13,6 +15,15 @@ const LatestNewsSection = () => {
 
   const news = data?.allNews || [];
 
+  if (isLoading) {
+    return (
+      <section className="my-24">
+        <p className="text-center text-muted-foreground">
+          Загрузка новостей...
+        </p>
+      </section>
+    );
+  }
   if (isLoading) {
     return (
       <section className="my-24">
