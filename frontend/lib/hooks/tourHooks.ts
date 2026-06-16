@@ -76,6 +76,12 @@ export const useTogglePublish = () => {
       queryClient.invalidateQueries({ queryKey: ['tours'] });
       queryClient.invalidateQueries({ queryKey: ['tour', variables.id] });
     },
+    onError: (error: unknown) => {
+      const axiosError = error as AxiosError<{ error: string }>;
+      const errorMessage = axiosError.response?.data?.error;
+
+      toast.error(errorMessage);
+    }
   });
 };
 
