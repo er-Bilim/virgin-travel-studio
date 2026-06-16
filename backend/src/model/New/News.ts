@@ -1,4 +1,4 @@
-import mongoose, {Schema} from "mongoose";
+import mongoose, {Schema} from 'mongoose';
 
 const NewsSchema = new Schema(
   {
@@ -28,6 +28,11 @@ const NewsSchema = new Schema(
       type: Boolean,
       default: false,
     },
+
+      publishedAt: {
+        type: Date,
+          default: null,
+      },
 
     author: {
       type: Schema.Types.ObjectId,
