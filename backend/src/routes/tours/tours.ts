@@ -196,7 +196,7 @@ toursRouter.get('/categories', async (_req, res, next) => {
         },
       },
       { $unwind: '$category' },
-      { $sort:  { '$category.title': 1 }},
+      { $sort:  { 'category.title': 1 }},
       { $project: { title: '$category.title' } },
     ]);
 
