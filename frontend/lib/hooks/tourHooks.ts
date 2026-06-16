@@ -78,7 +78,7 @@ export const useTogglePublish = () => {
     },
     onError: (error: unknown) => {
       const axiosError = error as AxiosError<{ error: string }>;
-      const errorMessage = axiosError.response?.data?.error;
+      const errorMessage = axiosError.response?.data?.error || 'Произошла ошибка при публикации тура';
 
       toast.error(errorMessage);
     }
