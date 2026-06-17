@@ -13,7 +13,7 @@ const TourSchema = new Schema(
          required: [true, 'Код страны обязателен для заполнения'],
          uppercase: true,
          trim: true,
-         match: [/^[A-Z]{2}$/, 'Код страны должен состоять из 2 букв'],
+         match: [/^[A-Z]{3}$/, 'Код страны должен состоять из 3 букв'],
          validate: {
             validator: function (value: string) {
               return isValidCountry(value)

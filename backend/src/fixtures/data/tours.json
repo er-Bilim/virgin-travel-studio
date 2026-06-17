@@ -17,7 +17,7 @@
     "isPublished": true,
     "rating": 4.8,
     "ratingCount": 15,
-    "countryCode": "ID"
+    "countryCode": "IDN"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c02",
@@ -36,7 +36,7 @@
     "isPublished": true,
     "rating": 4.5,
     "ratingCount": 24,
-    "countryCode": "EG"
+    "countryCode": "EGY"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c03",
@@ -54,7 +54,7 @@
     "isPublished": true,
     "rating": 4.9,
     "ratingCount": 31,
-    "countryCode": "RU"
+    "countryCode": "RUS"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c04",
@@ -72,7 +72,7 @@
     "isPublished": true,
     "rating": 4.6,
     "ratingCount": 19,
-    "countryCode": "TR"
+    "countryCode": "TUR"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c05",
@@ -92,7 +92,7 @@
     "isPublished": true,
     "rating": 4.7,
     "ratingCount": 12,
-    "countryCode": "MV"
+    "countryCode": "MDV"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c06",
@@ -110,7 +110,7 @@
     "isPublished": true,
     "rating": 4.4,
     "ratingCount": 8,
-    "countryCode": "RU"
+    "countryCode": "RUS"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c07",
@@ -128,7 +128,7 @@
     "isPublished": true,
     "rating": 4.8,
     "ratingCount": 20,
-    "countryCode": "RU"
+    "countryCode": "RUS"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c08",
@@ -146,7 +146,7 @@
     "isPublished": true,
     "rating": 4.3,
     "ratingCount": 14,
-    "countryCode": "IT"
+    "countryCode": "ITA"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c09",
@@ -164,7 +164,7 @@
     "isPublished": true,
     "rating": 4.6,
     "ratingCount": 11,
-    "countryCode": "FR"
+    "countryCode": "FRA"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c10",
@@ -183,7 +183,7 @@
     "isPublished": true,
     "rating": 4.5,
     "ratingCount": 18,
-    "countryCode": "TH"
+    "countryCode": "THA"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c11",
@@ -201,7 +201,7 @@
     "isPublished": true,
     "rating": 4.9,
     "ratingCount": 27,
-    "countryCode": "GE"
+    "countryCode": "GEO"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c12",
@@ -219,7 +219,7 @@
     "isPublished": true,
     "rating": 4.9,
     "ratingCount": 22,
-    "countryCode": "JP"
+    "countryCode": "JPN"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c13",
@@ -237,7 +237,7 @@
     "isPublished": true,
     "rating": 4.7,
     "ratingCount": 16,
-    "countryCode": "RU"
+    "countryCode": "RUS"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c14",
@@ -255,7 +255,7 @@
     "isPublished": true,
     "rating": 4.8,
     "ratingCount": 13,
-    "countryCode": "RU"
+    "countryCode": "RUS"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c15",
@@ -273,7 +273,7 @@
     "isPublished": true,
     "rating": 4.9,
     "ratingCount": 9,
-    "countryCode": "PH"
+    "countryCode": "PHL"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c16",
@@ -291,7 +291,7 @@
     "isPublished": true,
     "rating": 4.9,
     "ratingCount": 15,
-    "countryCode": "KE"
+    "countryCode": "KEN"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c17",
@@ -309,7 +309,7 @@
     "isPublished": true,
     "rating": 4.8,
     "ratingCount": 21,
-    "countryCode": "NO"
+    "countryCode": "NOR"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c18",
@@ -327,7 +327,7 @@
     "isPublished": true,
     "rating": 4.7,
     "ratingCount": 17,
-    "countryCode": "IS"
+    "countryCode": "ISL"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c19",
@@ -344,7 +344,7 @@
     "isPublished": false,
     "rating": 0,
     "ratingCount": 0,
-    "countryCode": "ES"
+    "countryCode": "ESP"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c20",
@@ -362,7 +362,7 @@
     "isPublished": true,
     "rating": 4.9,
     "ratingCount": 33,
-    "countryCode": "TR"
+    "countryCode": "TUR"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c21",
@@ -380,7 +380,7 @@
     "isPublished": true,
     "rating": 4.6,
     "ratingCount": 11,
-    "countryCode": "UZ"
+    "countryCode": "UZB"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c22",
@@ -398,7 +398,7 @@
     "isPublished": true,
     "rating": 4.8,
     "ratingCount": 14,
-    "countryCode": "AE"
+    "countryCode": "ARE"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c23",
@@ -416,7 +416,7 @@
     "isPublished": true,
     "rating": 4.5,
     "ratingCount": 7,
-    "countryCode": "IN"
+    "countryCode": "IND"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c24",
@@ -434,7 +434,7 @@
     "isPublished": true,
     "rating": 4.7,
     "ratingCount": 19,
-    "countryCode": "LK"
+    "countryCode": "LKA"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c25",
@@ -452,7 +452,7 @@
     "isPublished": true,
     "rating": 4.9,
     "ratingCount": 23,
-    "countryCode": "RU"
+    "countryCode": "RUS"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c26",
@@ -470,7 +470,7 @@
     "isPublished": true,
     "rating": 4.6,
     "ratingCount": 16,
-    "countryCode": "VN"
+    "countryCode": "VNM"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c27",
@@ -488,7 +488,7 @@
     "isPublished": false,
     "rating": 0,
     "ratingCount": 0,
-    "countryCode": "CH"
+    "countryCode": "CHE"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c28",
@@ -506,7 +506,7 @@
     "isPublished": true,
     "rating": 4.8,
     "ratingCount": 14,
-    "countryCode": "MA"
+    "countryCode": "MAR"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c29",
@@ -524,7 +524,7 @@
     "isPublished": true,
     "rating": 4.9,
     "ratingCount": 26,
-    "countryCode": "PE"
+    "countryCode": "PER"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c30",
@@ -542,7 +542,7 @@
     "isPublished": true,
     "rating": 4.5,
     "ratingCount": 12,
-    "countryCode": "CZ"
+    "countryCode": "CZE"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c31",
@@ -560,7 +560,7 @@
     "isPublished": true,
     "rating": 4.7,
     "ratingCount": 9,
-    "countryCode": "BR"
+    "countryCode": "BRA"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c32",
@@ -578,7 +578,7 @@
     "isPublished": true,
     "rating": 4.9,
     "ratingCount": 11,
-    "countryCode": "ZA"
+    "countryCode": "ZAF"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c33",
@@ -596,7 +596,7 @@
     "isPublished": true,
     "rating": 4.8,
     "ratingCount": 16,
-    "countryCode": "HR"
+    "countryCode": "HRV"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c34",
@@ -614,7 +614,7 @@
     "isPublished": true,
     "rating": 4.6,
     "ratingCount": 15,
-    "countryCode": "AT"
+    "countryCode": "AUT"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c35",
@@ -632,7 +632,7 @@
     "isPublished": true,
     "rating": 4.8,
     "ratingCount": 20,
-    "countryCode": "JO"
+    "countryCode": "JOR"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c36",
@@ -650,7 +650,7 @@
     "isPublished": true,
     "rating": 4.7,
     "ratingCount": 8,
-    "countryCode": "MG"
+    "countryCode": "MDG"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c37",
@@ -667,7 +667,7 @@
     "isPublished": true,
     "rating": 4.6,
     "ratingCount": 17,
-    "countryCode": "ME"
+    "countryCode": "MNE"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c38",
@@ -685,7 +685,7 @@
     "isPublished": true,
     "rating": 4.8,
     "ratingCount": 13,
-    "countryCode": "AM"
+    "countryCode": "ARM"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c39",
@@ -703,7 +703,7 @@
     "isPublished": true,
     "rating": 4.5,
     "ratingCount": 15,
-    "countryCode": "RU"
+    "countryCode": "RUS"
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5c40",
@@ -721,6 +721,6 @@
     "isPublished": true,
     "rating": 4.8,
     "ratingCount": 10,
-    "countryCode": "IL"
+    "countryCode": "ISR"
   }
 ]
