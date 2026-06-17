@@ -58,7 +58,7 @@ const TourSetReviewsManager = ({tourId}: Props) => {
 
       return () => clearTimeout(timer);
     }
-  }, [isLoading, reviewsData]);
+  }, [isLoading, reviews]);
 
   const handleReply = (review: IReview) => {
     setReplyReview(review);
