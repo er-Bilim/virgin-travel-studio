@@ -1,6 +1,6 @@
 'use client';
 
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {MessageSquareReply, Plus, Star, Trash2} from 'lucide-react';
 
 import {Button} from '@/components/ui/button';
@@ -33,9 +33,32 @@ const TourSetReviewsManager = ({tourId}: Props) => {
   const [replyReview, setReplyReview] = useState<IReview | null>(null);
   const [replyText, setReplyText] = useState('');
 
-  const {data: reviews = [], isLoading, isError} = useAdminReviews(tourId);
+  const {data: reviewsData, isLoading, isError} = useAdminReviews({tourId});
+  const reviews = reviewsData?.reviews || [];
   const {mutate: deleteReview, isPending: isDeleting} = useDeleteReview();
   const {mutate: updateReview, isPending: updatingReply} = useUpdateReview();
+
+  useEffect(() => {
+    const hash = window.location.hash;
+
+    if (hash && !isLoading && reviewsData?.reviews.length) {
+      const timer = setTimeout(() => {
+        const element = document.querySelector(hash);
+
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "center" });
+
+          element.classList.add("bg-yellow-50/80");
+
+          setTimeout(() => {
+            element.classList.remove("bg-yellow-50/80");
+          }, 2500);
+        }
+      }, 150);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, reviewsData]);
 
   const handleReply = (review: IReview) => {
     setReplyReview(review);
@@ -77,7 +100,7 @@ const TourSetReviewsManager = ({tourId}: Props) => {
     <section className="rounded-2xl sm:rounded-3xl bg-white p-4 sm:p-6 shadow-sm">
       <div className="mb-4 sm:mb-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h2 className="text-lg sm:text-xl font-black text-[#1E2B6D]">
+          <h2 className="text-lg sm:text-3xl font-black text-[#1E2B6D]">
             Отзывы тура
           </h2>
 
@@ -119,6 +142,7 @@ const TourSetReviewsManager = ({tourId}: Props) => {
           {reviews.map((review) => (
             <article
               key={review._id}
+              id={`review-${review._id}`}
               className="rounded-xl sm:rounded-2xl border border-gray-100 p-4 sm:p-5"
             >
               <div className="flex flex-col lg:flex-row items-start justify-between gap-3 sm:gap-4">

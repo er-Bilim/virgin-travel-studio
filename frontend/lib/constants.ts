@@ -4,7 +4,7 @@ import {
   LayoutDashboard,
   type LucideIcon,
   Newspaper,
-  Plane,
+  Plane, Star,
   Tags,
   Users
 } from 'lucide-react';
@@ -125,6 +125,12 @@ export const dashboardMenuItems: DashboardMenuItem[] = [
     icon: FolderOpen,
   },
   {
+    label: 'Отзывы',
+    href: '/admin/reviews',
+    roles: ['ADMIN'],
+    icon: Star,
+  },
+  {
     label: 'Настройки',
     href: '/admin/settings',
     roles: ['ADMIN'],
@@ -153,6 +159,12 @@ export const dashboardMenuItems: DashboardMenuItem[] = [
     href: '/manager/leads',
     roles: ['MANAGER'],
     icon: FolderOpen,
+  },
+  {
+    label: 'Отзывы',
+    href: '/manager/reviews',
+    roles: ['MANAGER'],
+    icon: Star,
   },
 ];
 
