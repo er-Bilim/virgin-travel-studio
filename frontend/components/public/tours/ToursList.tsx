@@ -12,19 +12,20 @@ import {
   Star,
   WifiOff,
   Compass,
+  Search,
 } from 'lucide-react';
 
 import { PaginationCustom } from '@/components/pagination/PaginationCustom';
 import PublicTourCard from '@/components/public/tours/PublicTourCard';
 import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
-import Filter from '@/components/shared/Filter';
 import Sort from '@/components/shared/Sort';
-import CountryCombobox from '../../shared/CountryCombobox';
+import FilterCombobox from '../../shared/FilterCombobox';
 
 import { useGetTourCategories, useTours } from '@/lib/hooks/tourHooks';
 import { useHomepageSettings } from '@/lib/hooks/homepageSettingsHooks';
 import { toursLimitPag } from '@/lib/constants';
-import { pluralize } from '@/lib/utils';
+import { getCountryOptions, pluralize } from '@/lib/utils';
+import { StyledInput } from '@/components/shared/form/field-styles';
 
 const SORT_OPTIONS = [
   { value: 'newest', label: 'Новые сверху', icon: CalendarPlus2 },
@@ -36,8 +37,11 @@ const SORT_OPTIONS = [
 const ToursList = () => {
   const [page, setPage] = useState(1);
   const [categoryId, setCategoryId] = useState<string | null | undefined>(null);
+  const [selectedCountry, setSelectedCountry] = useState<
+    { code: string; name: string } | null | undefined
+  >(null);
+  const countryOptions = getCountryOptions();
   const [sort, setSort] = useState<string | null | undefined>(null);
-
   const searchParams = useSearchParams();
   const rawCountryCode = searchParams.get('countryCode');
   const path = usePathname();
@@ -66,6 +70,24 @@ const ToursList = () => {
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCountries = (value: string | null) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (!value) {
+      params.delete('countryCode');
+    } else {
+      params.set('countryCode', value);
+    }
+
+    setPage(1);
+    router.push(`${path}?${params.toString()}`);
+
+    const selected: { code: string; name: string } | undefined | null =
+      countryOptions.find((country) => country.code === value);
+
+    setSelectedCountry(selected);
   };
 
   if (isToursError) {
@@ -133,7 +155,67 @@ const ToursList = () => {
         </p>
       </header>
 
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8 pb-6 border-b border-gray-100">
+      <div className="mb-6 flex flex-col gap-3 border-b border-gray-100 pb-6 lg:flex-row lg:items-end">
+        <div className="flex flex-1 flex-col gap-1">
+          <label
+            htmlFor="tour-search"
+            className="pl-0.5 text-xs font-semibold uppercase tracking-wide text-slate-400"
+          >
+            Поиск
+          </label>
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 size-[18px] -translate-y-1/2 text-slate-400" />
+            <StyledInput
+              id="tour-search"
+              type="text"
+              placeholder="Название тура..."
+              className="h-[50px] w-full rounded-xl border-1 border-slate-300 bg-white pl-11 pr-4 text-sm outline-none transition hover:border-slate-300 focus:border-cyan-700 focus:ring-[3px] focus:ring-cyan-700/10"
+            />
+          </div>
+        </div>
+
+        {categories && (
+          <div className="flex flex-col gap-1 lg:w-52">
+            <span className="pl-0.5 text-xs font-semibold uppercase tracking-wide text-slate-400">
+              Категория
+            </span>
+            <FilterCombobox
+              value={countryCode}
+              options={categories}
+              labelKey="title"
+              onChange={(val) => {
+                const params = new URLSearchParams(searchParams.toString());
+                if (!val) {
+                  params.delete('countryCode');
+                } else {
+                  params.set('countryCode', val);
+                }
+                setPage(1);
+                router.push(`${path}?${params.toString()}`);
+              }}
+            />
+          </div>
+        )}
+
+        <div className="flex flex-col gap-1 lg:w-52">
+          <span className="pl-0.5 text-xs font-semibold uppercase tracking-wide text-slate-400">
+            Страна
+          </span>
+          <FilterCombobox
+            value={countryCode}
+            onChange={(value) => handleCountries(value)}
+          />
+        </div>
+
+        <div className="flex flex-col gap-2 lg:w-48">
+          <span className="pl-0.5 text-xs font-semibold uppercase tracking-wide text-slate-400">
+            Сортировка
+          </span>
+          <Sort options={SORT_OPTIONS} setSort={setSort} />
+        </div>
+      </div>
+
+      {/* <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8 pb-6 border-b border-gray-100">
         {categories && (
           <Filter
             tags={categories}
@@ -145,23 +227,7 @@ const ToursList = () => {
             searchParamsName="categories"
           />
         )}
-        <div className="flex gap-2 self-start md:self-end items-center">
-          <Sort options={SORT_OPTIONS} setSort={setSort} />
-          <CountryCombobox
-            value={countryCode}
-            onChange={(val) => {
-              const params = new URLSearchParams(searchParams.toString());
-              if (!val) {
-                params.delete('countryCode');
-              } else {
-                params.set('countryCode', val);
-              }
-              setPage(1);
-              router.push(`${path}?${params.toString()}`);
-            }}
-          />
-        </div>
-      </div>
+      </div> */}
 
       {meta && toursData && toursData.tours.length > 0 && (
         <div className="mb-6 text-sm text-gray-500 flex flex-row gap-1 items-center font-medium">

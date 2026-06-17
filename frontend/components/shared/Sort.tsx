@@ -47,10 +47,9 @@ const Sort = ({ options, setSort }: Props) => {
 
   return (
     <>
-      <div className="flex items-center gap-2">
-        <span className="text-xs text-muted-foreground">Сортировка:</span>
+      <div className="flex gap-2 flex-col font-medium">
         <Select value={currentSort} onValueChange={handleChange}>
-          <SelectTrigger className="w-[220px] gap-2 cursor-pointer border-1 border-cyan-900 py-3 px-4">
+          <SelectTrigger className="gap-2 cursor-pointer border-1 border-slate-300 py-6 px-4 max-w-[194px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent className='p-3 border-1 border-cyan-400'>
