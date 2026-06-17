@@ -21,7 +21,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import countries from '@/lib/countries';
 import {
   clientNameRule,
   countryCodeRule,
@@ -36,7 +35,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
+import { cn, getCountryOptions } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { Spinner } from '@/components/ui/spinner';
@@ -103,11 +102,7 @@ const CustomTourForm = () => {
 
   const startDateValue = useWatch({ control, name: 'startDate' });
 
-  const countryOptions = Object.entries(
-    countries.getNames('ru', { select: 'official' }),
-  )
-    .map(([code, name]) => ({ code, name }))
-    .sort((a, b) => a.name.localeCompare(b.name));
+  const countryOptions = getCountryOptions()
 
   return (
     <>
