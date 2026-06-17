@@ -28,8 +28,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html className={`${montserrat.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">
+    <html className={`${montserrat.variable} antialiased`}>
+      <body className="min-h-screen flex flex-col">
         <Providers>{children}</Providers>
         <Toaster />
       </body>

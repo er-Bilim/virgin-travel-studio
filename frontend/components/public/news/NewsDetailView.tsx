@@ -8,7 +8,6 @@ import { toast } from 'sonner';
 import {
   cn,
   formatDayAndMonthWords,
-  getYearFullNumber,
 } from '../../../lib/utils';
 import { Clock, Dot } from 'lucide-react';
 import Image from 'next/image';
@@ -33,7 +32,7 @@ const NewsDetailView = ({ id }: Props) => {
     return toast.error('Что-то пошло не так');
   }
 
-  const { day, month } = formatDayAndMonthWords(news.createdAt)
+  const { day, month, year } = formatDayAndMonthWords(news.createdAt)
 
   const words: number = news.content.trim().split(/\s+/).length;
 
@@ -84,7 +83,7 @@ const NewsDetailView = ({ id }: Props) => {
                       </span>
                       <span>{month}</span>
                       <span className="font-semibold">
-                        {getYearFullNumber(news.createdAt)}
+                        {year}
                       </span>
                     </p>
                   </div>

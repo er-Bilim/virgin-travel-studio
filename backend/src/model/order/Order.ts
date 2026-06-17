@@ -16,6 +16,13 @@ const OrderSchema = new Schema(
       required: function (this: IOrder) {
         return this.type === 'STANDARD';
       },
+      validate: {
+        validator: function (this: IOrder, value: Types.ObjectId | null) {
+          if (this.type === "CUSTOM") return value == null;
+          return true
+        },
+        message: 'Кастомная заявка не может ссылаться на готовый заезд',
+      },
     },
     visibleId: {
       type: String,
@@ -31,6 +38,7 @@ const OrderSchema = new Schema(
       type: String,
       required: [true, 'Номер телефона обязателен'],
       trim: true,
+      set: (value: string) => value.replace(/[\s()-]/g, ''),
       match: [
         /^\+?[0-9]{7,15}$/,
         'Пожалуйста, введите корректный номер телефона',
@@ -77,11 +85,19 @@ const OrderSchema = new Schema(
           uppercase: true,
           trim: true,
           match: [/^[A-Z]{2}$/, 'Код страны в формате ISO (например KG, AE)'],
+          required: true,
         },
-        startDate: Date,
-        endDate: Date,
+        startDate: {
+          type: Date,
+          required: true,
+        },
+        endDate: {
+          type: Date,
+          required: true,
+        },
         hotel: { type: String, trim: true },
         description: { type: String, trim: true },
+        activities: [{ type: String, trim: true }]
       },
       required: function (this: IOrder) {
         return this.type === 'CUSTOM';

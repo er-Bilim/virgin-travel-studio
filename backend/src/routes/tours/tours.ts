@@ -196,6 +196,7 @@ toursRouter.get('/categories', async (_req, res, next) => {
         },
       },
       { $unwind: '$category' },
+      { $sort:  { 'category.title': 1 }},
       { $project: { title: '$category.title' } },
     ]);
 
@@ -336,7 +337,23 @@ toursRouter.patch(
       }
 
       if (isPublished !== undefined) {
-        tour.isPublished = String(isPublished) === 'true';
+        const shouldPublish = String(isPublished) === 'true';
+
+        if (shouldPublish) {
+          if (typeof id === 'string') {
+            const hasBatches = await TourSet.exists({ tourId: new mongoose.Types.ObjectId(id) });
+
+            if (!hasBatches) {
+              return res.status(400).send({
+                error: 'Невозможно опубликовать тур: добавьте хотя бы один поток'
+              });
+            }
+          } else {
+            return res.status(400).send({ error: 'Некорректный ID тура' });
+          }
+        }
+
+        tour.isPublished = shouldPublish;
       }
 
       if (baseAdvantages !== undefined) {
