@@ -55,7 +55,7 @@ const ReviewSchema = new Schema<ReviewFields>(
 
 ReviewSchema.statics.calculateAverageRating = async function (tourId) {
   const stats = await this.aggregate([
-    {$match: {tourId: tourId, isModerated: true}},
+    {$match: {tourId: tourId, isModerated: "approved"}},
 
     {
       $group: {
