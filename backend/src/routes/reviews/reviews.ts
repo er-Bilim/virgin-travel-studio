@@ -5,7 +5,7 @@ import Review from '@/model/review/Review.js';
 import {imagesUpload} from '@/middlewares/multer.js';
 import auth from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
-import deleteImage from '@/utils/deleteImage.js';
+import deleteFile from '@/utils/deleteFile.js';
 import validateObjectId from '@/middlewares/validateObjectId.js';
 
 const reviewsRouter = express.Router();
@@ -19,49 +19,50 @@ reviewsRouter.post(
     try {
       const {clientName, tourId, rating, comment} = req.body;
 
-      if (!clientName || !tourId || rating === undefined || !comment) {
-        await deleteImage(currentFilePath);
-        return res
-          .status(400)
-          .send({error: 'Заполните все обязательные поля'});
-      }
+        if (!clientName || !tourId || rating === undefined || !comment) {
+          await deleteFile(currentFilePath);
+          return res
+              .status(400)
+              .send({ error: 'Заполните все обязательные поля' });
+        }
 
-      if (!mongoose.Types.ObjectId.isValid(tourId)) {
-        await deleteImage(currentFilePath);
-        return res.status(400).send({error: 'Неверный ID тура'});
-      }
+        if (!mongoose.Types.ObjectId.isValid(tourId)) {
+          await deleteFile(currentFilePath);
+          return res.status(400).send({ error: 'Неверный ID тура' });
+        }
 
       const tour = await mongoose.model('Tour').findById(tourId);
 
-      if (!tour) {
-        await deleteImage(currentFilePath);
-        return res.status(404).send({error: 'Тур не найден'});
+        if (!tour) {
+          await deleteFile(currentFilePath);
+          return res.status(404).send({ error: 'Тур не найден' });
+        }
+
+        const reviewData: Partial<ReviewFields> = {
+          clientName,
+          tourId: new mongoose.Types.ObjectId(tourId),
+          rating: Number(rating),
+          comment,
+          image: req.file ? 'images/' + req.file.filename : null,
+          isModerated: "pending",
+        };
+
+        const review = new Review(reviewData);
+        await review.save();
+
+        res.send({
+          message: 'Отзыв отправлен на модерацию',
+          review,
+        });
+      } catch (e) {
+        if (e instanceof mongoose.Error.ValidationError) {
+          await deleteFile(currentFilePath);
+          return res
+              .status(400)
+              .send({ error: 'Ошибка валидации', details: e.errors });
+        }
+        next(e);
       }
-
-      const reviewData: Partial<ReviewFields> = {
-        clientName,
-        tourId: new mongoose.Types.ObjectId(tourId),
-        rating: Number(rating),
-        comment,
-        image: req.file ? 'images/' + req.file.filename : null,
-      };
-
-      const review = new Review(reviewData);
-      await review.save();
-
-      res.send({
-        message: 'Отзыв отправлен на модерацию',
-        review,
-      });
-    } catch (e) {
-      if (e instanceof mongoose.Error.ValidationError) {
-        await deleteImage(currentFilePath);
-        return res
-          .status(400)
-          .send({error: 'Ошибка валидации', details: e.errors});
-      }
-      next(e);
-    }
   },
 );
 
@@ -175,162 +176,153 @@ reviewsRouter.patch(
         return res.status(401).send({error: 'Статус модерации обязателен'});
       }
 
-      if (!isModerated && typeof isModerated === 'string') {
-        return res.status(401).send({error: 'Статус модерации обязателен'});
+      const approvedReview = await Review.findByIdAndUpdate(
+        id,
+        {isModerated: isModerated},
+        {new: true, runValidators: true},
+      );
+
+      if (!approvedReview) {
+        return res.status(404).send({error: 'Отзыв не найден'});
       }
 
-        const approvedReview = await Review.findByIdAndUpdate(
-          id,
-          {isModerated: isModerated},
-          {new: true, runValidators: true},
-        );
+      if (isModerated === 'approved') {
+        message = 'Отзыв успешно одобрен и опубликован'
+      } else {
+        message = 'Отзыв успешно отклонен'
+      }
 
-        if (!approvedReview) {
-          return res.status(404).send({error: 'Отзыв не найден'});
+      res.send({
+        message: message,
+        review: approvedReview,
+      });
+    } catch (e) {
+      next(e);
+    }
+  },
+);
+
+reviewsRouter.patch(
+  '/:id',
+  auth,
+  permit('ADMIN', 'MANAGER'),
+  validateObjectId(),
+  imagesUpload.single('image'),
+  async (req, res, next) => {
+    const currentFilePath = req.file?.path;
+
+    try {
+      const {id} = req.params;
+      const {rating, comment, companyReply, clientName} = req.body;
+
+      const review = await Review.findById(id);
+
+      if (!review) {
+        await deleteFile(currentFilePath);
+        return res.status(404).send({ error: 'Отзыв не найден' });
+      }
+
+      const updateData: Partial<ReviewFields> = {};
+
+      if (clientName !== undefined) {
+        if (typeof clientName !== 'string' || clientName.trim() === '') {
+          await deleteFile(currentFilePath);
+          return res.status(400).send({ error: 'Имя клиента обязательно' });
         }
 
-        if (isModerated === 'approved') {
-          message = 'Отзыв успешно одобрен и опубликован'
-        } else {
-          message = 'Отзыв успешно отклонен'
+        updateData.clientName = clientName.trim();
+      }
+
+      if (rating !== undefined) {
+        const numericRating = Number(rating);
+
+        if (
+          Number.isNaN(numericRating) ||
+          numericRating < 1 ||
+          numericRating > 5
+        ) {
+          await deleteFile(currentFilePath);
+
+          return res
+            .status(400)
+            .send({error: 'Рейтинг должен быть от 1 до 5'});
         }
 
-        res.send({
-          message: message,
-          review: approvedReview,
+        updateData.rating = numericRating;
+      }
+
+      if (comment !== undefined) {
+        if (typeof comment !== 'string' || comment.trim() === '') {
+          await deleteFile(currentFilePath);
+
+          return res.status(400).send({error: 'Комментарий обязателен'});
+        }
+
+        updateData.comment = comment.trim();
+      }
+
+      if (companyReply !== undefined) {
+        updateData.companyReply =
+          typeof companyReply === 'string' && companyReply.trim() !== ''
+            ? companyReply.trim()
+            : null;
+      }
+
+      const previousImage = review.image;
+
+      if (req.file) {
+        updateData.image = 'images/' + req.file.filename;
+      }
+
+      const updatedReview = await Review.findByIdAndUpdate(id, updateData, {
+        new: true,
+        runValidators: true,
+      });
+
+      if (req.file && previousImage && previousImage !== updateData.image) {
+        await deleteFile(previousImage);
+      }
+
+      res.send({
+        message: 'Отзыв успешно обновлен',
+        review: updatedReview,
+      });
+    } catch (e) {
+      await deleteFile(currentFilePath);
+
+      if (e instanceof mongoose.Error.ValidationError) {
+        return res.status(400).send({
+          error: 'Ошибка валидации',
+          details: e.errors,
         });
       }
-    catch
-      (e)
-      {
-        next(e);
-      }
+
+      next(e);
     }
-  ,
-  )
-    ;
+  },
+);
 
-    reviewsRouter.patch(
-      '/:id',
-      auth,
-      permit('ADMIN', 'MANAGER'),
-      validateObjectId(),
-      imagesUpload.single('image'),
-      async (req, res, next) => {
-        const currentFilePath = req.file?.path;
+reviewsRouter.delete(
+  '/:id',
+  auth,
+  permit('ADMIN', 'MANAGER'),
+  validateObjectId(),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
 
-        try {
-          const {id} = req.params;
-          const {rating, comment, companyReply, clientName} = req.body;
+      const deletedReview = await Review.findByIdAndDelete(id);
 
-          const review = await Review.findById(id);
+      if (!deletedReview) {
+        return res.status(404).send({ error: 'Отзыв не найден' });
+      }
 
-          if (!review) {
-            await deleteImage(currentFilePath);
-            return res.status(404).send({error: 'Отзыв не найден'});
-          }
+      await deleteFile(deletedReview.image);
+      res.send({ message: 'Отзыв успешно удален' });
+    } catch (e) {
+      next(e);
+    }
+  },
+);
 
-          const updateData: Partial<ReviewFields> = {};
-
-          if (clientName !== undefined) {
-            if (typeof clientName !== 'string' || clientName.trim() === '') {
-              await deleteImage(currentFilePath);
-              return res.status(400).send({error: 'Имя клиента обязательно'});
-            }
-
-            updateData.clientName = clientName.trim();
-          }
-
-          if (rating !== undefined) {
-            const numericRating = Number(rating);
-
-            if (
-              Number.isNaN(numericRating) ||
-              numericRating < 1 ||
-              numericRating > 5
-            ) {
-              await deleteImage(currentFilePath);
-
-              return res
-                .status(400)
-                .send({error: 'Рейтинг должен быть от 1 до 5'});
-            }
-
-            updateData.rating = numericRating;
-          }
-
-          if (comment !== undefined) {
-            if (typeof comment !== 'string' || comment.trim() === '') {
-              await deleteImage(currentFilePath);
-
-              return res.status(400).send({error: 'Комментарий обязателен'});
-            }
-
-            updateData.comment = comment.trim();
-          }
-
-          if (companyReply !== undefined) {
-            updateData.companyReply =
-              typeof companyReply === 'string' && companyReply.trim() !== ''
-                ? companyReply.trim()
-                : null;
-          }
-
-          const previousImage = review.image;
-
-          if (req.file) {
-            updateData.image = 'images/' + req.file.filename;
-          }
-
-          const updatedReview = await Review.findByIdAndUpdate(id, updateData, {
-            new: true,
-            runValidators: true,
-          });
-
-          if (req.file && previousImage && previousImage !== updateData.image) {
-            await deleteImage(previousImage);
-          }
-
-          res.send({
-            message: 'Отзыв успешно обновлен',
-            review: updatedReview,
-          });
-        } catch (e) {
-          await deleteImage(currentFilePath);
-
-          if (e instanceof mongoose.Error.ValidationError) {
-            return res.status(400).send({
-              error: 'Ошибка валидации',
-              details: e.errors,
-            });
-          }
-
-          next(e);
-        }
-      },
-    );
-
-    reviewsRouter.delete(
-      '/:id',
-      auth,
-      permit('ADMIN', 'MANAGER'),
-      validateObjectId(),
-      async (req, res, next) => {
-        try {
-          const {id} = req.params;
-
-          const deletedReview = await Review.findByIdAndDelete(id);
-
-          if (!deletedReview) {
-            return res.status(404).send({error: 'Отзыв не найден'});
-          }
-
-          await deleteImage(deletedReview.image);
-          res.send({message: 'Отзыв успешно удален'});
-        } catch (e) {
-          next(e);
-        }
-      },
-    );
-
-    export default reviewsRouter;
+export default reviewsRouter;
