@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Globe } from 'lucide-react';
+import { type LucideIcon } from 'lucide-react';
 import {
   Popover,
   PopoverContent,
@@ -17,30 +17,51 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
+import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 
-type FilterItemCombobox<K extends string> = {_id?: string} & Record<K, string>;
+type FilterItemCombobox<K extends string, V extends string> = {
+  _id?: string;
+} & Record<K | V, string>;
 
-interface Props<K extends string> {
-  value?: string | null;
-  onChange: (val: string | null) => void;
-  selected?: {name: string};
-  labelKey: K;
-  options: FilterItemCombobox<K>[];
+type settingsType = {
+  title: string;
+  icon: LucideIcon;
+  queryParamsName: string;
+  searchPlaceholder: string;
 };
 
-const FilterCombobox = <K extends string>({ value, onChange, selected, labelKey, options }: Props<K>) => {
+interface Props<K extends string, V extends string> {
+  labelKey: K;
+  options: FilterItemCombobox<K, V>[];
+  queryParamsKey: V;
+  settings: settingsType;
+  selected: string | null;
+}
+
+const FilterCombobox = <K extends string, V extends string>({
+  labelKey,
+  options,
+  queryParamsKey,
+  settings,
+  selected,
+}: Props<K, V>) => {
   const [open, setOpen] = useState(false);
+  const Icon = settings?.icon;
 
-  // const countryOptions = useMemo(() => {
-  //   const countries = Object.keys(countriesLib.getAlpha2Codes());
+  const searchParams = useSearchParams();
+  const params = new URLSearchParams(searchParams.toString());
+  const path = usePathname();
+  const router = useRouter();
 
-  //   return countries.map((code) => ({
-  //     code,
-  //     name: countriesLib.getName(code, 'ru') ?? code,
-  //   }));
-  // }, []);
+  const handleOnChange = (value: string | null) => {
+    if (!value) {
+      params.delete(settings?.queryParamsName);
+    } else {
+      params.set(settings?.queryParamsName, value);
+    }
 
-  // const selected = countryOptions.find((c) => c.code === value);
+    router.push(`${path}?${params.toString()}`);
+  };
 
   return (
     <div className="flex items-center gap-2 ">
@@ -55,9 +76,9 @@ const FilterCombobox = <K extends string>({ value, onChange, selected, labelKey,
             )}
           >
             <div className="flex items-center gap-2">
-              <Globe className="size-4 text-cyan-800" />
+              {Icon && <Icon className="size-4 text-cyan-800" />}
               <span className="truncate text-sm">
-                {selected ? selected.name : 'Все страны'}
+                {selected ? selected : settings?.title}
               </span>
             </div>
           </Button>
@@ -68,7 +89,7 @@ const FilterCombobox = <K extends string>({ value, onChange, selected, labelKey,
           align="start"
         >
           <Command>
-            <CommandInput placeholder="Поиск страны..." />
+            <CommandInput placeholder={settings.searchPlaceholder} />
 
             <CommandList>
               <CommandEmpty>Ничего не найдено</CommandEmpty>
@@ -76,27 +97,28 @@ const FilterCombobox = <K extends string>({ value, onChange, selected, labelKey,
               <CommandGroup>
                 <CommandItem
                   onSelect={() => {
-                    onChange(null);
+                    handleOnChange(null);
                     setOpen(false);
                   }}
                   className="cursor-pointer py-3"
                 >
-                  Все страны
+                  {settings?.title}
                 </CommandItem>
 
-                {options && options.map((option) => (
-                  <CommandItem
-                    key={option[labelKey]}
-                    value={option[labelKey]}
-                    onSelect={() => {
-                      onChange(option[labelKey]);
-                      setOpen(false);
-                    }}
-                    className="cursor-pointer py-3"
-                  >
-                    {option[labelKey]}
-                  </CommandItem>
-                ))}
+                {options &&
+                  options.map((option) => (
+                    <CommandItem
+                      key={option[labelKey]}
+                      value={option[labelKey]}
+                      onSelect={() => {
+                        handleOnChange(option[queryParamsKey]);
+                        setOpen(false);
+                      }}
+                      className="cursor-pointer py-3"
+                    >
+                      {option[labelKey]}
+                    </CommandItem>
+                  ))}
               </CommandGroup>
             </CommandList>
           </Command>
@@ -104,6 +126,6 @@ const FilterCombobox = <K extends string>({ value, onChange, selected, labelKey,
       </Popover>
     </div>
   );
-}
+};
 
 export default FilterCombobox;
