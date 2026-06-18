@@ -13,6 +13,9 @@ const config = {
   db: 'mongodb://localhost/virgin-travel',
   refreshJWTSecret: process.env.REFRESH_SECRET_JWT ?? 'refresh_secret',
   accessJWTSecret: process.env.ACCESS_SECRET_JWT ?? 'access_secret',
+  botToken: process.env.BOT_TOKEN ?? '',
+  channelId: process.env.CHANNEL_ID ?? '',
+  tgApi: process.env.BOT_API ?? '',
 };
 
 export default config;

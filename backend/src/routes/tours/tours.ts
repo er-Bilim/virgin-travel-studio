@@ -7,8 +7,12 @@ import mongoose from 'mongoose';
 import validateObjectId from '@/middlewares/validateObjectId.js';
 import parseSort from '@/lib/sort.js';
 import TourSet from '@/model/tourSet/TourSet.js';
-import type {AggregatedTour, AggregatedTours} from '@/types/tour.types.js';
+import type {AggregatedTour, AggregatedTours, ITour} from '@/types/tour.types.js';
 import type {ICategory} from '@/types/category.types.js';
+import telegramMessage, {
+  aggregate_tour,
+  type TourDocumentType,
+} from '@/utils/bot/telegram.js';
 
 const toursRouter = express.Router();
 
@@ -337,6 +341,10 @@ toursRouter.patch(
 
       if (isPublished !== undefined) {
         tour.isPublished = String(isPublished) === 'true';
+        const tourAggregate = await aggregate_tour(
+          tour.toObject() as unknown as TourDocumentType,
+        );
+        await telegramMessage(tourAggregate);
       }
 
       if (baseAdvantages !== undefined) {
