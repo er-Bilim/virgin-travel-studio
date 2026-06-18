@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import config from '@/config.js';
 
-const deleteImage = async (
+const deleteFile = async (
   filePath: string | undefined | null,
 ): Promise<void> => {
   if (!filePath) return;
@@ -16,4 +16,4 @@ const deleteImage = async (
   }
 };
 
-export default deleteImage;
+export default deleteFile;
