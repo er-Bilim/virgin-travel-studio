@@ -3,26 +3,26 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Dot, Newspaper, AlertCircle } from 'lucide-react';
+import { Dot, Newspaper, AlertCircle, AlignStartVertical } from 'lucide-react';
 import { toast } from 'sonner';
-
 import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
-import Filter from '@/components/shared/Filter';
 import ClientAvatar from '@/components/shared/ClientAvatar';
 import { PaginationCustom } from '@/components/pagination/PaginationCustom';
 import NewsSkeleton from './NewsSkeleton';
-
 import { useGetNewsTags, useNews } from '@/lib/hooks/newsHooks';
-import { useHomepageSettings } from '@/lib/hooks/homepageSettingsHooks'; // Подключаем настройки контента
+import { useHomepageSettings } from '@/lib/hooks/homepageSettingsHooks';
 import { imageUrl, isDev } from '@/lib/constants';
 import { formatDayAndMonthWords, truncateText } from '@/lib/utils';
 import CONTENT_PLACEHOLDER from '@/assets/placeholders/content_placeholder.png';
 import { Skeleton } from '@/components/ui/skeleton';
+import FilterCombobox from '@/components/shared/FilterCombobox';
+import { useSearchParams } from 'next/navigation';
 
 const NewsList = () => {
   const [page, setPage] = useState(1);
   const limit = 7;
-  const [tag, setTag] = useState<string | null | undefined>(null);
+  const searchParams = useSearchParams();
+  const tag = searchParams.get('tags');
 
   const { data: settings } = useHomepageSettings();
 
@@ -39,6 +39,15 @@ const NewsList = () => {
     isError: tagsError,
     refetch: refetchTags,
   } = useGetNewsTags();
+
+  const tagsSettingsCombobox = {
+    title: 'Все темы',
+    icon: AlignStartVertical,
+    queryParamsName: 'tags',
+    searchPlaceholder: 'Поиск темы',
+  };
+
+  const selectedTag = tags ? tags.find((tagItem) => tagItem.tag === tag) : null;
 
   const metadata = news?.metadata;
 
@@ -134,7 +143,7 @@ const NewsList = () => {
           {settings?.newsPage?.badge || 'Журнал путешествий'}
         </p>
 
-        <h1 className="font-black text-[#1E2B6D] text-4xl mt-3 md:text-5xl">
+        <h1 className="font-black text-navy-800 text-4xl mt-3 md:text-5xl">
           {settings?.newsPage?.title || 'Новости и истории'}
         </h1>
 
@@ -151,16 +160,18 @@ const NewsList = () => {
           ))}
         </div>
       ) : (
-        <Filter
-          tags={tags}
-          labelKey="tag"
-          className="mt-8"
-          setTag={setTag}
-          title="темы"
-          mainTag="все новости"
-          href="news"
-          searchParamsName="tags"
-        />
+        <div className="mt-6">
+          <span className="pl-0.5 text-xs font-semibold uppercase tracking-wide text-slate-400">
+            Темы
+          </span>
+          <FilterCombobox
+            options={tags}
+            labelKey="tag"
+            settings={tagsSettingsCombobox}
+            queryParamsKey="tag"
+            selected={selectedTag ? selectedTag.tag : null}
+          />
+        </div>
       )}
 
       <article className="group mt-10 border-t pt-10">
@@ -187,7 +198,7 @@ const NewsList = () => {
             </div>
           </figure>
 
-          <div className="flex flex-col justify-center gap-4">
+          <div className="flex flex-col  gap-4">
             <div className="flex flex-wrap gap-2">
               {news.allNews[0].tags.map((tag, index) => (
                 <span
@@ -205,7 +216,7 @@ const NewsList = () => {
               {truncateText(news.allNews[0].content, 200)}
             </p>
 
-            <div className="flex flex-row gap-1 items-center mt-2">
+            <div className="mt-auto flex flex-row gap-1 items-center mt-2">
               <div className="flex flex-row items-center gap-2">
                 <ClientAvatar name={news.allNews[0].author.fullName} />
                 <p className="font-semibold text-sm text-gray-700">
@@ -272,7 +283,7 @@ const NewsList = () => {
                   </div>
 
                   <h3
-                    className="font-bold text-lg mt-1 text-gray-900 group-hover:text-[#1E2B6D] transition-colors line-clamp-2 min-h-[56px] leading-snug"
+                    className="font-bold text-lg mt-1 text-gray-900 group-hover:text-[#1E2B6D] transition-colors line-clamp-2 leading-snug"
                     itemProp="headline"
                   >
                     {singleNews.title}
