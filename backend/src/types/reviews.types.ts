@@ -6,7 +6,7 @@ export interface ReviewFields {
   rating: number;
   comment: string;
   image?: string | null;
-  isModerated: boolean;
+  isModerated: "pending" | "approved" | "rejected";
   createdAt: Date;
   updatedAt: Date;
   companyReply?: string | null;

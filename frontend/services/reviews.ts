@@ -1,18 +1,18 @@
 import axiosApi from '@/lib/axiosApi';
-import { createFormData } from '@/lib/utils';
+import {createFormData} from '@/lib/utils';
 import type {
   IPaginationReviews,
   IReview,
   IReviewMutation,
   IReviewParams,
 } from '@/types/review';
-import { toast } from 'sonner';
+import {toast} from 'sonner';
 
 export const getPublicReviews = async (
-    params: IReviewParams,
+  params: IReviewParams,
 ): Promise<IPaginationReviews> => {
   try {
-    const { data } = await axiosApi.get<IPaginationReviews>('/reviews/public', {
+    const {data} = await axiosApi.get<IPaginationReviews>('/reviews/public', {
       params,
     });
 
@@ -24,10 +24,10 @@ export const getPublicReviews = async (
 };
 
 export const getAdminReviews = async (
-    params: Pick<IReviewParams, 'tourId'>,
-): Promise<IReview[]> => {
+  params: { tourId?: string; page?: number; limit?: number;isModerated?: string },
+): Promise<IPaginationReviews> => {
   try {
-    const { data } = await axiosApi.get<IReview[]>('/reviews/admin', {
+    const {data} = await axiosApi.get<IPaginationReviews>('/reviews/admin', {
       params,
     });
 
@@ -42,7 +42,7 @@ export const createReview = async (data: IReviewMutation) => {
   try {
     const formData = createFormData(data);
 
-    const { data: responseData } = await axiosApi.post<{
+    const {data: responseData} = await axiosApi.post<{
       message: string;
       review: IReview;
     }>('/reviews', formData);
@@ -56,13 +56,13 @@ export const createReview = async (data: IReviewMutation) => {
 };
 
 export const updateReview = async (
-    id: string,
-    data: Partial<IReviewMutation>,
+  id: string,
+  data: Partial<IReviewMutation>,
 ) => {
   try {
     const formData = createFormData(data);
 
-    const { data: responseData } = await axiosApi.patch<{
+    const {data: responseData} = await axiosApi.patch<{
       message: string;
       review: IReview;
     }>(`/reviews/${id}`, formData);
@@ -77,8 +77,8 @@ export const updateReview = async (
 
 export const deleteReview = async (id: string) => {
   try {
-    const { data } = await axiosApi.delete<{ message: string }>(
-        `/reviews/${id}`,
+    const {data} = await axiosApi.delete<{ message: string }>(
+      `/reviews/${id}`,
     );
 
     toast.success(data.message);
@@ -88,3 +88,21 @@ export const deleteReview = async (id: string) => {
     throw error;
   }
 };
+
+export const approveReview = async (id: string, isModerated: "pending" | "approved" | "rejected") => {
+  try {
+    const {data} = await axiosApi.patch<{
+      message: string;
+      review: IReview;
+    }>(
+      `/reviews/${id}/approve`,
+      {isModerated  }
+    );
+
+    toast.success(data.message);
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}

@@ -1,4 +1,4 @@
-import type {MetaType} from '@/types/meta';
+import type {MetaType} from "@/types/meta";
 
 export type NewsFields = {
   _id: string;
@@ -7,7 +7,6 @@ export type NewsFields = {
   image: string | null;
   tags: string[];
   isPublished: boolean;
-  publishedAt: string;
   author: {
     fullName: string;
     _id: string;

@@ -25,24 +25,29 @@ export const createFormData = (data: object): FormData => {
   return formData;
 };
 
-export const formatDayAndMonthWords = (date: string, isSlice?: boolean): {day: string, month: string, year: string} => {
+export const formatDayAndMonthWords = (date: string, isSlice?: boolean): {day: string, month: string} => {
   const formatDate = dayjs(date).locale('ru');
 
-  const fullDate = formatDate.format('D MMMM YYYY');
-  
-  const [ day, month, year ] = fullDate.split(' ');
+  const fullDate = formatDate.format('D MMMM');
+  const [ day, month ] = fullDate.split(' ');
 
   if (isSlice) {
     const sliceMonth: string = month.slice(0, 3);
     return {
       day,
-      month: sliceMonth,
-      year,
+      month: sliceMonth
     }
   }
 
-  return { day, month, year }
+  return { day, month }
 }
+
+export const getYearFullNumber = (date: string) => {
+  const formatDate = dayjs(date);
+
+  const year = formatDate.format('YYYY');
+  return year;
+};
 
 export const formatToReadablePrice = (
   priceParam: number,

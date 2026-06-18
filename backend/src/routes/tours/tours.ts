@@ -45,7 +45,11 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
     }
 
     if (typeof req.query.countryCode === 'string' && req.query.countryCode.trim()) {
-      query.countryCode = req.query.countryCode.trim().toUpperCase();
+      const code = req.query.countryCode.trim().toUpperCase();
+
+      if (code.length === 3) {
+        query.countryCode = code;
+      }
     }
 
     if (typeof req.query.category === 'string') {
@@ -197,9 +201,8 @@ toursRouter.get('/categories', async (_req, res, next) => {
           as: 'category',
         },
       },
-      {$unwind: '$category'},
-      {$sort: {'category.title': 1}},
-      {$project: {title: '$category.title'}},
+      { $unwind: '$category' },
+      { $project: { title: '$category.title' } },
     ]);
 
     return res.json(categories);
@@ -297,7 +300,7 @@ toursRouter.post(
       const tour = new Tour({
         title,
         description,
-        countryCode,
+        countryCode: countryCode?.trim().toUpperCase(),
         category,
         images: imagePaths,
         baseAdvantages: parsedAdvantages,
@@ -342,7 +345,7 @@ toursRouter.patch(
 
       if (title !== undefined) tour.title = title;
       if (description !== undefined) tour.description = description;
-      if (countryCode !== undefined) tour.countryCode = countryCode;
+      if (countryCode !== undefined) tour.countryCode = countryCode.trim().toUpperCase();
 
       if (category) {
         if (!mongoose.Types.ObjectId.isValid(String(category))) {
@@ -352,23 +355,7 @@ toursRouter.patch(
       }
 
       if (isPublished !== undefined) {
-        const shouldPublish = String(isPublished) === 'true';
-
-        if (shouldPublish) {
-          if (typeof id === 'string') {
-            const hasBatches = await TourSet.exists({tourId: new mongoose.Types.ObjectId(id)});
-
-            if (!hasBatches) {
-              return res.status(400).send({
-                error: 'Невозможно опубликовать тур: добавьте хотя бы один поток'
-              });
-            }
-          } else {
-            return res.status(400).send({error: 'Некорректный ID тура'});
-          }
-        }
-
-        tour.isPublished = shouldPublish;
+        tour.isPublished = String(isPublished) === 'true';
       }
 
       if (baseAdvantages !== undefined) {

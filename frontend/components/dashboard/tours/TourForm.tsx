@@ -11,7 +11,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from '@/components/ui/select';
 import MultiImageInput
   from '@/components/dashboard/MultiImageInput/MultiImageInput';
@@ -21,18 +21,14 @@ import {useCreateTour, useUpdateTour} from '@/lib/hooks/tourHooks';
 import type {TourMutation} from '@/types/tour';
 import countries from 'i18n-iso-countries';
 import ru from 'i18n-iso-countries/langs/ru.json';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
+import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Button} from '@/components/ui/button';
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
-  CommandItem,
+  CommandItem
 } from '@/components/ui/command';
 import {cn} from '@/lib/utils';
 
@@ -52,8 +48,11 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
   const categories = categoriesData?.categories;
   countries.registerLocale(ru);
   const countryOptions = Object.entries(countries.getNames('ru')).map(
-    ([code, name]) => ({ code, name }),
-  );
+  ([alpha2, name]) => ({
+    code: countries.alpha2ToAlpha3(alpha2) ?? alpha2,
+    name,
+  }),
+);
 
   const {
     register,

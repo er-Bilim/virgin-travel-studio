@@ -1,6 +1,8 @@
+// order.types.ts
+
 interface CategoryLite {
   _id: string;
-  title: string;
+  title: string
 }
 
 interface TourLite {
@@ -12,8 +14,8 @@ interface TourLite {
 interface ManagerLite {
   _id: string;
   fullName: string;
-  phone: number;
-}
+  phone: number
+}             
 
 interface ToursetLite {
   _id: string;
@@ -41,7 +43,7 @@ export interface PaginatedOrdersResponse {
     page: number;
     limit: number;
     totalPages: number;
-  };
+  }
 }
 
 export interface OrderMutationType {
@@ -51,32 +53,13 @@ export interface OrderMutationType {
   status?: string;
   rejectionReason?: string | null;
   managerId: string | null | undefined;
-}
+} 
+
 
 export interface OrderPostType {
-  tourSetId?: string;
-  clientPhone: string;
-  clientName: string;
-}
-
-export interface CustomTourMutation {
-  countryCode: string;
-  startDate: string;
-  endDate: string;
-  hotel?: string;
-  description?: string | null;
-  clientName: string;
-  clientPhone: string;
-}
-
-type CustomTourType = Omit<CustomTourMutation, 'clientName' | 'clientPhone'> & {
-  activities: string[];
-};
-
-export interface CustomTourPost {
-  clientName: string;
-  clientPhone: string;
-  customTour: CustomTourType;
+    tourSetId: string;
+    clientPhone: string;
+    clientName: string;
 }
 
 export interface ContractFormValues {
@@ -85,10 +68,3 @@ export interface ContractFormValues {
   passportIssueDate: string;
   birthDate: string;
 }
-
-export type OrderStatus =
-  | 'NEW'
-  | 'IN_PROGRESS'
-  | 'CONTRACT_PENDING'
-  | 'COMPLETED'
-  | 'REJECTED';

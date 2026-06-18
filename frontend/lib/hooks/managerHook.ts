@@ -7,7 +7,7 @@ import {
   updateManager,
 } from '@/services/manager';
 import type {UseFormSetError} from 'react-hook-form';
-import type {ManagerMutation, ManagerUpdateMutation} from '@/types/user';
+import type {IUser, ManagerMutation, ManagerUpdateMutation} from '@/types/user';
 import type {AxiosError} from 'axios';
 import {toast} from 'sonner';
 import type {GlobalError} from '@/types/error';
@@ -24,7 +24,7 @@ export const useManagers = (filters: {
 
 export const useOneManager = (id: string) => {
   return useQuery({
-    queryKey: ['managers', id],
+    queryKey: ['managers'],
     queryFn:() => getOneManager(id),
   });
 };
@@ -36,9 +36,11 @@ export const useCreateManager = (
 
   return useMutation({
     mutationFn: createManager,
-    onSuccess: async () => {
+    onSuccess: async (newManager) => {
       toast.success('Менеджер успешно создался!');
-      queryClient.invalidateQueries({ queryKey: ['managers'] });
+      queryClient.setQueryData<IUser[]>(['managers'], (old = []) => {
+        return [newManager, ...old];
+      });
     },
     onError: (err: AxiosError<GlobalError>) => {
       const data = err.response?.data;
@@ -70,9 +72,13 @@ export const useUpdateManager = (setError: UseFormSetError<ManagerUpdateMutation
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: ManagerUpdateMutation }) =>
       updateManager(id, data),
-    onSuccess: async () => {
+    onSuccess: async (updatedManager) => {
       toast.success('Менеджер успешно обновлен!');
-      queryClient.invalidateQueries({ queryKey: ['managers'] });
+      queryClient.setQueryData<IUser[]>(['managers'], (old = []) =>
+        old.map((manager) =>
+          manager._id === updatedManager._id ? updatedManager : manager,
+        ),
+      );
     },
     onError: (err: AxiosError<GlobalError>) => {
       const data = err.response?.data;
