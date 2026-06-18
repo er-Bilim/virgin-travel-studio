@@ -2,16 +2,16 @@
 
 import {Controller, useFieldArray, useForm} from 'react-hook-form';
 import {useRouter} from 'next/navigation';
-import { Loader2, Plus, Trash2, ChevronsUpDown, Check } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { useState } from 'react';
+import {Check, ChevronsUpDown, Loader2, Plus, Trash2} from 'lucide-react';
+import {Input} from '@/components/ui/input';
+import {Textarea} from '@/components/ui/textarea';
+import {useState} from 'react';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from '@/components/ui/select';
 import MultiImageInput
   from '@/components/dashboard/MultiImageInput/MultiImageInput';
@@ -21,20 +21,16 @@ import {useCreateTour, useUpdateTour} from '@/lib/hooks/tourHooks';
 import type {TourMutation} from '@/types/tour';
 import countries from 'i18n-iso-countries';
 import ru from 'i18n-iso-countries/langs/ru.json';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
+import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
+import {Button} from '@/components/ui/button';
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
-  CommandItem,
+  CommandItem
 } from '@/components/ui/command';
-import { cn } from '@/lib/utils';
+import {cn} from '@/lib/utils';
 
 interface Props {
   isEdit?: boolean;
@@ -52,8 +48,11 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
   const categories = categoriesData?.categories;
   countries.registerLocale(ru);
   const countryOptions = Object.entries(countries.getNames('ru')).map(
-    ([code, name]) => ({ code, name }),
-  );
+  ([alpha2, name]) => ({
+    code: countries.alpha2ToAlpha3(alpha2) ?? alpha2,
+    name,
+  }),
+);
 
   const {
     register,

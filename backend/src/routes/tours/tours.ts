@@ -43,7 +43,11 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
     }
 
     if (typeof req.query.countryCode === 'string' && req.query.countryCode.trim()) {
-      query.countryCode = req.query.countryCode.trim().toUpperCase();
+      const code = req.query.countryCode.trim().toUpperCase();
+
+      if (code.length === 3) {
+        query.countryCode = code;
+      }
     }
 
     if (typeof req.query.category === 'string') {
@@ -288,7 +292,7 @@ toursRouter.post(
       const tour = new Tour({
         title,
         description,
-        countryCode,
+        countryCode: countryCode?.trim().toUpperCase(),
         category,
         images: imagePaths,
         baseAdvantages: parsedAdvantages,
@@ -326,7 +330,7 @@ toursRouter.patch(
 
       if (title !== undefined) tour.title = title;
       if (description !== undefined) tour.description = description;
-      if (countryCode !== undefined) tour.countryCode = countryCode; 
+      if (countryCode !== undefined) tour.countryCode = countryCode.trim().toUpperCase();
 
       if (category) {
         if (!mongoose.Types.ObjectId.isValid(String(category))) {

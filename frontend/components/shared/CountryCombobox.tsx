@@ -5,29 +5,40 @@ import {Globe} from 'lucide-react';
 
 import countriesLib from 'i18n-iso-countries';
 import ru from 'i18n-iso-countries/langs/ru.json';
-import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
-import {Button} from "@/components/ui/button";
-import {cn} from "@/lib/utils";
-import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "@/components/ui/command";
+import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
+import {Button} from '@/components/ui/button';
+import {cn} from '@/lib/utils';
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList
+} from '@/components/ui/command';
 
 
 countriesLib.registerLocale(ru);
 
 type Props = {
     value?: string | null;
-    onChange: (val: string | null) => void;
+    onChange: (val: string | null | undefined) => void;
 };
 
 export default function CountryCombobox({ value, onChange }: Props) {
     const [open, setOpen] = useState(false);
 
     const countryOptions = useMemo(() => {
-        const countries = Object.keys(countriesLib.getAlpha2Codes());
+        const alpha2Codes = Object.keys(countriesLib.getAlpha2Codes());
 
-        return countries.map((code) => ({
-            code,
-            name: countriesLib.getName(code, 'ru') ?? code,
-        }));
+        return alpha2Codes.map((alpha2) => {
+            const alpha3 = countriesLib.alpha2ToAlpha3(alpha2);
+
+            return {
+                code: alpha3,
+                name: countriesLib.getName(alpha2, 'ru') ?? alpha2,
+            };
+        });
     }, []);
 
     const selected = countryOptions.find((c) => c.code === value);
