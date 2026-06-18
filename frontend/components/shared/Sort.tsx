@@ -19,10 +19,9 @@ type Option = {
 
 interface Props {
   options: Option[];
-  setSort: (sort: string) => void;
 }
 
-const Sort = ({ options, setSort }: Props) => {
+const Sort = ({ options }: Props) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -41,8 +40,6 @@ const Sort = ({ options, setSort }: Props) => {
 
     const query = params.toString();
     router.push(query ? `${pathname}?${query}` : pathname);
-
-    setSort(value);
   };
 
   return (
