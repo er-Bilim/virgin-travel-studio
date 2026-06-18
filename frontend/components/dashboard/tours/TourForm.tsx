@@ -2,10 +2,10 @@
 
 import {Controller, useFieldArray, useForm} from 'react-hook-form';
 import {useRouter} from 'next/navigation';
-import { Loader2, Plus, Trash2, ChevronsUpDown, Check } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { useState } from 'react';
+import {Check, ChevronsUpDown, Loader2, Plus, Trash2} from 'lucide-react';
+import {Input} from '@/components/ui/input';
+import {Textarea} from '@/components/ui/textarea';
+import {useState} from 'react';
 import {
   Select,
   SelectContent,
@@ -26,7 +26,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
+import {Button} from '@/components/ui/button';
 import {
   Command,
   CommandEmpty,
@@ -34,7 +34,7 @@ import {
   CommandInput,
   CommandItem,
 } from '@/components/ui/command';
-import { cn } from '@/lib/utils';
+import {cn} from '@/lib/utils';
 
 interface Props {
   isEdit?: boolean;
@@ -308,7 +308,8 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
         <label className="text-sm font-medium text-gray-700">
           Фотографии (до 5 штук)
         </label>
-        <Controller
+
+        {isEdit ? <Controller
           control={control}
           name="images"
           render={({ field }) => (
@@ -317,9 +318,27 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
               label="Выберите изображения"
               onChange={field.onChange}
               value={field.value}
+              showPreviews={true}
+              allowReorder={true}
             />
           )}
         />
+          :
+          <Controller
+            control={control}
+            name="images"
+            render={({ field }) => (
+              <MultiImageInput
+                name="images"
+                label="Выберите изображения"
+                onChange={field.onChange}
+                value={field.value}
+                showPreviews={true}
+              />
+            )}
+          />
+        }
+
       </div>
 
       <button

@@ -9,6 +9,8 @@ import parseSort from '@/lib/sort.js';
 import TourSet from '@/model/tourSet/TourSet.js';
 import type {AggregatedTour, AggregatedTours} from '@/types/tour.types.js';
 import type {ICategory} from '@/types/category.types.js';
+import path from "path";
+import fs from "fs/promises";
 
 const toursRouter = express.Router();
 
@@ -17,7 +19,7 @@ const escapeRegex = (value: string) => {
 };
 
 toursRouter.get('/', authOrNot, async (req, res, next) => {
-  const { user } = req as RequestWithUser;
+  const {user} = req as RequestWithUser;
   const isAdminOrManager = user?.role === 'ADMIN' || user?.role === 'MANAGER';
 
   try {
@@ -48,7 +50,7 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
 
     if (typeof req.query.category === 'string') {
       if (!mongoose.Types.ObjectId.isValid(req.query.category)) {
-        return res.status(400).send({ error: 'Неверный category ID' });
+        return res.status(400).send({error: 'Неверный category ID'});
       }
 
       query.category = new mongoose.Types.ObjectId(req.query.category);
@@ -75,7 +77,7 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
     }
 
     const tours: AggregatedTours[] = await Tour.aggregate([
-      { $match: query },
+      {$match: query},
       {
         $lookup: {
           from: 'categories',
@@ -92,7 +94,7 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
           as: 'tourSets',
         },
       },
-      { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } },
+      {$unwind: {path: '$category', preserveNullAndEmptyArrays: true}},
       {
         $addFields: {
           isHot: {
@@ -104,18 +106,18 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
               },
             },
           },
-          minPrice: { $min: '$tourSets.price' },
-          hotelLocation: { $arrayElemAt: ['$tourSets.hotelLocation', 0] },
+          minPrice: {$min: '$tourSets.price'},
+          hotelLocation: {$arrayElemAt: ['$tourSets.hotelLocation', 0]},
           durationDays: {
             $cond: {
-              if: { $gt: [{ $size: '$tourSets' }, 0] },
+              if: {$gt: [{$size: '$tourSets'}, 0]},
               then: {
                 $ceil: {
                   $divide: [
                     {
                       $subtract: [
-                        { $arrayElemAt: ['$tourSets.endDate', 0] },
-                        { $arrayElemAt: ['$tourSets.startDate', 0] },
+                        {$arrayElemAt: ['$tourSets.endDate', 0]},
+                        {$arrayElemAt: ['$tourSets.startDate', 0]},
                       ],
                     },
                     1000 * 60 * 60 * 24,
@@ -130,9 +132,9 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
           },
         },
       },
-      { $sort: sort },
-      { $skip: skip },
-      { $limit: limit },
+      {$sort: sort},
+      {$skip: skip},
+      {$limit: limit},
       {
         $project: {
           title: 1,
@@ -185,8 +187,8 @@ toursRouter.get('/countries', async (req, res, next) => {
 toursRouter.get('/categories', async (_req, res, next) => {
   try {
     const categories: ICategory[] = await Tour.aggregate([
-      { $match: { isPublished: true } },
-      { $group: { _id: '$category' } },
+      {$match: {isPublished: true}},
+      {$group: {_id: '$category'}},
       {
         $lookup: {
           from: 'categories',
@@ -195,9 +197,9 @@ toursRouter.get('/categories', async (_req, res, next) => {
           as: 'category',
         },
       },
-      { $unwind: '$category' },
-      { $sort:  { 'category.title': 1 }},
-      { $project: { title: '$category.title' } },
+      {$unwind: '$category'},
+      {$sort: {'category.title': 1}},
+      {$project: {title: '$category.title'}},
     ]);
 
     return res.json(categories);
@@ -212,11 +214,11 @@ toursRouter.get(
   validateObjectId(),
   async (req, res, next) => {
     try {
-      const { id } = req.params;
-      const { user } = req as RequestWithUser;
+      const {id} = req.params;
+      const {user} = req as RequestWithUser;
 
       const tours: AggregatedTour[] = await Tour.aggregate([
-        { $match: { _id: new mongoose.Types.ObjectId(id as string) } },
+        {$match: {_id: new mongoose.Types.ObjectId(id as string)}},
         {
           $lookup: {
             from: 'categories',
@@ -244,14 +246,14 @@ toursRouter.get(
       const tour: AggregatedTour | undefined = tours[0];
 
       if (!tour) {
-        return res.status(404).send({ error: 'Тур не найден' });
+        return res.status(404).send({error: 'Тур не найден'});
       }
 
       const isAdminOrManager =
         user?.role === 'ADMIN' || user?.role === 'MANAGER';
 
       if (!tour.isPublished && !isAdminOrManager) {
-        return res.status(404).send({ error: 'Тур не найден' });
+        return res.status(404).send({error: 'Тур не найден'});
       }
 
       res.send(tour);
@@ -268,22 +270,28 @@ toursRouter.post(
   imagesUpload.array('images', 5),
   async (req, res, next) => {
     try {
-      const { title, description, countryCode, category, baseAdvantages } = req.body;
+      const {
+        title,
+        description,
+        countryCode,
+        category,
+        baseAdvantages
+      } = req.body;
 
       const parsedAdvantages: string[] =
         typeof baseAdvantages === 'string'
           ? baseAdvantages
-              .split(',')
-              .map((a) => a.trim())
-              .filter(Boolean)
+            .split(',')
+            .map((a) => a.trim())
+            .filter(Boolean)
           : Array.isArray(baseAdvantages)
             ? baseAdvantages
             : [];
 
       const imagePaths = req.files
         ? (req.files as Express.Multer.File[]).map(
-            (file) => 'images/' + file.filename,
-          )
+          (file) => 'images/' + file.filename,
+        )
         : [];
 
       const tour = new Tour({
@@ -302,7 +310,7 @@ toursRouter.post(
       if (e instanceof mongoose.Error.ValidationError) {
         return res
           .status(400)
-          .send({ error: 'Ошибка валидации', details: e.errors });
+          .send({error: 'Ошибка валидации', details: e.errors});
       }
       next(e);
     }
@@ -316,22 +324,29 @@ toursRouter.patch(
   validateObjectId(),
   imagesUpload.array('images', 5),
   async (req, res, next) => {
-    const { id } = req.params;
+    const {id} = req.params;
 
     try {
       const tour = await Tour.findById(id);
-      if (!tour) return res.status(404).send({ error: 'Тур не найден' });
+      if (!tour) return res.status(404).send({error: 'Тур не найден'});
 
-      const { title, description, countryCode, category, baseAdvantages, isPublished } =
+      const {
+        title,
+        description,
+        countryCode,
+        category,
+        baseAdvantages,
+        isPublished
+      } =
         req.body;
 
       if (title !== undefined) tour.title = title;
       if (description !== undefined) tour.description = description;
-      if (countryCode !== undefined) tour.countryCode = countryCode; 
+      if (countryCode !== undefined) tour.countryCode = countryCode;
 
       if (category) {
         if (!mongoose.Types.ObjectId.isValid(String(category))) {
-          return res.status(400).send({ error: 'Неверный category ID' });
+          return res.status(400).send({error: 'Неверный category ID'});
         }
         tour.category = category;
       }
@@ -341,7 +356,7 @@ toursRouter.patch(
 
         if (shouldPublish) {
           if (typeof id === 'string') {
-            const hasBatches = await TourSet.exists({ tourId: new mongoose.Types.ObjectId(id) });
+            const hasBatches = await TourSet.exists({tourId: new mongoose.Types.ObjectId(id)});
 
             if (!hasBatches) {
               return res.status(400).send({
@@ -349,7 +364,7 @@ toursRouter.patch(
               });
             }
           } else {
-            return res.status(400).send({ error: 'Некорректный ID тура' });
+            return res.status(400).send({error: 'Некорректный ID тура'});
           }
         }
 
@@ -360,28 +375,59 @@ toursRouter.patch(
         tour.baseAdvantages =
           typeof baseAdvantages === 'string'
             ? baseAdvantages
-                .split(',')
-                .map((a) => a.trim())
-                .filter(Boolean)
+              .split(',')
+              .map((a) => a.trim())
+              .filter(Boolean)
             : Array.isArray(baseAdvantages)
               ? baseAdvantages
               : tour.baseAdvantages;
       }
 
-      if (req.files && (req.files as Express.Multer.File[]).length > 0) {
-        const newImages = (req.files as Express.Multer.File[]).map(
-          (file) => 'images/' + file.filename,
-        );
-        tour.images = [...(tour.images ?? []), ...newImages];
+      if (req.body.imagesOrder !== undefined) {
+        let orderMap = req.body.imagesOrder;
+
+        if (!Array.isArray(orderMap)) {
+          orderMap = [orderMap];
+        }
+
+        const finalImages: string[] = [];
+        let newFileIndex = 0;
+        const uploadedFiles = (req.files as Express.Multer.File[]) || [];
+
+        for (const item of orderMap) {
+          const currentFile = uploadedFiles[newFileIndex];
+
+          if (item === 'NEW_FILE' && currentFile) {
+            finalImages.push('images/' + currentFile.filename);
+            newFileIndex++;
+          } else if (item !== 'NEW_FILE' && item !== 'EMPTY') {
+            finalImages.push(item);
+          }
+        }
+
+
+        const imagesToDelete = tour.images?.filter(
+          (oldImg) => !finalImages.includes(oldImg)
+        ) || [];
+
+        for (const imgPath of imagesToDelete) {
+          try {
+            await fs.unlink(path.join(process.cwd(), 'public', imgPath));
+          } catch (err) {
+            console.error(`Не удалось удалить файл ${imgPath}:`, err);
+          }
+        }
+
+        tour.images = finalImages;
       }
 
       await tour.save();
-      res.send({ message: 'Тур обновлен', tour });
+      res.send({message: 'Тур обновлен', tour});
     } catch (e) {
       if (e instanceof mongoose.Error.ValidationError) {
         return res
           .status(400)
-          .send({ error: 'Ошибка валидации', details: e.errors });
+          .send({error: 'Ошибка валидации', details: e.errors});
       }
       next(e);
     }
@@ -394,7 +440,7 @@ toursRouter.delete(
   permit('ADMIN'),
   validateObjectId(),
   async (req, res, next) => {
-    const { id } = req.params;
+    const {id} = req.params;
 
     try {
       const hasLinks = await TourSet.exists({
@@ -408,11 +454,11 @@ toursRouter.delete(
         });
       }
 
-      const result = await Tour.deleteOne({ _id: id });
+      const result = await Tour.deleteOne({_id: id});
       if (!result.deletedCount) {
-        return res.status(404).send({ error: 'Тур не найден' });
+        return res.status(404).send({error: 'Тур не найден'});
       }
-      res.send({ message: 'Тур успешно удален' });
+      res.send({message: 'Тур успешно удален'});
     } catch (e) {
       next(e);
     }

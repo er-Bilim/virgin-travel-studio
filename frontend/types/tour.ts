@@ -48,7 +48,7 @@ export interface TourMutation {
   countryCode: string;
   category: string;
   baseAdvantages: string[];
-  images: File[];
+  images: (File | string)[];
 }
 
 export interface GetToursParams {
