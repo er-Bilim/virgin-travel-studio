@@ -1,5 +1,5 @@
 'use client';
-import { useEffect } from 'react';
+
 import { Controller, useForm } from 'react-hook-form';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import type { IUser, ManagerUpdateMutation } from '@/types/user';
@@ -20,7 +20,6 @@ export const UpdateManagerForm = ({ initialValues }: Props) => {
     handleSubmit,
     control,
     setError,
-    reset,
     formState: { errors },
   } = useForm<ManagerUpdateMutation>({
     defaultValues: initialValues || {
@@ -29,13 +28,6 @@ export const UpdateManagerForm = ({ initialValues }: Props) => {
       status: ''
     },
   });
-
-  useEffect(() => {
-    if (initialValues) {
-      reset(initialValues);
-    }
-  }, [initialValues, reset]);
-
   const { mutate: update, isPending: isUpdating } = useUpdateManager(setError);
 
   const onSubmit = (data: ManagerUpdateMutation) => {

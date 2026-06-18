@@ -8,11 +8,9 @@ import TourSet from '../model/tourSet/TourSet.js';
 import Order from '../model/order/Order.js';
 import Review from '../model/review/Review.js';
 import ContactSettings from '../model/contactSettings/ContactSettings.js';
-import path from 'path';
+import path from "path";
 import fs from 'fs/promises';
-import { fileURLToPath } from 'url';
-import HomepageSettings from '../model/homepageSettings/HomepageSettings.js';
-import Faq from '../model/faq/Faq.js';
+import {fileURLToPath} from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,7 +20,7 @@ const getJson = async (fileName: string) => {
   const data = await fs.readFile(filePath, 'utf8');
 
   return JSON.parse(data);
-};
+}
 
 const run = async () => {
   await mongoose.connect(config.db);
@@ -36,9 +34,7 @@ const run = async () => {
       'toursets',
       'orders',
       'reviews',
-      'contactsettings',
-      'homepagesettings',
-      'faqs',
+      'contactsettings'
     ];
 
     for (const collectionName of collections) {
@@ -132,26 +128,8 @@ const run = async () => {
             }
             console.log('Настройки контактов успешно созданы');
             break;
-          case 'homepagesettings':
-            const homepageSettingsData = await getJson(
-              collectionName + '.json',
-            );
-
-            for (const settingData of homepageSettingsData) {
-              const homepageSetting = new HomepageSettings(settingData);
-              await homepageSetting.save();
-            }
-            console.log('Настройки главной страницы успешно созданы');
-            break;
-          case 'faqs':
-            const faqsData = await getJson(collectionName + '.json');
-            for (const faqData of faqsData) {
-              const faq = new Faq(faqData);
-              await faq.save();
-            }
-            console.log('Вопросы FAQ успешно созданы');
-            break;
         }
+
       } catch (e) {
         const err = e as { code?: number };
         if (err.code === 26) {
@@ -163,6 +141,7 @@ const run = async () => {
         throw e;
       }
     }
+
 
     console.log('Fixtures created successfully!');
   } finally {

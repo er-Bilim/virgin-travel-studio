@@ -24,6 +24,7 @@ import {
 
 export default function Manager() {
   const {id} = useParams();
+  const [managerToChange, setManagerToChange] = useState<string | null>(null);
   const {data: manager, isLoading, error} = useOneManager(id as string);
   const {
     mutate: setStatusManager,
@@ -32,7 +33,6 @@ export default function Manager() {
   const {openModal} = useModalStore();
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [errorReport, setErrorReport] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const downloadReport = async () => {
     try {
@@ -79,7 +79,11 @@ export default function Manager() {
   }
 
   const confirmSetStatus = () => {
-    setStatusManager(id as string);
+    if (!managerToChange) return;
+
+    setStatusManager(managerToChange, {
+      onSettled: () => setManagerToChange(null),
+    });
   };
 
   return (
@@ -88,33 +92,26 @@ export default function Manager() {
         <h1 className="text-2xl font-bold">Страница просмотра менеджера</h1>
         <div className="flex items-center gap-3">
           <Button
-            className={
-              manager?.status !== 'banned'
-                ? 'bg-destructive opacity-80 text-white hover:opacity-100'
-                : 'bg-emerald-600 text-white hover:opacity-100'
-            }
-            onClick={() => setIsModalOpen(true)}
+            className={manager?.status !== 'banned' ? "bg-destructive opacity-80 text-white hover:opacity-100" : "bg-emerald-600 text-white hover:opacity-100"}
+            onClick={() => setManagerToChange(id as string)}
           >
             {manager?.status !== 'banned' ? (
+                <>
+                  <Delete className="w-4 h-4" />Забанить <span className="block underline">{manager.fullName}</span>
+                </>
+              )
+              :
               <>
-                <Delete className="w-4 h-4" />
-                Забанить{' '}
-                <span className="block underline">{manager.fullName}</span>
+                <Undo className="w-4 h-4" />Разбанить <span className="block underline">{manager.fullName}</span>
               </>
-            ) : (
-              <>
-                <Undo className="w-4 h-4" />
-                Разбанить{' '}
-                <span className="block underline">{manager.fullName}</span>
-              </>
-            )}
+            }
+
           </Button>
           <Button
             className="bg-[#1E2B6D] hover:bg-[#162356]"
-            onClick={() => openModal('reportManager')}
+            onClick={() => openModal("reportManager")}
           >
-            <Download className="w-4 h-4 mr-2" /> Отчет по менеджеру{' '}
-            <span className="block underline">{manager.fullName}</span>
+            <Download className="w-4 h-4 mr-2" /> Отчет по менеджеру <span className="block underline">{manager.fullName}</span>
           </Button>
         </div>
       </div>
@@ -123,13 +120,18 @@ export default function Manager() {
       </div>
       <OrderTable />
 
-      <Modal id="reportManager" title="Отчет по менеджеру">
+      <Modal
+        id="reportManager"
+        title="Отчет по менеджеру"
+      >
         <DateRangePicker
           value={dateRange}
           onChange={setDateRange}
           disableFuture
         />
-        {errorReport && <p className="text-sm text-red-500">{errorReport}</p>}
+        {errorReport && (
+          <p className="text-sm text-red-500">{errorReport}</p>
+        )}
         <Button
           className="w-full mt-4 bg-[#1E2B6D] hover:bg-[#162356]"
           onClick={downloadReport}
@@ -139,12 +141,12 @@ export default function Manager() {
       </Modal>
 
       <ConfirmDialog
-        open={isModalOpen}
+        open={!!managerToChange}
         title={`${manager?.status !== 'banned' ? 'Забанить' : 'Разбанить'} менеджера?`}
         description="Это действие нельзя отменить"
         loading={isChanging}
         confirmText={`${manager?.status !== 'banned' ? 'Забанить' : 'Разбанить'}`}
-        onCancel={() => setIsModalOpen(false)}
+        onCancel={() => setManagerToChange(null)}
         onConfirm={confirmSetStatus}
       />
     </section>

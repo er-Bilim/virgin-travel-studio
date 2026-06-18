@@ -1,4 +1,5 @@
 import {
+  approveReview,
   createReview,
   deleteReview,
   getAdminReviews,
@@ -11,7 +12,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import type { IReviewMutation } from '@/types/review';
+import type {IReviewMutation} from '@/types/review';
 
 const PAGE_SIZE = 10;
 
@@ -21,7 +22,7 @@ export const useCreateReview = () => {
   return useMutation({
     mutationFn: createReview,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['reviews'] });
+      queryClient.invalidateQueries({queryKey: ['reviews']});
     },
   });
 };
@@ -38,7 +39,22 @@ export const useUpdateReview = () => {
       data: Partial<IReviewMutation>;
     }) => updateReview(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['reviews'] });
+      queryClient.invalidateQueries({queryKey: ['reviews']});
+    },
+  });
+};
+
+export const useApproveReview = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({id, isModerated}: {
+      id: string;
+      isModerated: "pending" | "approved" | "rejected"
+    }) =>
+      approveReview(id, isModerated),
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ['reviews']});
     },
   });
 };
@@ -49,23 +65,27 @@ export const useDeleteReview = () => {
   return useMutation({
     mutationFn: deleteReview,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['reviews'] });
+      queryClient.invalidateQueries({queryKey: ['reviews']});
     },
   });
 };
 
-export const useAdminReviews = (tourId?: string) => {
+export const useAdminReviews = (params: {
+  tourId?: string;
+  page?: number;
+  limit?: number,
+  isModerated?: string
+} = {}) => {
   return useQuery({
-    queryKey: ['reviews', 'admin', tourId],
-    queryFn: () => getAdminReviews({ tourId }),
-    enabled: !!tourId,
+    queryKey: ['reviews', 'admin', params.tourId, params.page, params.limit, params.isModerated],
+    queryFn: () => getAdminReviews(params),
   });
 };
 
 export const useInfiniteReviews = (tourId?: string) => {
   return useInfiniteQuery({
     queryKey: ['reviews', 'public', 'infinite', tourId],
-    queryFn: ({ pageParam }) => {
+    queryFn: ({pageParam}) => {
       return getPublicReviews({
         tourId,
         page: pageParam,
