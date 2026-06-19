@@ -8,9 +8,10 @@ import TourSet from '../model/tourSet/TourSet.js';
 import Order from '../model/order/Order.js';
 import Review from '../model/review/Review.js';
 import ContactSettings from '../model/contactSettings/ContactSettings.js';
-import path from "path";
+import AboutUs from '../model/aboutUs/AboutUs.js';
+import path from 'path';
 import fs from 'fs/promises';
-import {fileURLToPath} from "url";
+import {fileURLToPath} from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,7 +35,8 @@ const run = async () => {
       'toursets',
       'orders',
       'reviews',
-      'contactsettings'
+      'contactsettings',
+      'aboutus'
     ];
 
     for (const collectionName of collections) {
@@ -128,6 +130,16 @@ const run = async () => {
             }
             console.log('Настройки контактов успешно созданы');
             break;
+
+            case 'aboutus':
+              const aboutUsData = await getJson(collectionName + '.json');
+
+              for (const aboutData of aboutUsData) {
+                const aboutUs = new AboutUs(aboutData);
+                await aboutUs.save();
+              }
+              console.log('О нас успешно создано');
+              break;
         }
 
       } catch (e) {

@@ -1,4 +1,7 @@
-import mongoose, {Schema} from 'mongoose';
+import mongoose, {Document, Schema} from 'mongoose';
+import type {AboutUsFields} from '@/types/aboutUs.types.js';
+
+export interface AboutUsDocument extends AboutUsFields, Document {}
 
 const ContentBlockSchema = new Schema({
     title: {
@@ -26,7 +29,7 @@ const AboutUsSchema = new Schema({
     missionBody:  { type: String, trim: true },
 
     // Правая карточка "Наша идея"
-    ideaLabel:       { type: String, trim: true }, // "НАША ИДЕЯ"
+    ideaLabel:       { type: String, trim: true },
     ideaTitle:       { type: String, trim: true },
     ideaDescription: { type: String, trim: true },
 
@@ -38,8 +41,7 @@ const AboutUsSchema = new Schema({
     heroCardBody: { type: String, trim: true },
     steps: { type: [String], default: [] },
 
-    imageUrl: { type: String, default: null },
 }, { timestamps: true });
 
-const AboutUs = mongoose.model('AboutUs', AboutUsSchema);
+const AboutUs = mongoose.model<AboutUsDocument>('AboutUs', AboutUsSchema);
 export default AboutUs;
