@@ -28,7 +28,7 @@ import { useHomepageSettings } from '@/lib/hooks/homepageSettingsHooks';
 import { toursLimitPag } from '@/lib/constants';
 import { getCountryOptions, pluralize } from '@/lib/utils';
 import { StyledInput } from '@/components/shared/form/field-styles';
-import useDebounce from '@/lib/hooks/useDebounce';
+import { useDebounce } from 'use-debounce';
 
 const SORT_OPTIONS = [
   { value: 'newest', label: 'Новые сверху', icon: CalendarPlus2 },
@@ -68,8 +68,8 @@ const ToursList = () => {
     categoryId,
     sort,
     countryCode: countryCode ?? undefined,
-    search: debouncedSearch,
-  });
+    search: debouncedSearch[0],
+  });  
 
   const meta = toursData?.meta;
 
