@@ -9,6 +9,8 @@ import ordersRouter from '@/routes/orders/orders.js';
 import reviewsRouter from './reviews/reviews.js';
 import reportsRouter from "@/routes/reports/reports.js";
 import contactSettingsRouter from '@/routes/contactSettings/contactSettings.js';
+import homepageSettingsRouter from '@/routes/homepageSettings/homepageSettings.js';
+import faqRouter from '@/routes/faq/faq.js';
 
 const apiRouter = Router();
 
@@ -22,5 +24,8 @@ apiRouter.use('/reviews', reviewsRouter)
 apiRouter.use('/orders', ordersRouter);
 apiRouter.use('/reports', reportsRouter);
 apiRouter.use('/contact-settings', contactSettingsRouter);
+apiRouter.use('/homepage-settings', homepageSettingsRouter);
+apiRouter.use('/faq', faqRouter);
+
 
 export default apiRouter;

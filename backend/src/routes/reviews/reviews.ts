@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 import express from 'express';
-import type {ReviewFields} from '@/types/reviews.types.js';
+import type { ReviewFields } from '@/types/reviews.types.js';
 import Review from '@/model/review/Review.js';
-import {imagesUpload} from '@/middlewares/multer.js';
+import { imagesUpload } from '@/middlewares/multer.js';
 import auth from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
 import deleteFile from '@/utils/deleteFile.js';
@@ -17,80 +17,80 @@ reviewsRouter.post(
     const currentFilePath = req.file?.path;
 
     try {
-      const {clientName, tourId, rating, comment} = req.body;
+      const { clientName, tourId, rating, comment } = req.body;
 
-        if (!clientName || !tourId || rating === undefined || !comment) {
-          await deleteFile(currentFilePath);
-          return res
-              .status(400)
-              .send({ error: 'Заполните все обязательные поля' });
-        }
+      if (!clientName || !tourId || rating === undefined || !comment) {
+        await deleteFile(currentFilePath);
+        return res
+          .status(400)
+          .send({ error: 'Заполните все обязательные поля' });
+      }
 
-        if (!mongoose.Types.ObjectId.isValid(tourId)) {
-          await deleteFile(currentFilePath);
-          return res.status(400).send({ error: 'Неверный ID тура' });
-        }
+      if (!mongoose.Types.ObjectId.isValid(tourId)) {
+        await deleteFile(currentFilePath);
+        return res.status(400).send({ error: 'Неверный ID тура' });
+      }
 
       const tour = await mongoose.model('Tour').findById(tourId);
 
-        if (!tour) {
-          await deleteFile(currentFilePath);
-          return res.status(404).send({ error: 'Тур не найден' });
-        }
-
-        const reviewData: Partial<ReviewFields> = {
-          clientName,
-          tourId: new mongoose.Types.ObjectId(tourId),
-          rating: Number(rating),
-          comment,
-          image: req.file ? 'images/' + req.file.filename : null,
-          isModerated: "pending",
-        };
-
-        const review = new Review(reviewData);
-        await review.save();
-
-        res.send({
-          message: 'Отзыв отправлен на модерацию',
-          review,
-        });
-      } catch (e) {
-        if (e instanceof mongoose.Error.ValidationError) {
-          await deleteFile(currentFilePath);
-          return res
-              .status(400)
-              .send({ error: 'Ошибка валидации', details: e.errors });
-        }
-        next(e);
+      if (!tour) {
+        await deleteFile(currentFilePath);
+        return res.status(404).send({ error: 'Тур не найден' });
       }
+
+      const reviewData: Partial<ReviewFields> = {
+        clientName,
+        tourId: new mongoose.Types.ObjectId(tourId),
+        rating: Number(rating),
+        comment,
+        image: req.file ? 'images/' + req.file.filename : null,
+        isModerated: 'pending',
+      };
+
+      const review = new Review(reviewData);
+      await review.save();
+
+      res.send({
+        message: 'Отзыв отправлен на модерацию',
+        review,
+      });
+    } catch (e) {
+      if (e instanceof mongoose.Error.ValidationError) {
+        await deleteFile(currentFilePath);
+        return res
+          .status(400)
+          .send({ error: 'Ошибка валидации', details: e.errors });
+      }
+      next(e);
+    }
   },
 );
 
 reviewsRouter.get('/public', async (req, res, next) => {
   try {
-    const {tourId, limit = '10', page = '1'} = req.query;
+    const { tourId, limit = '10', page = '1' } = req.query;
 
     const pageNum = Math.max(parseInt(page as string, 10) || 1, 1);
     const limitNum = Math.min(Math.max(parseInt(limit as string) || 10, 1), 50);
     const skipNum = (pageNum - 1) * limitNum;
 
     const query: {
-      isModerated: "approved";
+      isModerated: 'approved';
       tourId?: string;
     } = {
-      isModerated: "approved",
+      isModerated: 'approved',
     };
 
     if (typeof tourId === 'string') {
       if (!mongoose.Types.ObjectId.isValid(tourId)) {
-        return res.status(400).send({error: 'Неверный ID тура'});
+        return res.status(400).send({ error: 'Неверный ID тура' });
       }
       query.tourId = tourId;
     }
 
     const [reviews, totalReviews] = await Promise.all([
       Review.find(query)
-        .sort({createdAt: -1})
+        .sort({ createdAt: -1 })
         .skip(skipNum)
         .limit(limitNum)
         .populate('tourId', 'title'),
@@ -121,28 +121,31 @@ reviewsRouter.get(
         Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(50, rawLimit) : 10;
       const skip = (page - 1) * limit;
 
-      const {tourId, isModerated} = req.query;
+      const { tourId, isModerated } = req.query;
       const query: {
         tourId?: string;
-        isModerated?: "pending" | "approved" | "rejected";
+        isModerated?: 'pending' | 'approved' | 'rejected';
       } = {};
 
       if (typeof tourId === 'string') {
         if (!mongoose.Types.ObjectId.isValid(tourId)) {
-          return res.status(400).send({error: 'Неверный ID тура'});
+          return res.status(400).send({ error: 'Неверный ID тура' });
         }
         query.tourId = tourId;
       }
 
       const validStatuses = ['pending', 'approved', 'rejected'];
 
-      if (typeof isModerated === 'string' && validStatuses.includes(isModerated)) {
-        query.isModerated = isModerated as "pending" | "approved" | "rejected";
+      if (
+        typeof isModerated === 'string' &&
+        validStatuses.includes(isModerated)
+      ) {
+        query.isModerated = isModerated as 'pending' | 'approved' | 'rejected';
       }
 
       const [reviews, totalReviews] = await Promise.all([
         await Review.find(query)
-          .sort({createdAt: -1})
+          .sort({ createdAt: -1 })
           .skip(skip)
           .limit(limit)
           .populate('tourId'),
@@ -168,29 +171,43 @@ reviewsRouter.patch(
   validateObjectId(),
   async (req, res, next) => {
     try {
-      const {id} = req.params;
-      const {isModerated} = req.body;
+      const { id } = req.params;
+      const { isModerated } = req.body;
       let message = '';
 
       if (!isModerated && typeof isModerated === 'string') {
-        return res.status(401).send({error: 'Статус модерации обязателен'});
+        return res.status(401).send({ error: 'Статус модерации обязателен' });
       }
 
       const approvedReview = await Review.findByIdAndUpdate(
         id,
-        {isModerated: isModerated},
-        {new: true, runValidators: true},
+        { isModerated: isModerated },
+        { new: true, runValidators: true },
       );
 
       if (!approvedReview) {
-        return res.status(404).send({error: 'Отзыв не найден'});
+        return res.status(404).send({ error: 'Отзыв не найден' });
       }
 
       if (isModerated === 'approved') {
-        message = 'Отзыв успешно одобрен и опубликован'
+        message = 'Отзыв успешно одобрен и опубликован';
       } else {
-        message = 'Отзыв успешно отклонен'
+        message = 'Отзыв успешно отклонен';
       }
+
+    const result = await Review.aggregate([
+      { $match: { tourId: approvedReview.tourId, isModerated: 'approved' } },
+      { $group: { _id: null, avgRating: { $avg: '$rating' }, count: { $sum: 1 } } },
+    ]);
+
+      const ratingCount = result[0]?.count ?? 0;
+
+      const rating = result[0]?.avgRating ?? 0;
+
+      await mongoose.model('Tour').findByIdAndUpdate(approvedReview.tourId, {
+        ratingCount,
+        rating,
+      });
 
       res.send({
         message: message,
@@ -212,8 +229,8 @@ reviewsRouter.patch(
     const currentFilePath = req.file?.path;
 
     try {
-      const {id} = req.params;
-      const {rating, comment, companyReply, clientName} = req.body;
+      const { id } = req.params;
+      const { rating, comment, companyReply, clientName } = req.body;
 
       const review = await Review.findById(id);
 
@@ -245,7 +262,7 @@ reviewsRouter.patch(
 
           return res
             .status(400)
-            .send({error: 'Рейтинг должен быть от 1 до 5'});
+            .send({ error: 'Рейтинг должен быть от 1 до 5' });
         }
 
         updateData.rating = numericRating;
@@ -255,7 +272,7 @@ reviewsRouter.patch(
         if (typeof comment !== 'string' || comment.trim() === '') {
           await deleteFile(currentFilePath);
 
-          return res.status(400).send({error: 'Комментарий обязателен'});
+          return res.status(400).send({ error: 'Комментарий обязателен' });
         }
 
         updateData.comment = comment.trim();
@@ -301,7 +318,6 @@ reviewsRouter.patch(
     }
   },
 );
-
 
 reviewsRouter.delete(
   '/:id',
