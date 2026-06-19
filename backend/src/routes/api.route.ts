@@ -7,8 +7,9 @@ import toursRouter from '@/routes/tours/tours.js';
 import tourSetsRouter from '@/routes/tourSets/tourSets.js';
 import ordersRouter from '@/routes/orders/orders.js';
 import reviewsRouter from './reviews/reviews.js';
-import reportsRouter from "@/routes/reports/reports.js";
+import reportsRouter from '@/routes/reports/reports.js';
 import contactSettingsRouter from '@/routes/contactSettings/contactSettings.js';
+import aboutUsRouter from '@/routes/aboutUs/aboutUs.js';
 import homepageSettingsRouter from '@/routes/homepageSettings/homepageSettings.js';
 import faqRouter from '@/routes/faq/faq.js';
 
@@ -24,6 +25,7 @@ apiRouter.use('/reviews', reviewsRouter)
 apiRouter.use('/orders', ordersRouter);
 apiRouter.use('/reports', reportsRouter);
 apiRouter.use('/contact-settings', contactSettingsRouter);
+apiRouter.use('/aboutUs', aboutUsRouter);
 apiRouter.use('/homepage-settings', homepageSettingsRouter);
 apiRouter.use('/faq', faqRouter);
 
