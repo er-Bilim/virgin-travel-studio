@@ -4,7 +4,7 @@ import {
   LayoutDashboard,
   type LucideIcon,
   Newspaper,
-  Plane,
+  Plane, Star,
   Tags,
   Users
 } from 'lucide-react';
@@ -15,7 +15,8 @@ import type {QueryClient} from '@tanstack/react-query';
 export const isDev = process.env.NODE_ENV === 'development';
 export const apiURL = process.env.NEXT_API_URL || 'http://localhost:8000/api';
 export const imageUrl = process.env.NEXT_IMAGE_URL || 'http://localhost:8000/';
-export const toursLimitPag = 9;
+export const toursLimitPag = 10;
+
 
 export const queryConfig = {
   defaultOptions: {
@@ -124,6 +125,12 @@ export const dashboardMenuItems: DashboardMenuItem[] = [
     icon: FolderOpen,
   },
   {
+    label: 'Отзывы',
+    href: '/admin/reviews',
+    roles: ['ADMIN'],
+    icon: Star,
+  },
+  {
     label: 'Настройки',
     href: '/admin/settings',
     roles: ['ADMIN'],
@@ -152,6 +159,12 @@ export const dashboardMenuItems: DashboardMenuItem[] = [
     href: '/manager/leads',
     roles: ['MANAGER'],
     icon: FolderOpen,
+  },
+  {
+    label: 'Отзывы',
+    href: '/manager/reviews',
+    roles: ['MANAGER'],
+    icon: Star,
   },
 ];
 

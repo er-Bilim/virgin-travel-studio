@@ -31,7 +31,7 @@ const PublicTourCard = ({ tour }: Props) => {
         >
           <Link
             href={`/tours/${tour._id}`}
-            className="group block flex flex-col w-full overflow-hidden rounded-2xl border border-border bg-card transition-all duration-200 hover:-translate-y-1  shadow-cyan-200 hover:border-cyan-500 hover:text-cyan-600"
+            className="group block flex flex-col w-full overflow-hidden rounded-2xl border border-border bg-card transition-all duration-200 hover:-translate-y-1  shadow-cyan-200 hover:shadow-[0_1px_10px_rgba(0,0,0,0.1)]"
           >
             <figure className="relative aspect-[4/3] overflow-hidden">
               <Image

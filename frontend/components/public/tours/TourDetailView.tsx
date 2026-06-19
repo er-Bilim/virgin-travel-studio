@@ -176,6 +176,7 @@ const TourDetailView = ({ id }: Props) => {
       );
     }
 
+
     return (
       <>
         {reviews.map((review) => (

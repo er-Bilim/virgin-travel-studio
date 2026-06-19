@@ -49,7 +49,7 @@ export default function EditTour() {
                 ? tour.category._id
                 : (tour.category ?? ''),
             baseAdvantages: tour.baseAdvantages,
-            images: [],
+            images: tour.images,
           }}
         />
       </div>
