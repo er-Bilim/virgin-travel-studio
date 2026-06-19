@@ -54,8 +54,10 @@ const ToursList = () => {
   const selectedCountry = countryOptions.find(
     (option) => option.code === countryCode,
   );
-  
-  const selectedCategory = categories ? categories.find((category) => category._id === categoryId) : null;
+
+  const selectedCategory = categories
+    ? categories.find((category) => category._id === categoryId)
+    : null;
 
   const {
     data: toursData,
@@ -69,7 +71,7 @@ const ToursList = () => {
     sort,
     countryCode: countryCode ?? undefined,
     search: debouncedSearch[0],
-  });  
+  });
 
   const meta = toursData?.meta;
 
@@ -77,97 +79,94 @@ const ToursList = () => {
     title: 'Все категории',
     icon: Paintbrush,
     queryParamsName: 'categories',
-    searchPlaceholder: 'Поиск категории'
+    searchPlaceholder: 'Поиск категории',
   };
 
   const countrySettingsCombobox = {
     title: 'Все страны',
     icon: Globe,
     queryParamsName: 'countryCode',
-    searchPlaceholder: 'Поиск страны'
+    searchPlaceholder: 'Поиск страны',
   };
 
   const { data: settings } = useHomepageSettings();
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target
+    const { value } = event.target;
     setSearch(value);
-  }
+  };
+
+  const handleRefetch = () => {
+    refetchTours();
+  };
 
   if (isToursError) {
     return (
-      <section className="mx-auto max-w-[640px] px-4 py-16 text-center">
-        <div className="mb-5 inline-flex size-18 items-center justify-center rounded-full bg-cyan-50 text-cyan-900">
+      <section className="mx-auto max-w-[640px] px-4 py-24 text-center flex flex-col items-center justify-center">
+        <div className="mb-5 inline-flex p-5 items-center justify-center rounded-full bg-red-50 text-red-500">
           <WifiOff className="size-8" aria-hidden="true" />
         </div>
 
-        <h2 className="mb-2 text-2xl font-semibold text-foreground">
-          Не удалось загрузить
+        <h2 className="mb-2 text-2xl font-black text-gray-900">
+          Не удалось загрузить туры
         </h2>
 
-        <p className="mb-6 text-sm text-muted-foreground">
-          Что-то пошло не так – возможно проблемы с подключением. Попробуйте ещё
-          раз, обычно это помогает
+        <p className="mb-6 text-sm text-muted-foreground max-w-sm">
+          Что-то пошло не так – возможно, возникли проблемы с подключением.
+          Попробуйте обновить страницу.
         </p>
 
-        <div className="flex justify-center gap-2.5 flex-wrap mb-4">
+        <div className="flex justify-center gap-3 flex-wrap">
           <button
             type="button"
-            onClick={handleRefetch}
-            className="inline-flex rounded-xl border-1 items-center px-4 py-3 cursor-pointer border-[var(--primary)] bg-[var(--primary)] text-cyan-50 hover:bg-indigo-900 hover:text-indigo-50 duration-400"
+            onClick={() => handleRefetch()}
+            className="inline-flex rounded-xl items-center px-5 py-2.5 cursor-pointer bg-[#1E2B6D] text-white hover:bg-[#152054] transition font-medium text-sm shadow-sm"
           >
-            <RefreshCw className="size-4 mr-1.5" aria-hidden="true" />
+            <RefreshCw
+              className="size-4 mr-2 animate-spin-slow"
+              aria-hidden="true"
+            />
             Повторить
           </button>
           <Link
             href="/"
-            className="inline-flex rounded-xl border-1 items-center px-4 py-3 cursor-pointer border-[var(--primary)] bg-cyan-50 text-cyan-900 hover:bg-cyan-100 hover:text-cyan-900 duration-400"
+            className="inline-flex rounded-xl items-center px-5 py-2.5 cursor-pointer border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 transition font-medium text-sm"
           >
-            <House className="size-4 mr-1.5" aria-hidden="true" />
+            <House className="size-4 mr-2" aria-hidden="true" />
             На главную
           </Link>
         </div>
       </section>
     );
-  };
-
-  if (isToursError) {
-    return <>{renderErrorCard()}</>;
   }
 
   return (
-    <>
+    <div className="px-4 max-w-7xl mx-auto w-full pb-16">
       <Breadcrumbs
         items={[
-          {
-            label: 'Главная',
-            href: '/',
-          },
-          {
-            label: 'Туры',
-            href: '/tours',
-          },
+          { label: 'Главная', href: '/' },
+          { label: 'Туры', href: '/tours' },
         ]}
-        className="mt-10"
+        className="mt-5"
       />
 
-      <header className="mb-7 max-w-[720px] flex flex-col gap-3">
-        <p className="uppercase text-base font-semibold text-cyan-800">
-          Авторские маршруты
+      <header className="mt-8 mb-8">
+        <p className="text-cyan-800 font-semibold uppercase text-sm tracking-wider">
+          {settings?.toursPage?.badge || 'Авторские маршруты'}
         </p>
 
         <h1 className="font-black text-navy-800 text-4xl mt-3 md:text-5xl">
           {settings?.toursPage?.title || 'Путешествия'}
         </h1>
 
-        <p className="text-slate-500">
-          Каждый тур – частный проект нашей команды, без шаблонов и групп по 50
-          человек
+        <p className="text-gray-500 mt-3 max-w-2xl whitespace-pre-line text-base">
+          {settings?.toursPage?.subtitle ||
+            'Каждый тур – частный проект нашей команды, без шаблонов и групп по 50 человек.'}
         </p>
       </header>
 
@@ -225,71 +224,61 @@ const ToursList = () => {
           <span className="pl-0.5 text-xs font-semibold uppercase tracking-wide text-slate-400">
             Сортировка
           </span>
-          <Sort options={SORT_OPTIONS}/>
+          <Sort options={SORT_OPTIONS} />
         </div>
       </div>
 
-        {!isToursError && toursData && toursData.tours.length === 0 && (
-            <>
-                <Breadcrumbs
-                    items={[
-                        { label: 'Главная', href: '/' },
-                        { label: 'Туры', href: '/tours' },
-                    ]}
-                    className="mt-10"
-                />
-
-                <section className="mx-auto max-w-[720px] px-4 py-20 text-center">
-                    <h2 className="mb-3 text-2xl font-semibold text-foreground">
-                        Такого тура пока нет
-                    </h2>
-
-                    <p className="mb-8 text-sm text-muted-foreground">
-                        Но вы можете создать его под себя — мы соберём маршрут под ваши пожелания.
-                    </p>
-
-                    <Link
-                        href="/tours/custom"
-                        className="inline-flex rounded-xl border-1 items-center px-5 py-3
-          border-[var(--primary)] bg-[var(--primary)] text-cyan-50
-          hover:bg-indigo-900 duration-300"
-                    >
-                        Создать кастомный тур
-                    </Link>
-                </section>
-            </>
-        )}
-      {toursData && meta && (
-        <div className="mb-5 text-sm text-muted-foreground flex flex-row gap-1">
-          <span className="capitalize">найдено</span>
-          <p className="font-semibold inline-flex gap-1 text-[var(--primary)]">
-            <span>{meta.total}</span>
-            <span>
-              {pluralize(meta.total, 'тур', 'тура', 'туров')}
-            </span>
-          </p>
+      {meta && toursData && toursData.tours.length > 0 && (
+        <div className="mb-6 text-sm text-gray-500 flex flex-row gap-1 items-center font-medium">
+          <span className="capitalize">Найдено:</span>
+          <span className="font-bold text-[#1E2B6D] bg-slate-100 px-2.5 py-0.5 rounded-lg text-xs">
+            {meta.total} {pluralize(meta.total, 'тур', 'тура', 'туров')}
+          </span>
         </div>
       )}
 
-      <section aria-labelledby="tours-list-title">
-        <h2 id="tours-list-title" className="sr-only">
-          Список туров
-        </h2>
+      {toursData && toursData.tours.length === 0 ? (
+        <section className="flex flex-col items-center justify-center py-20 text-center gap-4 max-w-md mx-auto">
+          <div className="bg-muted rounded-full p-5 text-gray-400">
+            <Compass className="w-8 h-8" />
+          </div>
+          <div>
+            <h2 className="font-bold text-xl text-gray-900">
+              Такого тура пока нет
+            </h2>
+            <p className="text-muted-foreground text-sm mt-1 leading-relaxed">
+              Но вы можете создать его под себя — мы соберём уникальный маршрут
+              под ваши индивидуальные пожелания.
+            </p>
+          </div>
+          <Link
+            href="/tours/custom"
+            className="mt-2 inline-flex rounded-xl items-center px-6 py-3 bg-[#1E2B6D] text-white font-semibold text-sm hover:bg-[#152054] transition shadow-sm"
+          >
+            Создать кастомный тур
+          </Link>
+        </section>
+      ) : (
+        <section aria-labelledby="tours-list-title">
+          <h2 id="tours-list-title" className="sr-only">
+            Список туров
+          </h2>
 
-        <ul
-          role="list"
-          className="grid grid-cols-1 gap-[22px] sm:grid-cols-2 lg:grid-cols-3"
-        >
-          {toursData &&
-            toursData.tours.length > 0 &&
-            toursData.tours.map((tour) => (
-              <PublicTourCard tour={tour} key={tour._id} />
-            ))}
-        </ul>
-      </section>
+          <ul
+            role="list"
+            className="grid grid-cols-1 gap-[22px] sm:grid-cols-2 lg:grid-cols-3"
+          >
+            {toursData &&
+              toursData.tours.length > 0 &&
+              toursData.tours.map((tour) => (
+                <PublicTourCard tour={tour} key={tour._id} />
+              ))}
+          </ul>
+        </section>
+      )}
 
-      {meta && toursData.tours.length > 0 && (
-        <div className="my-10 border-t pt-6">
+      {meta && toursData && toursData.tours.length > 0 && (
+        <div className="my-12 border-t border-gray-100 pt-6">
           <PaginationCustom
             page={page}
             limit={meta.limit}
@@ -298,7 +287,7 @@ const ToursList = () => {
           />
         </div>
       )}
-    </>
+    </div>
   );
 };
 
