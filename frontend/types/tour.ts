@@ -55,7 +55,7 @@ export interface GetToursParams {
   page?: number,
   limit: number,
   categoryId?: string | null,
-  search?: string,
+  search?: string | null,
   isPublished?: string | boolean,
   countryCode?: string | null,
   sort?: string | null;
