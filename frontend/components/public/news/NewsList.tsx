@@ -154,10 +154,9 @@ const NewsList = () => {
       </header>
 
       {tagsLoading ? (
-        <div className="flex flex-row gap-2 mt-8 overflow-x-auto pb-2">
-          {Array.from({ length: 5 }).map((_, index) => (
-            <Skeleton key={index} className="h-9 w-24 rounded-xl shrink-0" />
-          ))}
+        <div className="flex flex-col mt-8 pb-2">
+            <Skeleton className="pl-0.5 w-[40px] h-[14px] rounded-xl" />
+            <Skeleton className="w-[210px] w-[50px] rounded-xl shrink-0" />
         </div>
       ) : (
         <div className="mt-6">
