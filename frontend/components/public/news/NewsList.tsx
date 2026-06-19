@@ -1,16 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Dot, Newspaper, AlertCircle, AlignStartVertical } from 'lucide-react';
+import { Dot, Newspaper, AlignStartVertical } from 'lucide-react';
 import { toast } from 'sonner';
 import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 import ClientAvatar from '@/components/shared/ClientAvatar';
-import { Dot, Newspaper } from 'lucide-react';
 import { useState } from 'react';
 import { PaginationCustom } from '@/components/pagination/PaginationCustom';
-import { Skeleton } from '@/components/ui/skeleton';
 import NewsSkeleton from './NewsSkeleton';
 import { useGetNewsTags, useNews } from '@/lib/hooks/newsHooks';
 import { useHomepageSettings } from '@/lib/hooks/homepageSettingsHooks';
@@ -131,7 +128,7 @@ const NewsList = () => {
       {tagsLoading ? (
         <div className="flex flex-col mt-8 pb-2">
             <Skeleton className="pl-0.5 w-[40px] h-[14px] rounded-xl" />
-            <Skeleton className="w-[210px] w-[50px] rounded-xl shrink-0" />
+            <Skeleton className="w-[210px] h-[50px] rounded-xl shrink-0" />
         </div>
       ) : (
         <div className="mt-6">
@@ -168,7 +165,7 @@ const NewsList = () => {
             </div>
           </figure>
 
-          <div className="flex flex-col  gap-4">
+          <div className="flex flex-col gap-4">
             <div className="flex flex-wrap gap-2">
               {news.allNews[0].tags.map((tag, index) => (
                 <span
@@ -182,7 +179,7 @@ const NewsList = () => {
             <h2 className="font-semibold text-4xl">{news.allNews[0].title}</h2>
             <p>{truncateText(news.allNews[0].content, 200)}</p>
 
-            <div className="mt-auto flex flex-row gap-1 items-center mt-2">
+            <div className="mt-auto flex flex-row gap-1 items-center">
               <div className="flex flex-row items-center gap-2">
                 <ClientAvatar name={news.allNews[0].author.fullName} />
                 <p className="font-semibold">
@@ -249,7 +246,7 @@ const NewsList = () => {
                     {singleNews.title}
                   </h3>
 
-                    <p className="line-clamp-2line-clamp-2 mt-2 pb-4">
+                    <p className="line-clamp-2 line-clamp-2 mt-2 pb-4">
                       {truncateText(singleNews.content, 150)}
                     </p>
 
