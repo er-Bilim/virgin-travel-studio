@@ -61,7 +61,16 @@ const buildTourFormData = (data: TourMutation) => {
     .forEach((adv: string) => formData.append('baseAdvantages', adv));
 
   if (data.images && data.images.length > 0) {
-    data.images.forEach((file: File) => formData.append('images', file));
+    data.images.forEach((item) => {
+      if (typeof item === 'string') {
+        formData.append('imagesOrder', item);
+      } else {
+        formData.append('images', item);
+        formData.append('imagesOrder', 'NEW_FILE');
+      }
+    });
+  } else {
+    formData.append('imagesOrder', 'EMPTY');
   }
 
   return formData;

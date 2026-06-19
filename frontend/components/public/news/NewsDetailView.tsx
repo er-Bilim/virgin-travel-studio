@@ -5,11 +5,7 @@ import ClientAvatar from '@/components/shared/ClientAvatar';
 import { Spinner } from '@/components/ui/spinner';
 import { useGetSingleNews } from '@/lib/hooks/newsHooks';
 import { toast } from 'sonner';
-import {
-  cn,
-  formatDayAndMonthWords,
-  getYearFullNumber,
-} from '../../../lib/utils';
+import { cn, formatDayAndMonthWords } from '../../../lib/utils';
 import { Clock, Dot } from 'lucide-react';
 import Image from 'next/image';
 import { imageUrl, isDev } from '@/lib/constants';
@@ -33,7 +29,7 @@ const NewsDetailView = ({ id }: Props) => {
     return toast.error('Что-то пошло не так');
   }
 
-  const { day, month } = formatDayAndMonthWords(news.createdAt)
+  const { day, month, year } = formatDayAndMonthWords(news.createdAt);
 
   const words: number = news.content.trim().split(/\s+/).length;
 
@@ -50,7 +46,7 @@ const NewsDetailView = ({ id }: Props) => {
         items={[{ label: 'Новости', href: '/news' }, { label: news.title }]}
       />
       <article itemScope itemType="https://schema.org/NewsArticle">
-        <header>
+        <header className='pb-6'>
           <ul
             aria-label="Теги статьи"
             role="list"
@@ -79,13 +75,9 @@ const NewsDetailView = ({ id }: Props) => {
                 <div className="flex flex-row items-center gap-2 text-gray-500">
                   <div>
                     <p className="flex gap-1 text-gray-500">
-                      <span className="font-semibold">
-                        {day}
-                      </span>
+                      <span className="font-semibold">{day}</span>
                       <span>{month}</span>
-                      <span className="font-semibold">
-                        {getYearFullNumber(news.createdAt)}
-                      </span>
+                      <span className="font-semibold">{year}</span>
                     </p>
                   </div>
                   <Dot size={12} />
@@ -120,17 +112,19 @@ const NewsDetailView = ({ id }: Props) => {
         </header>
 
         {news.image && (
-          <figure className="relative my-6 border-t border-border pt-7 w-full aspect-video">
-            <Image
-              src={imageSrc}
-              alt={news.title}
-              fill
-              priority
-              unoptimized={isDev}
-              itemProp="image"
-              className="rounded-xl object-cover pt-7"
-            />
-          </figure>
+          <div className='border-t border-border pt-3'>
+            <figure className="relative my-6 w-full aspect-video">
+              <Image
+                src={imageSrc}
+                alt={news.title}
+                fill
+                priority
+                unoptimized={isDev}
+                itemProp="image"
+                className="rounded-xl object-cover"
+              />
+            </figure>
+          </div>
         )}
 
         <div itemProp="articleBody" className="prose prose-slate max-w-none">

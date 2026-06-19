@@ -2,6 +2,7 @@ import {type ClassValue, clsx} from 'clsx';
 import {twMerge} from 'tailwind-merge';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
+import countries from './countries';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -25,21 +26,23 @@ export const createFormData = (data: object): FormData => {
   return formData;
 };
 
-export const formatDayAndMonthWords = (date: string, isSlice?: boolean): {day: string, month: string} => {
+export const formatDayAndMonthWords = (date: string, isSlice?: boolean): {day: string, month: string, year: string} => {
   const formatDate = dayjs(date).locale('ru');
 
   const fullDate = formatDate.format('D MMMM');
+  const year = formatDate.format('YYYY');
   const [ day, month ] = fullDate.split(' ');
 
   if (isSlice) {
     const sliceMonth: string = month.slice(0, 3);
     return {
       day,
-      month: sliceMonth
+      month: sliceMonth,
+      year,
     }
   }
 
-  return { day, month }
+  return { day, month, year }
 }
 
 export const getYearFullNumber = (date: string) => {
@@ -125,3 +128,9 @@ export const pluralize = (
 export const formatDate = (date: string): string => {
     return dayjs(date).locale('ru').format('D MMMM YYYY');
 };
+
+export const getCountryOptions = (): {code: string, name: string}[] => {
+  const countryOptions = Object.entries(countries.getNames('ru', {select: 'official'})).map(([code, name]) => ({ code, name })).sort((a, b) => a.name.localeCompare(b.name));
+
+  return countryOptions;
+}

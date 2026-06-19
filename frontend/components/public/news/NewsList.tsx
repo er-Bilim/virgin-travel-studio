@@ -1,25 +1,31 @@
 'use client';
 
-import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
-import { useGetNewsTags, useNews } from '@/lib/hooks/newsHooks';
-import { toast } from 'sonner';
-import Filter from '@/components/shared/Filter';
-import { imageUrl, isDev } from '@/lib/constants';
-import Image from 'next/image';
-import CONTENT_PLACEHOLDER from '@/assets/placeholders/content_placeholder.png';
 import Link from 'next/link';
-import { formatDayAndMonthWords, truncateText } from '@/lib/utils';
+import Image from 'next/image';
+import { Dot, Newspaper, AlignStartVertical } from 'lucide-react';
+import { toast } from 'sonner';
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 import ClientAvatar from '@/components/shared/ClientAvatar';
-import { Dot, Newspaper } from 'lucide-react';
 import { useState } from 'react';
 import { PaginationCustom } from '@/components/pagination/PaginationCustom';
-import { Skeleton } from '@/components/ui/skeleton';
 import NewsSkeleton from './NewsSkeleton';
+import { useGetNewsTags, useNews } from '@/lib/hooks/newsHooks';
+import { useHomepageSettings } from '@/lib/hooks/homepageSettingsHooks';
+import { imageUrl, isDev } from '@/lib/constants';
+import { formatDayAndMonthWords, truncateText } from '@/lib/utils';
+import CONTENT_PLACEHOLDER from '@/assets/placeholders/content_placeholder.png';
+import { Skeleton } from '@/components/ui/skeleton';
+import FilterCombobox from '@/components/shared/FilterCombobox';
+import { useSearchParams } from 'next/navigation';
 
 const NewsList = () => {
   const [page, setPage] = useState(1);
   const limit = 7;
-  const [tag, setTag] = useState<string | null | undefined>(null);
+  const searchParams = useSearchParams();
+  const tag = searchParams.get('tags');
+
+  const { data: settings } = useHomepageSettings();
+
   const {
     data: news,
     isPending: newsPending,
@@ -31,6 +37,15 @@ const NewsList = () => {
     isLoading: tagsLoading,
     isError: tagsError,
   } = useGetNewsTags();
+
+  const tagsSettingsCombobox = {
+    title: 'Все темы',
+    icon: AlignStartVertical,
+    queryParamsName: 'tags',
+    searchPlaceholder: 'Поиск темы',
+  };
+
+  const selectedTag = tags ? tags.find((tagItem) => tagItem.tag === tag) : null;
 
   const metadata = news?.metadata;
 
@@ -100,7 +115,9 @@ const NewsList = () => {
           Журнал путешествий
         </p>
 
-        <h1 className="font-semibold text-4xl mt-3">Новости и истории</h1>
+        <h1 className="font-black text-navy-800 text-4xl mt-3 md:text-5xl">
+          {settings?.newsPage?.title || 'Новости и истории'}
+        </h1>
 
         <p className="text-gray-500 my-2">
           Свежие маршруты, обновления виз, истории путешественников и подборки
@@ -109,22 +126,23 @@ const NewsList = () => {
       </header>
 
       {tagsLoading ? (
-        <div className="flex flex-row gap-2 mt-8">
-          {Array.from({ length: 5 }).map((_, index) => (
-            <Skeleton key={index} className="h-8 w-20 rounded-xl" />
-          ))}
+        <div className="flex flex-col mt-8 pb-2">
+            <Skeleton className="pl-0.5 w-[40px] h-[14px] rounded-xl" />
+            <Skeleton className="w-[210px] h-[50px] rounded-xl shrink-0" />
         </div>
       ) : (
-        <Filter
-          tags={tags}
-          labelKey="tag"
-          className="mt-8"
-          setTag={setTag}
-          title="темы"
-          mainTag="все новости"
-          href="news"
-          searchParamsName="tags"
-        />
+        <div className="mt-6">
+          <span className="pl-0.5 text-xs font-semibold uppercase tracking-wide text-slate-400">
+            Темы
+          </span>
+          <FilterCombobox
+            options={tags}
+            labelKey="tag"
+            settings={tagsSettingsCombobox}
+            queryParamsKey="tag"
+            selected={selectedTag ? selectedTag.tag : null}
+          />
+        </div>
       )}
 
       <article className="group grid grid-cols-[20fr_1fr] gap-6 mt-10 border-t pt-10">
@@ -147,8 +165,8 @@ const NewsList = () => {
             </div>
           </figure>
 
-          <div className="flex flex-col gap-5">
-            <div className="flex flex-row gap-3">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-wrap gap-2">
               {news.allNews[0].tags.map((tag, index) => (
                 <span
                   key={tag + index}
@@ -161,7 +179,7 @@ const NewsList = () => {
             <h2 className="font-semibold text-4xl">{news.allNews[0].title}</h2>
             <p>{truncateText(news.allNews[0].content, 200)}</p>
 
-            <div className="flex flex-row gap-1 items-center">
+            <div className="mt-auto flex flex-row gap-1 items-center">
               <div className="flex flex-row items-center gap-2">
                 <ClientAvatar name={news.allNews[0].author.fullName} />
                 <p className="font-semibold">
@@ -221,14 +239,14 @@ const NewsList = () => {
                       ))}
                     </div>
 
-                    <h3
-                      className="font-semibold text-lg mt-1 h-[56px]"
-                      itemProp="headline"
-                    >
-                      {singleNews.title}
-                    </h3>
+                  <h3
+                    className="font-bold text-lg mt-1 text-gray-900 group-hover:text-[#1E2B6D] transition-colors line-clamp-2 leading-snug"
+                    itemProp="headline"
+                  >
+                    {singleNews.title}
+                  </h3>
 
-                    <p className="line-clamp-2line-clamp-2 mt-2 pb-4">
+                    <p className="line-clamp-2 line-clamp-2 mt-2 pb-4">
                       {truncateText(singleNews.content, 150)}
                     </p>
 

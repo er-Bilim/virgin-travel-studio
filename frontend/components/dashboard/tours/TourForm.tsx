@@ -307,7 +307,8 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
         <label className="text-sm font-medium text-gray-700">
           Фотографии (до 5 штук)
         </label>
-        <Controller
+
+        {isEdit ? <Controller
           control={control}
           name="images"
           render={({ field }) => (
@@ -316,9 +317,27 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
               label="Выберите изображения"
               onChange={field.onChange}
               value={field.value}
+              showPreviews={true}
+              allowReorder={true}
             />
           )}
         />
+          :
+          <Controller
+            control={control}
+            name="images"
+            render={({ field }) => (
+              <MultiImageInput
+                name="images"
+                label="Выберите изображения"
+                onChange={field.onChange}
+                value={field.value}
+                showPreviews={true}
+              />
+            )}
+          />
+        }
+
       </div>
 
       <button
