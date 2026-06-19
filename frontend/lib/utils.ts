@@ -26,21 +26,23 @@ export const createFormData = (data: object): FormData => {
   return formData;
 };
 
-export const formatDayAndMonthWords = (date: string, isSlice?: boolean): {day: string, month: string} => {
+export const formatDayAndMonthWords = (date: string, isSlice?: boolean): {day: string, month: string, year: string} => {
   const formatDate = dayjs(date).locale('ru');
 
   const fullDate = formatDate.format('D MMMM');
+  const year = formatDate.format('YYYY');
   const [ day, month ] = fullDate.split(' ');
 
   if (isSlice) {
     const sliceMonth: string = month.slice(0, 3);
     return {
       day,
-      month: sliceMonth
+      month: sliceMonth,
+      year,
     }
   }
 
-  return { day, month }
+  return { day, month, year }
 }
 
 export const getYearFullNumber = (date: string) => {
