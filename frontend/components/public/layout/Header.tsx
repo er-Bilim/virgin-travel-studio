@@ -94,20 +94,22 @@ export default function Header() {
                 Собери свой тур
               </Link>
 
-              <button
-                title="Связаться с нами"
-                aria-label="Связаться с нами"
+              <Link
+                href="/faq"
+                title="Появился вопрос?"
+                aria-label="Перейти к часто задаваемым вопросам"
                 className="
-cursor-pointer
-p-2 rounded-full
-text-white
-transition-all duration-200
-active:scale-95
-focus:outline-none focus:ring-2 focus:ring-[#1E2B6D]/30
-"
+    cursor-pointer
+    p-2 rounded-full
+    text-white
+    transition-all duration-200
+    hover:bg-white/10
+    active:scale-95
+    focus:outline-none focus:ring-2 focus:ring-white/30
+  "
               >
                 <HelpCircle className="h-6 w-6" />
-              </button>
+              </Link>
             </div>
           </div>
 
