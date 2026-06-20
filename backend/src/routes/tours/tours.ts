@@ -341,10 +341,12 @@ toursRouter.patch(
 
       if (isPublished !== undefined) {
         tour.isPublished = String(isPublished) === 'true';
-        const tourAggregate = await aggregate_tour(
-          tour.toObject() as unknown as TourDocumentType,
-        );
-        await telegramMessage(tourAggregate);
+        if (tour.isPublished) {
+          const tourAggregate = await aggregate_tour(
+            tour.toObject() as unknown as TourDocumentType,
+          );
+          if (tourAggregate.hotelLocation) await telegramMessage(tourAggregate);
+        }
       }
 
       if (baseAdvantages !== undefined) {
