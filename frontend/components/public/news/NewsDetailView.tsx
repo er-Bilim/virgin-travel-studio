@@ -44,12 +44,12 @@ const NewsDetailView = ({ id }: Props) => {
     .filter(Boolean);
 
   return (
-    <section className="mt-5">
+    <section className="mt-10">
       <Breadcrumbs
         items={[{ label: 'Новости', href: '/news' }, { label: news.title }]}
       />
       <article itemScope itemType="https://schema.org/NewsArticle">
-        <header>
+        <header className='border-b border-border pb-7'>
           <ul
             aria-label="Теги статьи"
             role="list"
@@ -119,7 +119,7 @@ const NewsDetailView = ({ id }: Props) => {
         </header>
 
         {news.image && (
-          <figure className="relative my-6 border-t border-border pt-7 w-full aspect-video">
+          <figure className="relative my-10 w-full aspect-video">
             <Image
               src={imageSrc}
               alt={news.title}
@@ -127,7 +127,7 @@ const NewsDetailView = ({ id }: Props) => {
               priority
               unoptimized={isDev}
               itemProp="image"
-              className="rounded-xl object-cover pt-7"
+              className="rounded-xl object-cover"
             />
           </figure>
         )}
