@@ -67,7 +67,7 @@ export function Faq() {
 
   const whatsappPhone = contacts?.whatsapp?.replace(/\D/g, '');
   const telegramUsername = contacts?.telegram?.replace('@', '');
-  const phoneNumber = contacts?.phone;
+  const phoneNumber = contacts?.phone?.replace(/\D/g, '');
 
   const hasContactOptions = Boolean(
       whatsappPhone || telegramUsername || phoneNumber,
@@ -173,6 +173,7 @@ export function Faq() {
                             href={`https://wa.me/${whatsappPhone}`}
                             target="_blank"
                             rel="noopener noreferrer"
+                            aria-label="WhatsApp откроется в новой вкладке"
                         >
                           WhatsApp
                         </a>
@@ -190,6 +191,7 @@ export function Faq() {
                             href={`https://t.me/${telegramUsername}`}
                             target="_blank"
                             rel="noopener noreferrer"
+                            aria-label="Telegram откроется в новой вкладке"
                         >
                           <Send className="mr-2 h-4 w-4" />
                           Telegram
@@ -204,7 +206,7 @@ export function Faq() {
                           className="rounded-xl px-6 font-semibold text-xs md:text-sm"
                           asChild
                       >
-                        <a href={`tel:${phoneNumber}`}>
+                        <a href={`tel:${phoneNumber}`} aria-label="Позвонить по телефону">
                           <Phone className="mr-2 h-4 w-4" />
                           Позвонить
                         </a>
