@@ -7,20 +7,22 @@ import {
   AlertTriangle,
   HelpCircle,
   MessageSquare,
-  ArrowRight,
+  Phone,
+  Send,
 } from 'lucide-react';
+import { useContacts } from '@/lib/hooks/contactSettings';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import Link from 'next/link';
 import { usePublicFaqs } from '@/lib/hooks/faq';
 import type { Faq } from '@/types/faq';
 
 export function Faq() {
   const { data: faqs, isLoading, isError } = usePublicFaqs();
+  const { data: contacts } = useContacts();
 
   if (isLoading) {
     return (
@@ -62,6 +64,14 @@ export function Faq() {
   }
 
   const hasFaqs = faqs && faqs.length > 0;
+
+  const whatsappPhone = contacts?.whatsapp?.replace(/\D/g, '');
+  const telegramUsername = contacts?.telegram?.replace('@', '');
+  const phoneNumber = contacts?.phone;
+
+  const hasContactOptions = Boolean(
+      whatsappPhone || telegramUsername || phoneNumber,
+  );
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-12 md:pb-20">
@@ -140,26 +150,68 @@ export function Faq() {
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-[#1E2B6D] text-xs font-semibold">
                 <MessageSquare className="w-3.5 h-3.5" /> Поддержка клиентов
               </div>
+
               <h2 className="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight">
-                Не нашли ответ на свой вопрос?
+                Не нашли ответ на вопрос?
               </h2>
+
               <p className="text-xs md:text-sm text-slate-500 leading-relaxed">
-                Напишите нашей команде напрямую. Мы проконсультируем вас по
-                любым вопросам в течение часа.
+                Свяжитесь с нами удобным способом. Менеджер поможет с любыми
+                вопросами по турам, бронированию и документам.
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto shrink-0 z-10">
-              <Button
-                size="lg"
-                className="bg-[#1E2B6D] hover:bg-blue-900 text-white rounded-xl px-6 font-semibold shadow-sm transition-all text-xs md:text-sm"
-                asChild
-              >
-                <Link href="/contacts" className="flex items-center gap-2">
-                  Контакты офисов <ArrowRight className="w-4 h-4" />
-                </Link>
-              </Button>
-            </div>
+            {hasContactOptions && (
+                <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto shrink-0 z-10">
+                  {whatsappPhone && (
+                      <Button
+                          size="lg"
+                          className="bg-[#1E2B6D] hover:bg-blue-900 text-white rounded-xl px-6 font-semibold shadow-sm transition-all text-xs md:text-sm"
+                          asChild
+                      >
+                        <a
+                            href={`https://wa.me/${whatsappPhone}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                          WhatsApp
+                        </a>
+                      </Button>
+                  )}
+
+                  {telegramUsername && (
+                      <Button
+                          size="lg"
+                          variant="outline"
+                          className="rounded-xl px-6 font-semibold text-xs md:text-sm"
+                          asChild
+                      >
+                        <a
+                            href={`https://t.me/${telegramUsername}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                          <Send className="mr-2 h-4 w-4" />
+                          Telegram
+                        </a>
+                      </Button>
+                  )}
+
+                  {phoneNumber && (
+                      <Button
+                          size="lg"
+                          variant="outline"
+                          className="rounded-xl px-6 font-semibold text-xs md:text-sm"
+                          asChild
+                      >
+                        <a href={`tel:${phoneNumber}`}>
+                          <Phone className="mr-2 h-4 w-4" />
+                          Позвонить
+                        </a>
+                      </Button>
+                  )}
+                </div>
+            )}
           </div>
         </section>
       </main>
