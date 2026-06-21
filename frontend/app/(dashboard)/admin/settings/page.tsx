@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useModalStore } from '@/lib/stores/modalStore';
 import { Modal } from '@/components/shared/Modal';
 import HomepageSettingsForm from '@/components/dashboard/homepageSettings/HomepageSettingsForm';
+import FaqManagement from '@/components/dashboard/faqSettings/FaqManagement';
 
 export default function Settings() {
   const { openModal } = useModalStore();
@@ -47,6 +48,10 @@ export default function Settings() {
         </div>
 
         <HomepageSettingsForm />
+      </div>
+
+      <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100/60">
+        <FaqManagement />
       </div>
     </div>
   );
