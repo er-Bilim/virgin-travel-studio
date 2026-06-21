@@ -297,7 +297,7 @@ export default function AboutUsForm({ initialValues, isLoading, errorLoad }: Pro
                     className={`${inputClass} ${errors.steps?.[index] ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                     disabled={isPending}
                   />
-                  {fields.length > 1 && (
+                  {stepsFields.length > 1 && (
                     <button
                       aria-label="Удалить"
                       type="button"

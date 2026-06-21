@@ -133,7 +133,7 @@ const About = ({ about }: Props) => {
       <section className="mx-auto max-w-6xl px-6 py-10">
         <div className="grid gap-6 md:grid-cols-3">
           {values.map((item, index) => {
-            const Icon = contentBlocksIcons[index];
+            const Icon = contentBlocksIcons[index] || Star;
 
             return (
               <article

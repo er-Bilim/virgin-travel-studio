@@ -1,7 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import AboutUs from '@/model/aboutUs/AboutUs.js';
-import type {AboutUsFields} from '@/types/aboutUs.types.js';
+import type {AboutUsFields, AboutUsFieldsMutation} from '@/types/aboutUs.types.js';
 import auth from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
 
@@ -69,7 +69,7 @@ aboutUsRouter.post('/', auth, permit('ADMIN'), async (req, res, next) => {
       heroCardTitle,
       heroCardBody,
       steps,
-    } = req.body as AboutUsFields;
+    } = req.body as AboutUsFieldsMutation;
 
     const content = new AboutUs(
       {
