@@ -54,4 +54,50 @@ aboutUsRouter.put('/', auth, permit('ADMIN'), async (req, res, next) => {
     }
 });
 
+aboutUsRouter.post('/', auth, permit('ADMIN'), async (req, res, next) => {
+  try {
+    const {
+      pageTitle,
+      description,
+      contentBlocks,
+      missionTitle,
+      missionBody,
+      ideaLabel,
+      ideaTitle,
+      ideaDescription,
+      ideaBlocks,
+      heroCardTitle,
+      heroCardBody,
+      steps,
+    } = req.body as AboutUsFields;
+
+    const content = new AboutUs(
+      {
+        pageTitle,
+        description,
+        contentBlocks,
+        missionTitle,
+        missionBody,
+        ideaLabel,
+        ideaTitle,
+        ideaDescription,
+        ideaBlocks,
+        heroCardTitle,
+        heroCardBody,
+        steps,
+      }
+    );
+    await content.save()
+    return res.status(201).send({ message: 'Контент добавлен', content });
+  } catch (e) {
+    if (e instanceof mongoose.Error.ValidationError) {
+      return res.status(400).send({
+        error: 'Ошибка валидации',
+        details: e.errors,
+      });
+    }
+    next(e);
+  }
+});
+
 export default aboutUsRouter;
