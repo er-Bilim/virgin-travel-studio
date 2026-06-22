@@ -3,6 +3,7 @@ import {
   deleteOrder,
   getOneOrder,
   getOrders,
+  getOrdersStats,
   postOrder,
   updateOrder
 } from '@/services/orders';
@@ -23,6 +24,14 @@ export const useOrders = (
     queryKey: ['orders', filters],
     queryFn: () => getOrders(filters),
     refetchInterval: 10000,
+  });
+};
+
+export const useOrderStats = () => {
+  return useQuery({
+    queryKey: ['order-stats'],
+    queryFn: getOrdersStats,
+    refetchInterval: 60_000,
   });
 };
 
