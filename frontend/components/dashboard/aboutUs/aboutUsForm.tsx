@@ -85,8 +85,13 @@ export default function AboutUsForm({ initialValues, isLoading, errorLoad }: Pro
       onSuccess: () => {
         toast.success('Обновили данные', { position: 'top-center' });
       },
-      onError: () => {
-        toast.error(`Произошла ошибка ${error}`, { position: 'top-center' });
+      onError: (mutationError) => {
+        toast.error(
+          `Произошла ошибка ${mutationError.message || 'Неизвестная ошибка'}`,
+          {
+            position: 'top-center',
+          },
+        );
       },
     });
   };
@@ -137,7 +142,7 @@ export default function AboutUsForm({ initialValues, isLoading, errorLoad }: Pro
 
         <div className="space-y-4 border p-3 rounded-2xl ">
           <p className="font-bold text-[#1E2B6D]">Преимущества:</p>
-          <div className="space-y-4 flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-4">
             {fields.map((_: ContentBlock, index) => {
               const fieldError = errors.contentBlocks?.[index];
               return (
@@ -228,7 +233,7 @@ export default function AboutUsForm({ initialValues, isLoading, errorLoad }: Pro
             />
           </Field>
 
-          <div className="space-y-4 flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-4">
             {ideaFields.map((_: ContentBlock, index: number) => {
               const fieldError = errors.ideaBlocks?.[index];
               return (
@@ -239,8 +244,10 @@ export default function AboutUsForm({ initialValues, isLoading, errorLoad }: Pro
                   <div>
                     <label>Название:</label>
                     <Input
-                      {...register(`ideaBlocks.${index}.title` as const)}
-                      className={`${inputClass}`}
+                      {...register(`ideaBlocks.${index}.title` as const, {
+                        required: 'Введите название',
+                      })}
+                      className={`${inputClass} ${errors.ideaBlocks ? (errors.ideaBlocks[index] ? 'border-red-500 focus-visible:ring-red-500' : '') : ''}`}
                     />
                     {fieldError?.title && (
                       <span style={{ color: 'red' }}>
@@ -252,8 +259,10 @@ export default function AboutUsForm({ initialValues, isLoading, errorLoad }: Pro
                   <div>
                     <label>Текст:</label>
                     <textarea
-                      {...register(`ideaBlocks.${index}.body` as const)}
-                      className={`${inputClass} min-h-[100px] py-2.5 resize-y`}
+                      {...register(`ideaBlocks.${index}.body` as const, {
+                        required: 'Введите текст',
+                      })}
+                      className={`${inputClass} ${errors.ideaBlocks ? (errors.ideaBlocks[index] ? 'border-red-500 focus-visible:ring-red-500' : '') : ''} min-h-[100px] py-2.5 resize-y`}
                     />
                     {fieldError?.body && (
                       <span style={{ color: 'red' }}>
