@@ -53,11 +53,6 @@ export const useUpdateOrder = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       queryClient.invalidateQueries({ queryKey: ['order', variables.id] });
-      queryClient.invalidateQueries({
-        queryKey: ['tour'],
-        refetchType: 'active',
-      });
-
       toast.success('Заявка обновлена');
     },
     onError: (err: AxiosError<GlobalError>) => {
