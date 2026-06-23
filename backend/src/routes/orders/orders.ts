@@ -7,12 +7,13 @@ import type {
   PassportPayload,
   PopulatedOrder,
 } from '@/types/orders.types.js';
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import validateObjectId from '@/middlewares/validateObjectId.js';
 import type { ContractData } from '@/types/contracts.types.js';
 import { buildContractHTML } from '@/utils/contracts/buildContractHTML.js';
 import { getBrowser } from '@/lib/puppeteer.js';
 import { generateId } from '@/utils/id/generateId.js';
+import TourSet from '@/model/tourSet/TourSet.js';
 
 const ordersRouter = express.Router();
 
@@ -206,6 +207,28 @@ ordersRouter.post('/', async (req, res, next) => {
   }
 });
 
+async function update_tourSet(tourSetId: Types.ObjectId, step: 1 | -1 = 1) {
+
+  const validationQuery =
+    step === 1
+      ? { $expr: { $lt: ['$bookedSeats', '$totalSeats'] } } 
+      : { bookedSeats: { $gte: 1 } }; 
+  const updated = await TourSet.findOneAndUpdate(
+    {
+      _id: tourSetId,
+      ...validationQuery, 
+    },
+    {
+      $inc: { bookedSeats: step },
+    },
+    {
+      returnDocument: 'after',
+    },
+  );
+
+  return updated;
+}
+
 ordersRouter.patch(
   '/:id',
   auth,
@@ -246,8 +269,22 @@ ordersRouter.patch(
       if (clientName) order.clientName = clientName;
       if (clientPhone) order.clientPhone = clientPhone;
       if (order.status === 'NEW') order.status = 'IN_PROGRESS';
-      if (status) order.status = status as OrderStatus;
       if (rejectionReason) order.rejectionReason = rejectionReason;
+
+      if (status && status === 'COMPLETED') {
+        const booked = await update_tourSet(order.tourSetId);
+
+        if (!booked) {
+          return res.status(400).send('Нет свободных мест!');
+        }
+      }
+
+      if (status && status === 'REJECTED') {
+        const unBooked = await update_tourSet(order.tourSetId, -1);
+        if (!unBooked) return res.status(400).send('Ошибка при снятии брони!');
+      }
+
+      if (status) order.status = status as OrderStatus;
 
       await order.save();
 
