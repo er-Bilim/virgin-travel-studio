@@ -12,5 +12,6 @@ export interface IContactSettings {
   telegram?: string;
   instagram?: string;
   facebook?: string;
+  mapEmbedUrl?: string,
   workingHours: IWorkingHours;
 }

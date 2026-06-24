@@ -55,6 +55,7 @@ const ContactSettingsSchema = new Schema<ContactSettingsFields>(
     telegram: { type: String, trim: true },
     instagram: { type: String, trim: true },
     facebook: { type: String, trim: true },
+    mapEmbedUrl: { type: String, trim: true },
     workingHours: {
       weekdays: { type: TimeRangeSchema, default: () => ({}) },
       saturday: {
