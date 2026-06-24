@@ -8,7 +8,8 @@ import { useHomepageSettings } from '@/lib/hooks/homepageSettingsHooks';
 import { imageUrl } from '@/lib/constants';
 import { ArrowRight } from 'lucide-react';
 import CustomTourCard from '@/components/public/home/tourCustomCard/CustomTourCard';
-import { useTours } from '@/lib/hooks/tourHooks';
+import { usePopularTours } from '@/lib/hooks/tourHooks';
+import { toast } from 'sonner';
 
 export default function Home() {
   const limit = 4;
@@ -21,19 +22,17 @@ export default function Home() {
   } = useHomepageSettings();
 
   const {
-    data: toursData,
+    data: tours,
     isLoading: isToursLoading,
     isError: isToursError,
     refetch: refetchTours,
-  } = useTours({ limit });
+  } = usePopularTours(limit);
 
   const {
     isLoading: isTourSetsLoading,
     isError: isTourSetsError,
     refetch: refetchTourSets,
   } = useTourSets({ page: 1, limit: 100 });
-
-  const tours = toursData?.tours.filter((tour) => tour.isPublished) || [];
 
   const isLoading = isToursLoading || isTourSetsLoading || isSettingsLoading;
   const showError = isToursError || isTourSetsError || isSettingsError;
@@ -48,6 +47,10 @@ export default function Home() {
   const videoSource = settings?.hero?.videoUrl
     ? `${imageUrl}${settings.hero.videoUrl}`
     : 'http://localhost:8000/videos/default.mp4';
+
+  if (!tours) {
+    return toast.error('Не удалось загрузить популярные туры')
+  }
 
   return (
     <section className="w-full">
@@ -138,7 +141,7 @@ export default function Home() {
       </section>
 
       <LatestNewsSection />
-      
+
       <div className="mt-10 mb-15 flex flex-col items-center">
         <CustomTourCard />
       </div>
