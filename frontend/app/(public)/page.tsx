@@ -9,7 +9,6 @@ import { imageUrl } from '@/lib/constants';
 import { ArrowRight } from 'lucide-react';
 import CustomTourCard from '@/components/public/home/tourCustomCard/CustomTourCard';
 import { usePopularTours } from '@/lib/hooks/tourHooks';
-import { toast } from 'sonner';
 
 export default function Home() {
   const limit = 4;
@@ -47,10 +46,6 @@ export default function Home() {
   const videoSource = settings?.hero?.videoUrl
     ? `${imageUrl}${settings.hero.videoUrl}`
     : 'http://localhost:8000/videos/default.mp4';
-
-  if (!tours) {
-    return toast.error('Не удалось загрузить популярные туры')
-  }
 
   return (
     <section className="w-full">
@@ -123,7 +118,7 @@ export default function Home() {
           </div>
         )}
 
-        {!showLoading && !showError && (
+        {!showLoading && !showError && tours && (
           <>
             {tours.length === 0 ? (
               <p className="my-10 text-center text-gray-500">
