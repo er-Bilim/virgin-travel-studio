@@ -30,7 +30,10 @@ export const postOrder = async (data: OrderPostType) => {
   return result.data;
 };
 
-export const updateOrder = async (id: string, data: OrderMutationType) => {
+export const updateOrder = async (
+  id: string,
+  data: OrderMutationType,
+): Promise<OrderType> => {
   const result = await axiosApi.patch(`/orders/${id}`, data);
   return result.data;
 };

@@ -88,7 +88,7 @@ const TourDetailView = ({ id }: Props) => {
     tour.tourSets.find((tourSet) => tourSet._id === selectedSetId) ??
     tour.tourSets[0] ??
     null;
-
+  
   if (!selectedTourSet) {
     return (
       <div className="py-20 text-center text-muted-foreground">
