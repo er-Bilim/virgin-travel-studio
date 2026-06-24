@@ -4,6 +4,7 @@ export interface ContentBlock {
 }
 
 export interface AboutUsFields {
+  _id: string;
   pageTitle: string;
   description: string;
   contentBlocks: ContentBlock[];

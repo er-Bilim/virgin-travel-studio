@@ -1,5 +1,6 @@
 import {
   FileUser,
+  CircleUser,
   FolderOpen,
   LayoutDashboard,
   type LucideIcon,
@@ -135,6 +136,12 @@ export const dashboardMenuItems: DashboardMenuItem[] = [
     href: '/admin/settings',
     roles: ['ADMIN'],
     icon: FileUser,
+  },
+  {
+    label: 'О нас',
+    href: '/admin/aboutUs',
+    roles: ['ADMIN'],
+    icon: CircleUser,
   },
   {
     label: 'Панель',

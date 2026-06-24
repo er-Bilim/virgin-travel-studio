@@ -1,7 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import AboutUs from '@/model/aboutUs/AboutUs.js';
-import type {AboutUsFields} from '@/types/aboutUs.types.js';
+import type {AboutUsFields, AboutUsFieldsMutation} from '@/types/aboutUs.types.js';
 import auth from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
 
@@ -52,6 +52,52 @@ aboutUsRouter.put('/', auth, permit('ADMIN'), async (req, res, next) => {
         }
         next(e);
     }
+});
+
+aboutUsRouter.post('/', auth, permit('ADMIN'), async (req, res, next) => {
+  try {
+    const {
+      pageTitle,
+      description,
+      contentBlocks,
+      missionTitle,
+      missionBody,
+      ideaLabel,
+      ideaTitle,
+      ideaDescription,
+      ideaBlocks,
+      heroCardTitle,
+      heroCardBody,
+      steps,
+    } = req.body as AboutUsFieldsMutation;
+
+    const content = new AboutUs(
+      {
+        pageTitle,
+        description,
+        contentBlocks,
+        missionTitle,
+        missionBody,
+        ideaLabel,
+        ideaTitle,
+        ideaDescription,
+        ideaBlocks,
+        heroCardTitle,
+        heroCardBody,
+        steps,
+      }
+    );
+    await content.save()
+    return res.status(201).send({ message: 'Контент добавлен', content });
+  } catch (e) {
+    if (e instanceof mongoose.Error.ValidationError) {
+      return res.status(400).send({
+        error: 'Ошибка валидации',
+        details: e.errors,
+      });
+    }
+    next(e);
+  }
 });
 
 export default aboutUsRouter;
