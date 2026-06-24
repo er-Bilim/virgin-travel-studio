@@ -13,12 +13,14 @@ import {
 import ShareButton from "@/components/public/buttons/share/ShareButton";
 import Link from "next/link";
 import {useContacts} from "@/lib/hooks/contactSettings";
+import { usePublicFaqs } from "@/lib/hooks/faq";
 
 
 export default function ContactsPage() {
   const { data: settings, isLoading, isError } = useContacts();
+  const { data: faqs, isPending, isError: isFaqError } = usePublicFaqs();
 
-  if (isLoading) {
+  if (isLoading || isPending) {
     return (
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-20">
         <Skeleton className="w-48 h-6 mt-5 mb-8" />
@@ -49,22 +51,37 @@ export default function ContactsPage() {
 
             <Skeleton className="h-[300px] sm:h-[400px] lg:h-auto rounded-3xl" />
           </section>
+
+          <section className="flex justify-center flex-wrap items-center gap-5">
+            <Skeleton className="w-180 h-10"/>
+            <div className="p-5 space-y-3 w-150">
+              <Skeleton className="rounded-2xl h-6 w-full px-5 sm:px-6 md:px-8 shadow-sm" />
+              <Skeleton className="rounded-2xl h-6 w-full px-5 sm:px-6 md:px-8 shadow-sm" />
+              <Skeleton className="rounded-2xl h-6 w-full px-5 sm:px-6 md:px-8 shadow-sm" />
+            </div>
+          </section>
         </main>
       </div>
     );
   }
 
-  if (isError) {
+  if (isError || isFaqError) {
     return (
       <div className="container mx-auto px-4 py-20 md:py-32 text-center flex flex-col items-center">
         <div className="w-16 h-16 md:w-20 md:h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-6">
           <AlertTriangle className="w-8 h-8 md:w-10 md:h-10" />
         </div>
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">Упс, что-то пошло не так</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">
+          Упс, что-то пошло не так
+        </h1>
         <p className="text-sm md:text-base text-slate-500 max-w-md mx-auto mb-8 px-4">
-          Не удалось загрузить контактную информацию. Пожалуйста, проверьте подключение к интернету или попробуйте обновить страницу.
+          Не удалось загрузить контактную информацию. Пожалуйста, проверьте
+          подключение к интернету или попробуйте обновить страницу.
         </p>
-        <Button onClick={() => window.location.reload()} className="bg-[#1E2B6D] hover:bg-blue-900 w-full sm:w-auto">
+        <Button
+          onClick={() => window.location.reload()}
+          className="bg-[#1E2B6D] hover:bg-blue-900 w-full sm:w-auto"
+        >
           Обновить страницу
         </Button>
       </div>
@@ -85,18 +102,18 @@ export default function ContactsPage() {
       <Breadcrumbs
         className="mt-5"
         items={[
-          { label: "Главная", href: "/" },
-          { label: "Контакты", href: "/contacts" },
+          { label: 'Главная', href: '/' },
+          { label: 'Контакты', href: '/contacts' },
         ]}
       />
 
       <main className="mt-8 space-y-12 md:space-y-16">
-
         <section className="relative overflow-hidden rounded-3xl py-12 px-6 md:py-16 md:px-16 min-h-[300px] md:min-h-[350px] flex items-center shadow-lg">
           <div
             className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 hover:scale-105"
             style={{
-              backgroundImage: "url('https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1200&q=80')"
+              backgroundImage:
+                "url('https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1200&q=80')",
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-l from-[#101947]/95 via-[#1E2B6D]/80 to-transparent mix-blend-multiply" />
@@ -110,20 +127,22 @@ export default function ContactsPage() {
               Свяжитесь с нами
             </h1>
             <p className="text-gray-200 text-sm md:text-lg leading-relaxed font-light">
-              Планируете отпуск или деловую поездку? Наша команда Travel Virgin поможет вам с выбором туров, бронированием отелей, покупкой авиабилетов и оформлением всех необходимых документов.
+              Планируете отпуск или деловую поездку? Наша команда Travel Virgin
+              поможет вам с выбором туров, бронированием отелей, покупкой
+              авиабилетов и оформлением всех необходимых документов.
             </p>
           </div>
         </section>
 
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-stretch">
-
           <div className="flex flex-col justify-between space-y-6 md:space-y-8 bg-white p-5 sm:p-6 md:p-8 rounded-3xl border border-slate-100 shadow-sm">
             <div className="space-y-2 md:space-y-3">
               <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
                 Офис в Бишкеке
               </h2>
               <p className="text-slate-500 leading-relaxed max-w-md text-xs md:text-sm">
-                Мы с радостью ответим на все ваши вопросы. Позвоните нам, напишите на почту или загляните в наш уютный офис.
+                Мы с радостью ответим на все ваши вопросы. Позвоните нам,
+                напишите на почту или загляните в наш уютный офис.
               </p>
             </div>
 
@@ -135,7 +154,9 @@ export default function ContactsPage() {
                       <Mail className="w-4 h-4 md:w-5 md:h-5 text-[#1E2B6D]" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[10px] md:text-xs text-slate-400 font-semibold uppercase tracking-wider">Электронная почта</p>
+                      <p className="text-[10px] md:text-xs text-slate-400 font-semibold uppercase tracking-wider">
+                        Электронная почта
+                      </p>
                       <a
                         href={`mailto:${settings.email}`}
                         className="text-xs md:text-sm font-medium text-slate-700 hover:text-[#1E2B6D] transition-colors block truncate"
@@ -152,7 +173,9 @@ export default function ContactsPage() {
                       <Phone className="w-4 h-4 md:w-5 md:h-5 text-[#1E2B6D]" />
                     </div>
                     <div>
-                      <p className="text-[10px] md:text-xs text-slate-400 font-semibold uppercase tracking-wider">Телефон</p>
+                      <p className="text-[10px] md:text-xs text-slate-400 font-semibold uppercase tracking-wider">
+                        Телефон
+                      </p>
                       <a
                         href={`tel:${settings.phone}`}
                         className="text-xs md:text-sm font-bold text-slate-700 hover:text-[#1E2B6D] transition-colors block"
@@ -171,7 +194,9 @@ export default function ContactsPage() {
                       <MapPin className="w-4 h-4 md:w-5 md:h-5 text-[#1E2B6D]" />
                     </div>
                     <div>
-                      <p className="text-[10px] md:text-xs text-slate-400 font-semibold uppercase tracking-wider">Адрес офиса</p>
+                      <p className="text-[10px] md:text-xs text-slate-400 font-semibold uppercase tracking-wider">
+                        Адрес офиса
+                      </p>
                       <p className="text-xs md:text-sm font-medium text-slate-700 leading-snug">
                         {settings.address}
                       </p>
@@ -185,13 +210,24 @@ export default function ContactsPage() {
                       <Clock className="w-4 h-4 md:w-5 md:h-5 text-[#1E2B6D]" />
                     </div>
                     <div className="text-xs md:text-sm text-slate-600 space-y-0.5">
-                      <p className="text-[10px] md:text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">Режим работы</p>
-                      <p className="font-medium text-slate-700">Пн-Пт: {settings.workingHours.weekdays.from} - {settings.workingHours.weekdays.to}</p>
-                      <p className="text-[10px] md:text-xs">
-                        Сб: {settings.workingHours.saturday.isClosed ? 'Выходной' : `${settings.workingHours.saturday.from} - ${settings.workingHours.saturday.to}`}
+                      <p className="text-[10px] md:text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">
+                        Режим работы
+                      </p>
+                      <p className="font-medium text-slate-700">
+                        Пн-Пт: {settings.workingHours.weekdays.from} -{' '}
+                        {settings.workingHours.weekdays.to}
                       </p>
                       <p className="text-[10px] md:text-xs">
-                        Вс: {settings.workingHours.sunday.isClosed ? 'Выходной' : `${settings.workingHours.sunday.from} - ${settings.workingHours.sunday.to}`}
+                        Сб:{' '}
+                        {settings.workingHours.saturday.isClosed
+                          ? 'Выходной'
+                          : `${settings.workingHours.saturday.from} - ${settings.workingHours.saturday.to}`}
+                      </p>
+                      <p className="text-[10px] md:text-xs">
+                        Вс:{' '}
+                        {settings.workingHours.sunday.isClosed
+                          ? 'Выходной'
+                          : `${settings.workingHours.sunday.from} - ${settings.workingHours.sunday.to}`}
                       </p>
                     </div>
                   </div>
@@ -200,7 +236,9 @@ export default function ContactsPage() {
             </div>
 
             <div className="pt-5 md:pt-6 border-t border-slate-100">
-              <p className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Быстрая связь:</p>
+              <p className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+                Быстрая связь:
+              </p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
                 {settings.telegram && (
                   <ShareButton
@@ -258,61 +296,58 @@ export default function ContactsPage() {
             </p>
           </div>
 
-          <Accordion type="single" collapsible className="w-full space-y-3 md:space-y-4">
-            <AccordionItem
-              value="item-1"
-              className="bg-white border border-slate-100 rounded-2xl px-5 sm:px-6 md:px-8 shadow-sm transition-all duration-200 hover:shadow-md hover:border-blue-100 data-[state=open]:border-blue-200 data-[state=open]:shadow-md"
-            >
-              <AccordionTrigger className="text-sm md:text-lg font-bold text-slate-800 hover:text-[#1E2B6D] hover:no-underline py-4 md:py-6 text-left">
-                Как забронировать тур?
-              </AccordionTrigger>
-              <AccordionContent className="p-0">
-                <div className="pt-3 pb-5 md:pt-4 md:pb-6 border-t border-slate-100 text-slate-600 leading-relaxed text-xs md:text-base">
-                  Вы можете оставить заявку на нашем сайте, позвонить по указанному телефону или написать нам в WhatsApp/Telegram. Наши менеджеры свяжутся с вами, помогут определиться с выбором, подберут удобные даты и подготовят все необходимые документы.
-                </div>
-              </AccordionContent>
-            </AccordionItem>
+          <Accordion
+            type="single"
+            collapsible
+            className="w-full space-y-3 md:space-y-4"
+          >
+            {faqs?.length === 0 && (
+              <p className="text-center text-xl md:text-2xl text-slate-900">
+                Вопросов пока нет.
+              </p>
+            )}
 
-            <AccordionItem
-              value="item-2"
-              className="bg-white border border-slate-100 rounded-2xl px-5 sm:px-6 md:px-8 shadow-sm transition-all duration-200 hover:shadow-md hover:border-blue-100 data-[state=open]:border-blue-200 data-[state=open]:shadow-md"
-            >
-              <AccordionTrigger className="text-sm md:text-lg font-bold text-slate-800 hover:text-[#1E2B6D] hover:no-underline py-4 md:py-6 text-left">
-                Какие документы нужны для оформления визы?
-              </AccordionTrigger>
-              <AccordionContent className="p-0">
-                <div className="pt-3 pb-5 md:pt-4 md:pb-6 border-t border-slate-100 text-slate-600 leading-relaxed text-xs md:text-base">
-                  Список документов полностью зависит от страны вашего назначения. В базовый пакет обычно входят заграничный паспорт, фотографии установленного образца, справка с места работы и выписка из банка. Наш визовый специалист предоставит вам точный и актуальный список документов под выбранное направление.
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem
-              value="item-3"
-              className="bg-white border border-slate-100 rounded-2xl px-5 sm:px-6 md:px-8 shadow-sm transition-all duration-200 hover:shadow-md hover:border-blue-100 data-[state=open]:border-blue-200 data-[state=open]:shadow-md"
-            >
-              <AccordionTrigger className="text-sm md:text-lg font-bold text-slate-800 hover:text-[#1E2B6D] hover:no-underline py-4 md:py-6 text-left">
-                Возможна ли оплата онлайн?
-              </AccordionTrigger>
-              <AccordionContent className="p-0">
-                <div className="pt-3 pb-5 md:pt-4 md:pb-6 border-t border-slate-100 text-slate-600 leading-relaxed text-xs md:text-base">
-                  Нет, мы принимаем оплату наличными.
-                </div>
-              </AccordionContent>
-            </AccordionItem>
+            {faqs?.map((faq) => (
+              <AccordionItem
+                key={faq._id}
+                value={`item-${faq._id}`}
+                className="bg-white border border-slate-100 rounded-2xl px-5 sm:px-6 md:px-8 shadow-sm transition-all duration-200 hover:shadow-md hover:border-blue-100 data-[state=open]:border-blue-200 data-[state=open]:shadow-md"
+              >
+                <AccordionTrigger className="text-sm md:text-lg font-bold text-slate-800 hover:text-[#1E2B6D] hover:no-underline py-4 md:py-6 text-left">
+                  {faq.question}
+                </AccordionTrigger>
+                <AccordionContent className="p-0">
+                  <div className="pt-3 pb-5 md:pt-4 md:pb-6 border-t border-slate-100 text-slate-600 leading-relaxed text-xs md:text-base">
+                    {faq.answer}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
           </Accordion>
         </section>
 
         <section className="bg-gray-50/80 rounded-3xl p-6 sm:p-8 md:p-10 text-center max-w-4xl mx-auto border border-gray-100">
-          <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">Остались вопросы?</h2>
+          <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">
+            Остались вопросы?
+          </h2>
           <p className="text-xs md:text-sm text-gray-600 mb-6 md:mb-8 max-w-lg mx-auto">
-            Наши менеджеры готовы помочь вам с выбором направления и ответить на любые вопросы.
+            Наши менеджеры готовы помочь вам с выбором направления и ответить на
+            любые вопросы.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 w-full sm:w-auto">
-            <Button size="lg" className="bg-[#1E2B6D] hover:bg-blue-900 w-full sm:w-auto" asChild>
+            <Button
+              size="lg"
+              className="bg-[#1E2B6D] hover:bg-blue-900 w-full sm:w-auto"
+              asChild
+            >
               <Link href="/tours">Подобрать тур</Link>
             </Button>
-            <Button size="lg" variant="outline" className="w-full sm:w-auto bg-white" asChild>
+            <Button
+              size="lg"
+              variant="outline"
+              className="w-full sm:w-auto bg-white"
+              asChild
+            >
               <Link href="/tourSets">Оставить заявку</Link>
             </Button>
           </div>
