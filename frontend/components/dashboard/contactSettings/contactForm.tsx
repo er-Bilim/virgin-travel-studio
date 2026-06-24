@@ -158,14 +158,25 @@ export default function ContactSettingsForm() {
         </Field>
       </div>
 
-      <Field label="Facebook:" error={errors.facebook?.message}>
-        <Input
-          {...register('facebook')}
-          className={inputClass}
-          disabled={isPending}
-          placeholder="https://facebook.com/..."
-        />
-      </Field>
+      <div className="grid grid-cols-1 md:grid-cols-2 flex-1 gap-4">
+        <Field label="Facebook:" error={errors.facebook?.message}>
+          <Input
+            {...register('facebook')}
+            className={inputClass}
+            disabled={isPending}
+            placeholder="https://facebook.com/..."
+          />
+        </Field>
+
+        <Field label="Ссылка на карту (Google Maps Embed URL):" error={errors.mapEmbedUrl?.message}>
+          <Input
+            {...register('mapEmbedUrl')}
+            className={inputClass}
+            disabled={isPending}
+            placeholder="https://www.google.com/maps/embed?pb=..."
+          />
+        </Field>
+      </div>
 
       {/* Рабочие часы */}
       <div className="space-y-3">
