@@ -102,7 +102,7 @@ export default function FaqManagement() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 shrink-0">
           {isReorderMode ? (
             <>
               <Button
