@@ -134,6 +134,21 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
           nextStartDate: {
             $min: '$tourSets.startDate',
           },
+          saleDeadline: {
+            $min: {
+              $map: {
+                input: {
+                  $filter: {
+                    input: '$tourSets',
+                    as: 'set',
+                    cond: { $eq: ['$$set.isHot', true]}
+                  },
+                },
+                as: 'hotSet',
+                in: '$$hotSet.saleDeadline'
+              }
+            }
+          }
         },
       },
       {$sort: sort},
@@ -149,6 +164,7 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
           rating: 1,
           ratingCount: 1,
           isHot: 1,
+          saleDeadline: 1,
           hotelLocation: 1,
           minPrice: 1,
           durationDays: 1,
