@@ -1,11 +1,11 @@
 import express from 'express';
-import auth, { type RequestWithUser } from '@/middlewares/auth.js';
+import auth, {type RequestWithUser} from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
 import Order from '@/model/order/Order.js';
 import type {
   OrderStatus,
   PassportPayload,
-  PopulatedOrder,
+  PopulatedOrder
 } from '@/types/orders.types.js';
 import mongoose, { Types } from 'mongoose';
 import validateObjectId from '@/middlewares/validateObjectId.js';
@@ -107,6 +107,77 @@ ordersRouter.get(
           limit,
           totalPages,
         },
+      });
+    } catch (e) {
+      next(e);
+    }
+  },
+);
+
+ordersRouter.get(
+  '/stats',
+  auth,
+  permit('ADMIN', 'MANAGER'),
+  async (req, res, next) => {
+    try {
+      const { user } = req as RequestWithUser;
+
+      const baseQuery: Record<string, unknown> =
+        user.role === 'MANAGER' ? { managerId: user._id } : {};
+
+      const now = new Date();
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+      const [statusCounts, completedToday, monthRevenue] = await Promise.all([
+
+        Order.aggregate([
+          { $match: baseQuery },
+          { $group: { _id: '$status', count: { $sum: 1 } } },
+        ]),
+
+        Order.countDocuments({
+          ...baseQuery,
+          status: 'COMPLETED',
+          updatedAt: { $gte: todayStart },
+        }),
+
+        Order.aggregate([
+          {
+            $match: {
+              ...baseQuery,
+              status: 'COMPLETED',
+              tourSetId: { $exists: true, $ne: null },
+              updatedAt: { $gte: monthStart },
+            },
+          },
+          {
+            $lookup: {
+              from: 'toursets',
+              localField: 'tourSetId',
+              foreignField: '_id',
+              as: 'tourSet',
+            },
+          },
+          { $unwind: '$tourSet' },
+          { $group: { _id: null, total: { $sum: '$tourSet.price' } } },
+        ]),
+      ]);
+
+      const byStatus = Object.fromEntries(
+        statusCounts.map((s: { _id: string; count: number }) => [s._id, s.count]),
+      );
+
+      res.send({
+        byStatus: {
+          NEW: byStatus.NEW ?? 0,
+          IN_PROGRESS: byStatus.IN_PROGRESS ?? 0,
+          CONTRACT_PENDING: byStatus.CONTRACT_PENDING ?? 0,
+          COMPLETED: byStatus.COMPLETED ?? 0,
+          REJECTED: byStatus.REJECTED ?? 0,
+        },
+        completedToday,
+        monthRevenue: monthRevenue[0]?.total ?? 0,
       });
     } catch (e) {
       next(e);

@@ -46,6 +46,18 @@ export interface PaginatedOrdersResponse {
   }
 }
 
+export interface OrderStats {
+  byStatus: {
+    NEW: number;
+    IN_PROGRESS: number;
+    CONTRACT_PENDING: number;
+    COMPLETED: number;
+    REJECTED: number;
+  },
+  completedToday: number;
+  monthRevenue: number;
+}
+
 export interface OrderMutationType {
   tourSetId?: string;
   clientPhone?: string;
