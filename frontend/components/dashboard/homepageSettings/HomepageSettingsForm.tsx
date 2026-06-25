@@ -23,10 +23,10 @@ import { Button } from '@/components/ui/button';
 type FormTab = 'hero' | 'sections' | 'innerPages';
 
 const Field = ({
-                 label,
-                 error,
-                 children,
-               }: {
+  label,
+  error,
+  children,
+}: {
   label: string;
   error?: string;
   children: React.ReactNode;
@@ -45,7 +45,8 @@ export default function HomepageSettingsForm() {
   const [globalError, setGlobalError] = useState<string | null>(null);
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [pendingData, setPendingData] = useState<HomepageSettingsMutationData | null>(null);
+  const [pendingData, setPendingData] =
+    useState<HomepageSettingsMutationData | null>(null);
 
   const { data: currentSettings, isPending: isFetching } =
     useHomepageSettings(true);
@@ -278,6 +279,38 @@ export default function HomepageSettingsForm() {
                     className={`${inputClass} min-h-[80px] py-2.5 resize-y`}
                     disabled={isSaving}
                     placeholder="Например: Узнавайте первыми об изменениях в правилах перелетов, новых визовых требованиях и лайфхаках для туристов"
+                  />
+                </Field>
+              </div>
+            </div>
+
+            <div className="space-y-4 pt-2">
+              <h3 className="text-md font-bold text-[#1E2B6D] border-b border-gray-100 pb-1">
+                Блок отзывов
+              </h3>
+              <div className="space-y-4">
+                <Field
+                  label="Заголовок блока: *"
+                  error={errors.reviewsPages?.title?.message}
+                >
+                  <Input
+                    {...register('reviewsPages.title', {
+                      required: 'Заголовок секции отзывов обязателен',
+                    })}
+                    className={`${inputClass} ${errors.reviewsPages?.title ? 'border-red-500' : ''}`}
+                    disabled={isSaving}
+                    placeholder="Например: Отзывы о нашей компании"
+                  />
+                </Field>
+                <Field
+                  label="Подзаголовок / Описание блока:"
+                  error={errors.reviewsPages?.subtitle?.message}
+                >
+                  <textarea
+                    {...register('reviewsPages.subtitle')}
+                    className={`${inputClass} min-h-[80px] py-2.5 resize-y`}
+                    disabled={isSaving}
+                    placeholder="Например: Реальные впечатления тех, кто уже съездил с нами!"
                   />
                 </Field>
               </div>

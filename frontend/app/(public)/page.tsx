@@ -6,7 +6,7 @@ import LatestNewsSection from '@/components/public/news/LatestNewsSection';
 import { useTourSets } from '@/lib/hooks/tourSets';
 import { useHomepageSettings } from '@/lib/hooks/homepageSettingsHooks';
 import { imageUrl } from '@/lib/constants';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Quote } from 'lucide-react';
 import CustomTourCard from '@/components/public/home/tourCustomCard/CustomTourCard';
 import { usePopularTours } from '@/lib/hooks/tourHooks';
 
@@ -72,6 +72,26 @@ export default function Home() {
           </p>
         </div>
       </div>
+
+      <section
+        aria-labelledby="reviews-title"
+        className="mx-auto max-w-full py-14"
+      >
+        <div className="mb-9 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+          <div>
+            <p className="mb-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-cyan-800">
+              <Quote className="size-[15px]" />
+              Отзывы
+            </p>
+            <h2 id="reviews-title" className="text-3xl font-black tracking-tight text-navy-800">
+              {settings?.reviewsPages?.title || 'Что говорят путешественники'}
+            </h2>
+            <p className='mt-2 max-w-md text-[15px] text-muted-foreground'>
+              {settings?.reviewsPages?.subtitle || 'Реальные впечатления тех, кто уже съездил с нами'}
+            </p>
+          </div>
+        </div>
+      </section>
 
       <section className="my-24">
         <div className="mb-9 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
