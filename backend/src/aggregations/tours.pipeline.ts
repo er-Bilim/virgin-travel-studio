@@ -44,6 +44,7 @@ export const buildTourPipeline = ({
           },
         },
         minPrice: { $min: '$tourSets.price' },
+        discountPrice: { $min: '$tourSets.discountPrice'},
         hotelLocation: { $arrayElemAt: ['$tourSets.hotelLocation', 0] },
         durationDays: {
           $cond: {
@@ -82,6 +83,7 @@ export const buildTourPipeline = ({
         isHot: 1,
         hotelLocation: 1,
         minPrice: 1,
+        discountPrice: 1,
         durationDays: 1,
         nextStartDate: 1,
         createdAt: 1,
