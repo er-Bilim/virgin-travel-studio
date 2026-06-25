@@ -36,6 +36,7 @@ export interface ITourWithTourSetFields extends TourType {
   hotelLocation: string;
   nextStartDate: string;
   durationDays: number;
+  saleDeadline: string;
 } 
 
 export interface ISingleTour extends TourType {
