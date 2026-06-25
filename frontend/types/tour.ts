@@ -33,6 +33,7 @@ export interface TourType {
 export interface ITourWithTourSetFields extends TourType {
   isHot: boolean;
   minPrice: number;
+  discountPrice?: number;
   hotelLocation: string;
   nextStartDate: string;
   durationDays: number;

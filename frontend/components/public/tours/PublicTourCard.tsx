@@ -110,7 +110,7 @@ const PublicTourCard = ({ tour }: Props) => {
                   itemProp="offers"
                   itemScope
                   itemType="https://schema.org/Offer"
-                  className="whitespace-nowrap"
+                  className="whitespace-nowrap relative"
                 >
                   <meta itemProp="priceCurrency" content="KGS" />
                   <meta
@@ -124,10 +124,19 @@ const PublicTourCard = ({ tour }: Props) => {
                   <span
                     itemProp="price"
                     content={String(tour.minPrice)}
-                    className="block text-xl font-bold text-foreground"
+                    className={`block text-xl font-bold ${tour.discountPrice ? 'line-through text-black font-extralight italic' : ''}`}
                   >
                     {formatToReadablePrice(tour.minPrice).price}
                   </span>
+                  {tour.discountPrice && (
+                    <span
+                      itemProp="price"
+                      content={String(tour.minPrice)}
+                      className={`absolute top-[1] -right-7 text-xl font-bold text-red-500`}
+                    >
+                      {formatToReadablePrice(tour.discountPrice).price}
+                    </span>
+                  )}
                 </div>
 
                 <div className="text-sm text-gray-400 flex flex-col gap-1">

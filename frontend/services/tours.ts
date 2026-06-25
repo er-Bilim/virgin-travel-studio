@@ -15,7 +15,7 @@ export const getTours = async ({
   categoryId,
   search,
   isPublished,
-    countryCode,
+  countryCode,
   sort
 }: GetToursParams): Promise<ToursGetResponse> => {
   const params: Record<string, string | undefined | number> = {};
