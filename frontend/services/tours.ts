@@ -3,10 +3,11 @@ import axiosApi from '@/lib/axiosApi';
 import type {
   GetToursParams,
   ISingleTour,
+  ITourWithTourSetFields,
   TourCategoryType,
   TourMutation,
   ToursGetResponse,
-  TourType
+  TourType,
 } from '@/types/tour';
 
 export const getTours = async ({
@@ -15,8 +16,8 @@ export const getTours = async ({
   categoryId,
   search,
   isPublished,
-    countryCode,
-  sort
+  countryCode,
+  sort,
 }: GetToursParams): Promise<ToursGetResponse> => {
   const params: Record<string, string | undefined | number> = {};
 
@@ -34,9 +35,17 @@ export const getTours = async ({
   return res.data;
 };
 
-export const getTourById = async (id: string): Promise<ISingleTour> => {
-  const res = await axiosApi.get<ISingleTour>(`/tours/${id}`);
-  return res.data;
+export const getPopularTours = async (limit = 6): Promise<ITourWithTourSetFields[]> => {
+  const {data} = await axiosApi(`/tours/popular?limit=${limit}`);
+  return data;
+}
+
+export const getTourById = async (id: string, ip?: string): Promise<ISingleTour> => {
+  const {data} = await axiosApi.get<ISingleTour>(`/tours/${id}` , {
+    headers: ip ? { 'X-Forwarded-For': ip } : undefined,
+  });
+
+  return data;
 };
 
 export const getTourCategories = async (): Promise<TourCategoryType[]> => {

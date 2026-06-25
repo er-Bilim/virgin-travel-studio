@@ -8,7 +8,7 @@ import { useHomepageSettings } from '@/lib/hooks/homepageSettingsHooks';
 import { imageUrl } from '@/lib/constants';
 import { ArrowRight } from 'lucide-react';
 import CustomTourCard from '@/components/public/home/tourCustomCard/CustomTourCard';
-import { useTours } from '@/lib/hooks/tourHooks';
+import { usePopularTours } from '@/lib/hooks/tourHooks';
 
 export default function Home() {
   const limit = 4;
@@ -21,19 +21,17 @@ export default function Home() {
   } = useHomepageSettings();
 
   const {
-    data: toursData,
+    data: tours,
     isLoading: isToursLoading,
     isError: isToursError,
     refetch: refetchTours,
-  } = useTours({ limit });
+  } = usePopularTours(limit);
 
   const {
     isLoading: isTourSetsLoading,
     isError: isTourSetsError,
     refetch: refetchTourSets,
   } = useTourSets({ page: 1, limit: 100 });
-
-  const tours = toursData?.tours.filter((tour) => tour.isPublished) || [];
 
   const isLoading = isToursLoading || isTourSetsLoading || isSettingsLoading;
   const showError = isToursError || isTourSetsError || isSettingsError;
@@ -120,7 +118,7 @@ export default function Home() {
           </div>
         )}
 
-        {!showLoading && !showError && (
+        {!showLoading && !showError && tours && (
           <>
             {tours.length === 0 ? (
               <p className="my-10 text-center text-gray-500">
@@ -138,7 +136,7 @@ export default function Home() {
       </section>
 
       <LatestNewsSection />
-      
+
       <div className="mt-10 mb-15 flex flex-col items-center">
         <CustomTourCard />
       </div>

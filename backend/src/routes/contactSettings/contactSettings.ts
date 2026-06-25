@@ -39,6 +39,7 @@ contactSettingsRouter.post(
         telegram,
         instagram,
         facebook,
+        mapEmbedUrl,
         workingHours,
       } = req.body;
 
@@ -50,6 +51,7 @@ contactSettingsRouter.post(
         telegram,
         instagram,
         facebook,
+        mapEmbedUrl,
         workingHours,
       });
 
@@ -88,6 +90,7 @@ contactSettingsRouter.put(
         telegram,
         instagram,
         facebook,
+        mapEmbedUrl,
         workingHours,
       } = req.body;
 
@@ -98,6 +101,7 @@ contactSettingsRouter.put(
       if (telegram !== undefined) settings.telegram = telegram;
       if (instagram !== undefined) settings.instagram = instagram;
       if (facebook !== undefined) settings.facebook = facebook;
+      if (mapEmbedUrl !== undefined) settings.mapEmbedUrl = mapEmbedUrl;
 
       if (workingHours !== undefined) {
         if (!settings.workingHours) {

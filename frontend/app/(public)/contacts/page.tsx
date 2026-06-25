@@ -1,20 +1,19 @@
-"use client";
+'use client';
 
-import {Breadcrumbs} from "@/components/shared/Breadcrumbs";
-import {Button} from "@/components/ui/button";
-import {Skeleton} from "@/components/ui/skeleton";
-import {AlertTriangle, Clock, Mail, MapPin, Phone} from "lucide-react";
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { AlertTriangle, Clock, Mail, MapPin, Phone } from 'lucide-react';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
-  AccordionTrigger
-} from "@/components/ui/accordion";
-import ShareButton from "@/components/public/buttons/share/ShareButton";
-import Link from "next/link";
-import {useContacts} from "@/lib/hooks/contactSettings";
-import { usePublicFaqs } from "@/lib/hooks/faq";
-
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import ShareButton from '@/components/public/buttons/share/ShareButton';
+import Link from 'next/link';
+import { useContacts } from '@/lib/hooks/contactSettings';
+import { usePublicFaqs } from '@/lib/hooks/faq';
 
 export default function ContactsPage() {
   const { data: settings, isLoading, isError } = useContacts();
@@ -53,7 +52,7 @@ export default function ContactsPage() {
           </section>
 
           <section className="flex justify-center flex-wrap items-center gap-5">
-            <Skeleton className="w-180 h-10"/>
+            <Skeleton className="w-180 h-10" />
             <div className="p-5 space-y-3 w-150">
               <Skeleton className="rounded-2xl h-6 w-full px-5 sm:px-6 md:px-8 shadow-sm" />
               <Skeleton className="rounded-2xl h-6 w-full px-5 sm:px-6 md:px-8 shadow-sm" />
@@ -92,7 +91,9 @@ export default function ContactsPage() {
     return (
       <div className="container mx-auto px-4 py-32 text-center">
         <h1 className="text-2xl font-bold mb-4">Свяжитесь с нами</h1>
-        <p className="text-slate-500">К сожалению, контактная информация временно не заполнена.</p>
+        <p className="text-slate-500">
+          К сожалению, контактная информация временно не заполнена.
+        </p>
       </div>
     );
   }
@@ -272,17 +273,36 @@ export default function ContactsPage() {
             </div>
           </div>
 
-          <div className="h-[300px] sm:h-[400px] lg:h-auto rounded-3xl overflow-hidden shadow-sm border border-slate-100">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2925.4324328728844!2d74.61403670572865!3d42.842601497319585!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x389eb6155450422d%3A0x86e26db7a8764927!2zODkg0YPQuy4g0JDRhdGD0L3QsdCw0LXQstCwLCDQkdC40YjQutC10LogNzIwMDIw!5e0!3m2!1sru!2skg!4v1781259264024!5m2!1sru!2skg"
-              width="100%"
-              height="100%"
-              title="Карта местоположения офиса"
-              style={{ border: 0 }}
-              allowFullScreen={false}
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
+          <div className="h-[300px] sm:h-[400px] lg:h-auto rounded-3xl overflow-hidden shadow-sm border border-slate-100 flex items-stretch">
+            {settings.mapEmbedUrl ? (
+              <iframe
+                src={settings.mapEmbedUrl}
+                width="100%"
+                height="100%"
+                title="Карта местоположения офиса"
+                style={{ border: 0 }}
+                allowFullScreen={false}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="w-full h-full min-h-[300px]"
+              />
+            ) : (
+              <div className="w-full min-h-[300px] bg-slate-50 flex flex-col items-center justify-center p-8 text-center border border-dashed border-slate-200 rounded-3xl m-1">
+                <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 mb-3">
+                  <MapPin className="w-6 h-6" />
+                </div>
+                <h3 className="text-sm font-bold text-slate-700">
+                  Карта временно недоступна
+                </h3>
+                <p className="text-slate-400 text-xs mt-1 max-w-xs leading-relaxed">
+                  Интерактивная карта наполняется. Вы можете найти нас по
+                  адресу: <br />
+                  <span className="text-slate-600 font-medium">
+                    {settings.address}
+                  </span>
+                </p>
+              </div>
+            )}
           </div>
         </section>
 

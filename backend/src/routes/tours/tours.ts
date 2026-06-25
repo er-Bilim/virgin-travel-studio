@@ -1,16 +1,18 @@
 import express from 'express';
-import auth, {authOrNot, type RequestWithUser} from '@/middlewares/auth.js';
+import auth, { authOrNot, type RequestWithUser } from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
-import {imagesUpload} from '@/middlewares/multer.js';
+import { imagesUpload } from '@/middlewares/multer.js';
 import Tour from '@/model/tour/Tour.js';
 import mongoose from 'mongoose';
 import validateObjectId from '@/middlewares/validateObjectId.js';
 import parseSort from '@/lib/sort.js';
 import TourSet from '@/model/tourSet/TourSet.js';
-import type {AggregatedTour, AggregatedTours} from '@/types/tour.types.js';
-import type {ICategory} from '@/types/category.types.js';
-import path from "path";
-import fs from "fs/promises";
+import type { AggregatedTour, AggregatedTours } from '@/types/tour.types.js';
+import type { ICategory } from '@/types/category.types.js';
+import path from 'path';
+import fs from 'fs/promises';
+import TourView from '@/model/tour/TourView.js';
+import { buildTourPipeline } from '@/aggregations/tours.pipeline.js';
 
 const toursRouter = express.Router();
 
@@ -19,7 +21,7 @@ const escapeRegex = (value: string) => {
 };
 
 toursRouter.get('/', authOrNot, async (req, res, next) => {
-  const {user} = req as RequestWithUser;
+  const { user } = req as RequestWithUser;
   const isAdminOrManager = user?.role === 'ADMIN' || user?.role === 'MANAGER';
 
   try {
@@ -44,7 +46,10 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
       query.isPublished = true;
     }
 
-    if (typeof req.query.countryCode === 'string' && req.query.countryCode.trim()) {
+    if (
+      typeof req.query.countryCode === 'string' &&
+      req.query.countryCode.trim()
+    ) {
       const code = req.query.countryCode.trim().toUpperCase();
 
       if (code.length === 3) {
@@ -54,7 +59,7 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
 
     if (typeof req.query.category === 'string') {
       if (!mongoose.Types.ObjectId.isValid(req.query.category)) {
-        return res.status(400).send({error: 'Неверный category ID'});
+        return res.status(400).send({ error: 'Неверный category ID' });
       }
 
       query.category = new mongoose.Types.ObjectId(req.query.category);
@@ -196,7 +201,7 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
 
 toursRouter.get('/countries', async (req, res, next) => {
   try {
-    const countries = await Tour.distinct('countryCode')
+    const countries = await Tour.distinct('countryCode');
 
     res.send(countries.filter(Boolean).sort());
   } catch (e) {
@@ -207,8 +212,8 @@ toursRouter.get('/countries', async (req, res, next) => {
 toursRouter.get('/categories', async (_req, res, next) => {
   try {
     const categories: ICategory[] = await Tour.aggregate([
-      {$match: {isPublished: true}},
-      {$group: {_id: '$category'}},
+      { $match: { isPublished: true } },
+      { $group: { _id: '$category' } },
       {
         $lookup: {
           from: 'categories',
@@ -227,17 +232,30 @@ toursRouter.get('/categories', async (_req, res, next) => {
   }
 });
 
+toursRouter.get('/popular', async (req, res, next) => {
+  try {
+    const limit = Math.min(Number(req.query.limit) || 6, 12);
+
+    const tours = await Tour.aggregate(buildTourPipeline({ match: {isPublished: true}, sort: { viewsCount: -1, createdAt: -1 }, limit}))
+      
+    res.json(tours);
+  } catch (error) {
+    next(error);
+  }
+});
+
 toursRouter.get(
   '/:id',
   authOrNot,
   validateObjectId(),
   async (req, res, next) => {
     try {
-      const {id} = req.params;
-      const {user} = req as RequestWithUser;
+      const { id } = req.params;
+      const { user } = req as RequestWithUser;
+      const tourId = new mongoose.Types.ObjectId(id as string);
 
       const tours: AggregatedTour[] = await Tour.aggregate([
-        {$match: {_id: new mongoose.Types.ObjectId(id as string)}},
+        { $match: { _id: tourId } },
         {
           $lookup: {
             from: 'categories',
@@ -265,14 +283,30 @@ toursRouter.get(
       const tour: AggregatedTour | undefined = tours[0];
 
       if (!tour) {
-        return res.status(404).send({error: 'Тур не найден'});
+        return res.status(404).send({ error: 'Тур не найден' });
       }
 
       const isAdminOrManager =
         user?.role === 'ADMIN' || user?.role === 'MANAGER';
 
       if (!tour.isPublished && !isAdminOrManager) {
-        return res.status(404).send({error: 'Тур не найден'});
+        return res.status(404).send({ error: 'Тур не найден' });
+      }
+
+      if (tour.isPublished) {
+        const viewer = req.ip;
+
+        if (viewer) {
+          const existing = await TourView.findOne({ tourId, viewer });
+
+          if (!existing) {
+            await TourView.create({ tourId, viewer });
+
+            Tour.updateOne({ _id: tourId }, { $inc: { viewsCount: 1 } }).catch(
+              (error) => console.error(error),
+            );
+          }
+        }
       }
 
       res.send(tour);
@@ -289,28 +323,23 @@ toursRouter.post(
   imagesUpload.array('images', 5),
   async (req, res, next) => {
     try {
-      const {
-        title,
-        description,
-        countryCode,
-        category,
-        baseAdvantages
-      } = req.body;
+      const { title, description, countryCode, category, baseAdvantages } =
+        req.body;
 
       const parsedAdvantages: string[] =
         typeof baseAdvantages === 'string'
           ? baseAdvantages
-            .split(',')
-            .map((a) => a.trim())
-            .filter(Boolean)
+              .split(',')
+              .map((a) => a.trim())
+              .filter(Boolean)
           : Array.isArray(baseAdvantages)
             ? baseAdvantages
             : [];
 
       const imagePaths = req.files
         ? (req.files as Express.Multer.File[]).map(
-          (file) => 'images/' + file.filename,
-        )
+            (file) => 'images/' + file.filename,
+          )
         : [];
 
       const tour = new Tour({
@@ -329,7 +358,7 @@ toursRouter.post(
       if (e instanceof mongoose.Error.ValidationError) {
         return res
           .status(400)
-          .send({error: 'Ошибка валидации', details: e.errors});
+          .send({ error: 'Ошибка валидации', details: e.errors });
       }
       next(e);
     }
@@ -343,11 +372,11 @@ toursRouter.patch(
   validateObjectId(),
   imagesUpload.array('images', 5),
   async (req, res, next) => {
-    const {id} = req.params;
+    const { id } = req.params;
 
     try {
       const tour = await Tour.findById(id);
-      if (!tour) return res.status(404).send({error: 'Тур не найден'});
+      if (!tour) return res.status(404).send({ error: 'Тур не найден' });
 
       const {
         title,
@@ -355,17 +384,17 @@ toursRouter.patch(
         countryCode,
         category,
         baseAdvantages,
-        isPublished
-      } =
-        req.body;
+        isPublished,
+      } = req.body;
 
       if (title !== undefined) tour.title = title;
       if (description !== undefined) tour.description = description;
-      if (countryCode !== undefined) tour.countryCode = countryCode.trim().toUpperCase();
+      if (countryCode !== undefined)
+        tour.countryCode = countryCode.trim().toUpperCase();
 
       if (category) {
         if (!mongoose.Types.ObjectId.isValid(String(category))) {
-          return res.status(400).send({error: 'Неверный category ID'});
+          return res.status(400).send({ error: 'Неверный category ID' });
         }
         tour.category = category;
       }
@@ -378,9 +407,9 @@ toursRouter.patch(
         tour.baseAdvantages =
           typeof baseAdvantages === 'string'
             ? baseAdvantages
-              .split(',')
-              .map((a) => a.trim())
-              .filter(Boolean)
+                .split(',')
+                .map((a) => a.trim())
+                .filter(Boolean)
             : Array.isArray(baseAdvantages)
               ? baseAdvantages
               : tour.baseAdvantages;
@@ -408,10 +437,8 @@ toursRouter.patch(
           }
         }
 
-
-        const imagesToDelete = tour.images?.filter(
-          (oldImg) => !finalImages.includes(oldImg)
-        ) || [];
+        const imagesToDelete =
+          tour.images?.filter((oldImg) => !finalImages.includes(oldImg)) || [];
 
         for (const imgPath of imagesToDelete) {
           try {
@@ -425,12 +452,12 @@ toursRouter.patch(
       }
 
       await tour.save();
-      res.send({message: 'Тур обновлен', tour});
+      res.send({ message: 'Тур обновлен', tour });
     } catch (e) {
       if (e instanceof mongoose.Error.ValidationError) {
         return res
           .status(400)
-          .send({error: 'Ошибка валидации', details: e.errors});
+          .send({ error: 'Ошибка валидации', details: e.errors });
       }
       next(e);
     }
@@ -443,7 +470,7 @@ toursRouter.delete(
   permit('ADMIN'),
   validateObjectId(),
   async (req, res, next) => {
-    const {id} = req.params;
+    const { id } = req.params;
 
     try {
       const hasLinks = await TourSet.exists({
@@ -457,11 +484,11 @@ toursRouter.delete(
         });
       }
 
-      const result = await Tour.deleteOne({_id: id});
+      const result = await Tour.deleteOne({ _id: id });
       if (!result.deletedCount) {
-        return res.status(404).send({error: 'Тур не найден'});
+        return res.status(404).send({ error: 'Тур не найден' });
       }
-      res.send({message: 'Тур успешно удален'});
+      res.send({ message: 'Тур успешно удален' });
     } catch (e) {
       next(e);
     }
