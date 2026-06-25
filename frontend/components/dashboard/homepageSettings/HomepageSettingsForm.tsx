@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import type { AxiosError } from 'axios';
-import { Loader2, Layout, Compass, FileText } from 'lucide-react';
+import { Loader2, Layout, Compass, FileText, Plus, Trash2 } from 'lucide-react';
+import FileInput from '@/components/dashboard/FileInput/FileInput';
 
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
@@ -11,7 +12,7 @@ import { inputClass } from '@/lib/constants';
 import { VideoInput } from './VideoInput';
 import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog/ConfirmDialog'; // Импортируем модалку
 
-import type { HomepageSettingsMutationData } from '@/types/homepageSettings';
+import type { HomepageSettingsMutationData, AdvantagesFields } from '@/types/homepageSettings';
 import {
   mutateCreateHomepageSettings,
   mutateHomepageSettings,
@@ -65,7 +66,9 @@ export default function HomepageSettingsForm() {
     setError,
     formState: { errors },
   } = useForm<HomepageSettingsMutationData>({
-    defaultValues: currentSettings || {},
+    defaultValues: currentSettings || {
+      advantages: [],
+    },
   });
 
   useEffect(() => {
@@ -73,6 +76,15 @@ export default function HomepageSettingsForm() {
       reset(currentSettings);
     }
   }, [currentSettings, reset]);
+
+  const {
+    fields,
+    remove,
+    append,
+  } = useFieldArray({
+    control,
+    name: 'advantages',
+  });
 
   const onSubmit = (data: HomepageSettingsMutationData) => {
     setPendingData(data);
@@ -85,6 +97,7 @@ export default function HomepageSettingsForm() {
     setGlobalError(null);
     setIsConfirmOpen(false);
 
+    console.log(pendingData)
     mutate(pendingData, {
       onSuccess: () => {
         setPendingData(null);
@@ -249,6 +262,92 @@ export default function HomepageSettingsForm() {
                   />
                 </Field>
               </div>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-md font-bold text-[#1E2B6D] border-b border-gray-100 pb-1">
+                Блок преимуществ
+              </h3>
+              <div className="space-y-4">
+                {fields.map((_: AdvantagesFields, index) => {
+                  const fieldError = errors.advantages?.[index];
+
+                  const fileChangeHandler = (
+                    e: React.ChangeEvent<HTMLInputElement>,
+                  ) => {
+                    const { files } = e.target;
+                    const file = files && files[0] ? files[0] : null;
+
+                    setValue(`advantages.${index}.image` as const, file, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    });
+                  };
+
+                  return (
+                    <div
+                      key={index}
+                      className="relative p-3 border rounded-2xl bg-gray-100 items-start"
+                    >
+                      <div>
+                        <label>Заголовок:</label>
+                        <Input
+                          {...register(`advantages.${index}.title` as const, {
+                            required: 'Введите заголовок',
+                          })}
+                          className={`${inputClass} ${errors.advantages ? (errors.advantages[index] ? 'border-red-500 focus-visible:ring-red-500' : '') : ''}`}
+                        />
+                        {fieldError?.title && (
+                          <span style={{ color: 'red' }}>
+                            {fieldError.title.message}
+                          </span>
+                        )}
+                      </div>
+
+                      <div>
+                        <label>Текст:</label>
+                        <textarea
+                          {...register(`advantages.${index}.body` as const)}
+                          className={`${inputClass} min-h-[100px] py-2.5 resize-y`}
+                        />
+                        {fieldError?.body && (
+                          <span style={{ color: 'red' }}>
+                            {fieldError.body.message}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-sm font-medium leading-none">
+                          Добавить изображение
+                        </label>
+                        <FileInput
+                          key="image"
+                          name="image"
+                          label="Добавить"
+                          onChange={fileChangeHandler}
+                        />
+                      </div>
+                      <button
+                        aria-label="Убрать преимущество"
+                        type="button"
+                        onClick={() => remove(index)}
+                        className="absolute top-3 right-3 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-input bg-background hover:bg-red-50"
+                      >
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+              <button
+                type="button"
+                onClick={() => append({ title: '', body: '', image: null })}
+                className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-transparent hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 w-full mt-2"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Добавить преимущество
+              </button>
             </div>
 
             <div className="space-y-4 pt-2">

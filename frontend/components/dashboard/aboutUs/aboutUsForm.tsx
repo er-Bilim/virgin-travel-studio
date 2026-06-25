@@ -5,7 +5,6 @@ import { inputClass } from '@/lib/constants';
 import { useEditAboutUsData, useCreateAboutUsData } from "@/lib/hooks/aboutUs";
 import { Loader, Loader2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import type { GlobalError } from "@/types/error";
 
 
 const Field = ({
