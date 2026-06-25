@@ -11,7 +11,7 @@ const app: Express = express();
 app.use(
   cors({
     origin: config.corsOrigin,
-    credentials: true,
+    credentials: true,  
   }),
 );
 app.use(cookieParser());
@@ -24,6 +24,8 @@ app.use((_req: Request, res: Response) => {
     error: 'Not Found',
   });
 });
+
+app.set('trust proxy', true);
 
 const run = async () => {
   await mongoose.connect(config.db);
