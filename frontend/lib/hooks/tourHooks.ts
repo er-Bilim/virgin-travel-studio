@@ -3,6 +3,7 @@ import {
   createTour,
   deleteTour,
   getCountries,
+  getPopularTours,
   getTourById,
   getTourCategories,
   getTours,
@@ -46,6 +47,13 @@ export const useTours = ({
       }),
   });
 };
+
+export const usePopularTours = (limit: number) => {
+  return useQuery({
+    queryKey: ['tours', 'popular', limit],
+    queryFn: () => getPopularTours(limit),
+  })
+}
 
 export const useCountries = () => {
   return useQuery({
