@@ -66,6 +66,16 @@ const HomepageSettingsSchema = new Schema<HomepageSettingsFields>(
         type: String,
       },
     },
+
+    reviewsPage: {
+      title: {
+        type: String,
+        required: [true, 'Главный заголовок страницы рейтина обязателен']
+      },
+      subtitle: {
+        type: String
+      }
+    }
   },
   {
     timestamps: true,

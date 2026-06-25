@@ -22,4 +22,8 @@ export interface HomepageSettingsFields {
     title: string;
     subtitle?: string;
   };
+  reviewsPage: {
+    title: string;
+    subtitle?: string;
+  }
 }
