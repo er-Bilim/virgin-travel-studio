@@ -6,9 +6,11 @@ import LatestNewsSection from '@/components/public/news/LatestNewsSection';
 import { useTourSets } from '@/lib/hooks/tourSets';
 import { useHomepageSettings } from '@/lib/hooks/homepageSettingsHooks';
 import { imageUrl } from '@/lib/constants';
-import { ArrowRight, Quote } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import { IoIosQuote } from "react-icons/io";
 import CustomTourCard from '@/components/public/home/tourCustomCard/CustomTourCard';
 import { usePopularTours } from '@/lib/hooks/tourHooks';
+import ReviewsCarousel from '@/components/public/reviews/ReviewsCarousel';
 
 export default function Home() {
   const limit = 4;
@@ -80,7 +82,7 @@ export default function Home() {
         <div className="mb-9 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <div>
             <p className="mb-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-cyan-800">
-              <Quote className="size-[15px]" />
+              <IoIosQuote className="size-[18px]" />
               Отзывы
             </p>
             <h2 id="reviews-title" className="text-3xl font-black tracking-tight text-navy-800">
@@ -90,10 +92,12 @@ export default function Home() {
               {settings?.reviewsPages?.subtitle || 'Реальные впечатления тех, кто уже съездил с нами'}
             </p>
           </div>
+
         </div>
+          <ReviewsCarousel/>
       </section>
 
-      <section className="my-24">
+      <section>
         <div className="mb-9 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-cyan-800">

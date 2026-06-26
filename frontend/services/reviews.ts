@@ -1,18 +1,18 @@
 import axiosApi from '@/lib/axiosApi';
-import {createFormData} from '@/lib/utils';
+import { createFormData } from '@/lib/utils';
 import type {
   IPaginationReviews,
   IReview,
   IReviewMutation,
   IReviewParams,
 } from '@/types/review';
-import {toast} from 'sonner';
+import { toast } from 'sonner';
 
 export const getPublicReviews = async (
   params: IReviewParams,
 ): Promise<IPaginationReviews> => {
   try {
-    const {data} = await axiosApi.get<IPaginationReviews>('/reviews/public', {
+    const { data } = await axiosApi.get<IPaginationReviews>('/reviews/public', {
       params,
     });
 
@@ -23,11 +23,24 @@ export const getPublicReviews = async (
   }
 };
 
-export const getAdminReviews = async (
-  params: { tourId?: string; page?: number; limit?: number;isModerated?: string },
-): Promise<IPaginationReviews> => {
+export const getPublicFeaturedReviews = async () => {
   try {
-    const {data} = await axiosApi.get<IPaginationReviews>('/reviews/admin', {
+    const { data } = await axiosApi.get<IReview>('/reviews/public/featured');
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const getAdminReviews = async (params: {
+  tourId?: string;
+  page?: number;
+  limit?: number;
+  isModerated?: string;
+}): Promise<IPaginationReviews> => {
+  try {
+    const { data } = await axiosApi.get<IPaginationReviews>('/reviews/admin', {
       params,
     });
 
@@ -42,7 +55,7 @@ export const createReview = async (data: IReviewMutation) => {
   try {
     const formData = createFormData(data);
 
-    const {data: responseData} = await axiosApi.post<{
+    const { data: responseData } = await axiosApi.post<{
       message: string;
       review: IReview;
     }>('/reviews', formData);
@@ -62,7 +75,7 @@ export const updateReview = async (
   try {
     const formData = createFormData(data);
 
-    const {data: responseData} = await axiosApi.patch<{
+    const { data: responseData } = await axiosApi.patch<{
       message: string;
       review: IReview;
     }>(`/reviews/${id}`, formData);
@@ -75,9 +88,20 @@ export const updateReview = async (
   }
 };
 
+export const featureReview = async (id: string) => {
+  try {
+    const { data } = await axiosApi.patch(`/reviews/${id}/feature`);
+
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+} 
+
 export const deleteReview = async (id: string) => {
   try {
-    const {data} = await axiosApi.delete<{ message: string }>(
+    const { data } = await axiosApi.delete<{ message: string }>(
       `/reviews/${id}`,
     );
 
@@ -89,15 +113,15 @@ export const deleteReview = async (id: string) => {
   }
 };
 
-export const approveReview = async (id: string, isModerated: "pending" | "approved" | "rejected") => {
+export const approveReview = async (
+  id: string,
+  isModerated: 'pending' | 'approved' | 'rejected',
+) => {
   try {
-    const {data} = await axiosApi.patch<{
+    const { data } = await axiosApi.patch<{
       message: string;
       review: IReview;
-    }>(
-      `/reviews/${id}/approve`,
-      {isModerated  }
-    );
+    }>(`/reviews/${id}/approve`, { isModerated });
 
     toast.success(data.message);
     return data;
@@ -105,4 +129,4 @@ export const approveReview = async (id: string, isModerated: "pending" | "approv
     console.error(error);
     throw error;
   }
-}
+};

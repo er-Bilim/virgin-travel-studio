@@ -3,63 +3,73 @@
 import {
   useAdminReviews,
   useApproveReview,
-  useDeleteReview
-} from "@/lib/hooks/reviewHooks";
-import {useEffect, useMemo, useState} from "react";
-import {useRouter} from "next/navigation";
-import type {IReview} from "@/types/review";
-import {
-  getReviewColumns
-} from "@/components/dashboard/shared/data-table/columns/createColumnInTable/review-colum";
-import {DataTable} from "@/components/dashboard/shared/data-table/data-table";
+  useDeleteReview,
+} from '@/lib/hooks/reviewHooks';
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import type { IReview } from '@/types/review';
+import { getReviewColumns } from '@/components/dashboard/shared/data-table/columns/createColumnInTable/review-colum';
+import { DataTable } from '@/components/dashboard/shared/data-table/data-table';
 import {
   headerRowClassName,
   rowClassName,
-  tableClassName
-} from "@/lib/constants";
-import {
-  ConfirmDialog
-} from "@/components/dashboard/ConfirmDialog/ConfirmDialog";
-import {PaginationCustom} from "@/components/pagination/PaginationCustom";
-import {Tabs, TabsList, TabsTrigger} from "@/components/ui/tabs";
+  tableClassName,
+} from '@/lib/constants';
+import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog/ConfirmDialog';
+import { PaginationCustom } from '@/components/pagination/PaginationCustom';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function ReviewsList() {
-  const {mutate: deleteReview, isPending: isDeleting} = useDeleteReview();
-  const {mutate: updateReview} = useApproveReview();
-  const [modearateStatusFilter, setModearateStatusFilter] = useState("all");
+  const { mutate: deleteReview, isPending: isDeleting } = useDeleteReview();
+  const { mutate: updateReview } = useApproveReview();
+  const [modearateStatusFilter, setModearateStatusFilter] = useState('all');
   const router = useRouter();
   const [reviewToDelete, setReviewToDelete] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const limit = 10;
+  const [enabled, setEnabled] = useState<boolean>(false)
+  
   const {
     data: reviewsData,
     isLoading,
     isError,
-    refetch: refetchReviews
-  } = useAdminReviews({page, limit, isModerated: modearateStatusFilter});
+    refetch: refetchReviews,
+  } = useAdminReviews({ page, limit, isModerated: modearateStatusFilter });
   const reviews = reviewsData?.reviews;
 
   useEffect(() => {
     const changePage = () => {
       setPage(1);
-    }
+    };
 
     void changePage();
   }, []);
 
-  const columns = useMemo(() => getReviewColumns({
-    onView: (review: IReview) => {
-      const currentPath = window.location.pathname;
-      const basePath = currentPath.startsWith('/manager') ? '/manager' : '/admin';
+  const columns = useMemo(
+    () =>
+      getReviewColumns({
+        onView: (review: IReview) => {
+          const currentPath = window.location.pathname;
+          const basePath = currentPath.startsWith('/manager')
+            ? '/manager'
+            : '/admin';
 
-      router.push(`${basePath}/tours/${review.tourId._id}#review-${review._id}`);
-    },
-    onDelete: (review: IReview) => setReviewToDelete(review._id),
-    onTogglePublish: (review: IReview) => {
-      const status = review.isModerated === 'approved' ? 'rejected' : 'approved';
-      updateReview({id: review._id, isModerated: status});
-    },
-  }), [updateReview]);
+          router.push(
+            `${basePath}/tours/${review.tourId._id}#review-${review._id}`,
+          );
+        },
+        onDelete: (review: IReview) => setReviewToDelete(review._id),
+        onTogglePublish: (review: IReview) => {
+          const status =
+            review.isModerated === 'approved' ? 'rejected' : 'approved';
+          updateReview({ id: review._id, isModerated: status });
+        },
+        onCheckedChange(value) {
+          
+        },
+      }),
+    [updateReview],
+  );
 
   const confirmDelete = () => {
     if (reviewToDelete) {
@@ -76,14 +86,16 @@ export default function ReviewsList() {
   const handlePageChange = (page: number) => {
     setPage(page);
     window.scrollTo(0, 0);
-  }
+  };
 
   return (
     <>
       <div className="p-8 space-y-8 bg-gray-50">
         <div className="flex flex-col sm:flex-row items-center sm:justify-between gap-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold tracking-tight text-[#1E2B6D]">Отзывы</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-[#1E2B6D]">
+              Отзывы
+            </h1>
           </div>
 
           <div className="flex flex-col lg:flex-row lg:items-center gap-4">
@@ -138,10 +150,13 @@ export default function ReviewsList() {
           className={tableClassName}
           onRowClick={(review) => {
             const currentPath = window.location.pathname;
-            const basePath = currentPath.startsWith('/manager') ? '/manager' : '/admin';
-            router.push(`${basePath}/tours/${review.tourId._id}#review-${review._id}`);
-          }
-          }
+            const basePath = currentPath.startsWith('/manager')
+              ? '/manager'
+              : '/admin';
+            router.push(
+              `${basePath}/tours/${review.tourId._id}#review-${review._id}`,
+            );
+          }}
         />
 
         {isError && (
@@ -159,16 +174,19 @@ export default function ReviewsList() {
           </div>
         )}
 
-        {reviewsData && reviewsData.reviews.length > 0 && reviewsData.totalReviews && reviewsData.totalPage && (
-          <div className="my-8">
-            <PaginationCustom
-              page={page}
-              limit={limit}
-              totalPage={reviewsData.totalPage}
-              onChange={handlePageChange}
-            />
-          </div>
-        )}
+        {reviewsData &&
+          reviewsData.reviews.length > 0 &&
+          reviewsData.totalReviews &&
+          reviewsData.totalPage && (
+            <div className="my-8">
+              <PaginationCustom
+                page={page}
+                limit={limit}
+                totalPage={reviewsData.totalPage}
+                onChange={handlePageChange}
+              />
+            </div>
+          )}
 
         <ConfirmDialog
           open={!!reviewToDelete}
@@ -179,7 +197,6 @@ export default function ReviewsList() {
           onCancel={() => setReviewToDelete(null)}
           onConfirm={confirmDelete}
         />
-
       </div>
     </>
   );
