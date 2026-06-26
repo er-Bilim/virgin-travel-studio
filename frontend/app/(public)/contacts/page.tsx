@@ -17,11 +17,10 @@ import { usePublicFaqs } from '@/lib/hooks/faq';
 export default function ContactsPage() {
   const { data: settings, isLoading, isError } = useContacts();
   const { data: faqs, isPending, isError: isFaqError } = usePublicFaqs();
-  const { data: contacts } = useContacts();
 
-  const whatsappPhone = contacts?.whatsapp?.replace(/\D/g, '');
-  const telegramUsername = contacts?.telegram?.replace('@', '');
-  const phoneNumber = contacts?.phone?.replace(/\D/g, '');
+  const whatsappPhone = settings?.whatsapp?.replace(/\D/g, '');
+  const telegramUsername = settings?.telegram?.replace('@', '');
+  const phoneNumber = settings?.phone?.replace(/\D/g, '');
 
   const hasContactOptions = Boolean(
     whatsappPhone || telegramUsername || phoneNumber
