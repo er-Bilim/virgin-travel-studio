@@ -7,6 +7,7 @@ import auth from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
 import deleteFile from '@/utils/deleteFile.js';
 import validateObjectId from '@/middlewares/validateObjectId.js';
+import toggleBooleanFieldHelper from '@/helpers/toggleBooleanFieldHelper.js';
 
 const reviewsRouter = express.Router();
 
@@ -107,6 +108,28 @@ reviewsRouter.get('/public', async (req, res, next) => {
     next(e);
   }
 });
+
+reviewsRouter.get('/public/featured', async (_req, res, next) => {
+  try {
+    
+    const reviews = await Review.aggregate([
+      {
+        $match: { featuredOnHomepage: true }
+      },
+      {
+        $sort: {
+          createdAt: -1, 
+          rating: -1,
+        }
+      }
+    ])
+
+    return res.json(reviews);
+
+  } catch (error) {
+    next(error)
+  }
+})
 
 reviewsRouter.get(
   '/admin',
@@ -218,6 +241,30 @@ reviewsRouter.patch(
     }
   },
 );
+
+reviewsRouter.patch(
+  '/:id/feature',
+  auth,
+  permit('ADMIN', 'MANAGER'),
+  validateObjectId(),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+
+      const updatedReview = await toggleBooleanFieldHelper(Review, 'featuredOnHomepage', id as string);
+
+      if (!updatedReview) {
+        return res.status(404).json({
+          error: 'Отзыв не найден'
+        })
+      }
+
+      return res.json(updatedReview);
+    } catch (error) {
+      next(error)
+    }
+  }
+)
 
 reviewsRouter.patch(
   '/:id',
