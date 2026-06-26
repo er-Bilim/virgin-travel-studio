@@ -3,7 +3,7 @@
 import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AlertTriangle, Clock, Mail, MapPin, Phone } from 'lucide-react';
+import { AlertTriangle, Clock, Mail, MapPin, MessageSquare, Phone, Send } from 'lucide-react';
 import {
   Accordion,
   AccordionContent,
@@ -11,17 +11,25 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import ShareButton from '@/components/public/buttons/share/ShareButton';
-import Link from 'next/link';
 import { useContacts } from '@/lib/hooks/contactSettings';
 import { usePublicFaqs } from '@/lib/hooks/faq';
 
 export default function ContactsPage() {
   const { data: settings, isLoading, isError } = useContacts();
   const { data: faqs, isPending, isError: isFaqError } = usePublicFaqs();
+  const { data: contacts } = useContacts();
+
+  const whatsappPhone = contacts?.whatsapp?.replace(/\D/g, '');
+  const telegramUsername = contacts?.telegram?.replace('@', '');
+  const phoneNumber = contacts?.phone?.replace(/\D/g, '');
+
+  const hasContactOptions = Boolean(
+    whatsappPhone || telegramUsername || phoneNumber
+  );
 
   if (isLoading || isPending) {
     return (
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+      <div className="w-full pb-16">
         <Skeleton className="w-48 h-6 mt-5 mb-8" />
 
         <main className="space-y-12 md:space-y-16">
@@ -66,20 +74,20 @@ export default function ContactsPage() {
 
   if (isError || isFaqError) {
     return (
-      <div className="container mx-auto px-4 py-20 md:py-32 text-center flex flex-col items-center">
-        <div className="w-16 h-16 md:w-20 md:h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-6">
-          <AlertTriangle className="w-8 h-8 md:w-10 md:h-10" />
+      <div className="w-full py-24 text-center flex flex-col items-center justify-center">
+        <div className="mb-5 inline-flex p-5 items-center justify-center rounded-full bg-red-50 text-red-500">
+          <AlertTriangle className="size-8" aria-hidden="true" />
         </div>
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">
+        <h1 className="text-2xl font-black text-gray-900 mb-2">
           Упс, что-то пошло не так
         </h1>
-        <p className="text-sm md:text-base text-slate-500 max-w-md mx-auto mb-8 px-4">
+        <p className="mb-6 text-sm text-muted-foreground max-w-sm mx-auto px-4">
           Не удалось загрузить контактную информацию. Пожалуйста, проверьте
           подключение к интернету или попробуйте обновить страницу.
         </p>
         <Button
           onClick={() => window.location.reload()}
-          className="bg-[#1E2B6D] hover:bg-blue-900 w-full sm:w-auto"
+          className="bg-[#1E2B6D] hover:bg-blue-900 w-full sm:w-auto text-white font-medium text-sm rounded-xl px-5 py-2.5"
         >
           Обновить страницу
         </Button>
@@ -89,7 +97,7 @@ export default function ContactsPage() {
 
   if (!settings) {
     return (
-      <div className="container mx-auto px-4 py-32 text-center">
+      <div className="w-full py-32 text-center">
         <h1 className="text-2xl font-bold mb-4">Свяжитесь с нами</h1>
         <p className="text-slate-500">
           К сожалению, контактная информация временно не заполнена.
@@ -99,7 +107,7 @@ export default function ContactsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-12 md:pb-20">
+    <div className="w-full pb-16">
       <Breadcrumbs
         className="mt-5"
         items={[
@@ -306,7 +314,7 @@ export default function ContactsPage() {
           </div>
         </section>
 
-        <section className="max-w-4xl mx-auto py-4 md:py-8">
+        <section className="max-w-4xl mx-auto">
           <div className="text-center mb-6 md:mb-10">
             <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
               Часто задаваемые вопросы
@@ -346,30 +354,81 @@ export default function ContactsPage() {
           </Accordion>
         </section>
 
-        <section className="bg-gray-50/80 rounded-3xl p-6 sm:p-8 md:p-10 text-center max-w-4xl mx-auto border border-gray-100">
-          <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">
-            Остались вопросы?
-          </h2>
-          <p className="text-xs md:text-sm text-gray-600 mb-6 md:mb-8 max-w-lg mx-auto">
-            Наши менеджеры готовы помочь вам с выбором направления и ответить на
-            любые вопросы.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 w-full sm:w-auto">
-            <Button
-              size="lg"
-              className="bg-[#1E2B6D] hover:bg-blue-900 w-full sm:w-auto"
-              asChild
-            >
-              <Link href="/tours">Подобрать тур</Link>
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="w-full sm:w-auto bg-white"
-              asChild
-            >
-              <Link href="/tourSets">Оставить заявку</Link>
-            </Button>
+        <section className="max-w-4xl mx-auto">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-50 via-white to-blue-50/40 border border-slate-100 p-6 sm:p-8 md:p-10 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 group">
+            <div className="absolute -right-16 -bottom-16 w-44 h-44 bg-[#1E2B6D]/5 rounded-full blur-3xl pointer-events-none group-hover:bg-[#1E2B6D]/10 transition-colors duration-500" />
+
+            <div className="space-y-2 max-w-xl">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-[#1E2B6D] text-xs font-semibold">
+                <MessageSquare className="w-3.5 h-3.5" /> Поддержка клиентов
+              </div>
+
+              <h2 className="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight">
+                Не нашли ответ на вопрос?
+              </h2>
+
+              <p className="text-xs md:text-sm text-slate-500 leading-relaxed">
+                Свяжитесь с нами удобным способом. Менеджер поможет с любыми
+                вопросами по турам, бронированию и документам.
+              </p>
+            </div>
+
+            {hasContactOptions && (
+              <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto shrink-0 z-10">
+                {whatsappPhone && (
+                  <Button
+                    size="lg"
+                    className="bg-[#1E2B6D] hover:bg-blue-900 text-white rounded-xl px-6 font-semibold shadow-sm transition-all text-xs md:text-sm"
+                    asChild
+                  >
+                    <a
+                      href={`https://wa.me/${whatsappPhone}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="WhatsApp откроется в новой вкладке"
+                    >
+                      WhatsApp
+                    </a>
+                  </Button>
+                )}
+
+                {telegramUsername && (
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="rounded-xl px-6 font-semibold text-xs md:text-sm"
+                    asChild
+                  >
+                    <a
+                      href={`https://t.me/${telegramUsername}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Telegram откроется в новой вкладке"
+                    >
+                      <Send className="mr-2 h-4 w-4" />
+                      Telegram
+                    </a>
+                  </Button>
+                )}
+
+                {phoneNumber && (
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="rounded-xl px-6 font-semibold text-xs md:text-sm"
+                    asChild
+                  >
+                    <a
+                      href={`tel:${phoneNumber}`}
+                      aria-label="Позвонить по телефону"
+                    >
+                      <Phone className="mr-2 h-4 w-4" />
+                      Позвонить
+                    </a>
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
         </section>
       </main>
