@@ -103,6 +103,17 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
           as: 'tourSets',
         },
       },
+      {
+        $addFields: {
+          tourSets: {
+            $filter: {
+              input: '$tourSets',
+              as: 'set',
+              cond: { $eq: ['$$set.status', 'OPEN'] }
+            }
+          }
+        }
+      },
       {$unwind: {path: '$category', preserveNullAndEmptyArrays: true}},
       {
         $addFields: {
