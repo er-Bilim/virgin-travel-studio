@@ -69,6 +69,22 @@ const OrderSchema = new Schema(
       type: Types.ObjectId,
       ref: 'User',
     },
+    paymentMethod: {
+      type: String,
+      enum: {
+        values: [
+          'CASH',
+          'CARD',
+          'QR',
+          'BANK',
+        ],
+        message: 'Недопустимый способ оплаты',
+      },
+    },
+    paymentAmount: {
+      type: Number,
+      min: 0
+    },
 
     customTour: {
       type: {

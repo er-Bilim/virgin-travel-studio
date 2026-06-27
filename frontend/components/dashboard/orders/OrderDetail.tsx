@@ -1,13 +1,13 @@
 'use client';
-import { format } from 'date-fns';
+import {format} from 'date-fns';
 import OrderManageForm from '@/components/dashboard/orders/OrderManageForm';
-import { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { useUser } from '@/lib/hooks/authHooks';
-import { useOneOrder } from '@/lib/hooks/orderHooks';
-import { Button } from '@/components/ui/button';
-import { useDeleteOrder } from '@/lib/hooks/orderHooks';
-import {Trash2, ArrowLeft, Download} from 'lucide-react';
+import {useState} from 'react';
+import {useParams, useRouter} from 'next/navigation';
+import {useUser} from '@/lib/hooks/authHooks';
+import {useOneOrder} from '@/lib/hooks/orderHooks';
+import {Button} from '@/components/ui/button';
+import {useDeleteOrder} from '@/lib/hooks/orderHooks';
+import {Trash2, ArrowLeft, Download, Banknote} from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -15,23 +15,24 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { toast } from 'sonner';
+import {toast} from 'sonner';
 import {useModalStore} from "@/lib/stores/modalStore";
 import {Modal} from "@/components/shared/Modal";
 import ContractForm from "@/components/dashboard/orders/ContractForm";
+import PaymentForm from "@/components/dashboard/orders/PaymentForm";
 
 export default function OrderDetail() {
-  const { id } = useParams();
+  const {id} = useParams();
   const router = useRouter();
   const user = useUser().data;
 
-  const { openModal } = useModalStore();
+  const {openModal} = useModalStore();
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  const { data: order, isLoading, error, refetch } = useOneOrder(id as string);
+  const {data: order, isLoading, error, refetch} = useOneOrder(id as string);
 
-  const { mutate: deleteData, isPending: isDeleting } = useDeleteOrder();
+  const {mutate: deleteData, isPending: isDeleting} = useDeleteOrder();
 
   const confirmDelete = () => {
     if (order) {
@@ -45,6 +46,13 @@ export default function OrderDetail() {
         },
       });
     }
+  };
+
+  const paymentMethodsTranslate: Record<string, string> = {
+    CASH: 'Наличные',
+    CARD: 'Оплата картой',
+    QR: 'QR-код',
+    BANK: 'Банковский перевод',
   };
 
   if (isLoading) {
@@ -94,11 +102,28 @@ export default function OrderDetail() {
         <div className="flex flex-col xl:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-3">
-              <h1 className="text-xl sm:text-3xl font-bold tracking-tight text-[#1E2B6D] leading-none break-all min-w-0">
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1E2B6D] leading-none break-all min-w-0">
                 Заявка № {order._id}
               </h1>
             </div>
           </div>
+
+          {['CONTRACT_PENDING', 'COMPLETED'].includes(order.status) && (
+            <Button
+              className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer shadow-sm transition-all"
+              onClick={() => openModal('paymentModal')}
+            >
+              <Banknote className="w-4 h-4 mr-2" /> Фиксация оплаты
+            </Button>
+          )}
+          {order.status === 'CONTRACT_PENDING' && (
+            <Button
+              className="bg-[#1E2B6D] hover:bg-[#162356] cursor-pointer"
+              onClick={() => openModal('contractModal')}
+            >
+              <Download className="w-4 h-4 mr-2" /> Генерировать контракт
+            </Button>
+          )}
 
           {user?.role === 'ADMIN' && (
             <Button
@@ -110,18 +135,23 @@ export default function OrderDetail() {
               <Trash2 className="w-4 h-4" />
             </Button>
           )}
-          {order.status === 'CONTRACT_PENDING' && (
-              <Button
-                  className="bg-[#1E2B6D] hover:bg-[#162356] cursor-pointer"
-                  onClick={() => openModal('contractModal')}
-              >
-                <Download className="w-4 h-4 mr-2" /> Генерировать контракт
-              </Button>
-          )}
+
         </div>
 
-        <Modal id="contractModal" title="Впишите данные">
+        <Modal
+          id="contractModal"
+          title="Впишите данные"
+        >
           <ContractForm orderId={order._id} />
+        </Modal>
+
+        <Modal
+          id="paymentModal"
+          title="Фиксация оплаты"
+        >
+          <PaymentForm
+            orderId={order._id}
+          />
         </Modal>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 items-start text-lg border-b border-gray-200 pb-4 mt-18">
@@ -155,6 +185,31 @@ export default function OrderDetail() {
           </p>
         </div>
 
+        {order.paymentMethod && order.paymentAmount !== undefined && (
+          <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-5 mt-6 mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <Banknote className="w-5 h-5 text-emerald-600" />
+              <h3 className="text-lg font-bold text-emerald-800">
+                Информация об оплате
+              </h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-emerald-900 text-lg">
+              <p>
+                Способ оплаты:{' '}
+                <span className="font-bold">
+                  {paymentMethodsTranslate[order.paymentMethod] || order.paymentMethod}
+                </span>
+              </p>
+              <p>
+                Внесенная сумма:{' '}
+                <span className="font-bold">
+                  {order.paymentAmount.toLocaleString('ru-RU')}
+                </span>
+              </p>
+            </div>
+          </div>
+        )}
+
         <OrderManageForm
           initialValues={{
             tourSetId: order.tourSetId._id,
@@ -167,7 +222,10 @@ export default function OrderDetail() {
           orderId={order._id}
         />
 
-        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <Dialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+        >
           <DialogContent>
             <DialogHeader className="pr-8">
               <DialogTitle>

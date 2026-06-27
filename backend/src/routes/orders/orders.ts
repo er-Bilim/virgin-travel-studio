@@ -3,6 +3,7 @@ import auth, {type RequestWithUser} from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
 import Order from '@/model/order/Order.js';
 import type {
+  OrderPayment,
   OrderStatus,
   PassportPayload,
   PopulatedOrder
@@ -23,8 +24,8 @@ ordersRouter.get(
   permit('ADMIN', 'MANAGER'),
   async (req, res, next) => {
     try {
-      const { user } = req as RequestWithUser;
-      const { view, status, managerId } = req.query;
+      const {user} = req as RequestWithUser;
+      const {view, status, managerId} = req.query;
 
       const query: {
         status?: OrderStatus | { $ne: OrderStatus };
@@ -53,7 +54,7 @@ ordersRouter.get(
 
           if (typeof status === 'string') {
             if (!allowed.includes(status as OrderStatus)) {
-              return res.status(400).send({ error: 'Недопустимый статус' });
+              return res.status(400).send({error: 'Недопустимый статус'});
             }
             query.status = status as OrderStatus;
           }
@@ -67,14 +68,14 @@ ordersRouter.get(
       if (user.role === 'ADMIN') {
         if (typeof status === 'string') {
           if (!allowed.includes(status as OrderStatus)) {
-            return res.status(400).send({ error: 'Недопустимый статус' });
+            return res.status(400).send({error: 'Недопустимый статус'});
           }
           query.status = status as OrderStatus;
         }
 
         if (typeof managerId === 'string') {
           if (!mongoose.Types.ObjectId.isValid(managerId)) {
-            return res.status(400).send({ error: 'Неверный ID менеджера' });
+            return res.status(400).send({error: 'Неверный ID менеджера'});
           }
           query.managerId = new mongoose.Types.ObjectId(managerId);
         }
@@ -92,7 +93,7 @@ ordersRouter.get(
             select: 'title',
           },
         })
-        .sort({ createdAt: -1 })
+        .sort({createdAt: -1})
         .skip(skip)
         .limit(limit)
         .lean();
@@ -120,10 +121,10 @@ ordersRouter.get(
   permit('ADMIN', 'MANAGER'),
   async (req, res, next) => {
     try {
-      const { user } = req as RequestWithUser;
+      const {user} = req as RequestWithUser;
 
       const baseQuery: Record<string, unknown> =
-        user.role === 'MANAGER' ? { managerId: user._id } : {};
+        user.role === 'MANAGER' ? {managerId: user._id} : {};
 
       const now = new Date();
       const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -132,14 +133,14 @@ ordersRouter.get(
       const [statusCounts, completedToday, monthRevenue] = await Promise.all([
 
         Order.aggregate([
-          { $match: baseQuery },
-          { $group: { _id: '$status', count: { $sum: 1 } } },
+          {$match: baseQuery},
+          {$group: {_id: '$status', count: {$sum: 1}}},
         ]),
 
         Order.countDocuments({
           ...baseQuery,
           status: 'COMPLETED',
-          updatedAt: { $gte: todayStart },
+          updatedAt: {$gte: todayStart},
         }),
 
         Order.aggregate([
@@ -147,8 +148,8 @@ ordersRouter.get(
             $match: {
               ...baseQuery,
               status: 'COMPLETED',
-              tourSetId: { $exists: true, $ne: null },
-              updatedAt: { $gte: monthStart },
+              tourSetId: {$exists: true, $ne: null},
+              updatedAt: {$gte: monthStart},
             },
           },
           {
@@ -159,13 +160,16 @@ ordersRouter.get(
               as: 'tourSet',
             },
           },
-          { $unwind: '$tourSet' },
-          { $group: { _id: null, total: { $sum: '$tourSet.price' } } },
+          {$unwind: '$tourSet'},
+          {$group: {_id: null, total: {$sum: '$tourSet.price'}}},
         ]),
       ]);
 
       const byStatus = Object.fromEntries(
-        statusCounts.map((s: { _id: string; count: number }) => [s._id, s.count]),
+        statusCounts.map((s: {
+          _id: string;
+          count: number
+        }) => [s._id, s.count]),
       );
 
       res.send({
@@ -191,7 +195,7 @@ ordersRouter.get(
   permit('ADMIN', 'MANAGER'),
   async (req, res, next) => {
     try {
-      const { id } = req.params;
+      const {id} = req.params;
 
       const order = await Order.findById(id)
         .populate('managerId', 'fullName phone')
@@ -207,10 +211,10 @@ ordersRouter.get(
             },
           },
         })
-        .sort({ createdAt: -1 })
+        .sort({createdAt: -1})
         .lean();
 
-      if (!order) return res.status(404).send({ error: 'Заявка не найдена' });
+      if (!order) return res.status(404).send({error: 'Заявка не найдена'});
       res.send(order);
     } catch (e) {
       next(e);
@@ -220,17 +224,17 @@ ordersRouter.get(
 
 ordersRouter.post('/', async (req, res, next) => {
   try {
-    const { tourSetId, clientName, clientPhone, customTour } = req.body;
+    const {tourSetId, clientName, clientPhone, customTour} = req.body;
 
     if (mongoose.isValidObjectId(tourSetId)) {
       const tourSet = await TourSet.findById(tourSetId);
 
       if (!tourSet) {
-        return res.status(404).send({ error: 'Тур не найден' });
+        return res.status(404).send({error: 'Тур не найден'});
       }
 
       if (!tourSet.hasAvailableSeats()) {
-        return res.status(400).send({ error: 'Извините, все места в этом туре уже заняты' });
+        return res.status(400).send({error: 'Извините, все места в этом туре уже заняты'});
       }
     }
 
@@ -240,17 +244,17 @@ ordersRouter.post('/', async (req, res, next) => {
     if (hasTourSet && hasCustom) {
       return res
         .status(400)
-        .send({ error: 'Заявка не может быть и стандартной, и кастомной' });
+        .send({error: 'Заявка не может быть и стандартной, и кастомной'});
     }
 
     if (!hasTourSet && !hasCustom) {
       return res
         .status(400)
-        .send({ error: 'Нужен либо tourSetId, либо customTour' });
+        .send({error: 'Нужен либо tourSetId, либо customTour'});
     }
 
     if (!clientName || !clientPhone) {
-      return res.status(400).send({ error: 'Отсутствуют обязательные поля' });
+      return res.status(400).send({error: 'Отсутствуют обязательные поля'});
     }
 
     const type = hasTourSet ? 'STANDARD' : 'CUSTOM';
@@ -260,7 +264,7 @@ ordersRouter.post('/', async (req, res, next) => {
 
     while (!isUnique) {
       visibleId = `ORDER-${generateId(6, 3)}`;
-      const existing = await Order.findOne({ visibleId });
+      const existing = await Order.findOne({visibleId});
 
       if (!existing) isUnique = true;
     }
@@ -284,7 +288,7 @@ ordersRouter.post('/', async (req, res, next) => {
     if (e instanceof mongoose.Error.ValidationError) {
       return res
         .status(400)
-        .send({ error: 'Ошибка валидации', details: e.errors });
+        .send({error: 'Ошибка валидации', details: e.errors});
     }
     next(e);
   }
@@ -294,15 +298,15 @@ async function update_tourSet(tourSetId: Types.ObjectId, step: 1 | -1 = 1) {
 
   const validationQuery =
     step === 1
-      ? { $expr: { $lt: ['$bookedSeats', '$totalSeats'] } } 
-      : { bookedSeats: { $gte: 1 } }; 
+      ? {$expr: {$lt: ['$bookedSeats', '$totalSeats']}}
+      : {bookedSeats: {$gte: 1}};
   const updated = await TourSet.findOneAndUpdate(
     {
       _id: tourSetId,
-      ...validationQuery, 
+      ...validationQuery,
     },
     {
-      $inc: { bookedSeats: step },
+      $inc: {bookedSeats: step},
     },
     {
       returnDocument: 'after',
@@ -318,16 +322,23 @@ ordersRouter.patch(
   permit('ADMIN', 'MANAGER'),
   async (req, res, next) => {
     try {
-      const { id } = req.params;
-      const { clientName, clientPhone, status, rejectionReason } = req.body;
-      const { user } = req as RequestWithUser;
+      const {id} = req.params;
+      const {
+        clientName,
+        clientPhone,
+        status,
+        rejectionReason,
+        paymentMethod,
+        paymentAmount
+      } = req.body;
+      const {user} = req as RequestWithUser;
 
       if (user.status === 'banned') {
-        return res.status(403).send({ error: 'Менеджер забанен' });
+        return res.status(403).send({error: 'Менеджер забанен'});
       }
 
       if (!mongoose.Types.ObjectId.isValid(id as string)) {
-        return res.status(400).send({ error: 'Неверный ID' });
+        return res.status(400).send({error: 'Неверный ID'});
       }
 
       const allowedStatuses: OrderStatus[] = [
@@ -338,21 +349,36 @@ ordersRouter.patch(
         'REJECTED',
       ];
 
-      if (!allowedStatuses.includes(status as OrderStatus)) {
-        return res.status(400).send({
-          error: 'Недопустимый статус',
-        });
+      if (status !== undefined) {
+        if (!allowedStatuses.includes(status as OrderStatus)) {
+          return res.status(400).send({
+            error: 'Недопустимый статус',
+          });
+        }
       }
 
       const order = await Order.findById(id);
 
-      if (!order) return res.status(404).send({ error: 'Заявка не найдена' });
+      if (!order) return res.status(404).send({error: 'Заявка не найдена'});
 
       order.managerId = user._id;
       if (clientName) order.clientName = clientName;
       if (clientPhone) order.clientPhone = clientPhone;
       if (order.status === 'NEW') order.status = 'IN_PROGRESS';
       if (rejectionReason) order.rejectionReason = rejectionReason;
+
+
+      if (paymentMethod !== undefined) {
+        const allowedPayments: OrderPayment[] = ['CASH', 'CARD', 'QR', 'BANK'];
+        if (!allowedPayments.includes(paymentMethod as OrderPayment)) {
+          return res.status(400).send({error: 'Недопустимый вид оплаты'});
+        }
+        order.paymentMethod = paymentMethod;
+      }
+
+      if (paymentAmount !== undefined && paymentAmount !== null) {
+        order.paymentAmount = Number(paymentAmount);
+      }
 
       if (status && status === 'COMPLETED') {
         const booked = await update_tourSet(order.tourSetId);
@@ -375,15 +401,15 @@ ordersRouter.patch(
         .populate('managerId', 'fullName phone')
         .populate({
           path: 'tourSetId',
-          populate: { path: 'tourId', select: 'title' },
+          populate: {path: 'tourId', select: 'title'},
         });
 
-      res.send({ message: 'Статус успешно обновлен', order: updatedOrder });
+      res.send({message: 'Статус успешно обновлен', order: updatedOrder});
     } catch (e) {
       if (e instanceof mongoose.Error.ValidationError) {
         return res
           .status(400)
-          .send({ error: 'Ошибка валидации', details: e.errors });
+          .send({error: 'Ошибка валидации', details: e.errors});
       }
       next(e);
     }
@@ -396,15 +422,15 @@ ordersRouter.delete(
   permit('ADMIN', 'MANAGER'),
   validateObjectId(),
   async (req, res, next) => {
-    const { id } = req.params;
-    const { user } = req as RequestWithUser;
-    
+    const {id} = req.params;
+    const {user} = req as RequestWithUser;
+
     if (user.status === 'banned') {
-      return res.status(401).send({ error: 'Менеджер недоступен' });
+      return res.status(401).send({error: 'Менеджер недоступен'});
     }
 
     try {
-      const { deletedCount } = await Order.deleteOne({ _id: id as string });
+      const {deletedCount} = await Order.deleteOne({_id: id as string});
       if (!deletedCount) {
         return res.status(404).send({
           error: 'Заявка не найдена',
@@ -427,10 +453,10 @@ ordersRouter.post(
   validateObjectId(),
   async (req, res, next) => {
     try {
-      const { id } = req.params;
+      const {id} = req.params;
       const body = req.body as PassportPayload;
 
-      const { passportNumber, passportIssuedBy, passportIssueDate, birthDate } =
+      const {passportNumber, passportIssuedBy, passportIssueDate, birthDate} =
         body;
 
       const requiredFields = [
@@ -441,18 +467,18 @@ ordersRouter.post(
       ];
 
       if (requiredFields.some((v) => !v || v.trim() === '')) {
-        return res.status(400).send({ error: 'Не все данные указаны' });
+        return res.status(400).send({error: 'Не все данные указаны'});
       }
 
       const order = await Order.findById(id)
         .populate({
           path: 'tourSetId',
-          populate: { path: 'tourId' },
+          populate: {path: 'tourId'},
         })
         .populate('managerId', 'fullName phone')
         .lean<PopulatedOrder>();
 
-      if (!order) return res.status(404).send({ error: 'Заявка не найдена.' });
+      if (!order) return res.status(404).send({error: 'Заявка не найдена.'});
 
       if (order.status !== 'CONTRACT_PENDING')
         return res.status(400).send({
