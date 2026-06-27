@@ -8,11 +8,11 @@ interface TourAggregationParams {
 }
 
 export const buildTourPipeline = ({
-  match,
-  sort,
-  skip,
-  limit,
-}: TourAggregationParams) => {
+                                    match,
+                                    sort,
+                                    skip,
+                                    limit,
+                                  }: TourAggregationParams) => {
   const pipeline: PipelineStage[] = [
     { $match: match },
     {
@@ -29,6 +29,17 @@ export const buildTourPipeline = ({
         localField: '_id',
         foreignField: 'tourId',
         as: 'tourSets',
+      },
+    },
+    {
+      $addFields: {
+        tourSets: {
+          $filter: {
+            input: { $ifNull: ['$tourSets', []] },
+            as: 'set',
+            cond: { $eq: ['$$set.status', 'OPEN'] },
+          },
+        },
       },
     },
     { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } },
