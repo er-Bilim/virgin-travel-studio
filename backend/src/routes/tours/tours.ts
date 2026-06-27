@@ -211,7 +211,48 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
       },
     ]);
 
-    const totalTours = await Tour.countDocuments(query);
+    const countResult = await Tour.aggregate([
+        { $match: query },
+      {
+        $lookup: {
+          from: 'toursets',
+          localField: '_id',
+          foreignField: 'tourId',
+          as: 'tourSets',
+        },
+      },
+      {
+        $addFields: {
+          isHot: {
+            $anyElementTrue: {
+              $map: {
+                input: '$tourSets',
+                as: 'tour_set',
+                in: '$$tour_set.isHot',
+              },
+            },
+          },
+          hasDiscount: {
+            $anyElementTrue: {
+              $map: {
+                input: '$tourSets',
+                as: 'tour_set',
+                in: {
+                  $and: [
+                      { $ne: ['$$tour_set.discountPrice', null] },
+                    { $gt: ['$$tour_set.discountPrice', 0] },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+      ...postMatchStages,
+      { $count: 'total' },
+    ]);
+
+    const totalTours = countResult[0]?.total ?? 0;
 
     res.send({
       tours,
