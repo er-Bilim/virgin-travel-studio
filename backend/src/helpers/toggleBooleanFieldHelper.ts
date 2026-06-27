@@ -10,7 +10,7 @@ const toggleBooleanFieldHelper = async <T>(
     [
       {
         $set: {
-          field: { $not: `$${field}` },
+          [field]: { $not: `$${field}` },
         },
       },
     ],

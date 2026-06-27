@@ -117,9 +117,37 @@ reviewsRouter.get('/public/featured', async (_req, res, next) => {
         $match: { featuredOnHomepage: true }
       },
       {
+        $lookup: {
+          from: "tours",
+          localField: 'tourId',
+          foreignField: '_id',
+          as: 'tourData',
+          pipeline: [
+            {
+              $project: {
+                title: 1
+              }
+            }
+          ],
+        },
+      },
+      {
+        $unwind: {path: '$tourData', preserveNullAndEmptyArrays: true}
+      },
+      {
+        $addFields: {
+          tourId: '$tourData'
+        }
+      },
+      {
         $sort: {
           createdAt: -1, 
           rating: -1,
+        }
+      },
+      {
+        $project: {
+          tourData: 0
         }
       }
     ])
