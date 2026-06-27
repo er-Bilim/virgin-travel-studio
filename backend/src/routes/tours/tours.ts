@@ -36,8 +36,6 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
     const skip = (page - 1) * limit;
 
     const query: {
-      isHot?: string;
-      discountPrice?: string;
       countryCode?: string;
       isPublished?: boolean;
       category?: mongoose.Types.ObjectId;
