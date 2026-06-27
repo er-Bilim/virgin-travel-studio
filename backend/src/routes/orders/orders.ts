@@ -1,18 +1,18 @@
 import express from 'express';
-import auth, { type RequestWithUser } from '@/middlewares/auth.js';
+import auth, {type RequestWithUser} from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
 import Order from '@/model/order/Order.js';
 import type {
   OrderStatus,
   PassportPayload,
-  PopulatedOrder,
+  PopulatedOrder
 } from '@/types/orders.types.js';
-import mongoose, { Types } from 'mongoose';
+import mongoose, {Types} from 'mongoose';
 import validateObjectId from '@/middlewares/validateObjectId.js';
-import type { ContractData } from '@/types/contracts.types.js';
-import { buildContractHTML } from '@/utils/contracts/buildContractHTML.js';
-import { getBrowser } from '@/lib/puppeteer.js';
-import { generateId } from '@/utils/id/generateId.js';
+import type {ContractData} from '@/types/contracts.types.js';
+import {buildContractHTML} from '@/utils/contracts/buildContractHTML.js';
+import {getBrowser} from '@/lib/puppeteer.js';
+import {generateId} from '@/utils/id/generateId.js';
 import TourSet from '@/model/tourSet/TourSet.js';
 
 const ordersRouter = express.Router();
@@ -150,6 +150,18 @@ ordersRouter.get(
 ordersRouter.post('/', async (req, res, next) => {
   try {
     const { tourSetId, clientName, clientPhone, customTour } = req.body;
+
+    if (mongoose.isValidObjectId(tourSetId)) {
+      const tourSet = await TourSet.findById(tourSetId);
+
+      if (!tourSet) {
+        return res.status(404).send({ error: 'Тур не найден' });
+      }
+
+      if (!tourSet.hasAvailableSeats()) {
+        return res.status(400).send({ error: 'Извините, все места в этом туре уже заняты' });
+      }
+    }
 
     const hasTourSet = Boolean(tourSetId);
     const hasCustom = Boolean(customTour);
