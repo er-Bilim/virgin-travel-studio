@@ -45,13 +45,6 @@ export const formatDayAndMonthWords = (date: string, isSlice?: boolean): {day: s
   return { day, month, year }
 }
 
-export const getYearFullNumber = (date: string) => {
-  const formatDate = dayjs(date);
-
-  const year = formatDate.format('YYYY');
-  return year;
-};
-
 export const formatToReadablePrice = (
   priceParam: number,
 ): { price: string; currency: string } => {
