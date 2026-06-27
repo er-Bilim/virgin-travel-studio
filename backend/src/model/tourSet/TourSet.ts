@@ -1,7 +1,14 @@
-import mongoose, { Schema } from 'mongoose';
-import type { TourSetFields } from '@/types/tourSets.types.js';
+import mongoose, {Document, Model, Schema} from 'mongoose';
+import type {TourSetFields} from '@/types/tourSets.types.js';
 
-const TourSetSchema = new Schema<TourSetFields>(
+interface ITourSetMethods {
+  hasAvailableSeats(): boolean;
+}
+
+interface ITourSetDocument extends Document, TourSetFields, ITourSetMethods {}
+interface ITourSetModel extends Model<ITourSetDocument> {}
+
+const TourSetSchema = new Schema<ITourSetDocument, ITourSetModel>(
   {
     tourId: {
       type: Schema.Types.ObjectId,
@@ -73,5 +80,9 @@ const TourSetSchema = new Schema<TourSetFields>(
   },
 );
 
-const TourSet = mongoose.model<TourSetFields>('TourSet', TourSetSchema);
+TourSetSchema.methods.hasAvailableSeats = function () {
+    return this.bookedSeats < this.totalSeats;
+};
+
+const TourSet = mongoose.model<ITourSetDocument, ITourSetModel>('TourSet', TourSetSchema);
 export default TourSet;

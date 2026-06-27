@@ -51,6 +51,10 @@ export const useCreateOrder = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
     },
+    onError: (error: AxiosError<GlobalError>) => {
+      const data = error.response?.data;
+      toast.error(data?.error ?? 'Ошибка при оформлении заявки');
+    }
   });
 };
 

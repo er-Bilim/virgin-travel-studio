@@ -60,7 +60,7 @@
     "airline": "EgyptAir",
     "flightDetails": "Прямой чартер MS-502",
     "totalSeats": 25,
-    "bookedSeats": 20,
+    "bookedSeats": 25,
     "status": "OPEN"
   },
   {
