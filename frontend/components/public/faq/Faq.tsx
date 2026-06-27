@@ -18,7 +18,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { usePublicFaqs } from '@/lib/hooks/faq';
-import type { Faq } from '@/types/faq';
+import type { Faq as FaqType } from '@/types/faq';
 
 export function Faq() {
   const { data: faqs, isLoading, isError } = usePublicFaqs();
@@ -26,7 +26,7 @@ export function Faq() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+      <div className="w-full pb-16">
         <Skeleton className="w-48 h-6 mt-5 mb-8" />
         <main className="space-y-12">
           <Skeleton className="w-full h-[260px] md:h-[320px] rounded-3xl" />
@@ -42,7 +42,7 @@ export function Faq() {
 
   if (isError) {
     return (
-      <div className="container mx-auto px-4 py-20 md:py-32 text-center flex flex-col items-center">
+      <div className="w-full py-24 text-center flex flex-col items-center justify-center">
         <div className="w-16 h-16 md:w-20 md:h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-6">
           <AlertTriangle className="w-8 h-8 md:w-10 md:h-10" />
         </div>
@@ -70,11 +70,11 @@ export function Faq() {
   const phoneNumber = contacts?.phone?.replace(/\D/g, '');
 
   const hasContactOptions = Boolean(
-      whatsappPhone || telegramUsername || phoneNumber,
+    whatsappPhone || telegramUsername || phoneNumber
   );
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-12 md:pb-20">
+    <div className="w-full pb-16">
       <Breadcrumbs
         className="mt-5"
         items={[
@@ -104,14 +104,14 @@ export function Faq() {
           </div>
         </section>
 
-        <section className="max-w-4xl mx-auto py-2">
+        <section className="max-w-4xl mx-auto">
           {hasFaqs ? (
             <Accordion
               type="single"
               collapsible
               className="w-full space-y-3 md:space-y-4"
             >
-              {faqs.map((item: Faq, index: number) => (
+              {faqs.map((item: FaqType, index: number) => (
                 <AccordionItem
                   key={item._id}
                   value={`faq-item-${index}`}
@@ -162,57 +162,60 @@ export function Faq() {
             </div>
 
             {hasContactOptions && (
-                <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto shrink-0 z-10">
-                  {whatsappPhone && (
-                      <Button
-                          size="lg"
-                          className="bg-[#1E2B6D] hover:bg-blue-900 text-white rounded-xl px-6 font-semibold shadow-sm transition-all text-xs md:text-sm"
-                          asChild
-                      >
-                        <a
-                            href={`https://wa.me/${whatsappPhone}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="WhatsApp откроется в новой вкладке"
-                        >
-                          WhatsApp
-                        </a>
-                      </Button>
-                  )}
+              <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto shrink-0 z-10">
+                {whatsappPhone && (
+                  <Button
+                    size="lg"
+                    className="bg-[#1E2B6D] hover:bg-blue-900 text-white rounded-xl px-6 font-semibold shadow-sm transition-all text-xs md:text-sm"
+                    asChild
+                  >
+                    <a
+                      href={`https://wa.me/${whatsappPhone}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="WhatsApp откроется в новой вкладке"
+                    >
+                      WhatsApp
+                    </a>
+                  </Button>
+                )}
 
-                  {telegramUsername && (
-                      <Button
-                          size="lg"
-                          variant="outline"
-                          className="rounded-xl px-6 font-semibold text-xs md:text-sm"
-                          asChild
-                      >
-                        <a
-                            href={`https://t.me/${telegramUsername}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Telegram откроется в новой вкладке"
-                        >
-                          <Send className="mr-2 h-4 w-4" />
-                          Telegram
-                        </a>
-                      </Button>
-                  )}
+                {telegramUsername && (
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="rounded-xl px-6 font-semibold text-xs md:text-sm"
+                    asChild
+                  >
+                    <a
+                      href={`https://t.me/${telegramUsername}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Telegram откроется в новой вкладке"
+                    >
+                      <Send className="mr-2 h-4 w-4" />
+                      Telegram
+                    </a>
+                  </Button>
+                )}
 
-                  {phoneNumber && (
-                      <Button
-                          size="lg"
-                          variant="outline"
-                          className="rounded-xl px-6 font-semibold text-xs md:text-sm"
-                          asChild
-                      >
-                        <a href={`tel:${phoneNumber}`} aria-label="Позвонить по телефону">
-                          <Phone className="mr-2 h-4 w-4" />
-                          Позвонить
-                        </a>
-                      </Button>
-                  )}
-                </div>
+                {phoneNumber && (
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="rounded-xl px-6 font-semibold text-xs md:text-sm"
+                    asChild
+                  >
+                    <a
+                      href={`tel:${phoneNumber}`}
+                      aria-label="Позвонить по телефону"
+                    >
+                      <Phone className="mr-2 h-4 w-4" />
+                      Позвонить
+                    </a>
+                  </Button>
+                )}
+              </div>
             )}
           </div>
         </section>
