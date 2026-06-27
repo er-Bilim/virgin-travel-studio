@@ -23,9 +23,9 @@ export const getPublicReviews = async (
   }
 };
 
-export const getPublicFeaturedReviews = async () => {
+export const getPublicFeaturedReviews = async (): Promise<IReview[]> => {
   try {
-    const { data } = await axiosApi.get<IReview>('/reviews/public/featured');
+    const { data } = await axiosApi.get<IReview[]>('/reviews/public/featured');
     return data;
   } catch (error) {
     console.error(error);

@@ -14,7 +14,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import type { IReviewMutation } from '@/types/review';
+import type { IReview, IReviewMutation } from '@/types/review';
 
 const PAGE_SIZE = 10;
 
@@ -68,6 +68,25 @@ export const useFeatureReview = () => {
 
   return useMutation({
     mutationFn: (id: string)  => featureReview(id),
+    onMutate: async (id: string) => {
+      const listKey = ['reviews', 'admin'];
+
+      await queryClient.cancelQueries({ queryKey: listKey });
+
+      const prev = queryClient.getQueriesData({ queryKey: listKey });
+
+      queryClient.setQueriesData({ queryKey: listKey }, (old: {reviews: IReview[]}) => {
+        if (!old) return old;
+
+        return {
+          ...old,
+          reviews: old.reviews.map((review: IReview) => review._id === id ? {...review, featuredOnHomepage: !review.featuredOnHomepage} : review),
+        }
+      })
+
+      return { prev }
+
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reviews', 'featured']})
     } 
@@ -126,7 +145,7 @@ export const useInfiniteReviews = (tourId?: string) => {
   });
 };
 
-export const useFeaturedReviews = () => {
+export const useGetFeaturedReviews = () => {
   return useQuery({
     queryKey: ['reviews', 'featured'],
     queryFn: getPublicFeaturedReviews,

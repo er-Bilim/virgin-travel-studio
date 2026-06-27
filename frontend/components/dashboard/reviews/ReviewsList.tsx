@@ -4,6 +4,7 @@ import {
   useAdminReviews,
   useApproveReview,
   useDeleteReview,
+  useFeatureReview,
 } from '@/lib/hooks/reviewHooks';
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -22,13 +23,13 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 export default function ReviewsList() {
   const { mutate: deleteReview, isPending: isDeleting } = useDeleteReview();
   const { mutate: updateReview } = useApproveReview();
+  const { mutate: featureReview } = useFeatureReview();
   const [modearateStatusFilter, setModearateStatusFilter] = useState('all');
   const router = useRouter();
   const [reviewToDelete, setReviewToDelete] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const limit = 10;
-  const [enabled, setEnabled] = useState<boolean>(false)
-  
+
   const {
     data: reviewsData,
     isLoading,
@@ -64,11 +65,11 @@ export default function ReviewsList() {
             review.isModerated === 'approved' ? 'rejected' : 'approved';
           updateReview({ id: review._id, isModerated: status });
         },
-        onCheckedChange(value) {
-          
+        onCheckedChange(review) {
+          featureReview(review._id);
         },
       }),
-    [updateReview],
+    [updateReview, featureReview],
   );
 
   const confirmDelete = () => {
@@ -134,6 +135,12 @@ export default function ReviewsList() {
                   className="rounded-lg px-4 py-2 text-sm font-medium transition-all text-gray-500 hover:text-[#1E2B6D] data-[state=active]:bg-white data-[state=active]:text-[#1E2B6D] data-[state=active]:shadow-sm"
                 >
                   Отклоненные отзывы
+                </TabsTrigger>
+                <TabsTrigger
+                  value="rejected"
+                  className="rounded-lg px-4 py-2 text-sm font-medium transition-all text-gray-500 hover:text-[#1E2B6D] data-[state=active]:bg-white data-[state=active]:text-[#1E2B6D] data-[state=active]:shadow-sm"
+                >
+                  На главной
                 </TabsTrigger>
               </TabsList>
             </Tabs>

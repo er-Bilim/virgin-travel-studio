@@ -13,6 +13,7 @@ import { TooltipCustom } from '@/components/ui/tooltip-custom';
 import type { IReview } from '@/types/review';
 import dayjs from 'dayjs';
 import { Switch } from '@/components/ui/switch';
+import { cn } from '@/lib/utils';
 
 type Props = {
   onView: (tour: IReview) => void;
@@ -25,7 +26,7 @@ export const getReviewColumns = ({
   onView,
   onDelete,
   onTogglePublish,
-  onCheckedChange
+  onCheckedChange,
 }: Props): ColumnDef<IReview>[] => [
   {
     accessorKey: 'tour',
@@ -176,16 +177,39 @@ export const getReviewColumns = ({
   {
     accessorKey: 'featuredOnHomepage',
     header: 'на главной',
-    cell: () => {
+    cell: ({ row }) => {
+      const review = row.original;
+
+      const isDisabled: boolean =
+        review.isModerated === 'pending' || review.isModerated === 'rejected';
+
       return (
         <>
-          <div onClick={(event) => {
-            event.stopPropagation()
-          }}>
-            <Switch id="airplane-mode" className='data-[state=checked]:bg-cyan-500 data-[state=unchecked]:bg-gray-300 cursor-pointer' onCheckedChange={onCheckedChange}/>
+          <div
+            onClick={(event) => {
+              event.stopPropagation();
+            }}
+          >
+            <Switch
+              id="airplane-mode"
+              className={cn(
+                'data-[state=checked]:bg-cyan-500 data-[state=unchecked]:bg-gray-300 cursor-pointer',
+                isDisabled && 'disabled:bg-gray-200',
+              )}
+              onCheckedChange={() => {
+                onCheckedChange(review);
+              }}
+              disabled={isDisabled}
+              checked={review?.featuredOnHomepage}
+            />
+            {review.isModerated === 'pending' && (
+              <>
+                <p className="text-gray-200 text-xs font-semibold mt-2 tracking-widest">опубликуйте</p>
+              </>
+            )}
           </div>
         </>
-      )
+      );
     },
   },
   createActionsColumn<IReview>({
