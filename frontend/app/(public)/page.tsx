@@ -89,10 +89,10 @@ const Home = () => {
               id="reviews-title"
               className="text-3xl font-black tracking-tight text-navy-800"
             >
-              {settings?.reviewsPages?.title || 'Что говорят путешественники'}
+              {settings?.reviewsPage?.title || 'Что говорят путешественники'}
             </h2>
             <p className="mt-2 max-w-md text-[15px] text-muted-foreground">
-              {settings?.reviewsPages?.subtitle ||
+              {settings?.reviewsPage?.subtitle ||
                 'Реальные впечатления тех, кто уже съездил с нами'}
             </p>
           </div>

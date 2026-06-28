@@ -291,23 +291,23 @@ export default function HomepageSettingsForm() {
               <div className="space-y-4">
                 <Field
                   label="Заголовок блока: *"
-                  error={errors.reviewsPages?.title?.message}
+                  error={errors.reviewsPage?.title?.message}
                 >
                   <Input
-                    {...register('reviewsPages.title', {
+                    {...register('reviewsPage.title', {
                       required: 'Заголовок секции отзывов обязателен',
                     })}
-                    className={`${inputClass} ${errors.reviewsPages?.title ? 'border-red-500' : ''}`}
+                    className={`${inputClass} ${errors.reviewsPage?.title ? 'border-red-500' : ''}`}
                     disabled={isSaving}
                     placeholder="Например: Отзывы о нашей компании"
                   />
                 </Field>
                 <Field
                   label="Подзаголовок / Описание блока:"
-                  error={errors.reviewsPages?.subtitle?.message}
+                  error={errors.reviewsPage?.subtitle?.message}
                 >
                   <textarea
-                    {...register('reviewsPages.subtitle')}
+                    {...register('reviewsPage.subtitle')}
                     className={`${inputClass} min-h-[80px] py-2.5 resize-y`}
                     disabled={isSaving}
                     placeholder="Например: Реальные впечатления тех, кто уже съездил с нами!"
