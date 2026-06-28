@@ -3,6 +3,7 @@ import {
   deleteOrder,
   getOneOrder,
   getOrders,
+  getOrdersStats,
   postOrder,
   updateOrder
 } from '@/services/orders';
@@ -26,6 +27,14 @@ export const useOrders = (
   });
 };
 
+export const useOrderStats = () => {
+  return useQuery({
+    queryKey: ['order-stats'],
+    queryFn: getOrdersStats,
+    refetchInterval: 60_000,
+  });
+};
+
 export const useOneOrder = (id: string) => {
   return useQuery({
     queryKey: ['order', id], 
@@ -42,6 +51,10 @@ export const useCreateOrder = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
     },
+    onError: (error: AxiosError<GlobalError>) => {
+      const data = error.response?.data;
+      toast.error(data?.error ?? 'Ошибка при оформлении заявки');
+    }
   });
 };
 

@@ -85,7 +85,114 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
       }
     }
 
-    const tours: AggregatedTours[] = await Tour.aggregate(buildTourPipeline({ match: query, sort, skip, limit }));
+    const tours: AggregatedTours[] = await Tour.aggregate([
+      {$match: query},
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'category',
+          foreignField: '_id',
+          as: 'category',
+        },
+      },
+      {
+        $lookup: {
+          from: 'toursets',
+          localField: '_id',
+          foreignField: 'tourId',
+          as: 'tourSets',
+        },
+      },
+      {
+        $addFields: {
+          tourSets: {
+            $filter: {
+              input: '$tourSets',
+              as: 'set',
+              cond: { $eq: ['$$set.status', 'OPEN'] }
+            }
+          }
+        }
+      },
+      {$unwind: {path: '$category', preserveNullAndEmptyArrays: true}},
+      {
+        $addFields: {
+          isHot: {
+            $anyElementTrue: {
+              $map: {
+                input: '$tourSets',
+                as: 'tour_set',
+                in: '$$tour_set.isHot',
+              },
+            },
+          },
+          minPrice: {$min: '$tourSets.price'},
+          hotelLocation: {$arrayElemAt: ['$tourSets.hotelLocation', 0]},
+          durationDays: {
+            $cond: {
+              if: {$gt: [{$size: '$tourSets'}, 0]},
+              then: {
+                $ceil: {
+                  $divide: [
+                    {
+                      $subtract: [
+                        {$arrayElemAt: ['$tourSets.endDate', 0]},
+                        {$arrayElemAt: ['$tourSets.startDate', 0]},
+                      ],
+                    },
+                    1000 * 60 * 60 * 24,
+                  ],
+                },
+              },
+              else: null,
+            },
+          },
+          nextStartDate: {
+            $min: '$tourSets.startDate',
+          },
+          saleDeadline: {
+            $min: {
+              $map: {
+                input: {
+                  $filter: {
+                    input: '$tourSets',
+                    as: 'set',
+                    cond: { $eq: ['$$set.isHot', true]}
+                  },
+                },
+                as: 'hotSet',
+                in: '$$hotSet.saleDeadline'
+              }
+            }
+          }
+        },
+      },
+      {$sort: sort},
+      {$skip: skip},
+      {$limit: limit},
+      {
+        $project: {
+          title: 1,
+          description: 1,
+          images: 1,
+          baseAdventages: 1,
+          isPublished: 1,
+          rating: 1,
+          ratingCount: 1,
+          isHot: 1,
+          saleDeadline: 1,
+          hotelLocation: 1,
+          minPrice: 1,
+          durationDays: 1,
+          nextStartDate: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          countryCode: 1,
+          'category._id': 1,
+          'category.title': 1,
+        },
+      },
+    ]);
 
     const totalTours = await Tour.countDocuments(query);
 

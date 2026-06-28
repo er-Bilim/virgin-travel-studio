@@ -39,6 +39,22 @@ const Review = ({ review }: Props) => {
           />
         </div>
       )}
+
+      {review.companyReply && (
+        <div className="items-end mt-3 sm:mt-4 rounded-xl sm:rounded-2xl border border-[#DCE4FF] bg-[#F4F7FF] p-3 sm:p-4">
+          <div className="flex flex-col sm:flex-row items-start justify-between gap-3">
+            <div>
+              <p className="text-[10px] sm:text-[14px] font-bold uppercase tracking-wide text-[#1E2B6D]">
+                Ответ Virgin Travel
+              </p>
+
+              <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm leading-relaxed text-gray-700">
+                {review.companyReply}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

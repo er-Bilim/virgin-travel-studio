@@ -146,7 +146,7 @@ const ToursList = () => {
   }
 
   return (
-    <div className="px-4 max-w-7xl mx-auto w-full pb-16">
+    <div className="w-full pb-16">
       <Breadcrumbs
         items={[
           { label: 'Главная', href: '/' },
@@ -170,8 +170,8 @@ const ToursList = () => {
         </p>
       </header>
 
-      <div className="mb-6 flex flex-col gap-3 border-b border-gray-100 pb-6 lg:flex-row lg:items-end">
-        <div className="flex flex-1 flex-col gap-1">
+      <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 lg:flex lg:flex-row lg:items-end gap-4 border-b border-gray-100 pb-6">
+        <div className="flex flex-col gap-1 sm:col-span-3 lg:flex-1">
           <label
             htmlFor="tour-search"
             className="pl-0.5 text-xs font-semibold uppercase tracking-wide text-slate-400"
@@ -191,7 +191,7 @@ const ToursList = () => {
         </div>
 
         {categories && (
-          <div className="flex flex-col gap-1 lg:w-52">
+          <div className="flex flex-col gap-1 w-full lg:w-52">
             <span className="pl-0.5 text-xs font-semibold uppercase tracking-wide text-slate-400">
               Категория
             </span>
@@ -206,7 +206,7 @@ const ToursList = () => {
         )}
 
         {countryOptions && (
-          <div className="flex flex-col gap-1 lg:w-52">
+          <div className="flex flex-col gap-1 w-full lg:w-52">
             <span className="pl-0.5 text-xs font-semibold uppercase tracking-wide text-slate-400">
               Страна
             </span>
@@ -220,7 +220,7 @@ const ToursList = () => {
           </div>
         )}
 
-        <div className="flex flex-col gap-2 lg:w-48">
+        <div className="flex flex-col gap-1 w-full lg:w-48">
           <span className="pl-0.5 text-xs font-semibold uppercase tracking-wide text-slate-400">
             Сортировка
           </span>
