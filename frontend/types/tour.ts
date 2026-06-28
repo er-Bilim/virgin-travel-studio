@@ -61,4 +61,6 @@ export interface GetToursParams {
   isPublished?: string | boolean,
   countryCode?: string | null,
   sort?: string | null;
+  isHot?: boolean;
+  hasDiscount?: boolean;
 }
