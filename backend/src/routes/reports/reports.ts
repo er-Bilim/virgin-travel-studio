@@ -7,10 +7,13 @@ import validateObjectId from '@/middlewares/validateObjectId.js';
 import type {PopulatedOrder} from "@/types/reports.types.js";
 import {parseDate} from "@/utils/excel/parseDate.js";
 import {applyExcelStyles} from "@/utils/excel/applyExcelStyles.js";
+import auth, {type RequestWithUser} from "@/middlewares/auth.js";
+import permit from "@/middlewares/permit.js";
 
 
 async function getDailyManagerReport(req: Request, res: Response, next: NextFunction) {
     try {
+        const reqUser  = (req as RequestWithUser).user;
         const { from, to, managerId } = req.query;
 
         if (managerId && typeof managerId !== 'string') {
@@ -38,11 +41,21 @@ async function getDailyManagerReport(req: Request, res: Response, next: NextFunc
 
         let managerObjectId: Types.ObjectId | undefined;
 
-        if (typeof managerId === 'string') {
-            if (!mongoose.Types.ObjectId.isValid(managerId)) {
-                return res.status(400).json({ error: 'Неверный managerId' });
+        if (reqUser.role === 'MANAGER' && managerId) {
+            return res.status(403).json({
+                error: 'Менеджер не может запрашивать отчеты других менеджеров',
+            });
+        }
+
+        if (reqUser.role === 'MANAGER') {
+            managerObjectId = reqUser._id;
+        } else if (reqUser.role === 'ADMIN') {
+            if (typeof managerId === 'string') {
+                if (!mongoose.Types.ObjectId.isValid(managerId)) {
+                    return res.status(400).json({ error: 'Неверный managerId' });
+                }
+                managerObjectId = new Types.ObjectId(managerId);
             }
-            managerObjectId = new Types.ObjectId(managerId);
         }
 
         if (fromDate && toDate && fromDate > toDate) {
@@ -341,7 +354,7 @@ async function getTourRosterReport(req: Request, res: Response, next: NextFuncti
 
 const reportsRouter = Router();
 
-reportsRouter.get('/daily-manager', getDailyManagerReport);
-reportsRouter.get('/tour-roster/:tourSetId', validateObjectId('tourSetId'), getTourRosterReport,);
+reportsRouter.get('/daily-manager', auth, permit('ADMIN', 'MANAGER'), getDailyManagerReport);
+reportsRouter.get('/tour-roster/:tourSetId',auth, permit('ADMIN', 'MANAGER'), validateObjectId('tourSetId'), getTourRosterReport,);
 
 export default reportsRouter;
