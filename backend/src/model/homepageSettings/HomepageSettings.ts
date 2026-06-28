@@ -70,7 +70,7 @@ const HomepageSettingsSchema = new Schema<HomepageSettingsFields>(
     reviewsPage: {
       title: {
         type: String,
-        required: [true, 'Главный заголовок страницы рейтина обязателен']
+        required: [true, 'Главный заголовок страницы рейтинга обязателен']
       },
       subtitle: {
         type: String

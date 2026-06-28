@@ -74,7 +74,7 @@ homepageSettingsRouter.post(
               subtitle: newsPage.subtitle,
             }
           : undefined,
-        reviewsPage: reviewsPage ? {} : undefined,
+        reviewsPage: reviewsPage ? {title: reviewsPage.title, subtitle: reviewsPage.subtitle} : undefined,
       });
 
       await settings.save();
