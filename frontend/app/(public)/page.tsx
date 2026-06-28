@@ -7,14 +7,14 @@ import { useTourSets } from '@/lib/hooks/tourSets';
 import { useHomepageSettings } from '@/lib/hooks/homepageSettingsHooks';
 import { imageUrl } from '@/lib/constants';
 import { ArrowRight, MapPinned } from 'lucide-react';
-import { IoIosQuote } from "react-icons/io";
+import { IoIosQuote } from 'react-icons/io';
 import CustomTourCard from '@/components/public/home/tourCustomCard/CustomTourCard';
 import { usePopularTours } from '@/lib/hooks/tourHooks';
 import ReviewsCarousel from '@/components/public/reviews/ReviewsCarousel';
 
-export default function Home() {
+const Home = () => {
   const limit = 4;
-
+  
   const {
     data: settings,
     isLoading: isSettingsLoading,
@@ -85,23 +85,27 @@ export default function Home() {
               <IoIosQuote className="size-[18px]" />
               Отзывы
             </p>
-            <h2 id="reviews-title" className="text-3xl font-black tracking-tight text-navy-800">
+            <h2
+              id="reviews-title"
+              className="text-3xl font-black tracking-tight text-navy-800"
+            >
               {settings?.reviewsPages?.title || 'Что говорят путешественники'}
             </h2>
-            <p className='mt-2 max-w-md text-[15px] text-muted-foreground'>
-              {settings?.reviewsPages?.subtitle || 'Реальные впечатления тех, кто уже съездил с нами'}
+            <p className="mt-2 max-w-md text-[15px] text-muted-foreground">
+              {settings?.reviewsPages?.subtitle ||
+                'Реальные впечатления тех, кто уже съездил с нами'}
             </p>
           </div>
-
         </div>
-          <ReviewsCarousel/>
+
+        <ReviewsCarousel/>
       </section>
 
       <section>
         <div className="mb-9 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="mb-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-cyan-800">
-              <MapPinned className='size-[18px]'/>
+              <MapPinned className="size-[18px]" />
               Популярно сейчас
             </p>
             <h2 className="text-3xl font-black tracking-tight text-navy-800">
@@ -168,3 +172,5 @@ export default function Home() {
     </section>
   );
 }
+
+export default Home;
