@@ -25,6 +25,7 @@ export default function ReviewsList() {
   const { mutate: updateReview } = useApproveReview();
   const { mutate: featureReview } = useFeatureReview();
   const [modearateStatusFilter, setModearateStatusFilter] = useState('all');
+  // const [isFeatured, setIsFeatured] = useState<boolean>(false);
   const router = useRouter();
   const [reviewToDelete, setReviewToDelete] = useState<string | null>(null);
   const [page, setPage] = useState(1);
@@ -137,7 +138,7 @@ export default function ReviewsList() {
                   Отклоненные отзывы
                 </TabsTrigger>
                 <TabsTrigger
-                  value="rejected"
+                  value="featured"
                   className="rounded-lg px-4 py-2 text-sm font-medium transition-all text-gray-500 hover:text-[#1E2B6D] data-[state=active]:bg-white data-[state=active]:text-[#1E2B6D] data-[state=active]:shadow-sm"
                 >
                   На главной
