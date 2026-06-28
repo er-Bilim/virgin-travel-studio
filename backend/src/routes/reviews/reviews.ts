@@ -111,53 +111,51 @@ reviewsRouter.get('/public', async (req, res, next) => {
 
 reviewsRouter.get('/public/featured', async (_req, res, next) => {
   try {
-    
     const reviews = await Review.aggregate([
       {
-        $match: { featuredOnHomepage: true }
+        $match: { featuredOnHomepage: true },
       },
       {
         $lookup: {
-          from: "tours",
+          from: 'tours',
           localField: 'tourId',
           foreignField: '_id',
           as: 'tourData',
           pipeline: [
             {
               $project: {
-                title: 1
-              }
-            }
+                title: 1,
+              },
+            },
           ],
         },
       },
       {
-        $unwind: {path: '$tourData', preserveNullAndEmptyArrays: true}
+        $unwind: { path: '$tourData', preserveNullAndEmptyArrays: true },
       },
       {
         $addFields: {
-          tourId: '$tourData'
-        }
+          tourId: '$tourData',
+        },
       },
       {
         $sort: {
-          createdAt: -1, 
+          createdAt: -1,
           rating: -1,
-        }
+        },
       },
       {
         $project: {
-          tourData: 0
-        }
-      }
-    ])
+          tourData: 0,
+        },
+      },
+    ]);
 
     return res.json(reviews);
-
   } catch (error) {
-    next(error)
+    next(error);
   }
-})
+});
 
 reviewsRouter.get(
   '/admin',
@@ -176,6 +174,7 @@ reviewsRouter.get(
       const query: {
         tourId?: string;
         isModerated?: 'pending' | 'approved' | 'rejected';
+        featuredOnHomepage?: boolean;
       } = {};
 
       if (typeof tourId === 'string') {
@@ -185,13 +184,18 @@ reviewsRouter.get(
         query.tourId = tourId;
       }
 
-      const validStatuses = ['pending', 'approved', 'rejected'];
+      const validStatuses = ['pending', 'approved', 'rejected', 'featured'];
 
       if (
         typeof isModerated === 'string' &&
         validStatuses.includes(isModerated)
       ) {
         query.isModerated = isModerated as 'pending' | 'approved' | 'rejected';
+      }
+
+      if (isModerated === 'featured') {
+        query.isModerated = "approved";
+        query.featuredOnHomepage = Boolean(isModerated === 'featured');
       }
 
       const [reviews, totalReviews] = await Promise.all([
@@ -246,10 +250,16 @@ reviewsRouter.patch(
         message = 'Отзыв успешно отклонен';
       }
 
-    const result = await Review.aggregate([
-      { $match: { tourId: approvedReview.tourId, isModerated: 'approved' } },
-      { $group: { _id: null, avgRating: { $avg: '$rating' }, count: { $sum: 1 } } },
-    ]);
+      const result = await Review.aggregate([
+        { $match: { tourId: approvedReview.tourId, isModerated: 'approved' } },
+        {
+          $group: {
+            _id: null,
+            avgRating: { $avg: '$rating' },
+            count: { $sum: 1 },
+          },
+        },
+      ]);
 
       const ratingCount = result[0]?.count ?? 0;
 
@@ -279,20 +289,24 @@ reviewsRouter.patch(
     try {
       const { id } = req.params;
 
-      const updatedReview = await toggleBooleanFieldHelper(Review, 'featuredOnHomepage', id as string);
+      const updatedReview = await toggleBooleanFieldHelper(
+        Review,
+        'featuredOnHomepage',
+        id as string,
+      );
 
       if (!updatedReview) {
         return res.status(404).json({
-          error: 'Отзыв не найден'
-        })
+          error: 'Отзыв не найден',
+        });
       }
 
       return res.json(updatedReview);
     } catch (error) {
-      next(error)
+      next(error);
     }
-  }
-)
+  },
+);
 
 reviewsRouter.patch(
   '/:id',
