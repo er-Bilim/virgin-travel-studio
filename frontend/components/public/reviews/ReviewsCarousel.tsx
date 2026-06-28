@@ -86,7 +86,7 @@ const ReviewsCarousel = () => {
                           itemProp="reviewRating"
                           itemScope
                           itemType="https://schema.org/Rating"
-                          arial-label={`Оценка ${review.rating} из 5`}
+                          aria-label={`Оценка ${review.rating} из 5`}
                           className="mb-3.5 flex gap-0.5"
                         >
                           <meta
