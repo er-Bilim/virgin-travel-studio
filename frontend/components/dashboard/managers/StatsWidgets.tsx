@@ -27,6 +27,7 @@ export const StatsWidgets = () => {
   const { openModal } = useModalStore();
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [errorReport, setErrorReport] = useState<string | null>(null);
+  const [isDownloading, setIsDownloading] = useState<boolean>(false);
 
   const downloadReport = async () => {
     try {
@@ -34,7 +35,7 @@ export const StatsWidgets = () => {
         from: dateRange?.from?.toISOString(),
         to: dateRange?.to?.toISOString(),
       });
-
+      setIsDownloading(true);
       downloadBlobFile({
         blob: res.data,
         disposition: res.headers?.["content-disposition"],
@@ -56,6 +57,8 @@ export const StatsWidgets = () => {
       }
 
       setErrorReport("Неизвестная ошибка при генерации отчёта");
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -155,8 +158,9 @@ export const StatsWidgets = () => {
           <Button
               className="w-full mt-4 bg-[#1E2B6D] hover:bg-[#162356]"
               onClick={downloadReport}
+              disabled={isDownloading}
           >
-            Скачать отчет
+            {isDownloading ? <Spinner /> : "Скачать отчет"}
           </Button>
         </Modal>
       </>
