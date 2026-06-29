@@ -214,10 +214,6 @@ export const itemsNavHeader = [
     label: 'Туры',
   },
   {
-    id: 'tourSets',
-    label: 'Направления',
-  },
-  {
     id: 'news',
     label: 'Новости',
   },
