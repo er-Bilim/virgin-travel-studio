@@ -49,7 +49,7 @@ const About = () => {
 
   return (
     <>
-      <section aria-label='about-title' className="relative overflow-hidden py-20 md:py-28">
+      <section aria-labelledby="about-title" className="relative overflow-hidden py-20 md:py-28">
         <div aria-hidden className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full border-2 border-cyan-400/30" />
         <div aria-hidden className="pointer-events-none absolute right-10 top-8 size-36 rounded-full border-2 border-navy-700/15" />
         <div aria-hidden className="pointer-events-none absolute -left-0 bottom-26 size-40 rounded-full border-2 border-cyan-400/25" />
@@ -225,7 +225,7 @@ const About = () => {
               const Icon = [Map, ClipboardCheck, BadgeCheck, Plane][index] ?? Map;
               return (
                 <li
-                  key={text}
+                  key={text + index}
                   className="group flex items-center gap-4 rounded-2xl border border-gray-300 px-8 py-6 transition hover:border-slate-400 hover:bg-slate-50"
                 >
                   <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-cyan-50 text-cyan-800 transition group-hover:bg-navy-700 group-hover:text-cyan-400">
