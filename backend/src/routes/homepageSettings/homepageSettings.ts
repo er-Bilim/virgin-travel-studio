@@ -3,7 +3,7 @@ import auth from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
 import mongoose from 'mongoose';
 import deleteFile from '@/utils/deleteFile.js';
-import { imagesUpload, videosUpload } from '@/middlewares/multer.js';
+import { combinedUpload, videosUpload } from '@/middlewares/multer.js';
 import HomepageSettings from '@/model/homepageSettings/HomepageSettings.js';
 
 const homepageSettingsRouter = express.Router();
@@ -89,28 +89,20 @@ homepageSettingsRouter.put(
   '/',
   auth,
   permit('ADMIN'),
-  imagesUpload.fields([
-    { name: 'image', maxCount: 10 }, // до 10 картинок для преимуществ
-    { name: 'video', maxCount: 1 }   // 1 видео для блока hero
-  ]), 
+  combinedUpload.any(),
   async (req, res, next) => {
+    const uploadedFiles = (req.files as Express.Multer.File[]) || [];   
+
     try {
       const settings = await HomepageSettings.findOne();
+
       if (!settings) {
-        if (req.file) await deleteFile(`videos/${req.file.filename}`);
-        if (req.files && Array.isArray(req.files)) {
-          for (const file of req.files) {
-            await deleteFile(`images/${file.filename}`);
-          }
+        for (const file of uploadedFiles) {
+          const folder = file.fieldname === 'video' ? 'videos' : 'images';
+          await deleteFile(`${folder}/${file.filename}`);
         }
-        return res
-          .status(404)
-          .send({ error: 'Настройки страниц не найдены для обновления' });
+        return res.status(404).send({ error: 'Настройки страниц не найдены' });
       }
-      const filesObject = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
-      
-      const advantageFiles = filesObject?.['image'] || []; 
-      const videoFiles = filesObject?.['video'] || [];     
 
       const {
         hero,
@@ -121,46 +113,48 @@ homepageSettingsRouter.put(
         deleteVideo,
       } = req.body;
 
-      const uploadedVideo = videoFiles[0]; // Берем первое (и единственное) видео
-      if (uploadedVideo) {
+      const currentVideo = uploadedFiles.find(
+        (file) => file.fieldname === 'video',
+      );
+      if (currentVideo) {
         if (settings.hero?.videoUrl) await deleteFile(settings.hero.videoUrl);
-        settings.hero.videoUrl = `videos/${uploadedVideo.filename}`;
+        settings.hero.videoUrl = `videos/${currentVideo.filename}`;
       } else if (deleteVideo === true || deleteVideo === 'true') {
         if (settings.hero?.videoUrl) await deleteFile(settings.hero.videoUrl);
         settings.hero.videoUrl = '';
       }
 
-      if (req.body.advantages && typeof req.body.advantages === 'object') {
+      let advantagesData = req.body.advantages;
+      if (typeof advantagesData === 'string') {
+        try {
+          advantagesData = JSON.parse(advantagesData);
+        } catch {
+          advantagesData = undefined;
+        }
+      }
+
+      if (advantagesData && typeof advantagesData === 'object') {
         const parsedAdvantages = [];
-        const keys = Object.keys(req.body.advantages).sort(
-          (a, b) => Number(a) - Number(b),
-        );
-
-        // Счётчик, чтобы забирать файлы картинок строго по очереди
-        let fileIndex = 0;
-
+        const keys = Object.keys(advantagesData);
+      
         for (const key of keys) {
           const index = Number(key);
-          const advData = req.body.advantages[key];
+          const advData = advantagesData[key];
 
-          // Проверяем, отправлял ли фронтенд файл для этого элемента.
-          // Если в объекте преимуществ с фронта была картинка, берем следующий файл из массива
-          let attachedFile = null;
-
-          // Важно: на фронтенде картинку мы шлем только если её выбрали.
-          // Если у нас в данных с фронта для этого индекса есть признак наличия файла,
-          // сопоставляем его с файлом из массива advantageFiles по порядку:
-          if (advantageFiles[fileIndex]) {
-            attachedFile = advantageFiles[fileIndex];
-            fileIndex++;
-          }
+          const attachedFile = uploadedFiles.find(
+            (file) => file.fieldname === `advantages[${index}][file]`,
+          );
 
           let currentImage = settings.advantages[index]?.image || null;
 
           if (attachedFile) {
             if (currentImage) await deleteFile(currentImage);
             currentImage = `images/${attachedFile.filename}`;
-          }
+          } else if (advData.imageString === '') {
+            if (currentImage) await deleteFile(currentImage);
+            currentImage = null; 
+          } 
+
 
           parsedAdvantages.push({
             title: advData.title || '',
@@ -206,15 +200,22 @@ homepageSettingsRouter.put(
           settings.newsPage.subtitle = newsPage.subtitle;
       }
 
+      // Маркируем изменения для Mongoose
+      settings.markModified('hero');
+      settings.markModified('advantages');
+
       await settings.save();
-      res.send({ message: 'Настройки страниц успешно обновлены', settings });
+
+      return res.send({
+        message: 'Настройки страниц успешно обновлены',
+        settings,
+      });
     } catch (e) {
-      if (req.file) await deleteFile(`videos/${req.file.filename}`);
-      if (req.files && Array.isArray(req.files)) {
-        for (const file of req.files) {
-          await deleteFile(`images/${file.filename}`);
-        }
+      for (const file of uploadedFiles) {
+        const folder = file.fieldname === 'video' ? 'videos' : 'images';
+        await deleteFile(`${folder}/${file.filename}`);
       }
+
       if (e instanceof mongoose.Error.ValidationError) {
         return res
           .status(400)
@@ -224,5 +225,4 @@ homepageSettingsRouter.put(
     }
   },
 );
-
 export default homepageSettingsRouter;

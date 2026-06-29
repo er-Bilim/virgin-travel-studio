@@ -18,7 +18,7 @@ export interface PageSettings {
 export interface AdvantagesFields {
   title: string;
   body: string;
-  image: File | null
+  image: File | null | ''
 }
 
 export interface HomepageSettingsFields {

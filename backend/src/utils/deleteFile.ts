@@ -12,8 +12,16 @@ const deleteFile = async (
   try {
     await fs.unlink(absolutePath);
   } catch (error) {
-    console.error(error);
-  }
+
+    const nodeError = error as NodeJS.ErrnoException;
+
+    if (nodeError.code === 'ENOENT') {
+      console.warn(`Файл не найден для удаления: ${filePath}`);
+      return;
+    }
+      console.error(error);
+      throw nodeError;
+    }
 };
 
 export default deleteFile;

@@ -56,22 +56,27 @@ const makeHomepageFormData = (data: HomepageSettingsMutationData): FormData => {
       formData.append('newsPage[subtitle]', data.newsPage.subtitle);
   }
 
-  if (data.advantages && Array.isArray(data.advantages)) {
-    data.advantages.forEach((advantage, index) => {
-      if (advantage.title !== undefined) {
-        formData.append(`advantages[${index}][title]`, advantage.title);
-      }
-      if (advantage.body !== undefined) {
-        formData.append(`advantages[${index}][body]`, advantage.body);
-      }
-      if (advantage.image) {
-        formData.append(`image`, advantage.image);
-      }
-    });
-  }
+if (data.advantages && Array.isArray(data.advantages)) {
+  data.advantages.forEach((advantage, index) => {
+    if (advantage.title !== undefined) {
+      formData.append(`advantages[${index}][title]`, advantage.title);
+    }
+    if (advantage.body !== undefined) {
+      formData.append(`advantages[${index}][body]`, advantage.body);
+    }
+    console.log(advantage.image)
+    if (advantage.image instanceof File) {
+      formData.append(`advantages[${index}][file]`, advantage.image);
+    } else if (advantage.image === null || advantage.image === undefined) {
+      formData.append(`advantages[${index}][imageString]`, '');
+    } else if (typeof advantage.image === 'string') {
+      formData.append(`advantages[${index}][imageString]`, advantage.image);
+    }
+  });
+}
 
   return formData;
-};;
+};
 
 export const fetchHomepageSettings = async () => {
   const result = await axiosApi.get<HomepageSettingsFields>('/homepage-settings');
@@ -88,6 +93,7 @@ export const createHomepageSettings = async (data: HomepageSettingsMutationData)
 
 export const editHomepageSettings = async (data: HomepageSettingsMutationData) => {
   const formData = makeHomepageFormData(data);
+
   const result = await axiosApi.put<{ message: string; settings: HomepageSettingsFields }>(
     '/homepage-settings',
     formData,

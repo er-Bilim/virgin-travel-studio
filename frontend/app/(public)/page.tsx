@@ -9,6 +9,7 @@ import { imageUrl } from '@/lib/constants';
 import { ArrowRight } from 'lucide-react';
 import CustomTourCard from '@/components/public/home/tourCustomCard/CustomTourCard';
 import { usePopularTours } from '@/lib/hooks/tourHooks';
+import Advantages from '@/components/public/advantages/advantages';
 
 export default function Home() {
   const limit = 4;
@@ -135,6 +136,7 @@ export default function Home() {
         )}
       </section>
 
+      <Advantages/>
       <LatestNewsSection />
 
       <div className="mt-10 mb-15 flex flex-col items-center">

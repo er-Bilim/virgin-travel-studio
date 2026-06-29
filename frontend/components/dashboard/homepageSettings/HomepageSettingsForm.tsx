@@ -5,10 +5,16 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import type { AxiosError } from 'axios';
 import { Loader2, Layout, Compass, FileText, Plus, Trash2 } from 'lucide-react';
 import FileInput from '@/components/dashboard/FileInput/FileInput';
-
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
-import { inputClass } from '@/lib/constants';
+import { imageUrl, inputClass } from '@/lib/constants';
 import { VideoInput } from './VideoInput';
 import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog/ConfirmDialog'; // Импортируем модалку
 
@@ -79,6 +85,7 @@ export default function HomepageSettingsForm() {
 
   const {
     fields,
+    update,
     remove,
     append,
   } = useFieldArray({
@@ -97,7 +104,6 @@ export default function HomepageSettingsForm() {
     setGlobalError(null);
     setIsConfirmOpen(false);
 
-    console.log(pendingData)
     mutate(pendingData, {
       onSuccess: () => {
         setPendingData(null);
@@ -269,7 +275,7 @@ export default function HomepageSettingsForm() {
                 Блок преимуществ
               </h3>
               <div className="space-y-4">
-                {fields.map((_: AdvantagesFields, index) => {
+                {fields.map((field: AdvantagesFields, index) => {
                   const fieldError = errors.advantages?.[index];
 
                   const fileChangeHandler = (
@@ -281,6 +287,15 @@ export default function HomepageSettingsForm() {
                     setValue(`advantages.${index}.image` as const, file, {
                       shouldDirty: true,
                       shouldValidate: true,
+                    });
+                  };
+
+                  const deleteFile = (index: number) => {
+                    const currentItem = watch(`advantages.${index}`);
+
+                    update(index, {
+                      ...currentItem,
+                      image: null,
                     });
                   };
 
@@ -318,9 +333,43 @@ export default function HomepageSettingsForm() {
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-sm font-medium leading-none">
-                          Добавить изображение
-                        </label>
+                        {field.image && (
+                          <div className="flex items-center gap-3">
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <button
+                                  type="button"
+                                  className="text-blue-600 hover:underline text-sm"
+                                >
+                                  Посмотреть
+                                </button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-4xl flex flex-col items-center">
+                                <DialogHeader>
+                                  <DialogTitle className="sr-only">
+                                    Просмотр изображения
+                                  </DialogTitle>
+                                </DialogHeader>
+
+                                <div className="flex items-center justify-center">
+                                  <img
+                                    src={imageUrl + field.image}
+                                    alt={field.title}
+                                    className="max-h-[80vh] w-auto rounded-xl object-contain"
+                                  />
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                            <button
+                              className="cursor-pointer"
+                              type="button"
+                              onClick={() => deleteFile(index)}
+                            >
+                              <Trash2 className="h-4 w-4 text-red-500" />
+                            </button>
+                          </div>
+                        )}
+
                         <FileInput
                           key="image"
                           name="image"
