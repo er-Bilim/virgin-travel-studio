@@ -15,7 +15,7 @@ const DashboardLayout = ({ children }: Props) => {
 
   return (
     <ProtectedLayout roles={['ADMIN', 'MANAGER']}>
-      <div className="min-h-screen bg-[#F7F8F4]">
+      <div className="min-h-screen bg-slate-100">
 
         <Sidebar />
 
