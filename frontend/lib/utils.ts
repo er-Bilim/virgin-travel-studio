@@ -26,12 +26,16 @@ export const createFormData = (data: object): FormData => {
   return formData;
 };
 
-export const formatDayAndMonthWords = (date: string, isSlice?: boolean): {day: string, month: string, year: string} => {
+export const formatDayAndMonthWords = (date: string, isSlice?: boolean): {
+  day: string,
+  month: string,
+  year: string
+} => {
   const formatDate = dayjs(date).locale('ru');
 
   const fullDate = formatDate.format('D MMMM');
   const year = formatDate.format('YYYY');
-  const [ day, month ] = fullDate.split(' ');
+  const [day, month] = fullDate.split(' ');
 
   if (isSlice) {
     const sliceMonth: string = month.slice(0, 3);
@@ -42,15 +46,8 @@ export const formatDayAndMonthWords = (date: string, isSlice?: boolean): {day: s
     }
   }
 
-  return { day, month, year }
+  return {day, month, year}
 }
-
-export const getYearFullNumber = (date: string) => {
-  const formatDate = dayjs(date);
-
-  const year = formatDate.format('YYYY');
-  return year;
-};
 
 export const formatToReadablePrice = (
   priceParam: number,
@@ -126,11 +123,15 @@ export const pluralize = (
 };
 
 export const formatDate = (date: string): string => {
-    return dayjs(date).locale('ru').format('D MMMM YYYY');
+  return dayjs(date).locale('ru').format('D MMMM YYYY');
 };
 
-export const getCountryOptions = (): {code: string, name: string}[] => {
-  const countryOptions = Object.entries(countries.getNames('ru', {select: 'official'})).map(([code, name]) => ({ code, name })).sort((a, b) => a.name.localeCompare(b.name));
+export const getCountryOptions = (): { code: string, name: string }[] => {
+  const countryOptions = Object.entries(countries.getNames('ru', {select: 'official'})).map(([code, name]) => ({
+    code: countries.alpha2ToAlpha3(code) ?? code,
+    name
+  })).sort((a, b) => a.name.localeCompare(b.name));
+
 
   return countryOptions;
 }

@@ -81,7 +81,6 @@ const NewsList = () => {
   const renderPagination = () => {
     if (metadata) {
       return (
-        /* Синхронизировали отступы пагинации с турами (my-12) */
         <div className="my-12 border-t border-slate-100 dark:border-slate-800 pt-6">
           <PaginationCustom
             page={page}
@@ -95,7 +94,6 @@ const NewsList = () => {
   };
 
   return (
-    /* Завернули в базовый w-full pb-16 для соблюдения общей структуры отступов */
     <div className="w-full pb-16">
       <Breadcrumbs
         className="mt-5"
@@ -109,7 +107,6 @@ const NewsList = () => {
         <p className="text-cyan-800 font-semibold uppercase text-sm tracking-wider">
           Журнал путешествий
         </p>
-        {/* Привели стилистику шрифта к единому виду с турами (font-black text-navy-800 mt-3) */}
         <h1 className="font-black text-navy-800 dark:text-white text-4xl mt-3 md:text-5xl">
           {settings?.newsPage?.title || 'Новости и истории'}
         </h1>
@@ -118,10 +115,6 @@ const NewsList = () => {
         </p>
       </header>
 
-      {/*
-        Унифицировали панель фильтрации: теперь темы не растягиваются на весь экран,
-        а аккуратно занимают фиксированную ширину, завершаясь нижней линией-разделителем.
-      */}
       <div className="mb-6 border-b border-gray-100 dark:border-slate-800 pb-6">
         {tagsLoading ? (
           <div className="flex flex-col gap-1 sm:w-64">
@@ -144,7 +137,6 @@ const NewsList = () => {
         )}
       </div>
 
-      {/* Т.к. верхняя панель фильтрации уже получила разделитель pb-6, здесь просто делаем отступ mt-8 */}
       <article className="mt-8">
         <Link
           href={`/news/${news.allNews[0]._id}`}

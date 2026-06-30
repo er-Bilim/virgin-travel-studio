@@ -316,7 +316,7 @@ toursRouter.get('/popular', async (req, res, next) => {
 
     const tours = await Tour.aggregate(buildTourPipeline({ match: {isPublished: true}, sort: { viewsCount: -1, createdAt: -1 }, limit}))
       
-    res.json(tours);
+    return res.json(tours);
   } catch (error) {
     next(error);
   }

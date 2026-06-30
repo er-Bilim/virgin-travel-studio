@@ -1,0 +1,62 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: virgin-mongo
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: virgin-backend
+    restart: unless-stopped
+    env_file:
+      - .env.docker
+    ports:
+      - "8000:8000"
+    volumes:
+      - uploads-images:/app/public/images
+      - uploads-videos:/app/public/videos
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - app-network
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_IMAGE_URL: ${NEXT_IMAGE_URL:-http://localhost:8000}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+    container_name: virgin-frontend
+    restart: unless-stopped
+    environment:
+      - NEXT_API_URL=${NEXT_API_URL:-http://backend:8000/api}
+      - NEXT_BACK_URL=${NEXT_BACK_URL:-http://backend:8000}
+      - NEXT_IMAGE_URL=${NEXT_IMAGE_URL:-http://localhost:8000}
+      - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+      - NEXT_WHATSAPP_PHONE=${NEXT_WHATSAPP_PHONE:-}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+volumes:
+  mongo-data:
+  uploads-images:
+  uploads-videos:
+networks:
+  app-network:
+    driver: bridge

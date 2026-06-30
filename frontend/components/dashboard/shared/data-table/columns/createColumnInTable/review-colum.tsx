@@ -1,35 +1,37 @@
-import type {ColumnDef} from '@tanstack/react-table';
-import {Badge} from '@/components/ui/badge';
-import {
-  createActionsColumn
-} from '@/components/dashboard/shared/data-table/columns/createActionsColumn';
+import type { ColumnDef } from '@tanstack/react-table';
+import { Badge } from '@/components/ui/badge';
+import { createActionsColumn } from '@/components/dashboard/shared/data-table/columns/createActionsColumn';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
+  DialogTrigger,
 } from '@/components/ui/dialog';
-import {imageUrl} from '@/lib/constants';
-import {TooltipCustom} from '@/components/ui/tooltip-custom';
-import type {IReview} from "@/types/review";
-import dayjs from "dayjs";
+import { imageUrl } from '@/lib/constants';
+import { TooltipCustom } from '@/components/ui/tooltip-custom';
+import type { IReview } from '@/types/review';
+import dayjs from 'dayjs';
+import { Switch } from '@/components/ui/switch';
+import { cn } from '@/lib/utils';
 
 type Props = {
   onView: (tour: IReview) => void;
   onDelete: (tour: IReview) => void;
   onTogglePublish: (tour: IReview) => void;
+  onCheckedChange: (review: IReview) => void;
 };
 
 export const getReviewColumns = ({
-                                 onView,
-                                 onDelete,
-                                 onTogglePublish,
-                               }: Props): ColumnDef<IReview>[] => [
+  onView,
+  onDelete,
+  onTogglePublish,
+  onCheckedChange,
+}: Props): ColumnDef<IReview>[] => [
   {
     accessorKey: 'tour',
     header: 'Отзыв тура',
-    cell: ({row}) => {
+    cell: ({ row }) => {
       const review = row.original;
       const tour = review.tourId;
 
@@ -54,7 +56,7 @@ export const getReviewColumns = ({
                 {tour?.images && tour.images.length > 0 && (
                   <div className="relative w-full h-48 overflow-hidden rounded-md bg-gray-100">
                     <img
-                      src={`${imageUrl}/${tour.images[0]}`}
+                      src={`${imageUrl}${tour.images[0]}`}
                       alt={tour.title}
                       className="w-full h-full object-cover"
                     />
@@ -63,11 +65,13 @@ export const getReviewColumns = ({
 
                 <div>
                   <div className="flex items-center justify-between gap-2">
-                    <h3 className="font-semibold text-lg text-gray-950">{tour?.title}</h3>
+                    <h3 className="font-semibold text-lg text-gray-950">
+                      {tour?.title}
+                    </h3>
                     {tour?.countryCode && (
                       <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded font-medium uppercase">
-            {tour.countryCode}
-          </span>
+                        {tour.countryCode}
+                      </span>
                     )}
                   </div>
 
@@ -87,26 +91,22 @@ export const getReviewColumns = ({
   {
     accessorKey: 'clientName',
     header: 'Имя клиента',
-    cell: ({row}) => {
+    cell: ({ row }) => {
       const author = row.original.clientName;
       return (
-        <span className="font-medium text-gray-900">
-          {author || 'Аноним'}
-        </span>
+        <span className="font-medium text-gray-900">{author || 'Аноним'}</span>
       );
     },
   },
   {
     accessorKey: 'comment',
     header: 'Текст отзыва',
-    cell: ({row}) => {
+    cell: ({ row }) => {
       const text = row.original.comment;
       return (
         <div className="max-w-[300px]">
           <TooltipCustom title={text}>
-            <span className="text-sm text-gray-600 line-clamp-2">
-              {text}
-            </span>
+            <span className="text-sm text-gray-600 line-clamp-2">{text}</span>
           </TooltipCustom>
         </div>
       );
@@ -115,7 +115,7 @@ export const getReviewColumns = ({
   {
     accessorKey: 'rating',
     header: 'Рейтинг',
-    cell: ({row}) => {
+    cell: ({ row }) => {
       const rating = row.original.rating;
       return (
         <div className="flex items-center gap-1">
@@ -140,12 +140,12 @@ export const getReviewColumns = ({
 
       return (
         <>
-                    <span className="hidden min-[335px]:inline">
-                        {dayjs(rawDate).format('DD.MM.YYYY (HH:mm)')}
-                    </span>
+          <span className="hidden min-[335px]:inline">
+            {dayjs(rawDate).format('DD.MM.YYYY (HH:mm)')}
+          </span>
           <span className="inline min-[335px]:hidden">
-                        {dayjs(rawDate).format('DD.MM.YYYY')}
-                    </span>
+            {dayjs(rawDate).format('DD.MM.YYYY')}
+          </span>
         </>
       );
     },
@@ -153,24 +153,62 @@ export const getReviewColumns = ({
   {
     accessorKey: 'isModerated',
     header: 'Статус',
-    cell: ({row}) => {
+    cell: ({ row }) => {
       const isModerated = row.original.isModerated;
 
-      let badgeStyles = "bg-gray-100 text-gray-600 border-gray-200";
-      let statusLabel = "Ожидает";
+      let badgeStyles = 'bg-gray-100 text-gray-600 border-gray-200';
+      let statusLabel = 'Ожидает';
 
-      if (isModerated === "approved") {
-        badgeStyles = "bg-emerald-50 text-emerald-700 border-emerald-200";
-        statusLabel = "Опубликовано";
-      } else if (isModerated === "rejected") {
-        badgeStyles = "bg-rose-50 text-rose-700 border-rose-200";
-        statusLabel = "Отклонено";
+      if (isModerated === 'approved') {
+        badgeStyles = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+        statusLabel = 'Опубликовано';
+      } else if (isModerated === 'rejected') {
+        badgeStyles = 'bg-rose-50 text-rose-700 border-rose-200';
+        statusLabel = 'Отклонено';
       }
 
       return (
         <Badge variant="outline" className={badgeStyles}>
           {statusLabel}
         </Badge>
+      );
+    },
+  },
+  {
+    accessorKey: 'featuredOnHomepage',
+    header: 'на главной',
+    cell: ({ row }) => {
+      const review = row.original;
+
+      const isDisabled: boolean =
+        review.isModerated === 'pending' || review.isModerated === 'rejected';
+
+      return (
+        <>
+          <div
+            onClick={(event) => {
+              event.stopPropagation();
+            }}
+          >
+            <Switch
+              id="airplane-mode"
+              className={cn(
+                'data-[state=checked]:bg-cyan-500 data-[state=unchecked]:bg-gray-300 cursor-pointer',
+                isDisabled && 'disabled:bg-gray-200',
+              )}
+              onCheckedChange={() => {
+                onCheckedChange(review);
+              }}
+              disabled={isDisabled}
+              checked={review?.featuredOnHomepage}
+            />
+            {review.isModerated === 'pending' && (
+              <>
+                <p className="text-gray-200 text-xs font-semibold mt-2 tracking-widest">опубликуйте</p>
+              </>
+            )}
+          </div>
+        </>
       );
     },
   },
@@ -184,7 +222,9 @@ export const getReviewColumns = ({
       {
         id: 'toggle-publish',
         label: (review) =>
-          review.isModerated === 'approved' ? 'Снять с публикации' : 'Опубликовать',
+          review.isModerated === 'approved'
+            ? 'Снять с публикации'
+            : 'Опубликовать',
         onClick: onTogglePublish,
         className: 'text-blue-600',
       },
