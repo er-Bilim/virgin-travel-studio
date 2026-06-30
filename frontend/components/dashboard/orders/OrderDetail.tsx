@@ -1,5 +1,5 @@
 'use client';
-import { format } from 'date-fns';
+
 import OrderManageForm from '@/components/dashboard/orders/OrderManageForm';
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -8,15 +8,16 @@ import { useOneOrder } from '@/lib/hooks/orderHooks';
 import { Button } from '@/components/ui/button';
 import { useDeleteOrder } from '@/lib/hooks/orderHooks';
 import {
-  Trash2,
   ArrowLeft,
-  Download,
   Trash,
   Dot,
   Hash,
   Copy,
   User,
   CircleCheckBig,
+  UsersRound,
+  TriangleAlert,
+  ScrollText,
 } from 'lucide-react';
 import {
   Dialog,
@@ -30,8 +31,24 @@ import { useModalStore } from '@/lib/stores/modalStore';
 import { Modal } from '@/components/shared/Modal';
 import ContractForm from '@/components/dashboard/orders/ContractForm';
 import { Spinner } from '@/components/ui/spinner';
-import { PiHashStraightBold } from 'react-icons/pi';
-import { formatDayAndMonthWords } from '@/lib/utils';
+import { cn, formatDayAndMonthWords, formatToReadablePrice } from '@/lib/utils';
+import type { SeatsLevel } from '@/lib/tour/seats';
+import getSeatsLevel from '@/lib/tour/seats';
+
+const styles: Record<SeatsLevel, { style: string }> = {
+  available: {
+    style: 'emerald-500',
+  },
+  low: {
+    style: 'yellow-500',
+  },
+  critical: {
+    style: 'red-500',
+  },
+  'sold-out': {
+    style: 'gray-400',
+  },
+};
 
 export default function OrderDetail() {
   const { id } = useParams();
@@ -93,6 +110,16 @@ export default function OrderDetail() {
   }
 
   const { day, month, year } = formatDayAndMonthWords(order.createdAt);
+  const {
+    day: tourDayStart,
+    month: tourMonthStart,
+    year: tourYearStart,
+  } = formatDayAndMonthWords(order.tourSetId.startDate, true);
+  const {
+    day: tourDayEnd,
+    month: tourMonthEnd,
+    year: tourYearEnd,
+  } = formatDayAndMonthWords(order.tourSetId.endDate, true);
 
   const handleCopy = async (id: string) => {
     try {
@@ -125,10 +152,30 @@ export default function OrderDetail() {
     }
   };
 
+  const { price, currency } = formatToReadablePrice(order.tourSetId.price);
+  const totalSeats = order.tourSetId.totalSeats;
+  const bookedSeats = order.tourSetId.bookedSeats;
+  const freeSeats = totalSeats - bookedSeats;
+  const seatLevel = getSeatsLevel(freeSeats, totalSeats);
+  const isOrderPending: boolean = order.status === 'CONTRACT_PENDING';
+
+  const getSeatLevelText = (level: SeatsLevel) => {
+    switch (level) {
+      case 'available':
+        return `Забронировано ${bookedSeats} из ${totalSeats}`;
+      case 'low':
+        return `Среднее количество мест – забронировано ${bookedSeats} из ${totalSeats}`;
+      case 'critical':
+        return `Осталось мало мест – забронировано ${bookedSeats} из ${totalSeats}`;
+      default:
+        return '';
+    }
+  };
+
   return (
     <div className="flex min-h-screen">
       <div className="flex-1 overflow-x-hidden">
-        <div className="max-w-[1180px] mx-auto px-5 md:px-8 py-7">
+        <div className="max-w-full mx-auto px-5 md:px-8 py-7">
           <div className="flex items-center justify-between gap-4 mb-7">
             <Button
               onClick={() => router.back()}
@@ -138,15 +185,31 @@ export default function OrderDetail() {
               <ArrowLeft className="w-4 h-4" />
               <span>Назад к списку</span>
             </Button>
-            {user?.role === 'ADMIN' && (
-              <Button
-                className="group inline-flex items-center gap-2 h-10 px-5 rounded-xl border border-red-300 text-red-600 bg-white hover:bg-red-100 transition text-sm font-semibold cursor-pointer"
-                type="button"
+            <div className="flex items-center gap-4">
+              <button
+                className={cn(
+                  'group inline-flex items-center gap-2 h-10 px-6 py-7 rounded-xl bg-navy-800 text-white font-semibold text-sm  cursor-not-allowed',
+                  !isOrderPending
+                    ? ' cursor-not-allowed opacity-50'
+                    : 'cursor-pointer hover:bg-navy-900 transition',
+                )}
+                onClick={() => openModal('contractModal')}
+                disabled={!isOrderPending}
               >
-                <Trash className="w-4 h-4" />
-                <span>Удалить</span>
-              </Button>
-            )}
+                <ScrollText className="size-5 text-cyan-400" />
+                Генерировать контракт
+              </button>
+              {user?.role === 'ADMIN' && (
+                <Button
+                  className="group inline-flex items-center gap-2 h-10 px-6 py-7 rounded-xl border border-red-300 text-red-600 bg-white hover:bg-red-100 transition text-sm font-semibold cursor-pointer"
+                  type="button"
+                  onClick={() => setIsDeleteDialogOpen(true)}
+                >
+                  <Trash className="w-4 h-4" />
+                  <span>Удалить</span>
+                </Button>
+              )}
+            </div>
           </div>
 
           <header className="mb-8">
@@ -182,7 +245,7 @@ export default function OrderDetail() {
             </p>
           </header>
 
-          <div className="grid lg:grid-cols-[1fr_360px] gap-6 items-start">
+          <div className="grid lg:grid-cols-[1fr_530px] gap-6 items-start">
             <div className="space-y-6">
               <section className="bg-white rounded-2xl border border-line p-6">
                 <h2 className="text-base font-extrabold text-navy-800 mb-5 flex items-center gap-2">
@@ -239,11 +302,113 @@ export default function OrderDetail() {
                 />
               </section>
             </div>
+
+            <aside className="space-y-6 lg:sticky lg:top-6">
+              <section className="bg-white rounded-2xl border border-line overflow-hidden ">
+                <div className="bg-navy-800 px-5 py-4 text-white">
+                  <h2 className="text-[11px] uppercase tracking-wide text-cyan-300 font-bold mb-1">
+                    Тур
+                  </h2>
+                  <p className="font-extrabold text-lg leading-snug">
+                    {order.tourSetId.tourId.title}
+                  </p>
+                </div>
+                <div className="p-5 space-y-3 text-[14px]">
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500">Категория</span>
+                    <span className="font-semibold text-navy-800">
+                      {order.tourSetId.tourId.category.title}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500">Даты</span>
+                    <p className="font-semibold text-navy-800 flex gap-1">
+                      {tourDayStart} {tourMonthStart} {tourYearStart}
+                      <span>–</span>
+                      {tourDayEnd} {tourMonthEnd} {tourYearEnd}
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500">Отель</span>
+                    <span className="font-semibold text-navy-800">
+                      {order.tourSetId.hotelName}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500">Стоимость</span>
+                    <p className="font-black text-navy-800 flex gap-1 text-lg items-center">
+                      <span>{price}</span>
+                      <span className="text-sm font-bold text-slate-400">
+                        {currency}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </section>
+
+              <section className="bg-white rounded-2xl border border-line p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-[13px] font-bold uppercase tracking-wide text-navy-700 flex items-center gap-2">
+                    <UsersRound className="text-cyan-800 size-5" />
+                    Свободные места
+                  </h3>
+                </div>
+
+                <div>
+                  <div className="flex items-end gap-2 mb-3">
+                    <span
+                      className={cn(
+                        `text-${styles[seatLevel].style} text-4xl font-black leading-none`,
+                      )}
+                    >
+                      {freeSeats}
+                    </span>
+                    <span className="text-navy-700/50 font-semibold mb-0.5">
+                      / <span id="seatTotal">{totalSeats}</span> мест
+                    </span>
+                  </div>
+
+                  <div className="h-3 w-full rounded-full bg-slate-200 overflow-hidden">
+                    <div
+                      className={cn(
+                        `bg-${styles[seatLevel].style} h-full rounded-full`,
+                      )}
+                      style={{ width: `${( Math.max(0, Math.min(100, totalSeats ? (freeSeats / totalSeats) * 100 : 0)))}%` }}
+                    />
+                  </div>
+
+                  <p
+                    id="seatNote"
+                    className={cn(
+                      `mt-5 text-[13px] text-${styles[seatLevel].style} font-semibold`,
+                    )}
+                  >
+                    {getSeatLevelText(seatLevel)}
+                  </p>
+                </div>
+
+                {seatLevel === 'sold-out' && (
+                  <div>
+                    <div className="rounded-xl bg-red-100 border border-red-200 p-4 flex items-start gap-3">
+                      <TriangleAlert className="size-5 text-red-600 shrink-0 mt-1" />
+                      <div>
+                        <p className="font-extrabold text-red-600 text-[15px]">
+                          Мест нет
+                        </p>
+                        <p className="text-[13px] text-red-600 mt-1">
+                          Все {totalSeats} мест заняты. Бронирование недоступно
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </section>
+            </aside>
           </div>
         </div>
       </div>
 
-      {/* <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader className="pr-8">
             <DialogTitle>
@@ -251,128 +416,26 @@ export default function OrderDetail() {
             </DialogTitle>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+            >
               Отмена
             </Button>
-            <Button variant="destructive" onClick={confirmDelete} disabled={isDeleting}>
-              Удалить {isDeleting && <Spinner/>}
+            <Button
+              variant="destructive"
+              onClick={confirmDelete}
+              disabled={isDeleting}
+            >
+              Удалить {isDeleting && <Spinner />}
             </Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog> */}
+      </Dialog>
+
+      <Modal id="contractModal" title="Впишите данные">
+        <ContractForm orderId={order._id} />
+      </Modal>
     </div>
-    // <div className="min-h-screen bg-gray-50 p-8">
-    //   <div className="max-w-5xl mx-auto space-y-6">
-    //     <div className="flex items-center justify-between border-b border-gray-200 pb-3">
-    //       <button
-    //         onClick={() => router.back()}
-    //         className="flex items-center text-[11px] font-bold uppercase tracking-widest text-[#64748B] hover:text-[#1E2B6D] transition-colors gap-2"
-    //       >
-    //         <ArrowLeft className="w-4 h-4" /> Назад к списку
-    //       </button>
-    //     </div>
-
-    //     <div className="flex flex-col xl:flex-row md:items-center justify-between gap-4">
-    //       <div className="space-y-1">
-    //         <div className="flex items-center gap-3">
-    //           <h1 className="text-xl sm:text-3xl font-bold tracking-tight text-[#1E2B6D] leading-none break-all min-w-0">
-    //             Заявка № {order._id}
-    //           </h1>
-    //         </div>
-    //       </div>
-
-    //       {user?.role === 'ADMIN' && (
-    //         <Button
-    //           variant="destructive"
-    //           size="sm"
-    //           className="h-10 w-10 p-0 rounded-xl"
-    //           onClick={() => setIsDeleteDialogOpen(true)}
-    //         >
-    //           <Trash2 className="w-4 h-4" />
-    //         </Button>
-    //       )}
-    //       {order.status === 'CONTRACT_PENDING' && (
-    //           <Button
-    //               className="bg-[#1E2B6D] hover:bg-[#162356] cursor-pointer"
-    //               onClick={() => openModal('contractModal')}
-    //           >
-    //             <Download className="w-4 h-4 mr-2" /> Генерировать контракт
-    //           </Button>
-    //       )}
-    //     </div>
-
-    //     <Modal id="contractModal" title="Впишите данные">
-    //       <ContractForm orderId={order._id} />
-    //     </Modal>
-
-    //     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 items-start text-lg border-b border-gray-200 pb-4 mt-18">
-    //       <h2 className="md:col-span-2text-xl border-b border-gray-100 pb-2">
-    //         Тур{' '}
-    //         <span className="font-bold ">{order.tourSetId.tourId.title}</span>
-    //       </h2>
-
-    //       <p>
-    //         Категория:{' '}
-    //         <span className="font-medium">
-    //           {order.tourSetId.tourId.category.title}
-    //         </span>
-    //       </p>
-
-    //       <p>
-    //         Даты:{' '}
-    //         <span className="font-bold">
-    //           {format(new Date(order.tourSetId.startDate), 'dd.MM.yyyy')} -{' '}
-    //           {format(new Date(order.tourSetId.endDate), 'dd.MM.yyyy')}
-    //         </span>
-    //       </p>
-
-    //       <p>
-    //         Цена: <span className="font-medium">{order.tourSetId.price}</span>
-    //       </p>
-
-    //       <p>
-    //         Отель:{' '}
-    //         <span className="font-medium">{order.tourSetId.hotelName}</span>
-    //       </p>
-    //     </div>
-
-    //     <OrderManageForm
-    // initialValues={{
-    //   tourSetId: order.tourSetId._id,
-    //   clientName: order.clientName,
-    //   clientPhone: order.clientPhone,
-    //   status: order.status,
-    //   managerId: order.managerId?._id,
-    //   rejectionReason: order.rejectionReason,
-    // }}
-    //       orderId={order._id}
-    //     />
-
-    //     <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-    //       <DialogContent>
-    //         <DialogHeader className="pr-8">
-    //           <DialogTitle>
-    //             Вы уверены, что хотите удалить этот тур?
-    //           </DialogTitle>
-    //         </DialogHeader>
-    //         <DialogFooter>
-    //           <Button
-    //             variant="outline"
-    //             onClick={() => setIsDeleteDialogOpen(false)}
-    //           >
-    //             Отмена
-    //           </Button>
-    //           <Button
-    //             variant="destructive"
-    //             onClick={confirmDelete}
-    //             disabled={isDeleting}
-    //           >
-    //             {isDeleting ? 'Удаление...' : 'Удалить'}
-    //           </Button>
-    //         </DialogFooter>
-    //       </DialogContent>
-    //     </Dialog>
-    //   </div>
-    // </div>
   );
 }
