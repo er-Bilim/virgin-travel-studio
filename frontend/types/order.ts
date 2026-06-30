@@ -24,6 +24,8 @@ interface ToursetLite {
   price: number;
   hotelName: string;
   tourId: TourLite;
+  bookedSeats: number;
+  totalSeats: number;
 }
 
 export interface OrderType {
