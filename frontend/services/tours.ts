@@ -7,7 +7,7 @@ import type {
   TourCategoryType,
   TourMutation,
   ToursGetResponse,
-  TourType,
+  TourType
 } from '@/types/tour';
 
 export const getTours = async ({
@@ -17,7 +17,9 @@ export const getTours = async ({
   search,
   isPublished,
   countryCode,
-  sort
+  sort,
+    isHot,
+    hasDiscount
 }: GetToursParams): Promise<ToursGetResponse> => {
   const params: Record<string, string | undefined | number> = {};
 
@@ -26,6 +28,8 @@ export const getTours = async ({
   if (search) params.search = search;
   if (isPublished) params.isPublished = String(isPublished);
   if (countryCode) params.countryCode = countryCode;
+  if (isHot) params.isHot = 'true';
+  if (hasDiscount) params.hasDiscount = 'true';
 
   params.page = Number(page);
   params.limit = Number(limit);

@@ -2,7 +2,8 @@ import express from 'express';
 import auth from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
 import mongoose from 'mongoose';
-import  ContactSettings  from '@/model/contactSettings/ContactSettings.js';
+import ContactSettings from '@/model/contactSettings/ContactSettings.js';
+import { imagesUpload } from '@/middlewares/multer.js';
 
 const contactSettingsRouter = express.Router();
 
@@ -17,10 +18,11 @@ contactSettingsRouter.get('/', async (_req, res, next) => {
 });
 
 contactSettingsRouter.post(
-  '/',
-  auth,
-  permit('ADMIN'),
-  async (req, res, next) => {
+    '/',
+    auth,
+    permit('ADMIN'),
+    imagesUpload.single('logo'),
+    async (req, res, next) => {
     try {
       const existingSettings = await ContactSettings.findOne();
       if (existingSettings) {
@@ -43,6 +45,10 @@ contactSettingsRouter.post(
         workingHours,
       } = req.body;
 
+      const logo = req.file ? `images/${req.file.filename}` : undefined;
+      const parsedWorkingHours =
+          typeof workingHours === 'string' ? JSON.parse(workingHours) : workingHours;
+
       const settings = new ContactSettings({
         phone,
         email,
@@ -52,7 +58,8 @@ contactSettingsRouter.post(
         instagram,
         facebook,
         mapEmbedUrl,
-        workingHours,
+        logo,
+        workingHours: parsedWorkingHours,
       });
 
       await settings.save();
@@ -69,10 +76,11 @@ contactSettingsRouter.post(
 );
 
 contactSettingsRouter.put(
-  '/',
-  auth,
-  permit('ADMIN'),
-  async (req, res, next) => {
+    '/',
+    auth,
+    permit('ADMIN'),
+    imagesUpload.single('logo'),
+    async (req, res, next) => {
     try {
       let settings = await ContactSettings.findOne();
 
@@ -94,6 +102,9 @@ contactSettingsRouter.put(
         workingHours,
       } = req.body;
 
+      const parsedWorkingHours =
+          typeof workingHours === 'string' ? JSON.parse(workingHours) : workingHours;
+
       if (phone !== undefined) settings.phone = phone;
       if (email !== undefined) settings.email = email;
       if (address !== undefined) settings.address = address;
@@ -102,8 +113,11 @@ contactSettingsRouter.put(
       if (instagram !== undefined) settings.instagram = instagram;
       if (facebook !== undefined) settings.facebook = facebook;
       if (mapEmbedUrl !== undefined) settings.mapEmbedUrl = mapEmbedUrl;
+      if (req.file) {
+        settings.logo = `images/${req.file.filename}`;
+      }
 
-      if (workingHours !== undefined) {
+      if (parsedWorkingHours !== undefined) {
         if (!settings.workingHours) {
           settings.workingHours = {
             weekdays: { from: '09:00', to: '18:00' },
@@ -114,24 +128,24 @@ contactSettingsRouter.put(
 
         const currentWorkingHours = settings.workingHours!;
 
-        if (workingHours.weekdays !== undefined) {
+        if (parsedWorkingHours.weekdays !== undefined) {
           currentWorkingHours.weekdays = {
             ...currentWorkingHours.weekdays,
-            ...workingHours.weekdays,
+            ...parsedWorkingHours.weekdays,
           };
         }
 
-        if (workingHours.saturday !== undefined) {
+        if (parsedWorkingHours.saturday !== undefined) {
           currentWorkingHours.saturday = {
             ...currentWorkingHours.saturday,
-            ...workingHours.saturday,
+            ...parsedWorkingHours.saturday,
           };
         }
 
-        if (workingHours.sunday !== undefined) {
+        if (parsedWorkingHours.sunday !== undefined) {
           currentWorkingHours.sunday = {
             ...currentWorkingHours.sunday,
-            ...workingHours.sunday,
+            ...parsedWorkingHours.sunday,
           };
         }
 

@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {
   createTour,
   deleteTour,
@@ -8,12 +8,12 @@ import {
   getTourCategories,
   getTours,
   togglePublish,
-  updateTour,
+  updateTour
 } from '@/services/tours';
-import { toast } from 'sonner';
-import type { GetToursParams, TourMutation } from '@/types/tour';
-import type { AxiosError } from 'axios';
-import type { GlobalError } from '@/types/error';
+import {toast} from 'sonner';
+import type {GetToursParams, TourMutation} from '@/types/tour';
+import type {AxiosError} from 'axios';
+import type {GlobalError} from '@/types/error';
 
 export const useTours = ({
   page,
@@ -23,6 +23,8 @@ export const useTours = ({
   isPublished,
   countryCode,
   sort,
+    isHot,
+    hasDiscount,
 }: GetToursParams) => {
   return useQuery({
     queryKey: [
@@ -34,6 +36,8 @@ export const useTours = ({
       isPublished,
       sort,
       countryCode,
+        isHot,
+        hasDiscount,
     ],
     queryFn: () =>
       getTours({
@@ -44,6 +48,8 @@ export const useTours = ({
         isPublished,
         sort,
         countryCode,
+        isHot,
+        hasDiscount
       }),
   });
 };

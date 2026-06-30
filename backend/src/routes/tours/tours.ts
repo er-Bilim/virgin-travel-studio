@@ -1,18 +1,18 @@
 import express from 'express';
-import auth, { authOrNot, type RequestWithUser } from '@/middlewares/auth.js';
+import auth, {authOrNot, type RequestWithUser} from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
-import { imagesUpload } from '@/middlewares/multer.js';
+import {imagesUpload} from '@/middlewares/multer.js';
 import Tour from '@/model/tour/Tour.js';
-import mongoose from 'mongoose';
+import mongoose, {type PipelineStage} from 'mongoose';
 import validateObjectId from '@/middlewares/validateObjectId.js';
 import parseSort from '@/lib/sort.js';
 import TourSet from '@/model/tourSet/TourSet.js';
-import type { AggregatedTour, AggregatedTours } from '@/types/tour.types.js';
-import type { ICategory } from '@/types/category.types.js';
+import type {AggregatedTour, AggregatedTours} from '@/types/tour.types.js';
+import type {ICategory} from '@/types/category.types.js';
 import path from 'path';
 import fs from 'fs/promises';
 import TourView from '@/model/tour/TourView.js';
-import { buildTourPipeline } from '@/aggregations/tours.pipeline.js';
+import {buildTourPipeline} from '@/aggregations/tours.pipeline.js';
 
 const toursRouter = express.Router();
 
@@ -85,6 +85,16 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
       }
     }
 
+    const postMatchStages: PipelineStage[] = [];
+
+    if (req.query.isHot === 'true') {
+      postMatchStages.push({ $match: { isHot: true } });
+    }
+
+    if (req.query.hasDiscount === 'true') {
+      postMatchStages.push({ $match: { hasDiscount: true } });
+    }
+
     const tours: AggregatedTours[] = await Tour.aggregate([
       {$match: query},
       {
@@ -103,6 +113,17 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
           as: 'tourSets',
         },
       },
+      {
+        $addFields: {
+          tourSets: {
+            $filter: {
+              input: '$tourSets',
+              as: 'set',
+              cond: { $eq: ['$$set.status', 'OPEN'] }
+            }
+          }
+        }
+      },
       {$unwind: {path: '$category', preserveNullAndEmptyArrays: true}},
       {
         $addFields: {
@@ -112,6 +133,20 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
                 input: '$tourSets',
                 as: 'tour_set',
                 in: '$$tour_set.isHot',
+              },
+            },
+          },
+          hasDiscount: {
+            $anyElementTrue: {
+              $map: {
+                input: '$tourSets',
+                as: 'tour_set',
+                in: {
+                  $and: [
+                      { $ne: ['$$tour_set.discountPrice', null] },
+                    { $gt: ['$$tour_set.discountPrice', 0] },
+                  ]
+                },
               },
             },
           },
@@ -156,6 +191,7 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
           }
         },
       },
+        ...postMatchStages,
       {$sort: sort},
       {$skip: skip},
       {$limit: limit},
@@ -169,6 +205,7 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
           rating: 1,
           ratingCount: 1,
           isHot: 1,
+          hasDiscount: 1,
           saleDeadline: 1,
           hotelLocation: 1,
           minPrice: 1,
@@ -183,7 +220,48 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
       },
     ]);
 
-    const totalTours = await Tour.countDocuments(query);
+    const countResult = await Tour.aggregate([
+        { $match: query },
+      {
+        $lookup: {
+          from: 'toursets',
+          localField: '_id',
+          foreignField: 'tourId',
+          as: 'tourSets',
+        },
+      },
+      {
+        $addFields: {
+          isHot: {
+            $anyElementTrue: {
+              $map: {
+                input: '$tourSets',
+                as: 'tour_set',
+                in: '$$tour_set.isHot',
+              },
+            },
+          },
+          hasDiscount: {
+            $anyElementTrue: {
+              $map: {
+                input: '$tourSets',
+                as: 'tour_set',
+                in: {
+                  $and: [
+                      { $ne: ['$$tour_set.discountPrice', null] },
+                    { $gt: ['$$tour_set.discountPrice', 0] },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+      ...postMatchStages,
+      { $count: 'total' },
+    ]);
+
+    const totalTours = countResult[0]?.total ?? 0;
 
     res.send({
       tours,

@@ -1,34 +1,34 @@
 'use client';
 
-import { useState, type ChangeEvent } from 'react';
+import {type ChangeEvent, useState} from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import {usePathname, useRouter, useSearchParams} from 'next/navigation';
 import {
   ArrowBigDown,
   ArrowBigUp,
   CalendarPlus2,
-  House,
-  RefreshCw,
-  Star,
-  WifiOff,
   Compass,
-  Search,
   Globe,
+  House,
   Paintbrush,
+  RefreshCw,
+  Search,
+  Star,
+  WifiOff
 } from 'lucide-react';
 
-import { PaginationCustom } from '@/components/pagination/PaginationCustom';
+import {PaginationCustom} from '@/components/pagination/PaginationCustom';
 import PublicTourCard from '@/components/public/tours/PublicTourCard';
-import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
+import {Breadcrumbs} from '@/components/shared/Breadcrumbs';
 import Sort from '@/components/shared/Sort';
 import FilterCombobox from '../../shared/FilterCombobox';
 
-import { useGetTourCategories, useTours } from '@/lib/hooks/tourHooks';
-import { useHomepageSettings } from '@/lib/hooks/homepageSettingsHooks';
-import { toursLimitPag } from '@/lib/constants';
-import { getCountryOptions, pluralize } from '@/lib/utils';
-import { StyledInput } from '@/components/shared/form/field-styles';
-import { useDebounce } from 'use-debounce';
+import {useGetTourCategories, useTours} from '@/lib/hooks/tourHooks';
+import {useHomepageSettings} from '@/lib/hooks/homepageSettingsHooks';
+import {toursLimitPag} from '@/lib/constants';
+import {getCountryOptions, pluralize} from '@/lib/utils';
+import {StyledInput} from '@/components/shared/form/field-styles';
+import {useDebounce} from 'use-debounce';
 
 const SORT_OPTIONS = [
   { value: 'newest', label: 'Новые сверху', icon: CalendarPlus2 },
@@ -41,12 +41,31 @@ const ToursList = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState<string | null>(null);
   const debouncedSearch = useDebounce(search, 400);
+  const router = useRouter();
+  const pathname = usePathname();
 
   const countryOptions = getCountryOptions();
   const searchParams = useSearchParams();
   const sort = searchParams.get('sort');
   const categoryId = searchParams.get('categories');
   const rawCountryCode = searchParams.get('countryCode');
+
+  const isHot = searchParams.get('isHot') === 'true';
+  const hasDiscount = searchParams.get('hasDiscount') === 'true';
+
+  const toggleParam = (key: string, current: boolean) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (current) {
+      params.delete(key);
+    } else {
+      params.set(key, 'true');
+    }
+
+    params.delete('page');
+    router.push(`${pathname}?${params.toString()}`);
+    setPage(1);
+  };
 
   const { data: categories } = useGetTourCategories();
 
@@ -69,6 +88,8 @@ const ToursList = () => {
     isPublished: true,
     categoryId,
     sort,
+    isHot,
+    hasDiscount,
     countryCode: countryCode ?? undefined,
     search: debouncedSearch[0],
   });
@@ -146,7 +167,7 @@ const ToursList = () => {
   }
 
   return (
-    <div className="px-4 max-w-7xl mx-auto w-full pb-16">
+    <div className="w-full pb-16">
       <Breadcrumbs
         items={[
           { label: 'Главная', href: '/' },
@@ -170,8 +191,8 @@ const ToursList = () => {
         </p>
       </header>
 
-      <div className="mb-6 flex flex-col gap-3 border-b border-gray-100 pb-6 lg:flex-row lg:items-end">
-        <div className="flex flex-1 flex-col gap-1">
+      <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 lg:flex lg:flex-row lg:items-end gap-4 border-b border-gray-100 pb-6">
+        <div className="flex flex-col gap-1 sm:col-span-3 lg:flex-1">
           <label
             htmlFor="tour-search"
             className="pl-0.5 text-xs font-semibold uppercase tracking-wide text-slate-400"
@@ -191,7 +212,7 @@ const ToursList = () => {
         </div>
 
         {categories && (
-          <div className="flex flex-col gap-1 lg:w-52">
+          <div className="flex flex-col gap-1 w-full lg:w-52">
             <span className="pl-0.5 text-xs font-semibold uppercase tracking-wide text-slate-400">
               Категория
             </span>
@@ -206,7 +227,7 @@ const ToursList = () => {
         )}
 
         {countryOptions && (
-          <div className="flex flex-col gap-1 lg:w-52">
+          <div className="flex flex-col gap-1 w-full lg:w-52">
             <span className="pl-0.5 text-xs font-semibold uppercase tracking-wide text-slate-400">
               Страна
             </span>
@@ -220,11 +241,39 @@ const ToursList = () => {
           </div>
         )}
 
-        <div className="flex flex-col gap-2 lg:w-48">
+        <div className="flex flex-col gap-1 w-full lg:w-48">
           <span className="pl-0.5 text-xs font-semibold uppercase tracking-wide text-slate-400">
             Сортировка
           </span>
           <Sort options={SORT_OPTIONS} />
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2 mb-5">
+        <span className="pl-0.5 text-xs font-semibold uppercase tracking-wide text-slate-400">
+          Фильтры
+        </span>
+
+        <div className="flex gap-2">
+          <button
+              type="button"
+              onClick={() => toggleParam('isHot', isHot)}
+              className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition cursor-pointer ${
+                isHot ? 'bg-red-500 text-white border-red-500' : 'bg-white text-gray-600 border-gray-300 hover:border-red-400'
+              }`}
+          >
+            🔥 Горящие
+          </button>
+
+          <button
+              type="button"
+              onClick={() => toggleParam('hasDiscount', hasDiscount)}
+              className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition cursor-pointer ${
+                hasDiscount ? 'bg-green-500 text-white border-green-500' : 'bg-white text-gray-600 border-gray-300 hover:border-green-400'
+              }`}
+          >
+            % Скидка
+          </button>
         </div>
       </div>
 

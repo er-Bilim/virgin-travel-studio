@@ -7,90 +7,81 @@ import validateObjectId from '@/middlewares/validateObjectId.js';
 import type {PopulatedOrder} from "@/types/reports.types.js";
 import {parseDate} from "@/utils/excel/parseDate.js";
 import {applyExcelStyles} from "@/utils/excel/applyExcelStyles.js";
+import auth, {type RequestWithUser} from "@/middlewares/auth.js";
+import permit from "@/middlewares/permit.js";
 
 
 async function getDailyManagerReport(req: Request, res: Response, next: NextFunction) {
-  try {
-    const {from, to, managerId} = req.query;
+    try {
+        const reqUser  = (req as RequestWithUser).user;
+        const { from, to, managerId } = req.query;
 
-    if (managerId && typeof managerId !== 'string') {
-      return res.status(400).json({error: 'managerId должен быть строкой'});
-    }
+        if (managerId && typeof managerId !== 'string') {
+            return res.status(400).json({ error: 'managerId должен быть строкой' });
+        }
 
-    if (from && typeof from !== 'string') {
-      return res.status(400).json({error: '"from" должен быть строкой'});
-    }
+        if (from && typeof from !== 'string') {
+            return res.status(400).json({ error: '"from" должен быть строкой' });
+        }
 
-    if (to && typeof to !== 'string') {
-      return res.status(400).json({error: '"to" должен быть строкой'});
-    }
+        if (to && typeof to !== 'string') {
+            return res.status(400).json({ error: '"to" должен быть строкой' });
+        }
 
-    const fromDate = parseDate(from);
-    const toDate = parseDate(to);
+        const fromDate = parseDate(from);
+        const toDate = parseDate(to);
 
-    if (from && !fromDate) {
-      return res.status(400).json({error: 'Неправильная "from" дата'});
-    }
+        if (from && !fromDate) {
+            return res.status(400).json({ error: 'Неправильная "from" дата' });
+        }
 
-    if (to && !toDate) {
-      return res.status(400).json({error: 'Неправильная "to" дата'});
-    }
+        if (to && !toDate) {
+            return res.status(400).json({ error: 'Неправильная "to" дата' });
+        }
 
-    let managerObjectId: Types.ObjectId | undefined;
+        let managerObjectId: Types.ObjectId | undefined;
 
-    if (typeof managerId === 'string') {
-      if (!mongoose.Types.ObjectId.isValid(managerId)) {
-        return res.status(400).json({error: 'Неверный managerId'});
-      }
-      managerObjectId = new Types.ObjectId(managerId);
-    }
+        if (reqUser.role === 'MANAGER' && managerId) {
+            return res.status(403).json({
+                error: 'Менеджер не может запрашивать отчеты других менеджеров',
+            });
+        }
 
-    if (fromDate && toDate && fromDate > toDate) {
-      return res.status(400).json({
-        error: '"from" не должен быть больше "to"',
-      });
-    }
+        if (reqUser.role === 'MANAGER') {
+            managerObjectId = reqUser._id;
+        } else if (reqUser.role === 'ADMIN') {
+            if (typeof managerId === 'string') {
+                if (!mongoose.Types.ObjectId.isValid(managerId)) {
+                    return res.status(400).json({ error: 'Неверный managerId' });
+                }
+                managerObjectId = new Types.ObjectId(managerId);
+            }
+        }
 
-    const diffDays =
-      fromDate && toDate
-        ? Math.ceil((toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60 * 24))
-        : 0;
+        if (fromDate && toDate && fromDate > toDate) {
+            return res.status(400).json({
+                error: '"from" не должен быть больше "to"',
+            });
+        }
 
-    if (diffDays > 31) {
-      return res.status(400).json({
-        error: 'Диапазон дат слишком большой (максимум 31 день)',
-      });
-    }
+        const diffDays =
+            fromDate && toDate
+                ? Math.ceil((toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60 * 24))
+                : 0;
 
-    const endOfDay =
-      toDate ? new Date(toDate.setHours(23, 59, 59, 999)) : null;
+        if (diffDays > 31) {
+            return res.status(400).json({
+                error: 'Диапазон дат слишком большой (максимум 31 день)',
+            });
+        }
 
-    const data = await mongoose.connection
-      .collection('users')
-      .aggregate([
-        {
-          $match: {
-            role: 'MANAGER',
-            ...(managerObjectId && {_id: managerObjectId}),
-          },
-        },
+        const endOfDay =
+            toDate ? new Date(toDate.setHours(23, 59, 59, 999)) : null;
 
-        {
-          $lookup: {
-            from: 'orders',
-            let: {managerId: '$_id'},
-            pipeline: [
-              {
-                $match: {
-                  $expr: {
-                    $eq: ['$managerId', '$$managerId'],
-                  },
-                },
-              },
-
-              ...(fromDate || endOfDay
-                ? [
-                  {
+        const data = await mongoose.connection
+            .collection('users')
+            .aggregate([
+                {
                     $match: {
                       createdAt: {
                         ...(fromDate && {$gte: fromDate}),
@@ -416,7 +407,7 @@ async function getTourRosterReport(req: Request, res: Response, next: NextFuncti
 
 const reportsRouter = Router();
 
-reportsRouter.get('/daily-manager', getDailyManagerReport);
-reportsRouter.get('/tour-roster/:tourSetId', validateObjectId('tourSetId'), getTourRosterReport,);
+reportsRouter.get('/daily-manager', auth, permit('ADMIN', 'MANAGER'), getDailyManagerReport);
+reportsRouter.get('/tour-roster/:tourSetId',auth, permit('ADMIN', 'MANAGER'), validateObjectId('tourSetId'), getTourRosterReport,);
 
 export default reportsRouter;
