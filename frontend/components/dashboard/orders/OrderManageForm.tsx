@@ -5,7 +5,6 @@ import type { OrderMutationType } from '@/types/order';
 import { inputClass } from '@/lib/constants';
 import { Input } from '@/components/ui/input';
 import { useUpdateOrder } from '@/lib/hooks/orderHooks';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import {
@@ -18,6 +17,7 @@ import {
 import { useState } from 'react';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { CircleX } from 'lucide-react';
 
 interface Props {
   initialValues: OrderMutationType;
@@ -33,7 +33,6 @@ export default function OrderManageForm({ initialValues, orderId }: Props) {
     formState: { errors },
   } = useForm<OrderMutationType>({ defaultValues: initialValues });
 
-  const router = useRouter();
   const { mutate: updateOrder, isPending: isUpdatinging } = useUpdateOrder();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -50,7 +49,7 @@ export default function OrderManageForm({ initialValues, orderId }: Props) {
       { id: orderId, data: payload },
       {
         onSuccess: () => {
-          router.back();
+          toast.success('Заявка обновлена', { position: 'top-center' });
         },
         onError: () => {
           toast.error('Произошла ошибка', { position: 'top-center' });
@@ -119,101 +118,98 @@ export default function OrderManageForm({ initialValues, orderId }: Props) {
               const isCurrentlyRejected = field.value === rejectStatus;
 
               return (
-                <div className="flex flex-col space-y-2 w-full py-4">
-                  <div className="flex justify-between items-center px-1">
-                    <span className="text-sm font-medium text-gray-500">
-                      Этап заявки
-                    </span>
-                    {errors.status && (
-                      <span className="text-xs text-red-500">
-                        {errors.status.message}
-                      </span>
-                    )}
-                  </div>
+                <div>
+                  <div className="flex flex-col space-y-2 w-full py-4">
+                    <div className="flex justify-between items-center px-1">
+                      {errors.status && (
+                        <span className="text-xs text-red-500">
+                          {errors.status.message}
+                        </span>
+                      )}
+                    </div>
 
-                  <div className="flex flex-col lg:flex-row items-start lg:items-center lg:gap-2 relative w-full p-4 rounded-xl">
-                    {statusText?.map((status, index) => {
-                      const isCompleted =
-                        !isCurrentlyRejected && index < currentStepIndex;
-                      const isActive =
-                        !isCurrentlyRejected && index === currentStepIndex;
+                    <div className="flex flex-col lg:flex-row items-start lg:items-center lg:gap-2 relative w-full p-4 rounded-xl">
+                      {statusText?.map((status, index) => {
+                        const isCompleted =
+                          !isCurrentlyRejected && index < currentStepIndex;
+                        const isActive =
+                          !isCurrentlyRejected && index === currentStepIndex;
 
-                      return (
-                        <div
-                          key={index}
-                          className="flex items-center w-full lg:w-auto"
-                        >
-                          <button
-                            type="button"
-                            onClick={() => field.onChange(status.status)}
-                            className="flex flex-col items-start space-x-3 lg:space-x-2 group w-full lg:w-auto transition-all duration-200 cursor-pointer"
+                        return (
+                          <div
+                            key={index}
+                            className="flex items-center w-full lg:w-auto"
                           >
-                            <div className="flex flex-row gap-2 items-center">
-                              <div
-                                className={`flex items-center justify-center w-10 h-10 rounded-full border-2 text-sm font-bold shrink-0 transition-all
-                                ${isActive ? 'bg-white border-cyan-500 text-cyan-500' : ''}
-                                ${isCompleted ? 'bg-cyan-600 border-cyan-600 text-white' : ''}
-                                ${!isActive && !isCompleted ? ' border-slate-100 bg-slate-100 text-gray-400 group-hover:border-gray-400' : ''}
-                      `}
-                              >
-                                {isCompleted ? (
-                                  <Check className="size-4" />
-                                ) : (
-                                  index + 1
+                            <button
+                              type="button"
+                              onClick={() => field.onChange(status.status)}
+                              className="flex flex-col items-start space-x-3 lg:space-x-2 group w-full lg:w-auto transition-all duration-200 cursor-pointer"
+                            >
+                              <div className="flex flex-row gap-2 items-center">
+                                <div
+                                  className={`flex items-center justify-center w-13 h-13 rounded-full border-2 text-sm font-bold shrink-0 transition-all
+                                  ${isActive ? 'bg-white border-cyan-500 text-cyan-500' : ''}
+                                  ${isCompleted ? 'bg-cyan-600 border-cyan-600 text-white' : ''}
+                                  ${!isActive && !isCompleted ? ' border-slate-100 bg-slate-100 text-gray-400 group-hover:border-gray-400' : ''}
+                        `}
+                                >
+                                  {isCompleted ? (
+                                    <Check className="size-4" />
+                                  ) : (
+                                    index + 1
+                                  )}
+                                </div>
+
+                                {index < statusText.length - 1 && (
+                                  <span
+                                    className={cn(
+                                      'h-0.5 text-slate-100 bg-slate-200 w-[175px] rounded-2xl',
+                                      { 'bg-cyan-600': isCompleted },
+                                    )}
+                                  />
                                 )}
                               </div>
 
-                              {
-                                index < statusText.length - 1 && (
-                                  <span className='h-0.5 text-slate-100 bg-red-300 w-[85px] rounded-2xl'/>
-                                )
-                              }
-                            </div>
+                              <div className="flex flex-col">
+                                <span
+                                  className={cn(
+                                    'mt-3 text-[12px] font-bold uppercase tracking-wide step-label transition',
+                                    {
+                                      'text-gray-400':
+                                        !isActive && !isCompleted,
+                                      'text-cyan-600 font-bold': isActive,
+                                    },
+                                  )}
+                                >
+                                  {status.text}
+                                </span>
+                              </div>
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
 
-                            <div className="flex flex-col">
-                              <span
-                                className={cn(
-                                  'mt-3 text-[12px] font-bold uppercase tracking-wide step-label transition',
-                                  {
-                                    'text-gray-400': !isActive && !isCompleted,
-                                    'text-cyan-600 font-bold': isActive,
-                                  },
-                                )}
-                              >
-                                {status.text}
-                              </span>
-                            </div>
-                          </button>
-                        </div>
-                      );
-                    })}
+                  <div className="mt-6 pt-5 border-t border-line">
+                    <div className="flex items-center justify-between gap-4">
+                      <p className="text-[13px] text-slate-400">
+                        Если заявку нельзя выполнить – отклоните её и укажите
+                        причину
+                      </p>
 
-                    {/*<button
-                      type="button"
-                      onClick={() => {
-                        setIsModalOpen(true);
-                        field.onChange(rejectStatus);
-                      }}
-                      className="flex items-center space-x-3 lg:space-x-2 text-left group w-full lg:w-auto transition-all duration-200"
-                    >
-                      <div
-                        className={`flex items-center justify-center w-8 h-8 rounded-full border-2 text-sm font-bold shrink-0 transition-all
-                ${isCurrentlyRejected ? 'bg-red-500 border-red-500 text-white ring-4 ring-red-100' : 'bg-white border-red-200 text-red-400 group-hover:border-red-400 group-hover:text-red-500'}
-              `}
+                      <button
+                        type="button"
+                        className="shrink-0 inline-flex items-center gap-2 h-10 px-3 rounded-xl border border-red-100 text-red-600 bg-white hover:bg-red-50 transition text-sm font-semibold cursor-pointer"
+                        onClick={() => {
+                          setIsModalOpen(true);
+                          field.onChange(rejectStatus);
+                        }}
                       >
-                        {isCurrentlyRejected ? '✕' : '✕'}
-                      </div>
-
-                      <div className="flex flex-col">
-                        <span
-                          className={`text-sm font-medium transition-colors
-                  ${isCurrentlyRejected ? 'text-red-600 font-bold' : 'text-red-400 group-hover:text-red-500'}
-                `}
-                        >
-                          {rejectStatus}
-                        </span>
-                      </div>
-                    </button>*/}
+                        <CircleX />
+                        Отклонить
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
@@ -233,8 +229,17 @@ export default function OrderManageForm({ initialValues, orderId }: Props) {
             className={`${inputClass} font-black`}
           />
         </div>
-        <Button type="submit">Сохранить</Button>
+
+        <div className="mt-6 pt-5 border-t border-line flex items-center justify-end gap-3">
+          <Button
+            type="submit"
+            className="h-11 px-6 rounded-xl bg-navy-800 text-white font-semibold hover:bg-navy-900 transition shadow-soft cursor-pointer"
+          >
+            Сохранить изменения
+          </Button>
+        </div>
       </div>
+      
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent>
           <DialogHeader className="pr-8">
