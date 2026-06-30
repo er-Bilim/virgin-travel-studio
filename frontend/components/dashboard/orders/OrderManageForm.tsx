@@ -16,6 +16,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useState } from 'react';
+import { Check } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface Props {
   initialValues: OrderMutationType;
@@ -32,10 +34,7 @@ export default function OrderManageForm({ initialValues, orderId }: Props) {
   } = useForm<OrderMutationType>({ defaultValues: initialValues });
 
   const router = useRouter();
-  const {
-    mutate: updateOrder,
-    isPending: isUpdatinging,
-  } = useUpdateOrder();
+  const { mutate: updateOrder, isPending: isUpdatinging } = useUpdateOrder();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -60,11 +59,11 @@ export default function OrderManageForm({ initialValues, orderId }: Props) {
     );
   };
 
-  const statusList = [
-    'NEW',
-    'IN_PROGRESS',
-    'CONTRACT_PENDING',
-    'COMPLETED',
+  const statusText = [
+    { status: 'NEW', text: 'Новый' },
+    { status: 'IN_PROGRESS', text: 'В работе' },
+    { status: 'CONTRACT_PENDING', text: 'Договор' },
+    { status: 'COMPLETED', text: 'Завершена' },
   ];
 
   const rejectStatus = 'REJECTED';
@@ -113,10 +112,10 @@ export default function OrderManageForm({ initialValues, orderId }: Props) {
             control={control}
             name="status"
             render={({ field }) => {
-              const currentStepIndex = statusList && field.value
-                ? statusList.indexOf(field.value)
-                : -1;
-              // Проверяем, является ли текущий статус статусом отклонения
+              const currentStepIndex =
+                statusText && field.value
+                  ? statusText.findIndex((item) => item.status === field.value)
+                  : -1;
               const isCurrentlyRejected = field.value === rejectStatus;
 
               return (
@@ -132,11 +131,8 @@ export default function OrderManageForm({ initialValues, orderId }: Props) {
                     )}
                   </div>
 
-                  {/* Контейнер для всех статусов, включая Отказ */}
-                  <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 lg:gap-2 relative w-full bg-gray-50 p-4 rounded-xl border border-gray-200">
-                    {/* 1. Рендерим основную цепочку статусов */}
-                    {statusList?.map((status, index) => {
-                      // Если заявка отклонена, обычные шаги не должны подсвечиваться как выполненные
+                  <div className="flex flex-col lg:flex-row items-start lg:items-center lg:gap-2 relative w-full p-4 rounded-xl">
+                    {statusText?.map((status, index) => {
                       const isCompleted =
                         !isCurrentlyRejected && index < currentStepIndex;
                       const isActive =
@@ -149,41 +145,50 @@ export default function OrderManageForm({ initialValues, orderId }: Props) {
                         >
                           <button
                             type="button"
-                            onClick={() => field.onChange(status)}
-                            className="flex items-center space-x-3 lg:space-x-2 text-left group w-full lg:w-auto transition-all duration-200"
+                            onClick={() => field.onChange(status.status)}
+                            className="flex flex-col items-start space-x-3 lg:space-x-2 group w-full lg:w-auto transition-all duration-200 cursor-pointer"
                           >
-                            <div
-                              className={`flex items-center justify-center w-8 h-8 rounded-full border-2 text-sm font-bold shrink-0 transition-all
-                      ${isActive ? 'bg-[#eaeaea] border-[#1E2B6D] text-[#1E2B6D] ring-4 ring-blue-100' : ''}
-                      ${isCompleted ? 'bg-[#1E2B6D] border-[#1E2B6D] text-white' : ''}
-                      ${!isActive && !isCompleted ? 'bg-white border-gray-300 text-gray-400 group-hover:border-gray-400' : ''}
-                    `}
-                            >
-                              {isCompleted ? '✓' : index + 1}
+                            <div className="flex flex-row gap-2 items-center">
+                              <div
+                                className={`flex items-center justify-center w-10 h-10 rounded-full border-2 text-sm font-bold shrink-0 transition-all
+                                ${isActive ? 'bg-white border-cyan-500 text-cyan-500' : ''}
+                                ${isCompleted ? 'bg-cyan-600 border-cyan-600 text-white' : ''}
+                                ${!isActive && !isCompleted ? ' border-slate-100 bg-slate-100 text-gray-400 group-hover:border-gray-400' : ''}
+                      `}
+                              >
+                                {isCompleted ? (
+                                  <Check className="size-4" />
+                                ) : (
+                                  index + 1
+                                )}
+                              </div>
+
+                              {
+                                index < statusText.length - 1 && (
+                                  <span className='h-0.5 text-slate-100 bg-red-300 w-[85px] rounded-2xl'/>
+                                )
+                              }
                             </div>
 
                             <div className="flex flex-col">
                               <span
-                                className={`text-sm font-medium transition-colors
-                        ${isActive ? 'text-[#1E2B6D] font-bold' : ''}
-                        ${isCompleted ? 'text-gray-700' : 'text-gray-400 group-hover:text-gray-600'}
-                      `}
+                                className={cn(
+                                  'mt-3 text-[12px] font-bold uppercase tracking-wide step-label transition',
+                                  {
+                                    'text-gray-400': !isActive && !isCompleted,
+                                    'text-cyan-600 font-bold': isActive,
+                                  },
+                                )}
                               >
-                                {status}
+                                {status.text}
                               </span>
                             </div>
                           </button>
-
-                          {/* Стрелочка-разделитель */}
-                          <span className="hidden lg:inline-block text-gray-300 px-4 pointer-events-none">
-                            →
-                          </span>
                         </div>
                       );
                     })}
 
-                    {/* 2. Отдельная кнопка-статус «Отклонить» в самом конце линейки */}
-                    <button
+                    {/*<button
                       type="button"
                       onClick={() => {
                         setIsModalOpen(true);
@@ -208,7 +213,7 @@ export default function OrderManageForm({ initialValues, orderId }: Props) {
                           {rejectStatus}
                         </span>
                       </div>
-                    </button>
+                    </button>*/}
                   </div>
                 </div>
               );
