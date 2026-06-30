@@ -1,7 +1,7 @@
 import ClientAvatar from '@/components/shared/ClientAvatar';
 import Rating from '@/components/shared/Rating';
-import {formatDayAndMonthWords, getYearFullNumber} from '@/lib/utils';
-import type {IReview} from '@/types/review';
+import { formatDayAndMonthWords } from '@/lib/utils';
+import type { IReview } from '@/types/review';
 import ReviewPhoto from './ReviewPhoto';
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
 
 const Review = ({ review }: Props) => {
 
-  const { day, month } = formatDayAndMonthWords(review.createdDate);
+  const { day, month, year } = formatDayAndMonthWords(review.createdDate);
 
   return (
     <div className="border-1 border-[var(--border)] p-5 rounded-2xl bg-gray-50">
@@ -22,7 +22,7 @@ const Review = ({ review }: Props) => {
             <p className="text-gray-500 text-sm flex gap-1">
               <span>{day}</span>
               <span>{month}</span>
-              <span>{getYearFullNumber(review.createdDate)}</span>
+              <span>{year}</span>
             </p>
           </div>
         </div>

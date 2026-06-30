@@ -16,14 +16,14 @@ const CustomTourCard = () => {
         <div className="grid overflow-hidden rounded-3xl bg-card lg:grid-cols-[1fr_1fr] border border-slate-300">
           <div className="relative flex flex-col justify-between overflow-hidden bg-white p-10">
             <div className="relative z-10">
-              <p className="mb-4 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-cyan-600">
+              <p className="mb-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-cyan-800">
                 <Route className="size-3.5" />
                 Индивидуальный маршрут
               </p>
-              <h3 className="mb-4 text-3xl font-black leading-tight tracking-tight text-navy-900 md:text-4xl">
+              <h3 className="mb-4 text-3xl font-black tracking-tight text-navy-800">
                 Тур, которого ещё нет
               </h3>
-              <p className="max-w-sm leading-relaxed text-slate-700">
+              <p className="max-w-sm leading-relaxed text-slate-700 text-[15px]">
                 Тур, которого ещё нет Расскажите, куда мечтаете поехать и когда
                 – мы создадим маршрут под вас
               </p>

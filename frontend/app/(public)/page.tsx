@@ -6,13 +6,15 @@ import LatestNewsSection from '@/components/public/news/LatestNewsSection';
 import { useTourSets } from '@/lib/hooks/tourSets';
 import { useHomepageSettings } from '@/lib/hooks/homepageSettingsHooks';
 import { imageUrl } from '@/lib/constants';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, MapPinned } from 'lucide-react';
+import { IoIosQuote } from 'react-icons/io';
 import CustomTourCard from '@/components/public/home/tourCustomCard/CustomTourCard';
 import { usePopularTours } from '@/lib/hooks/tourHooks';
+import ReviewsCarousel from '@/components/public/reviews/ReviewsCarousel';
 
-export default function Home() {
+const Home = () => {
   const limit = 4;
-
+  
   const {
     data: settings,
     isLoading: isSettingsLoading,
@@ -73,16 +75,43 @@ export default function Home() {
         </div>
       </div>
 
-      <section className="my-24">
+      <section
+        aria-labelledby="reviews-title"
+        className="mx-auto max-w-full py-14"
+      >
+        <div className="mb-9 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+          <div>
+            <p className="mb-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-cyan-800">
+              <IoIosQuote className="size-[18px]" />
+              Отзывы
+            </p>
+            <h2
+              id="reviews-title"
+              className="text-3xl font-black tracking-tight text-navy-800"
+            >
+              {settings?.reviewsPage?.title || 'Что говорят путешественники'}
+            </h2>
+            <p className="mt-2 max-w-md text-[15px] text-muted-foreground">
+              {settings?.reviewsPage?.subtitle ||
+                'Реальные впечатления тех, кто уже съездил с нами'}
+            </p>
+          </div>
+        </div>
+
+        <ReviewsCarousel/>
+      </section>
+
+      <section>
         <div className="mb-9 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-cyan-800">
+            <p className="mb-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-cyan-800">
+              <MapPinned className="size-[18px]" />
               Популярно сейчас
             </p>
-            <h2 className="text-3xl font-black text-navy-700 md:text-4xl">
+            <h2 className="text-3xl font-black tracking-tight text-navy-800">
               Туры, которые выбирают
             </h2>
-            <p className="mt-3 max-w-xl text-muted-foreground">
+            <p className="mt-3 max-w-xl text-muted-foreground text-[15px]">
               Готовы к приключениям? Выбирайте маршрут – остальное мы возьмём на
               себя.
             </p>
@@ -143,3 +172,5 @@ export default function Home() {
     </section>
   );
 }
+
+export default Home;
