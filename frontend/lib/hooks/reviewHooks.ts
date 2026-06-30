@@ -89,6 +89,7 @@ export const useFeatureReview = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reviews', 'featured']})
+      queryClient.invalidateQueries({ queryKey: ['reviews', 'admin'] })
     } 
   })
 }
