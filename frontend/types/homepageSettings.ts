@@ -22,7 +22,6 @@ export interface AdvantagesFields {
   image: File | null | ''
 }
 
-
 export interface HomepageSettingsFields {
   _id?: string;
   hero?: HeroSettings;

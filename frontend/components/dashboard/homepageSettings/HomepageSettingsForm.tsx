@@ -3,15 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import type { AxiosError } from 'axios';
-import { Loader2, Layout, Compass, FileText, Plus, Trash2 } from 'lucide-react';
-import FileInput from '@/components/dashboard/FileInput/FileInput';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+import { Loader2, Layout, Compass, FileText, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { imageUrl, inputClass } from '@/lib/constants';

@@ -9,16 +9,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import type { AdvantagesFields, HomepageSettingsMutationData } from '@/types/homepageSettings';
+import type { FieldErrors, UseFieldArrayRemove, UseFieldArrayUpdate, UseFormRegister, UseFormSetValue, UseFormWatch } from 'react-hook-form';
 
 interface AdvantageItemProps {
   index: number;
-  field: any;
-  fieldError: any;
-  register: any;
-  setValue: any;
-  watch: any;
-  update: any;
-  remove: any;
+  field: AdvantagesFields;
+  fieldError: FieldErrors<AdvantagesFields> | undefined;
+  register: UseFormRegister<HomepageSettingsMutationData>;
+  setValue: UseFormSetValue<HomepageSettingsMutationData>;
+  watch: UseFormWatch<HomepageSettingsMutationData>;
+  update: UseFieldArrayUpdate<HomepageSettingsMutationData, 'advantages'>;
+  remove: UseFieldArrayRemove;
   imageUrl: string;
   inputClass: string;
 }
@@ -38,7 +40,6 @@ export default function AdvantageItem({
   const imageToDisplay = field.image;
   const [previewSrc, setPreviewSrc] = useState<string | undefined>(undefined);
 
-  // ИСПРАВЛЕНО: Хук теперь находится внутри отдельного компонента и работает изолированно
   useEffect(() => {
     let objectUrl: string | undefined;
 
