@@ -33,7 +33,7 @@ export default function OrderManageForm({ initialValues, orderId }: Props) {
     formState: { errors },
   } = useForm<OrderMutationType>({ defaultValues: initialValues });
 
-  const { mutate: updateOrder, isPending: isUpdatinging } = useUpdateOrder();
+  const { mutate: updateOrder, isPending: isUpdating } = useUpdateOrder();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -67,7 +67,7 @@ export default function OrderManageForm({ initialValues, orderId }: Props) {
 
   const rejectStatus = 'REJECTED';
 
-  if (isUpdatinging) {
+  if (isUpdating) {
     return <div className="p-8 text-center text-gray-500">Обновляется...</div>;
   }
 
