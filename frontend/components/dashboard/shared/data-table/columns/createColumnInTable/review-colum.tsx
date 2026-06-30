@@ -56,7 +56,7 @@ export const getReviewColumns = ({
                 {tour?.images && tour.images.length > 0 && (
                   <div className="relative w-full h-48 overflow-hidden rounded-md bg-gray-100">
                     <img
-                      src={`${imageUrl}/${tour.images[0]}`}
+                      src={`${imageUrl}${tour.images[0]}`}
                       alt={tour.title}
                       className="w-full h-full object-cover"
                     />

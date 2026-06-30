@@ -3,6 +3,7 @@ const imageUrl = process.env.NEXT_IMAGE_URL ?? 'http://localhost:8000';
 const parsedImageUrl = new URL(imageUrl);
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
   images: {
     remotePatterns: [
       {
