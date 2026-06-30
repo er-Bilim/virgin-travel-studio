@@ -16,10 +16,12 @@ export interface PageSettings {
 }
 
 export interface AdvantagesFields {
+  _id?: string;
   title: string;
   body: string;
   image: File | null | ''
 }
+
 
 export interface HomepageSettingsFields {
   _id?: string;

@@ -17,7 +17,7 @@ const AdvantageSchema = new Schema({
       type: String,
       default: null,
     }
-}, { _id: false });
+});
 
 
 const HomepageSettingsSchema = new Schema<HomepageSettingsFields>(

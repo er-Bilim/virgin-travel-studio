@@ -16,7 +16,8 @@ import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { imageUrl, inputClass } from '@/lib/constants';
 import { VideoInput } from './VideoInput';
-import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog/ConfirmDialog'; // Импортируем модалку
+import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog/ConfirmDialog'; 
+import AdvantageItem from './advantages/advantageItem';
 
 import type { HomepageSettingsMutationData, AdvantagesFields } from '@/types/homepageSettings';
 import {
@@ -26,6 +27,7 @@ import {
 } from '@/lib/hooks/homepageSettingsHooks';
 import type { GlobalError } from '@/types/error';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 type FormTab = 'hero' | 'sections' | 'innerPages';
 
@@ -106,6 +108,7 @@ export default function HomepageSettingsForm() {
 
     mutate(pendingData, {
       onSuccess: () => {
+        toast.success('Данные обновились!', { position: 'top-center'})
         setPendingData(null);
       },
       onError: (err: unknown) => {
@@ -275,119 +278,21 @@ export default function HomepageSettingsForm() {
                 Блок преимуществ
               </h3>
               <div className="space-y-4">
-                {fields.map((field: AdvantagesFields, index) => {
-                  const fieldError = errors.advantages?.[index];
-
-                  const fileChangeHandler = (
-                    e: React.ChangeEvent<HTMLInputElement>,
-                  ) => {
-                    const { files } = e.target;
-                    const file = files && files[0] ? files[0] : null;
-
-                    setValue(`advantages.${index}.image` as const, file, {
-                      shouldDirty: true,
-                      shouldValidate: true,
-                    });
-                  };
-
-                  const deleteFile = (index: number) => {
-                    const currentItem = watch(`advantages.${index}`);
-
-                    update(index, {
-                      ...currentItem,
-                      image: null,
-                    });
-                  };
-
-                  return (
-                    <div
-                      key={index}
-                      className="relative p-3 border rounded-2xl bg-gray-100 items-start"
-                    >
-                      <div>
-                        <label>Заголовок:</label>
-                        <Input
-                          {...register(`advantages.${index}.title` as const, {
-                            required: 'Введите заголовок',
-                          })}
-                          className={`${inputClass} ${errors.advantages ? (errors.advantages[index] ? 'border-red-500 focus-visible:ring-red-500' : '') : ''}`}
-                        />
-                        {fieldError?.title && (
-                          <span style={{ color: 'red' }}>
-                            {fieldError.title.message}
-                          </span>
-                        )}
-                      </div>
-
-                      <div>
-                        <label>Текст:</label>
-                        <textarea
-                          {...register(`advantages.${index}.body` as const)}
-                          className={`${inputClass} min-h-[100px] py-2.5 resize-y`}
-                        />
-                        {fieldError?.body && (
-                          <span style={{ color: 'red' }}>
-                            {fieldError.body.message}
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="space-y-1">
-                        {field.image && (
-                          <div className="flex items-center gap-3">
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <button
-                                  type="button"
-                                  className="text-blue-600 hover:underline text-sm"
-                                >
-                                  Посмотреть
-                                </button>
-                              </DialogTrigger>
-                              <DialogContent className="max-w-4xl flex flex-col items-center">
-                                <DialogHeader>
-                                  <DialogTitle className="sr-only">
-                                    Просмотр изображения
-                                  </DialogTitle>
-                                </DialogHeader>
-
-                                <div className="flex items-center justify-center">
-                                  <img
-                                    src={imageUrl + field.image}
-                                    alt={field.title}
-                                    className="max-h-[80vh] w-auto rounded-xl object-contain"
-                                  />
-                                </div>
-                              </DialogContent>
-                            </Dialog>
-                            <button
-                              className="cursor-pointer"
-                              type="button"
-                              onClick={() => deleteFile(index)}
-                            >
-                              <Trash2 className="h-4 w-4 text-red-500" />
-                            </button>
-                          </div>
-                        )}
-
-                        <FileInput
-                          key="image"
-                          name="image"
-                          label="Добавить"
-                          onChange={fileChangeHandler}
-                        />
-                      </div>
-                      <button
-                        aria-label="Убрать преимущество"
-                        type="button"
-                        onClick={() => remove(index)}
-                        className="absolute top-3 right-3 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-input bg-background hover:bg-red-50"
-                      >
-                        <Trash2 className="h-4 w-4 text-red-500" />
-                      </button>
-                    </div>
-                  );
-                })}
+                {fields.map((field: AdvantagesFields, index) => (
+                  <AdvantageItem
+                    key={index}
+                    index={index}
+                    field={field}
+                    fieldError={errors.advantages?.[index]}
+                    register={register}
+                    setValue={setValue}
+                    watch={watch}
+                    update={update}
+                    remove={remove}
+                    imageUrl={imageUrl}
+                    inputClass={inputClass}
+                  />
+                ))}
               </div>
               <button
                 type="button"

@@ -1,4 +1,6 @@
-interface AdvantageFields {
+import type { Types } from "mongoose";
+
+export interface AdvantageFields {
   title: string;
   body: string;
   image: string | null;
@@ -11,7 +13,7 @@ export interface HomepageSettingsFields {
     title: string;
     subtitle?: string;
   };
-  advantages: AdvantageFields[];
+  advantages: Types.DocumentArray<AdvantageFields>;
   mainPopularTours: {
     title: string;
     subtitle?: string;

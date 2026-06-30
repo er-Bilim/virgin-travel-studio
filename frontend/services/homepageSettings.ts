@@ -58,13 +58,17 @@ const makeHomepageFormData = (data: HomepageSettingsMutationData): FormData => {
 
 if (data.advantages && Array.isArray(data.advantages)) {
   data.advantages.forEach((advantage, index) => {
+    if (advantage._id) {
+      formData.append(`advantages[${index}][_id]`, advantage._id);
+    }
+
     if (advantage.title !== undefined) {
       formData.append(`advantages[${index}][title]`, advantage.title);
     }
     if (advantage.body !== undefined) {
       formData.append(`advantages[${index}][body]`, advantage.body);
     }
-    console.log(advantage.image)
+
     if (advantage.image instanceof File) {
       formData.append(`advantages[${index}][file]`, advantage.image);
     } else if (advantage.image === null || advantage.image === undefined) {

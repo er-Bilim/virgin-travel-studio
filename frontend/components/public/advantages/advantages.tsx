@@ -30,9 +30,9 @@ export default function Advantages() {
             </div>
             <div className="flex flex-wrap gap-2 md:gap-4 justify-center">
               {
-                advantages.map((adv, index) => (
+                advantages.map((adv) => (
                   <article
-                    key={index}
+                    key={adv._id}
                     className="group w-[350px] flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-gray-200"
                   >
                     {adv.image && (

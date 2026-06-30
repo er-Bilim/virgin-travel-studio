@@ -3,7 +3,7 @@ import auth from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
 import mongoose from 'mongoose';
 import deleteFile from '@/utils/deleteFile.js';
-import { combinedUpload, videosUpload } from '@/middlewares/multer.js';
+import { combinedUpload } from '@/middlewares/multer.js';
 import HomepageSettings from '@/model/homepageSettings/HomepageSettings.js';
 
 const homepageSettingsRouter = express.Router();
@@ -22,7 +22,7 @@ homepageSettingsRouter.post(
   '/',
   auth,
   permit('ADMIN'),
-  videosUpload.single('video'),
+  combinedUpload.any(),
   async (req, res, next) => {
     try {
       const existingSettings = await HomepageSettings.findOne();
@@ -35,17 +35,63 @@ homepageSettingsRouter.post(
         });
       }
 
-      const { hero, advantages, mainPopularTours, mainLatestNews, toursPage, newsPage } =
-        req.body;
-      const videoUrl = req.file
-        ? `videos/${req.file.filename}`
-        : hero?.videoUrl || '';
+      const uploadedFiles = (req.files as Express.Multer.File[]) || [];
+
+      const currentVideo = uploadedFiles.find( 
+        (file) => file.fieldname === 'video',
+      );
+
+      const {
+        hero,
+        advantages,
+        mainPopularTours,
+        mainLatestNews,
+        toursPage,
+        newsPage,
+      } = req.body;
+      const videoUrl = currentVideo ? `videos/${currentVideo.filename}` : null
+
+      let advantagesData = req.body.advantages;
+      if (typeof advantagesData === 'string') {
+        try {
+          advantagesData = JSON.parse(advantagesData);
+        } catch {
+          advantagesData = undefined;
+        }
+      }
+
+      const parsedAdvantages = [];
+
+       if (advantagesData && typeof advantagesData === 'object') {
+         const keys = Object.keys(advantagesData);
+
+         for (const key of keys) {
+           const index = Number(key);
+           const advData = advantagesData[key];
+
+           const attachedFile = uploadedFiles.find(
+             (file) => file.fieldname === `advantages[${index}][file]`,
+           );
+
+           let image = '';
+           if (attachedFile) {
+             image = `images/${attachedFile.filename}`;
+           }
+
+           parsedAdvantages.push({
+            //  ...(advData._id && { _id: advData._id }),
+             title: advData.title || '',
+             body: advData.body || '',
+             image: image,
+           });
+         }
+       }
 
       const settings = new HomepageSettings({
         hero: hero
           ? { videoUrl, title: hero.title, subtitle: hero.subtitle }
           : undefined,
-        advantages,
+        advantages: parsedAdvantages,
         mainPopularTours: mainPopularTours
           ? {
               title: mainPopularTours.title,
@@ -113,58 +159,88 @@ homepageSettingsRouter.put(
         deleteVideo,
       } = req.body;
 
-      const currentVideo = uploadedFiles.find(
-        (file) => file.fieldname === 'video',
+  const currentVideo = uploadedFiles.find((file) => file.fieldname === 'video');
+
+  if (currentVideo) {
+    if (settings.hero?.videoUrl) await deleteFile(settings.hero.videoUrl);
+    settings.hero.videoUrl = `videos/${currentVideo.filename}`;
+  } else if (deleteVideo === true || deleteVideo === 'true') {
+    if (settings.hero?.videoUrl) await deleteFile(settings.hero.videoUrl);
+    settings.hero.videoUrl = '';
+  }
+
+  const oldAdvantageImages = settings.advantages
+    .map((adv) => adv.image)
+    .filter(Boolean) as string[];
+
+  const newAdvantageImagesToKeep: string[] = [];
+
+  let advantagesData = req.body.advantages;
+  if (typeof advantagesData === 'string') {
+    try {
+      advantagesData = JSON.parse(advantagesData);
+    } catch {
+      advantagesData = undefined;
+    }
+  }
+
+  if (advantagesData && typeof advantagesData === 'object') {
+    const parsedAdvantages = [];
+    const keys = Object.keys(advantagesData);
+
+    for (const key of keys) {
+      const index = Number(key);
+      const advData = advantagesData[key];
+
+      const attachedFile = uploadedFiles.find(
+        (file) => file.fieldname === `advantages[${index}][file]`,
       );
-      if (currentVideo) {
-        if (settings.hero?.videoUrl) await deleteFile(settings.hero.videoUrl);
-        settings.hero.videoUrl = `videos/${currentVideo.filename}`;
-      } else if (deleteVideo === true || deleteVideo === 'true') {
-        if (settings.hero?.videoUrl) await deleteFile(settings.hero.videoUrl);
-        settings.hero.videoUrl = '';
-      }
 
-      let advantagesData = req.body.advantages;
-      if (typeof advantagesData === 'string') {
-        try {
-          advantagesData = JSON.parse(advantagesData);
-        } catch {
-          advantagesData = undefined;
+      let currentImageForThisAdvantage: string | null = null;
+
+      if (advData._id) {
+        const dbAdvantage = settings.advantages.id(advData._id);
+        if (dbAdvantage) {
+          currentImageForThisAdvantage = dbAdvantage.image || null;
         }
       }
 
-      if (advantagesData && typeof advantagesData === 'object') {
-        const parsedAdvantages = [];
-        const keys = Object.keys(advantagesData);
-      
-        for (const key of keys) {
-          const index = Number(key);
-          const advData = advantagesData[key];
-
-          const attachedFile = uploadedFiles.find(
-            (file) => file.fieldname === `advantages[${index}][file]`,
-          );
-
-          let currentImage = settings.advantages[index]?.image || null;
-
-          if (attachedFile) {
-            if (currentImage) await deleteFile(currentImage);
-            currentImage = `images/${attachedFile.filename}`;
-          } else if (advData.imageString === '') {
-            if (currentImage) await deleteFile(currentImage);
-            currentImage = null; 
-          } 
-
-
-          parsedAdvantages.push({
-            title: advData.title || '',
-            body: advData.body || '',
-            image: currentImage,
-          });
+      if (attachedFile) {
+        // Сценарий А: Загрузили новое фото -> удаляем старое, если оно было
+        if (currentImageForThisAdvantage) {
+          await deleteFile(currentImageForThisAdvantage);
         }
-
-        settings.advantages = parsedAdvantages;
+        currentImageForThisAdvantage = `images/${attachedFile.filename}`;
+        newAdvantageImagesToKeep.push(currentImageForThisAdvantage);
+      } else if (advData.imageString === '') {
+        // Сценарий Б: Картинку полностью стерли на фронтенде -> удаляем с диска
+        if (currentImageForThisAdvantage) {
+          await deleteFile(currentImageForThisAdvantage);
+        }
+        currentImageForThisAdvantage = null;
+      } else if (typeof advData.imageString === 'string') {
+        // Сценарий В: Картинку не трогали -> сохраняем старый путь
+        currentImageForThisAdvantage = advData.imageString;
+        newAdvantageImagesToKeep.push(currentImageForThisAdvantage!);
       }
+
+      parsedAdvantages.push({
+        ...(advData._id && { _id: advData._id }),
+        title: advData.title || '',
+        body: advData.body || '',
+        image: currentImageForThisAdvantage,
+      });
+    }
+
+    settings.advantages =
+      parsedAdvantages as unknown as typeof settings.advantages;
+  }
+
+  for (const oldImage of oldAdvantageImages) {
+    if (!newAdvantageImagesToKeep.includes(oldImage)) {
+      await deleteFile(oldImage);
+    }
+  }
 
       if (hero !== undefined && hero !== null) {
         if (hero.title !== undefined) settings.hero.title = hero.title;
