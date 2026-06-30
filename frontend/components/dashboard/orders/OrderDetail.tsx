@@ -35,18 +35,22 @@ import { cn, formatDayAndMonthWords, formatToReadablePrice } from '@/lib/utils';
 import type { SeatsLevel } from '@/lib/tour/seats';
 import getSeatsLevel from '@/lib/tour/seats';
 
-const styles: Record<SeatsLevel, { style: string }> = {
+const styles: Record<SeatsLevel, { text: string, bg: string }> = {
   available: {
-    style: 'emerald-500',
+    text: 'text-emerald-500',
+    bg: 'bg-emerald-500',
   },
   low: {
-    style: 'yellow-500',
+    text: 'text-yellow-500',
+    bg: 'bg-yellow-500',
   },
   critical: {
-    style: 'red-500',
+    text: 'text-red-500',
+    bg: 'bg-red-500',
   },
   'sold-out': {
-    style: 'gray-400',
+    text: 'text-gray-400',
+    bg: 'bg-gray-400',
   },
 };
 
@@ -358,7 +362,7 @@ export default function OrderDetail() {
                   <div className="flex items-end gap-2 mb-3">
                     <span
                       className={cn(
-                        `text-${styles[seatLevel].style} text-4xl font-black leading-none`,
+                        `${styles[seatLevel].text} text-4xl font-black leading-none`,
                       )}
                     >
                       {freeSeats}
@@ -371,7 +375,7 @@ export default function OrderDetail() {
                   <div className="h-3 w-full rounded-full bg-slate-200 overflow-hidden">
                     <div
                       className={cn(
-                        `bg-${styles[seatLevel].style} h-full rounded-full`,
+                        `${styles[seatLevel].bg} h-full rounded-full`,
                       )}
                       style={{ width: `${( Math.max(0, Math.min(100, totalSeats ? (freeSeats / totalSeats) * 100 : 0)))}%` }}
                     />
@@ -380,7 +384,7 @@ export default function OrderDetail() {
                   <p
                     id="seatNote"
                     className={cn(
-                      `mt-5 text-[13px] text-${styles[seatLevel].style} font-semibold`,
+                      `mt-5 text-[13px] ${styles[seatLevel].text } font-semibold`,
                     )}
                   >
                     {getSeatLevelText(seatLevel)}
