@@ -34,6 +34,8 @@ export interface OrderType {
   status: string;
   rejectionReason: string | null;
   managerId: ManagerLite | null;
+  visibleId: string;
+  createdAt: string;
 }
 
 export interface PaginatedOrdersResponse {
