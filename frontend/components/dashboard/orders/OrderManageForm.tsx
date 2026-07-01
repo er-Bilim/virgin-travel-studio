@@ -2,7 +2,7 @@
 
 import { useForm, Controller } from 'react-hook-form';
 import type { OrderMutationType } from '@/types/order';
-import { inputClass } from '@/lib/constants';
+import { inputClass, ORDER_STATUS_LABELS, ORDER_STATUS_FLOW } from '@/lib/constants';
 import { Input } from '@/components/ui/input';
 import { useUpdateOrder } from '@/lib/hooks/orderHooks';
 import { Button } from '@/components/ui/button';
