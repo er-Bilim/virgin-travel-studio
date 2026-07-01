@@ -271,9 +271,9 @@ export default function HomepageSettingsForm() {
                 Блок преимуществ
               </h3>
               <div className="space-y-4">
-                {fields.map((field: AdvantagesFields, index) => (
+                {fields.map((field, index) => (
                   <AdvantageItem
-                    key={index}
+                    key={field.id}    
                     index={index}
                     field={field}
                     fieldError={errors.advantages?.[index]}

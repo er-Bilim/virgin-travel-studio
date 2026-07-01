@@ -23,7 +23,7 @@ export default function Advantages() {
       <>
         {advantages.length > 0 && !isError && (
           <>
-            <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div className="my-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
               <h2 className="text-3xl font-black text-navy-700 md:text-4xl">
                 Наши преимущества
               </h2>
