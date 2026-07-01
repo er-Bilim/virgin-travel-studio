@@ -48,6 +48,7 @@ homepageSettingsRouter.post(
         mainLatestNews,
         toursPage,
         newsPage,
+        reviewsPage,
       } = req.body;
       const videoUrl = currentVideo ? `videos/${currentVideo.filename}` : null
 
@@ -115,6 +116,9 @@ homepageSettingsRouter.post(
               subtitle: newsPage.subtitle,
             }
           : undefined,
+        reviewsPage: reviewsPage
+          ? { title: reviewsPage.title, subtitle: reviewsPage.subtitle }
+          : undefined,
       });
 
       await settings.save();
@@ -157,6 +161,7 @@ homepageSettingsRouter.put(
         toursPage,
         newsPage,
         deleteVideo,
+        reviewsPage,
       } = req.body;
 
   const currentVideo = uploadedFiles.find((file) => file.fieldname === 'video');
@@ -279,6 +284,12 @@ homepageSettingsRouter.put(
       // Маркируем изменения для Mongoose
       settings.markModified('hero');
       settings.markModified('advantages');
+      if (reviewsPage !== undefined && reviewsPage !== null) {
+        if (reviewsPage.title !== undefined)
+          settings.reviewsPage.title = reviewsPage.title;
+        if (reviewsPage.subtitle !== undefined)
+          settings.reviewsPage.subtitle = reviewsPage.subtitle;
+      }
 
       await settings.save();
 

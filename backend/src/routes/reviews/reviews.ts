@@ -7,6 +7,7 @@ import auth from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
 import deleteFile from '@/utils/deleteFile.js';
 import validateObjectId from '@/middlewares/validateObjectId.js';
+import toggleBooleanFieldHelper from '@/helpers/toggleBooleanFieldHelper.js';
 
 const reviewsRouter = express.Router();
 
@@ -108,6 +109,54 @@ reviewsRouter.get('/public', async (req, res, next) => {
   }
 });
 
+reviewsRouter.get('/public/featured', async (_req, res, next) => {
+  try {
+    const reviews = await Review.aggregate([
+      {
+        $match: { featuredOnHomepage: true },
+      },
+      {
+        $lookup: {
+          from: 'tours',
+          localField: 'tourId',
+          foreignField: '_id',
+          as: 'tourData',
+          pipeline: [
+            {
+              $project: {
+                title: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $unwind: { path: '$tourData', preserveNullAndEmptyArrays: true },
+      },
+      {
+        $addFields: {
+          tourId: '$tourData',
+        },
+      },
+      {
+        $sort: {
+          createdAt: -1,
+          rating: -1,
+        },
+      },
+      {
+        $project: {
+          tourData: 0,
+        },
+      },
+    ]);
+
+    return res.json(reviews);
+  } catch (error) {
+    next(error);
+  }
+});
+
 reviewsRouter.get(
   '/admin',
   auth,
@@ -125,6 +174,7 @@ reviewsRouter.get(
       const query: {
         tourId?: string;
         isModerated?: 'pending' | 'approved' | 'rejected';
+        featuredOnHomepage?: boolean;
       } = {};
 
       if (typeof tourId === 'string') {
@@ -134,13 +184,18 @@ reviewsRouter.get(
         query.tourId = tourId;
       }
 
-      const validStatuses = ['pending', 'approved', 'rejected'];
+      const validStatuses = ['pending', 'approved', 'rejected', 'featured'];
 
       if (
         typeof isModerated === 'string' &&
         validStatuses.includes(isModerated)
       ) {
         query.isModerated = isModerated as 'pending' | 'approved' | 'rejected';
+      }
+
+      if (isModerated === 'featured') {
+        query.isModerated = "approved";
+        query.featuredOnHomepage = Boolean(isModerated === 'featured');
       }
 
       const [reviews, totalReviews] = await Promise.all([
@@ -195,10 +250,16 @@ reviewsRouter.patch(
         message = 'Отзыв успешно отклонен';
       }
 
-    const result = await Review.aggregate([
-      { $match: { tourId: approvedReview.tourId, isModerated: 'approved' } },
-      { $group: { _id: null, avgRating: { $avg: '$rating' }, count: { $sum: 1 } } },
-    ]);
+      const result = await Review.aggregate([
+        { $match: { tourId: approvedReview.tourId, isModerated: 'approved' } },
+        {
+          $group: {
+            _id: null,
+            avgRating: { $avg: '$rating' },
+            count: { $sum: 1 },
+          },
+        },
+      ]);
 
       const ratingCount = result[0]?.count ?? 0;
 
@@ -215,6 +276,34 @@ reviewsRouter.patch(
       });
     } catch (e) {
       next(e);
+    }
+  },
+);
+
+reviewsRouter.patch(
+  '/:id/feature',
+  auth,
+  permit('ADMIN', 'MANAGER'),
+  validateObjectId(),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+
+      const updatedReview = await toggleBooleanFieldHelper(
+        Review,
+        'featuredOnHomepage',
+        id as string,
+      );
+
+      if (!updatedReview) {
+        return res.status(404).json({
+          error: 'Отзыв не найден',
+        });
+      }
+
+      return res.json(updatedReview);
+    } catch (error) {
+      next(error);
     }
   },
 );

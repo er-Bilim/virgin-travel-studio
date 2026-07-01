@@ -11,7 +11,7 @@ export default function PublicLayout({
   return (
     <>
       <Header />
-      <main className="flex-1 overflow-x-clip relative">
+      <main className="flex-1 overflow-x-hidden relative">
         <div className="max-w-[1400px] mx-auto px-[10px] md:px-[20px]">
           {children}
         </div>

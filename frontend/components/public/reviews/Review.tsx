@@ -1,6 +1,6 @@
 import ClientAvatar from '@/components/shared/ClientAvatar';
 import Rating from '@/components/shared/Rating';
-import { formatDayAndMonthWords, getYearFullNumber } from '@/lib/utils';
+import { formatDayAndMonthWords } from '@/lib/utils';
 import type { IReview } from '@/types/review';
 import ReviewPhoto from './ReviewPhoto';
 
@@ -10,7 +10,7 @@ interface Props {
 
 const Review = ({ review }: Props) => {
 
-  const { day, month } = formatDayAndMonthWords(review.createdDate);
+  const { day, month, year } = formatDayAndMonthWords(review.createdDate);
 
   return (
     <div className="border-1 border-[var(--border)] p-5 rounded-2xl bg-gray-50">
@@ -22,7 +22,7 @@ const Review = ({ review }: Props) => {
             <p className="text-gray-500 text-sm flex gap-1">
               <span>{day}</span>
               <span>{month}</span>
-              <span>{getYearFullNumber(review.createdDate)}</span>
+              <span>{year}</span>
             </p>
           </div>
         </div>
@@ -37,6 +37,22 @@ const Review = ({ review }: Props) => {
             authorName={review.clientName}
             rating={review.rating}
           />
+        </div>
+      )}
+
+      {review.companyReply && (
+        <div className="items-end mt-3 sm:mt-4 rounded-xl sm:rounded-2xl border border-[#DCE4FF] bg-[#F4F7FF] p-3 sm:p-4">
+          <div className="flex flex-col sm:flex-row items-start justify-between gap-3">
+            <div>
+              <p className="text-[10px] sm:text-[14px] font-bold uppercase tracking-wide text-[#1E2B6D]">
+                Ответ Virgin Travel
+              </p>
+
+              <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm leading-relaxed text-gray-700">
+                {review.companyReply}
+              </p>
+            </div>
+          </div>
         </div>
       )}
     </div>

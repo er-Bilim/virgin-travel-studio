@@ -46,6 +46,11 @@ const ReviewSchema = new Schema<ReviewFields>(
       enum: ["pending", "approved", "rejected"],
       default: "pending",
     },
+
+    featuredOnHomepage: {
+      type: Boolean,
+      default: false,
+    }
   },
   {
     timestamps: true,

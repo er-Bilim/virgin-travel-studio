@@ -30,6 +30,7 @@ export interface HomepageSettingsFields {
   mainLatestNews?: TextSectionSettings;
   toursPage?: PageSettings;
   newsPage?: PageSettings;
+  reviewsPage?: TextSectionSettings;
 }
 
 export interface HomepageSettingsMutationData extends HomepageSettingsFields {

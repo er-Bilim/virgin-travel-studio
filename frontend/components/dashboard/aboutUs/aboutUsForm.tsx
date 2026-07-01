@@ -75,7 +75,7 @@ export default function AboutUsForm({ initialValues, isLoading, errorLoad }: Pro
     name: 'steps' as const as never,
   });
 
-  const { mutate, isPending, error } = initialValues
+  const { mutate, isPending } = initialValues
     ? useEditAboutUsData()
     : useCreateAboutUsData();
 
@@ -295,7 +295,7 @@ export default function AboutUsForm({ initialValues, isLoading, errorLoad }: Pro
           </Field>
 
           <div className="space-y-2">
-            {stepsFields.map((field, index) => (
+            {stepsFields.map((_, index) => (
               <div key={index} className="space-y-1">
                 <div className="flex items-center gap-2">
                   <Input

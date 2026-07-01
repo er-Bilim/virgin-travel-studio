@@ -1,5 +1,8 @@
-import axiosApi from "@/lib/axiosApi";
-import type { HomepageSettingsFields, HomepageSettingsMutationData } from "@/types/homepageSettings";
+import axiosApi from '@/lib/axiosApi';
+import type {
+  HomepageSettingsFields,
+  HomepageSettingsMutationData,
+} from '@/types/homepageSettings';
 
 const makeHomepageFormData = (data: HomepageSettingsMutationData): FormData => {
   const formData = new FormData();
@@ -56,6 +59,13 @@ const makeHomepageFormData = (data: HomepageSettingsMutationData): FormData => {
       formData.append('newsPage[subtitle]', data.newsPage.subtitle);
   }
 
+  if (data.reviewsPage) {
+    if (data.reviewsPage.title !== undefined)
+      formData.append('reviewsPage[title]', data.reviewsPage.title);
+    if (data.reviewsPage.subtitle !== undefined)
+      formData.append('reviewsPage[subtitle]', data.reviewsPage.subtitle);
+  }
+
 if (data.advantages && Array.isArray(data.advantages)) {
   data.advantages.forEach((advantage, index) => {
     if (advantage._id) {
@@ -83,11 +93,14 @@ if (data.advantages && Array.isArray(data.advantages)) {
 };
 
 export const fetchHomepageSettings = async () => {
-  const result = await axiosApi.get<HomepageSettingsFields>('/homepage-settings');
+  const result =
+    await axiosApi.get<HomepageSettingsFields>('/homepage-settings');
   return result.data;
 };
 
-export const createHomepageSettings = async (data: HomepageSettingsMutationData) => {
+export const createHomepageSettings = async (
+  data: HomepageSettingsMutationData,
+) => {
   const formData = makeHomepageFormData(data);
   const result = await axiosApi.post<HomepageSettingsFields>('/homepage-settings', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
@@ -95,13 +108,16 @@ export const createHomepageSettings = async (data: HomepageSettingsMutationData)
   return result.data;
 };
 
-export const editHomepageSettings = async (data: HomepageSettingsMutationData) => {
-  const formData = makeHomepageFormData(data);
 
-  const result = await axiosApi.put<{ message: string; settings: HomepageSettingsFields }>(
-    '/homepage-settings',
-    formData,
-    { headers: { 'Content-Type': 'multipart/form-data' } }
-  );
+export const editHomepageSettings = async (
+  data: HomepageSettingsMutationData,
+) => {
+  const formData = makeHomepageFormData(data);
+  const result = await axiosApi.put<{
+    message: string;
+    settings: HomepageSettingsFields;
+  }>('/homepage-settings', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
   return result.data.settings;
 };

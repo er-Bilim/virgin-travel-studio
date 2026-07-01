@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 type Props = {
     saleDeadline?: string;
+    className?: string;
 };
 
 const getTimeLeft = (saleDeadline?: string) => {
@@ -31,7 +32,7 @@ const getTimeLeft = (saleDeadline?: string) => {
     return `${days}д ${hours}ч ${minutes}м ${seconds}с`;
 };
 
-const CountdownTimer = ({ saleDeadline }: Props) => {
+const CountdownTimer = ({ saleDeadline,className }: Props) => {
     const [timeLeft, setTimeLeft] = useState('Загрузка...');
 
     useEffect(() => {
@@ -56,7 +57,7 @@ const CountdownTimer = ({ saleDeadline }: Props) => {
         return () => window.clearInterval(interval);
     }, [saleDeadline]);
 
-    return <span>{timeLeft}</span>;
+    return <span className={className}>{timeLeft}</span>;
 };
 
 export default CountdownTimer;

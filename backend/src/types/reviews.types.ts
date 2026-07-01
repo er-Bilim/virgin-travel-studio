@@ -10,6 +10,7 @@ export interface ReviewFields {
   createdAt: Date;
   updatedAt: Date;
   companyReply?: string | null;
+  featuredOnHomepage: boolean;
 }
 
 export type ReviewDocument = HydratedDocument<ReviewFields>;
