@@ -51,25 +51,17 @@ export default function OrderManageForm({ initialValues, orderId }: Props) {
         onSuccess: () => {
           toast.success('Заявка обновлена', { position: 'top-center' });
         },
-        onError: () => {
-          toast.error('Произошла ошибка', { position: 'top-center' });
-        },
       },
     );
   };
-
-  const statusText = [
-    { status: 'NEW', text: 'Новый' },
-    { status: 'IN_PROGRESS', text: 'В работе' },
-    { status: 'CONTRACT_PENDING', text: 'Договор' },
-    { status: 'COMPLETED', text: 'Завершена' },
-  ];
 
   const rejectStatus = 'REJECTED';
 
   if (isUpdating) {
     return <div className="p-8 text-center text-gray-500">Обновляется...</div>;
   }
+
+  const statusText = ORDER_STATUS_FLOW.map((status) => ({ status, text: ORDER_STATUS_LABELS[status] }));
 
   return (
     <form
