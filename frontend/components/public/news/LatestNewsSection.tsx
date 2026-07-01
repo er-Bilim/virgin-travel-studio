@@ -5,6 +5,7 @@ import { ArrowRight, CalendarDays } from 'lucide-react';
 import { useNews } from '@/lib/hooks/newsHooks';
 import { imageUrl } from '@/lib/constants';
 import { formatDayAndMonthWords, truncateText } from '@/lib/utils';
+import { IoIosJournal } from "react-icons/io";
 
 const LatestNewsSection = () => {
   const { data, isLoading, isError } = useNews({
@@ -40,13 +41,14 @@ const LatestNewsSection = () => {
     <section className="my-24">
       <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-cyan-800">
+          <p className="mb-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-cyan-800">
+            <IoIosJournal className="size-[18px]"/>
             Журнал путешествий
           </p>
-          <h2 className="text-3xl font-black text-navy-700 md:text-4xl">
+          <h2 className="text-3xl font-black tracking-tight text-navy-800">
             Последние новости
           </h2>
-          <p className="mt-3 max-w-xl text-muted-foreground">
+          <p className="mt-3 max-w-xl text-muted-foreground text-[15px]">
             Свежие обновления, полезные заметки и вдохновение для будущих
             путешествий.
           </p>

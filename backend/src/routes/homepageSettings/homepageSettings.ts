@@ -35,8 +35,14 @@ homepageSettingsRouter.post(
         });
       }
 
-      const { hero, mainPopularTours, mainLatestNews, toursPage, newsPage } =
-        req.body;
+      const {
+        hero,
+        mainPopularTours,
+        mainLatestNews,
+        toursPage,
+        newsPage,
+        reviewsPage,
+      } = req.body;
       const videoUrl = req.file
         ? `videos/${req.file.filename}`
         : hero?.videoUrl || '';
@@ -67,6 +73,9 @@ homepageSettingsRouter.post(
               title: newsPage.title,
               subtitle: newsPage.subtitle,
             }
+          : undefined,
+        reviewsPage: reviewsPage
+          ? { title: reviewsPage.title, subtitle: reviewsPage.subtitle }
           : undefined,
       });
 
@@ -106,6 +115,7 @@ homepageSettingsRouter.put(
         toursPage,
         newsPage,
         deleteVideo,
+        reviewsPage,
       } = req.body;
 
       if (req.file) {
@@ -147,6 +157,13 @@ homepageSettingsRouter.put(
           settings.newsPage.title = newsPage.title;
         if (newsPage.subtitle !== undefined)
           settings.newsPage.subtitle = newsPage.subtitle;
+      }
+
+      if (reviewsPage !== undefined && reviewsPage !== null) {
+        if (reviewsPage.title !== undefined)
+          settings.reviewsPage.title = reviewsPage.title;
+        if (reviewsPage.subtitle !== undefined)
+          settings.reviewsPage.subtitle = reviewsPage.subtitle;
       }
 
       await settings.save();

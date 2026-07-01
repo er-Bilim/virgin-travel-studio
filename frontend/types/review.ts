@@ -20,6 +20,7 @@ export interface IReview {
   companyReply?: string | null;
   tourId: TourType;
   isModerated: "pending" | "approved" | "rejected";
+  featuredOnHomepage: boolean;
 }
 
 export interface IPaginationReviews {

@@ -1,8 +1,6 @@
-// order.types.ts
-
 interface CategoryLite {
   _id: string;
-  title: string
+  title: string;
 }
 
 interface TourLite {
@@ -14,8 +12,8 @@ interface TourLite {
 interface ManagerLite {
   _id: string;
   fullName: string;
-  phone: number
-}             
+  phone: number;
+}
 
 interface ToursetLite {
   _id: string;
@@ -24,6 +22,8 @@ interface ToursetLite {
   price: number;
   hotelName: string;
   tourId: TourLite;
+  bookedSeats: number;
+  totalSeats: number;
 }
 
 export interface OrderType {
@@ -34,6 +34,8 @@ export interface OrderType {
   status: string;
   rejectionReason: string | null;
   managerId: ManagerLite | null;
+  visibleId: string;
+  createdAt: string;
 }
 
 export interface PaginatedOrdersResponse {
@@ -43,19 +45,7 @@ export interface PaginatedOrdersResponse {
     page: number;
     limit: number;
     totalPages: number;
-  }
-}
-
-export interface OrderStats {
-  byStatus: {
-    NEW: number;
-    IN_PROGRESS: number;
-    CONTRACT_PENDING: number;
-    COMPLETED: number;
-    REJECTED: number;
-  },
-  completedToday: number;
-  monthRevenue: number;
+  };
 }
 
 export interface OrderMutationType {
@@ -65,13 +55,32 @@ export interface OrderMutationType {
   status?: string;
   rejectionReason?: string | null;
   managerId: string | null | undefined;
-} 
-
+}
 
 export interface OrderPostType {
-    tourSetId: string;
-    clientPhone: string;
-    clientName: string;
+  tourSetId?: string;
+  clientPhone: string;
+  clientName: string;
+}
+
+export interface CustomTourMutation {
+  countryCode: string;
+  startDate: string;
+  endDate: string;
+  hotel?: string;
+  description?: string | null;
+  clientName: string;
+  clientPhone: string;
+}
+
+type CustomTourType = Omit<CustomTourMutation, 'clientName' | 'clientPhone'> & {
+  activities: string[];
+};
+
+export interface CustomTourPost {
+  clientName: string;
+  clientPhone: string;
+  customTour: CustomTourType;
 }
 
 export interface ContractFormValues {
@@ -80,3 +89,22 @@ export interface ContractFormValues {
   passportIssueDate: string;
   birthDate: string;
 }
+
+export type OrderStatus =
+  | 'NEW'
+  | 'IN_PROGRESS'
+  | 'CONTRACT_PENDING'
+  | 'COMPLETED'
+  | 'REJECTED';
+
+  export interface OrderStats {
+    byStatus: {
+      NEW: number;
+      IN_PROGRESS: number;
+      CONTRACT_PENDING: number;
+      COMPLETED: number;
+      REJECTED: number;
+    };
+    completedToday: number;
+    monthRevenue: number;
+  }

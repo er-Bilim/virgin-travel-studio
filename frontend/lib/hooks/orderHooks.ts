@@ -66,7 +66,6 @@ export const useUpdateOrder = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       queryClient.invalidateQueries({ queryKey: ['order', variables.id] });
-      toast.success('Заявка обновлена');
     },
     onError: (err: AxiosError<GlobalError>) => {
       const data = err.response?.data;
