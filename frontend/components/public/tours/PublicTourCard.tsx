@@ -186,7 +186,7 @@ const PublicTourCard = ({ tour }: Props) => {
                           <span className="text-[12px] uppercase tracking-wider text-muted-foreground">
                             от
                           </span>
-                          {discountPercent && discountPercent > 0 && (
+                          {Number.isFinite(discountPercent) && discountPercent > 0 && (
                             <p className="text-[12px] uppercase tracking-wider text-cyan-500 bg-slate-100 font-semibold rounded-xl px-3">
                               –{discountPercent.toFixed(0)}%
                             </p>
