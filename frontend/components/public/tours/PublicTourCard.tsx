@@ -43,7 +43,7 @@ const PublicTourCard = ({ tour }: Props) => {
       : { price: '', currency: '' };
 
   const discountPercent: number = tour.discountPrice
-    ? tour.discountPrice / tour.minPrice
+    ? (1 - tour.discountPrice / tour.minPrice) * 100
     : 0;
 
   return (
