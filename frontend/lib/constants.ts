@@ -53,6 +53,13 @@ export enum OrderStatus {
   REJECTED = 'REJECTED',
 }
 
+export const ORDER_STATUS_FLOW: OrderStatus[] = [
+  OrderStatus.NEW,
+  OrderStatus.IN_PROGRESS,
+  OrderStatus.CONTRACT_PENDING,
+  OrderStatus.COMPLETED,
+];
+
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   [OrderStatus.NEW]: 'Новый',
   [OrderStatus.IN_PROGRESS]: 'В работе',
