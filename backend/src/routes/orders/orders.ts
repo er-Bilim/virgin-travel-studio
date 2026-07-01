@@ -197,7 +197,7 @@ ordersRouter.get(
         .populate('managerId', 'fullName phone')
         .populate({
           path: 'tourSetId',
-          select: 'startDate endDate price hotelName',
+          select: 'startDate endDate price hotelName totalSeats bookedSeats',
           populate: {
             path: 'tourId',
             select: 'title category',

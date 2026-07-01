@@ -22,6 +22,8 @@ interface ToursetLite {
   price: number;
   hotelName: string;
   tourId: TourLite;
+  bookedSeats: number;
+  totalSeats: number;
 }
 
 export interface OrderType {
@@ -32,6 +34,8 @@ export interface OrderType {
   status: string;
   rejectionReason: string | null;
   managerId: ManagerLite | null;
+  visibleId: string;
+  createdAt: string;
 }
 
 export interface PaginatedOrdersResponse {
