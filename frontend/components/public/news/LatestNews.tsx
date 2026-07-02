@@ -1,34 +1,38 @@
 'use client';
 
-import Link from 'next/link';
-import { ArrowRight, CalendarDays } from 'lucide-react';
-import { useNews } from '@/lib/hooks/newsHooks';
+import { CalendarDays } from 'lucide-react';
 import { imageUrl } from '@/lib/constants';
 import { formatDayAndMonthWords, truncateText } from '@/lib/utils';
-import { IoIosJournal } from "react-icons/io";
+import ErrorState from '@/components/shared/ErrorState';
+import LatestNewsSkeleton from '@/components/shared/skeletons/LatestNewsSkeleton';
+import { useNews } from '@/lib/hooks/newsHooks';
+import Link from 'next/link';
 
-const LatestNewsSection = () => {
-  const { data, isLoading, isError } = useNews({
+const LatestNews = () => {
+  const limit: number = 5;
+  const {
+    data: newsData,
+    isLoading: isNewsLoading,
+    isError: isNewsError,
+    refetch,
+  } = useNews({
     page: 1,
-    limit: 5,
+    limit,
     isPublished: 'true',
   });
 
-  const news = data?.allNews || [];
+  const news = newsData?.allNews || [];
 
-  if (isLoading) {
+  if (isNewsLoading) {
     return (
       <section className="my-24">
-        <p className="text-center text-muted-foreground">
-          Загрузка новостей...
-        </p>
+        <LatestNewsSkeleton limit={limit - 1} />
       </section>
     );
   }
 
-  const hasNews = news.length > 0 && !isError;
+  const hasNews = news.length > 0 && !isNewsError;
   const featured = hasNews ? news[0] : null;
-
   let featuredDay, featuredMonth, featuredYear;
   if (featured) {
     const formatted = formatDayAndMonthWords(featured.updatedAt);
@@ -37,36 +41,18 @@ const LatestNewsSection = () => {
     featuredYear = formatted.year;
   }
 
+  if (isNewsError) {
+    return <ErrorState onRetry={refetch} />;
+  }
+
   return (
-    <section className="my-24">
-      <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div>
-          <p className="mb-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-cyan-800">
-            <IoIosJournal className="size-[18px]"/>
-            Журнал путешествий
-          </p>
-          <h2 className="text-3xl font-black tracking-tight text-navy-800">
-            Последние новости
-          </h2>
-          <p className="mt-3 max-w-xl text-muted-foreground text-[15px]">
-            Свежие обновления, полезные заметки и вдохновение для будущих
-            путешествий.
-          </p>
-        </div>
-
-        <Link
-          href="/news"
-          className="group inline-flex items-center gap-2 rounded-2xl border border-border bg-card px-5 py-3 text-sm font-semibold text-navy-700 transition hover:border-cyan-600 hover:text-cyan-600"
-        >
-          Все новости
-          <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
-        </Link>
-      </div>
-
+    <>
       {!hasNews ? (
         <div className="flex h-48 w-full flex-col items-center justify-center rounded-3xl border border-dashed border-border bg-muted/30 text-center">
           <p className="text-lg font-medium text-navy-700">Пока нет новостей</p>
-          <p className="text-sm text-muted-foreground mt-1">Новые статьи появятся здесь в ближайшее время.</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Новые статьи появятся здесь в ближайшее время.
+          </p>
         </div>
       ) : (
         <div
@@ -189,8 +175,8 @@ const LatestNewsSection = () => {
           )}
         </div>
       )}
-    </section>
+    </>
   );
 };
 
-export default LatestNewsSection;
+export default LatestNews;

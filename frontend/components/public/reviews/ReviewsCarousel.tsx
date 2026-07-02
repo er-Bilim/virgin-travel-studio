@@ -1,6 +1,7 @@
 'use client';
 
 import ClientAvatar from '@/components/shared/ClientAvatar';
+import ErrorState from '@/components/shared/ErrorState';
 import Rating from '@/components/shared/Rating';
 import ReviewCarouselSkeleton from '@/components/shared/skeletons/ReviewCarouselSkeleton';
 import {
@@ -25,7 +26,7 @@ import { useEffect, useState } from 'react';
 import { IoSparkles } from 'react-icons/io5';
 
 const ReviewsCarousel = () => {
-  const { data: reviews, isLoading } = useGetFeaturedReviews();
+  const { data: reviews, isLoading, isError, refetch } = useGetFeaturedReviews();
   const [api, setApi] = useState<CarouselApi>();
   const router = useRouter();
 
@@ -52,7 +53,11 @@ const ReviewsCarousel = () => {
   }, [api]);
 
   if (isLoading) {
-    return <ReviewCarouselSkeleton/>
+    return <ReviewCarouselSkeleton />;
+  }
+
+  if (isError) {
+    return <ErrorState onRetry={refetch} />;
   }
 
   return (
@@ -76,7 +81,9 @@ const ReviewsCarousel = () => {
                         itemScope
                         itemType="https://schema.org/Review"
                         className="flex h-full w-full flex-col rounded-[20px] border border-border p-5 sm:p-[26px] hover:border-cyan-500 hover:text-cyan-600 cursor-pointer duration-300"
-                        onClick={() => router.push(`/tours/${review.tourId._id}`)}
+                        onClick={() =>
+                          router.push(`/tours/${review.tourId._id}`)
+                        }
                       >
                         <div
                           aria-hidden="true"
@@ -199,10 +206,10 @@ const ReviewsCarousel = () => {
               Скоро здесь появятся отзывы
             </h3>
 
-                      <p className="mb-[22px] max-w-[380px] text-sm leading-relaxed text-muted-foreground">
-            Мы готовим истории наших путешественников. Поделитесь своими впечатлениями
-            о поездке. Лучшие отзывы попадут на главную страницу
-          </p>
+            <p className="mb-[22px] max-w-[380px] text-sm leading-relaxed text-muted-foreground">
+              Мы готовим истории наших путешественников. Поделитесь своими
+              впечатлениями о поездке. Лучшие отзывы попадут на главную страницу
+            </p>
 
             <Link
               href="/tours"
