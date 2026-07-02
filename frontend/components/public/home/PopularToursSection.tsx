@@ -15,7 +15,6 @@ const PopularToursSection = () => {
   const {
     data: settings,
     isPending: isSettingsLoading,
-    isError: isSettingsError,
     refetch: refetchSettings,
   } = useHomepageSettings();
 
@@ -25,10 +24,6 @@ const PopularToursSection = () => {
     isError: isToursError,
     refetch: refetchTours,
   } = usePopularTours(limit);
-
-  const isLoading = isToursLoading || isSettingsLoading;
-  const showError = isToursError  || isSettingsError;
-  const showLoading = !showError && isLoading;
 
   const handleRefetch = () => {
     refetchTours();
@@ -72,7 +67,7 @@ const PopularToursSection = () => {
         </Link>
       </div>
 
-      {showLoading && (
+      {isToursLoading && (
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {Array.from({ length: limit }).map((_, index) => (
             <TourCardSkeleton key={index} />
@@ -81,11 +76,11 @@ const PopularToursSection = () => {
       )}
  
 
-      {showError && (
+      {isToursError && (
         <ErrorState onRetry={handleRefetch} />
       )}
 
-      {!showLoading && !showError && tours && (
+      {!isToursError && tours && (
         <>
           {tours.length === 0 ? (
             <p className="my-10 text-center text-gray-500">
