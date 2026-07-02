@@ -7,6 +7,7 @@ import { useUser } from '@/lib/hooks/authHooks';
 import { useOneOrder, useUpdateOrder } from '@/lib/hooks/orderHooks';
 import { Button } from '@/components/ui/button';
 import { useDeleteOrder } from '@/lib/hooks/orderHooks';
+import { ORDER_STATUS_LABELS } from '@/lib/constants';
 import {
   ArrowLeft,
   Trash,
@@ -136,18 +137,7 @@ export default function OrderDetail() {
     }
   };
 
-  const statusBadgeText = (status: string) => {
-    switch (status) {
-      case 'NEW': return { text: 'Новая' };
-      case 'IN_PROGRESS': return { text: 'В процессе' };
-      case 'CONTRACT_PENDING': return { text: 'Ожидает контракта' };
-      case 'COMPLETED': return { text: 'Завершена' };
-      case 'REJECTED': return { text: 'Отклонена' };
-      default: return { text: status };
-    }
-  };
-
-  const { price, currency } = formatToReadablePrice(order.tourSetId.price);
+  const priceInfo = formatToReadablePrice(order.tourSetId.price);
   const totalSeats = order.tourSetId.totalSeats;
   const bookedSeats = order.tourSetId.bookedSeats;
   const freeSeats = totalSeats - bookedSeats;
@@ -164,14 +154,14 @@ export default function OrderDetail() {
   };
 
   return (
-    <div className="space-y-8 bg-gray-50">
+    <div className="pt-4 space-y-8 bg-gray-50">
       <div className="flex-1 overflow-x-hidden">
         <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
             <Button
               onClick={() => router.back()}
-              className="group inline-flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-cyan-800 hover:text-navy-800 transition cursor-pointer bg-transparent p-0 w-fit"
+              className="group inline-flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-cyan-800 hover:text-[#031633] transition cursor-pointer bg-transparent p-0 w-fit"
               type="button"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -197,8 +187,8 @@ export default function OrderDetail() {
 
               <button
                 className={cn(
-                  'group flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 h-11 px-4 rounded-xl bg-navy-800 text-white font-semibold text-sm transition',
-                  !isOrderPending ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-navy-900',
+                  'group flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 h-11 px-4 rounded-xl bg-[#031633] text-white font-semibold text-sm transition',
+                  !isOrderPending ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-[#031633]/90',
                 )}
                 onClick={() => openModal('contractModal')}
                 disabled={!isOrderPending}
@@ -282,7 +272,7 @@ export default function OrderDetail() {
                     Статус заявки
                   </h2>
                   <span id="statusBadge" className="inline-flex items-center gap-1 h-6 px-2.5 rounded-full text-[11px] font-bold bg-slate-100 text-cyan-800">
-                    {statusBadgeText(order.status).text}
+                    {ORDER_STATUS_LABELS[order.status as keyof typeof ORDER_STATUS_LABELS] || order.status}
                   </span>
                 </div>
 
@@ -302,7 +292,7 @@ export default function OrderDetail() {
 
             <aside className="space-y-6 w-full lg:sticky lg:top-6">
               <section className="bg-white rounded-2xl border border-line overflow-hidden shadow-sm">
-                <div className="bg-navy-800 px-4 py-3.5 text-white">
+                <div className="bg-[#031633] px-4 py-3.5 text-white">
                   <h2 className="text-[10px] uppercase tracking-wide text-cyan-300 font-bold mb-0.5">Тур</h2>
                   <p className="font-extrabold text-md sm:text-lg leading-snug truncate">{order.tourSetId.tourId.title}</p>
                 </div>
@@ -324,8 +314,8 @@ export default function OrderDetail() {
                   <div className="flex items-center justify-between pt-2 border-t border-slate-50">
                     <span className="text-slate-500">Стоимость</span>
                     <p className="font-black text-navy-800 flex gap-1 text-base sm:text-lg items-center">
-                      <span>{price}</span>
-                      <span className="text-xs font-bold text-slate-400">{currency}</span>
+                      <span>{priceInfo.price}</span>
+                      <span className="text-xs font-bold text-slate-400">{priceInfo.currency}</span>
                     </p>
                   </div>
                 </div>
