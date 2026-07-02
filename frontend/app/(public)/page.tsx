@@ -12,6 +12,8 @@ import {
 import { fetchHomepageSettings } from '@/services/homepageSettings';
 import { getPopularTours } from '@/services/tours';
 import { queryConfig } from '@/lib/constants';
+import { getPublicFeaturedReviews } from '@/services/reviews';
+import { latestNewsQueryOptions } from '@/lib/hooks/newsHooks';
 
 const Home = async () => {
   const limit: number = 4;
@@ -26,6 +28,11 @@ const Home = async () => {
       queryKey: ['tours', 'popular', limit],
       queryFn: () => getPopularTours(limit),
     }),
+    qc.prefetchQuery({
+      queryKey: ['reviews', 'featured'],
+      queryFn: () => getPublicFeaturedReviews(),
+    }),
+    qc.prefetchQuery(latestNewsQueryOptions),
   ]);
 
   return (
