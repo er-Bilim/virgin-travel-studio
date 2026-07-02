@@ -1,6 +1,25 @@
 import { Schema, model } from 'mongoose';
 import type { HomepageSettingsFields } from '@/types/homepageSettings.types.js';
 
+
+const AdvantageSchema = new Schema({
+    title: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    body: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    image: {
+      type: String,
+      default: null,
+    }
+});
+
+
 const HomepageSettingsSchema = new Schema<HomepageSettingsFields>(
   {
     hero: {
@@ -14,6 +33,11 @@ const HomepageSettingsSchema = new Schema<HomepageSettingsFields>(
       subtitle: {
         type: String,
       },
+    },
+
+    advantages: {
+      type: [AdvantageSchema],
+      default: []
     },
 
     mainPopularTours: {
@@ -83,7 +107,7 @@ const HomepageSettingsSchema = new Schema<HomepageSettingsFields>(
   },
 );
 
-const HomepageSettings = model(
+const HomepageSettings = model<HomepageSettingsFields>(
   'HomepageSettings',
   HomepageSettingsSchema,
 );

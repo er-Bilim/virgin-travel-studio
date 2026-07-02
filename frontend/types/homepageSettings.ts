@@ -15,9 +15,17 @@ export interface PageSettings {
   subtitle?: string;
 }
 
+export interface AdvantagesFields {
+  _id?: string;
+  title: string;
+  body: string;
+  image: File | null | ''
+}
+
 export interface HomepageSettingsFields {
   _id?: string;
   hero?: HeroSettings;
+  advantages: AdvantagesFields[];
   mainPopularTours?: TextSectionSettings;
   mainLatestNews?: TextSectionSettings;
   toursPage?: PageSettings;
