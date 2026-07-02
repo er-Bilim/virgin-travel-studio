@@ -1,15 +1,13 @@
-import type {OrderType} from '@/types/order';
-import type {CellContext, ColumnDef} from '@tanstack/react-table';
-import {
-  createActionsColumn
-} from '@/components/dashboard/shared/data-table/columns/createActionsColumn';
+import type { OrderType } from '@/types/order';
+import type { CellContext, ColumnDef } from '@tanstack/react-table';
+import { createActionsColumn } from '@/components/dashboard/shared/data-table/columns/createActionsColumn';
 
 import {
   ORDER_STATUS_LABELS,
   ORDER_STATUS_STYLES,
-  type OrderStatus
+  type OrderStatus,
 } from '@/lib/constants';
-import {Badge} from '@/components/ui/badge';
+import { Badge } from '@/components/ui/badge';
 import dayjs from 'dayjs';
 
 export const getOrdersColumns = ({
@@ -79,7 +77,7 @@ export const getOrdersColumns = ({
   },
   createActionsColumn<OrderType>({
     actions: [
-      ...(currentTab !== 'all'
+      ...(currentTab !== 'all' || role === 'ADMIN'
         ? [
             {
               id: 'view',
@@ -107,4 +105,3 @@ export const getOrdersColumns = ({
     ],
   }),
 ];
-
