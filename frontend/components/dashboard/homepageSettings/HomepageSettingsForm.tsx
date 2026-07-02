@@ -1,17 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import type { AxiosError } from 'axios';
-import { Loader2, Layout, Compass, FileText } from 'lucide-react';
-
+import { Loader2, Layout, Compass, FileText, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
-import { inputClass } from '@/lib/constants';
+import { imageUrl, inputClass } from '@/lib/constants';
 import { VideoInput } from './VideoInput';
-import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog/ConfirmDialog'; // Импортируем модалку
+import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog/ConfirmDialog'; 
+import AdvantageItem from './advantages/advantageItem';
 
-import type { HomepageSettingsMutationData } from '@/types/homepageSettings';
+import type { HomepageSettingsMutationData, AdvantagesFields } from '@/types/homepageSettings';
 import {
   mutateCreateHomepageSettings,
   mutateHomepageSettings,
@@ -19,6 +19,7 @@ import {
 } from '@/lib/hooks/homepageSettingsHooks';
 import type { GlobalError } from '@/types/error';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 type FormTab = 'hero' | 'sections' | 'innerPages';
 
@@ -66,7 +67,9 @@ export default function HomepageSettingsForm() {
     setError,
     formState: { errors },
   } = useForm<HomepageSettingsMutationData>({
-    defaultValues: currentSettings || {},
+    defaultValues: currentSettings || {
+      advantages: [],
+    },
   });
 
   useEffect(() => {
@@ -74,6 +77,16 @@ export default function HomepageSettingsForm() {
       reset(currentSettings);
     }
   }, [currentSettings, reset]);
+
+  const {
+    fields,
+    update,
+    remove,
+    append,
+  } = useFieldArray({
+    control,
+    name: 'advantages',
+  });
 
   const onSubmit = (data: HomepageSettingsMutationData) => {
     setPendingData(data);
@@ -88,6 +101,7 @@ export default function HomepageSettingsForm() {
 
     mutate(pendingData, {
       onSuccess: () => {
+        toast.success('Данные обновились!', { position: 'top-center'})
         setPendingData(null);
       },
       onError: (err: unknown) => {
@@ -250,6 +264,37 @@ export default function HomepageSettingsForm() {
                   />
                 </Field>
               </div>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-md font-bold text-[#1E2B6D] border-b border-gray-100 pb-1">
+                Блок преимуществ
+              </h3>
+              <div className="space-y-4">
+                {fields.map((field, index) => (
+                  <AdvantageItem
+                    key={field.id}    
+                    index={index}
+                    field={field}
+                    fieldError={errors.advantages?.[index]}
+                    register={register}
+                    setValue={setValue}
+                    watch={watch}
+                    update={update}
+                    remove={remove}
+                    imageUrl={imageUrl}
+                    inputClass={inputClass}
+                  />
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => append({ title: '', body: '', image: null })}
+                className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-transparent hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 w-full mt-2"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Добавить преимущество
+              </button>
             </div>
 
             <div className="space-y-4 pt-2">

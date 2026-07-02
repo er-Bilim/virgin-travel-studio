@@ -10,6 +10,7 @@ import { ArrowRight, MapPinned } from 'lucide-react';
 import { IoIosQuote } from 'react-icons/io';
 import CustomTourCard from '@/components/public/home/tourCustomCard/CustomTourCard';
 import { usePopularTours } from '@/lib/hooks/tourHooks';
+import Advantages from '@/components/public/advantages/advantages';
 import ReviewsCarousel from '@/components/public/reviews/ReviewsCarousel';
 
 const Home = () => {
@@ -164,6 +165,7 @@ const Home = () => {
         )}
       </section>
 
+      <Advantages/>
       <LatestNewsSection />
 
       <div className="mt-10 mb-15 flex flex-col items-center">

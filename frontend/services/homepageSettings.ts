@@ -66,6 +66,29 @@ const makeHomepageFormData = (data: HomepageSettingsMutationData): FormData => {
       formData.append('reviewsPage[subtitle]', data.reviewsPage.subtitle);
   }
 
+if (data.advantages && Array.isArray(data.advantages)) {
+  data.advantages.forEach((advantage, index) => {
+    if (advantage._id) {
+      formData.append(`advantages[${index}][_id]`, advantage._id);
+    }
+
+    if (advantage.title !== undefined) {
+      formData.append(`advantages[${index}][title]`, advantage.title);
+    }
+    if (advantage.body !== undefined) {
+      formData.append(`advantages[${index}][body]`, advantage.body);
+    }
+
+    if (advantage.image instanceof File) {
+      formData.append(`advantages[${index}][file]`, advantage.image);
+    } else if (advantage.image === null || advantage.image === undefined) {
+      formData.append(`advantages[${index}][imageString]`, '');
+    } else if (typeof advantage.image === 'string') {
+      formData.append(`advantages[${index}][imageString]`, advantage.image);
+    }
+  });
+}
+
   return formData;
 };
 
@@ -79,15 +102,12 @@ export const createHomepageSettings = async (
   data: HomepageSettingsMutationData,
 ) => {
   const formData = makeHomepageFormData(data);
-  const result = await axiosApi.post<HomepageSettingsFields>(
-    '/homepage-settings',
-    formData,
-    {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    },
-  );
+  const result = await axiosApi.post<HomepageSettingsFields>('/homepage-settings', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
   return result.data;
 };
+
 
 export const editHomepageSettings = async (
   data: HomepageSettingsMutationData,

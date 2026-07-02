@@ -3,7 +3,7 @@ import auth from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
 import mongoose from 'mongoose';
 import deleteFile from '@/utils/deleteFile.js';
-import { videosUpload } from '@/middlewares/multer.js';
+import { combinedUpload } from '@/middlewares/multer.js';
 import HomepageSettings from '@/model/homepageSettings/HomepageSettings.js';
 
 const homepageSettingsRouter = express.Router();
@@ -22,7 +22,7 @@ homepageSettingsRouter.post(
   '/',
   auth,
   permit('ADMIN'),
-  videosUpload.single('video'),
+  combinedUpload.any(),
   async (req, res, next) => {
     try {
       const existingSettings = await HomepageSettings.findOne();
@@ -35,22 +35,64 @@ homepageSettingsRouter.post(
         });
       }
 
+      const uploadedFiles = (req.files as Express.Multer.File[]) || [];
+
+      const currentVideo = uploadedFiles.find( 
+        (file) => file.fieldname === 'video',
+      );
+
       const {
         hero,
+        advantages,
         mainPopularTours,
         mainLatestNews,
         toursPage,
         newsPage,
         reviewsPage,
       } = req.body;
-      const videoUrl = req.file
-        ? `videos/${req.file.filename}`
-        : hero?.videoUrl || '';
+      const videoUrl = currentVideo ? `videos/${currentVideo.filename}` : null
+
+      let advantagesData = req.body.advantages;
+      if (typeof advantagesData === 'string') {
+        try {
+          advantagesData = JSON.parse(advantagesData);
+        } catch {
+          advantagesData = undefined;
+        }
+      }
+
+      const parsedAdvantages = [];
+
+       if (advantagesData && typeof advantagesData === 'object') {
+         const keys = Object.keys(advantagesData);
+
+         for (const key of keys) {
+           const index = Number(key);
+           const advData = advantagesData[key];
+
+           const attachedFile = uploadedFiles.find(
+             (file) => file.fieldname === `advantages[${index}][file]`,
+           );
+
+           let image = '';
+           if (attachedFile) {
+             image = `images/${attachedFile.filename}`;
+           }
+
+           parsedAdvantages.push({
+            //  ...(advData._id && { _id: advData._id }),
+             title: advData.title || '',
+             body: advData.body || '',
+             image: image,
+           });
+         }
+       }
 
       const settings = new HomepageSettings({
         hero: hero
           ? { videoUrl, title: hero.title, subtitle: hero.subtitle }
           : undefined,
+        advantages: parsedAdvantages,
         mainPopularTours: mainPopularTours
           ? {
               title: mainPopularTours.title,
@@ -97,15 +139,19 @@ homepageSettingsRouter.put(
   '/',
   auth,
   permit('ADMIN'),
-  videosUpload.single('video'),
+  combinedUpload.any(),
   async (req, res, next) => {
+    const uploadedFiles = (req.files as Express.Multer.File[]) || [];   
+
     try {
       const settings = await HomepageSettings.findOne();
+
       if (!settings) {
-        if (req.file) await deleteFile(`videos/${req.file.filename}`);
-        return res
-          .status(404)
-          .send({ error: 'Настройки страниц не найдены для обновления' });
+        for (const file of uploadedFiles) {
+          const folder = file.fieldname === 'video' ? 'videos' : 'images';
+          await deleteFile(`${folder}/${file.filename}`);
+        }
+        return res.status(404).send({ error: 'Настройки страниц не найдены' });
       }
 
       const {
@@ -118,18 +164,94 @@ homepageSettingsRouter.put(
         reviewsPage,
       } = req.body;
 
-      if (req.file) {
-        if (settings.hero?.videoUrl) await deleteFile(settings.hero.videoUrl);
-        settings.hero.videoUrl = `videos/${req.file.filename}`;
-      } else if (deleteVideo === true || deleteVideo === 'true') {
-        if (settings.hero?.videoUrl) await deleteFile(settings.hero.videoUrl);
-        settings.hero.videoUrl = '';
+  const currentVideo = uploadedFiles.find((file) => file.fieldname === 'video');
+
+  if (currentVideo) {
+    if (settings.hero?.videoUrl) await deleteFile(settings.hero.videoUrl);
+    settings.hero.videoUrl = `videos/${currentVideo.filename}`;
+  } else if (deleteVideo === true || deleteVideo === 'true') {
+    if (settings.hero?.videoUrl) await deleteFile(settings.hero.videoUrl);
+    settings.hero.videoUrl = '';
+  }
+
+  const oldAdvantageImages = settings.advantages
+    .map((adv) => adv.image)
+    .filter(Boolean) as string[];
+
+  const newAdvantageImagesToKeep: string[] = [];
+
+  let advantagesData = req.body.advantages;
+  if (typeof advantagesData === 'string') {
+    try {
+      advantagesData = JSON.parse(advantagesData);
+    } catch {
+      advantagesData = undefined;
+    }
+  }
+
+  if (advantagesData && typeof advantagesData === 'object') {
+    const parsedAdvantages = [];
+    const keys = Object.keys(advantagesData);
+
+    for (const key of keys) {
+      const index = Number(key);
+      const advData = advantagesData[key];
+
+      const attachedFile = uploadedFiles.find(
+        (file) => file.fieldname === `advantages[${index}][file]`,
+      );
+
+      let currentImageForThisAdvantage: string | null = null;
+
+      if (advData._id) {
+        const dbAdvantage = settings.advantages.id(advData._id);
+        if (dbAdvantage) {
+          currentImageForThisAdvantage = dbAdvantage.image || null;
+        }
       }
+
+      if (attachedFile) {
+        // Сценарий А: Загрузили новое фото -> удаляем старое, если оно было
+        if (currentImageForThisAdvantage) {
+          await deleteFile(currentImageForThisAdvantage);
+        }
+        currentImageForThisAdvantage = `images/${attachedFile.filename}`;
+        newAdvantageImagesToKeep.push(currentImageForThisAdvantage);
+      } else if (advData.imageString === '') {
+        // Сценарий Б: Картинку полностью стерли на фронтенде -> удаляем с диска
+        if (currentImageForThisAdvantage) {
+          await deleteFile(currentImageForThisAdvantage);
+        }
+        currentImageForThisAdvantage = null;
+      } else if (typeof advData.imageString === 'string') {
+        // Сценарий В: Картинку не трогали -> сохраняем старый путь
+        currentImageForThisAdvantage = advData.imageString;
+        newAdvantageImagesToKeep.push(currentImageForThisAdvantage!);
+      }
+
+      parsedAdvantages.push({
+        ...(advData._id && { _id: advData._id }),
+        title: advData.title || '',
+        body: advData.body || '',
+        image: currentImageForThisAdvantage,
+      });
+    }
+
+    settings.advantages =
+      parsedAdvantages as unknown as typeof settings.advantages;
+  }
+
+  for (const oldImage of oldAdvantageImages) {
+    if (!newAdvantageImagesToKeep.includes(oldImage)) {
+      await deleteFile(oldImage);
+    }
+  }
 
       if (hero !== undefined && hero !== null) {
         if (hero.title !== undefined) settings.hero.title = hero.title;
         if (hero.subtitle !== undefined) settings.hero.subtitle = hero.subtitle;
       }
+
       if (mainPopularTours !== undefined && mainPopularTours !== null) {
         if (mainPopularTours.title !== undefined)
           settings.mainPopularTours.title = mainPopularTours.title;
@@ -159,6 +281,9 @@ homepageSettingsRouter.put(
           settings.newsPage.subtitle = newsPage.subtitle;
       }
 
+      // Маркируем изменения для Mongoose
+      settings.markModified('hero');
+      settings.markModified('advantages');
       if (reviewsPage !== undefined && reviewsPage !== null) {
         if (reviewsPage.title !== undefined)
           settings.reviewsPage.title = reviewsPage.title;
@@ -167,9 +292,17 @@ homepageSettingsRouter.put(
       }
 
       await settings.save();
-      res.send({ message: 'Настройки страниц успешно обновлены', settings });
+
+      return res.send({
+        message: 'Настройки страниц успешно обновлены',
+        settings,
+      });
     } catch (e) {
-      if (req.file) await deleteFile(`videos/${req.file.filename}`);
+      for (const file of uploadedFiles) {
+        const folder = file.fieldname === 'video' ? 'videos' : 'images';
+        await deleteFile(`${folder}/${file.filename}`);
+      }
+
       if (e instanceof mongoose.Error.ValidationError) {
         return res
           .status(400)
@@ -179,5 +312,4 @@ homepageSettingsRouter.put(
     }
   },
 );
-
 export default homepageSettingsRouter;

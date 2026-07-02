@@ -51,3 +51,55 @@ export const videosUpload = multer({
 });
 
 export const imagesUpload = multer({ storage: imageStorage });
+
+export const combinedUpload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      if (file.fieldname === 'video') {
+        cb(null, 'public/videos');
+      } else {
+        cb(null, 'public/images'); 
+      }
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      const ext = file.originalname.split('.').pop();
+      cb(
+        null,
+        `${file.fieldname.replace(/\[|\]/g, '-')}-${uniqueSuffix}.${ext}`,
+      );
+    },
+  }),
+
+  limits: {
+    fileSize: 15 * 1024 * 1024,
+  },
+
+  fileFilter: (_req, file, callback) => {
+    if (file.fieldname === 'video') {
+      const allowedVideoTypes = ['video/mp4', 'video/webm'];
+      if (allowedVideoTypes.includes(file.mimetype)) {
+        return callback(null, true);
+      }
+      return callback(
+        new Error('Недопустимый формат видео. Разрешены только MP4 и WebM.'),
+      );
+    }
+
+    if (file.fieldname === 'image' || file.fieldname.startsWith('advantages')) {
+      const allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      if (allowedImageTypes.includes(file.mimetype)) {
+        return callback(null, true);
+      }
+      return callback(
+        new Error(
+          'Недопустимый формат изображения. Разрешены JPEG, PNG и WebP.',
+        ),
+      );
+    }
+
+    callback(
+      new Error(`Неизвестное поле для загрузки файлов: ${file.fieldname}`),
+    );
+  },
+});
