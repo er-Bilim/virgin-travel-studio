@@ -38,21 +38,20 @@ export const videosUpload = multer({
     fileSize: 15 * 1024 * 1024,
   },
   fileFilter: (_req, file, callback) => {
-    const allowedMimeTypes = ['video/mp4', 'video/webm'];
-
-    if (allowedMimeTypes.includes(file.mimetype)) {
-      callback(null, true);
-    } else {
-      callback(
-        new Error(
-          'Недопустимый формат. Пожалуйста, загрузите видео в формате MP4 или WebM.',
-        ),
-      );
-    }
+    fileFilterImage({ file, callback });
   },
 });
 
 export const imagesUpload = multer({ storage: imageStorage });
+export const imageMemoryUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 15 * 1024 * 1024,
+  },
+  fileFilter: (_req, file, callback) => {
+    fileFilterImage({ file, callback });
+  },
+});
 
 export const combinedUpload = multer({
   storage: multer.diskStorage({
