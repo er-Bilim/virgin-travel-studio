@@ -3,6 +3,8 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { randomUUID } from 'crypto';
 import config from '@/config.js';
+import fileFilterImage from '@/lib/fileFilter.js';
+
 
 const imageStorage = multer.diskStorage({
   destination: async (_req, _file, cb) => {
@@ -76,30 +78,6 @@ export const combinedUpload = multer({
   },
 
   fileFilter: (_req, file, callback) => {
-    if (file.fieldname === 'video') {
-      const allowedVideoTypes = ['video/mp4', 'video/webm'];
-      if (allowedVideoTypes.includes(file.mimetype)) {
-        return callback(null, true);
-      }
-      return callback(
-        new Error('Недопустимый формат видео. Разрешены только MP4 и WebM.'),
-      );
-    }
-
-    if (file.fieldname === 'image' || file.fieldname.startsWith('advantages')) {
-      const allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp'];
-      if (allowedImageTypes.includes(file.mimetype)) {
-        return callback(null, true);
-      }
-      return callback(
-        new Error(
-          'Недопустимый формат изображения. Разрешены JPEG, PNG и WebP.',
-        ),
-      );
-    }
-
-    callback(
-      new Error(`Неизвестное поле для загрузки файлов: ${file.fieldname}`),
-    );
+    fileFilterImage({ file, callback });  
   },
 });
