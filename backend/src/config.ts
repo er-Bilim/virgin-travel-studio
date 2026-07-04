@@ -10,7 +10,7 @@ const config = {
   publicPath: path.join(rootPath, '../public'),
   port: process.env.PORT ?? 8000,
   corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:3000',
-  db: 'mongodb://localhost/virgin-travel',
+  db: process.env.MONGODB_URI ?? 'mongodb://localhost:27017/virgin-travel',
   refreshJWTSecret: process.env.REFRESH_SECRET_JWT ?? 'refresh_secret',
   accessJWTSecret: process.env.ACCESS_SECRET_JWT ?? 'access_secret',
   botToken: process.env.BOT_TOKEN ?? '',

@@ -1,7 +1,10 @@
 import {
+  approveReview,
   createReview,
   deleteReview,
+  featureReview,
   getAdminReviews,
+  getPublicFeaturedReviews,
   getPublicReviews,
   updateReview,
 } from '@/services/reviews';
@@ -11,7 +14,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import type { IReviewMutation } from '@/types/review';
+import type { IReview, IReviewMutation } from '@/types/review';
 
 const PAGE_SIZE = 10;
 
@@ -31,9 +34,9 @@ export const useUpdateReview = () => {
 
   return useMutation({
     mutationFn: ({
-                   id,
-                   data,
-                 }: {
+      id,
+      data,
+    }: {
       id: string;
       data: Partial<IReviewMutation>;
     }) => updateReview(id, data),
@@ -42,6 +45,54 @@ export const useUpdateReview = () => {
     },
   });
 };
+
+export const useApproveReview = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      isModerated,
+    }: {
+      id: string;
+      isModerated: 'pending' | 'approved' | 'rejected';
+    }) => approveReview(id, isModerated),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reviews'] });
+    },
+  });
+};
+
+export const useFeatureReview = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string)  => featureReview(id),
+    onMutate: async (id: string) => {
+      const listKey = ['reviews', 'admin'];
+
+      await queryClient.cancelQueries({ queryKey: listKey });
+
+      const prev = queryClient.getQueriesData({ queryKey: listKey });
+
+      queryClient.setQueriesData({ queryKey: listKey }, (old: {reviews: IReview[]}) => {
+        if (!old) return old;
+
+        return {
+          ...old,
+          reviews: old.reviews.map((review: IReview) => review._id === id ? {...review, featuredOnHomepage: !review.featuredOnHomepage} : review),
+        }
+      })
+
+      return { prev }
+
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reviews', 'featured']})
+      queryClient.invalidateQueries({ queryKey: ['reviews', 'admin'] })
+    } 
+  })
+}
 
 export const useDeleteReview = () => {
   const queryClient = useQueryClient();
@@ -54,11 +105,25 @@ export const useDeleteReview = () => {
   });
 };
 
-export const useAdminReviews = (tourId?: string) => {
+
+export const useAdminReviews = (
+  params: {
+    tourId?: string;
+    page?: number;
+    limit?: number;
+    isModerated?: string;
+  } = {},
+) => {
   return useQuery({
-    queryKey: ['reviews', 'admin', tourId],
-    queryFn: () => getAdminReviews({ tourId }),
-    enabled: !!tourId,
+    queryKey: [
+      'reviews',
+      'admin',
+      params.tourId,
+      params.page,
+      params.limit,
+      params.isModerated,
+    ],
+    queryFn: () => getAdminReviews(params),
   });
 };
 
@@ -80,3 +145,10 @@ export const useInfiniteReviews = (tourId?: string) => {
     enabled: !!tourId,
   });
 };
+
+export const useGetFeaturedReviews = () => {
+  return useQuery({
+    queryKey: ['reviews', 'featured'],
+    queryFn: getPublicFeaturedReviews,
+  })
+}

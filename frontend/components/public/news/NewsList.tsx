@@ -1,25 +1,31 @@
 'use client';
 
-import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
-import { useGetNewsTags, useNews } from '@/lib/hooks/newsHooks';
-import { toast } from 'sonner';
-import Filter from '@/components/shared/Filter';
-import { imageUrl, isDev } from '@/lib/constants';
-import Image from 'next/image';
-import CONTENT_PLACEHOLDER from '@/assets/placeholders/content_placeholder.png';
 import Link from 'next/link';
-import { formatDayAndMonthWords, truncateText } from '@/lib/utils';
+import Image from 'next/image';
+import { Dot, Newspaper, AlignStartVertical } from 'lucide-react';
+import { toast } from 'sonner';
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 import ClientAvatar from '@/components/shared/ClientAvatar';
-import { Dot, Newspaper } from 'lucide-react';
 import { useState } from 'react';
 import { PaginationCustom } from '@/components/pagination/PaginationCustom';
-import { Skeleton } from '@/components/ui/skeleton';
 import NewsSkeleton from './NewsSkeleton';
+import { useGetNewsTags, useNews } from '@/lib/hooks/newsHooks';
+import { useHomepageSettings } from '@/lib/hooks/homepageSettingsHooks';
+import { imageUrl, isDev } from '@/lib/constants';
+import { formatDayAndMonthWords } from '@/lib/utils';
+import CONTENT_PLACEHOLDER from '@/assets/placeholders/content_placeholder.png';
+import { Skeleton } from '@/components/ui/skeleton';
+import FilterCombobox from '@/components/shared/FilterCombobox';
+import { useSearchParams } from 'next/navigation';
 
 const NewsList = () => {
   const [page, setPage] = useState(1);
   const limit = 7;
-  const [tag, setTag] = useState<string | null | undefined>(null);
+  const searchParams = useSearchParams();
+  const tag = searchParams.get('tags');
+
+  const { data: settings } = useHomepageSettings();
+
   const {
     data: news,
     isPending: newsPending,
@@ -32,6 +38,14 @@ const NewsList = () => {
     isError: tagsError,
   } = useGetNewsTags();
 
+  const tagsSettingsCombobox = {
+    title: 'Все темы',
+    icon: AlignStartVertical,
+    queryParamsName: 'tags',
+    searchPlaceholder: 'Поиск темы',
+  };
+
+  const selectedTag = tags ? tags.find((tagItem) => tagItem.tag === tag) : null;
   const metadata = news?.metadata;
 
   const handlePageChange = (page: number) => {
@@ -62,12 +76,12 @@ const NewsList = () => {
     );
   }
 
-  const { day: mainNewsDay, month: mainNewsMonth } = formatDayAndMonthWords(news.allNews[0].createdAt)
+  const { day: mainNewsDay, month: mainNewsMonth } = formatDayAndMonthWords(news.allNews[0].createdAt);
 
   const renderPagination = () => {
     if (metadata) {
       return (
-        <div className="my-10 border-t pt-6">
+        <div className="my-12 border-t border-slate-100 dark:border-slate-800 pt-6">
           <PaginationCustom
             page={page}
             limit={metadata.limit}
@@ -80,59 +94,55 @@ const NewsList = () => {
   };
 
   return (
-    <>
+    <div className="w-full pb-16">
       <Breadcrumbs
         className="mt-5"
         items={[
-          {
-            label: 'Главная',
-            href: '/',
-          },
-          {
-            label: 'Новости',
-            href: '/news',
-          },
+          { label: 'Главная', href: '/' },
+          { label: 'Новости', href: '/news' },
         ]}
       />
 
-      <header>
-        <p className="text-[var(--cyan-800)] font-semibold uppercase">
+      <header className="mt-8 mb-8">
+        <p className="text-cyan-800 font-semibold uppercase text-sm tracking-wider">
           Журнал путешествий
         </p>
-
-        <h1 className="font-semibold text-4xl mt-3">Новости и истории</h1>
-
-        <p className="text-gray-500 my-2">
-          Свежие маршруты, обновления виз, истории путешественников и подборки
-          скрытых мест.
+        <h1 className="font-black text-navy-800 dark:text-white text-4xl mt-3 md:text-5xl">
+          {settings?.newsPage?.title || 'Новости и истории'}
+        </h1>
+        <p className="text-gray-500 dark:text-slate-400 mt-3 max-w-2xl text-base leading-relaxed">
+          Свежие маршруты, обновления виз, истории путешественников и подборки скрытых мест.
         </p>
       </header>
 
-      {tagsLoading ? (
-        <div className="flex flex-row gap-2 mt-8">
-          {Array.from({ length: 5 }).map((_, index) => (
-            <Skeleton key={index} className="h-8 w-20 rounded-xl" />
-          ))}
-        </div>
-      ) : (
-        <Filter
-          tags={tags}
-          labelKey="tag"
-          className="mt-8"
-          setTag={setTag}
-          title="темы"
-          mainTag="все новости"
-          href="news"
-          searchParamsName="tags"
-        />
-      )}
+      <div className="mb-6 border-b border-gray-100 dark:border-slate-800 pb-6">
+        {tagsLoading ? (
+          <div className="flex flex-col gap-1 sm:w-64">
+            <Skeleton className="pl-0.5 w-[40px] h-[14px] rounded-xl" />
+            <Skeleton className="w-full h-[50px] rounded-xl" />
+          </div>
+        ) : (
+          <div className="flex flex-col gap-1 sm:w-64">
+            <span className="pl-0.5 text-xs font-semibold uppercase tracking-wide text-slate-400">
+              Темы
+            </span>
+            <FilterCombobox
+              options={tags}
+              labelKey="tag"
+              settings={tagsSettingsCombobox}
+              queryParamsKey="tag"
+              selected={selectedTag ? selectedTag.tag : null}
+            />
+          </div>
+        )}
+      </div>
 
-      <article className="group grid grid-cols-[20fr_1fr] gap-6 mt-10 border-t pt-10">
+      <article className="mt-8">
         <Link
-          href={`news/${news.allNews[0]._id}`}
-          className="group grid grid-cols-[1.6fr_1fr] gap-6"
+          href={`/news/${news.allNews[0]._id}`}
+          className="group grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-x-8 gap-y-3 items-stretch"
         >
-          <figure className="relative aspect-[4/3] overflow-hidden rounded-xl relative">
+          <figure className="relative aspect-[16/10] md:aspect-[4/3] w-full overflow-hidden rounded-xl md:rounded-2xl bg-muted shadow-xs">
             <Image
               src={imageUrl + news.allNews[0].image || CONTENT_PLACEHOLDER}
               alt={news.allNews[0].title}
@@ -140,45 +150,50 @@ const NewsList = () => {
               priority
               unoptimized={isDev}
               itemProp="image"
-              className="rounded-xl object-cover group-hover:scale-105 transition-transform duration-300"
+              className="object-cover group-hover:scale-102 transition-transform duration-500 ease-out"
             />
-            <div className="text-[var(--primary)] z-3 absolute top-5 left-5 uppercase text-sm bg-gray-100 rounded-xl py-1 px-4 font-semibold ">
+            <div className="text-[var(--primary)] z-3 absolute top-4 left-4 uppercase text-sm bg-gray-100 rounded-xl py-1 px-4 font-semibold ">
               главное
             </div>
           </figure>
 
-          <div className="flex flex-col gap-5">
-            <div className="flex flex-row gap-3">
+          <div className="flex flex-col justify-center py-1">
+            <div className="flex flex-wrap gap-1.5 mb-3">
               {news.allNews[0].tags.map((tag, index) => (
                 <span
                   key={tag + index}
-                  className="text-xs capitalize bg-slate-100 px-3 py-1 rounded-xl font-semibold text-cyan-500"
+                  className="text-[10px] md:text-[11px] uppercase tracking-wider bg-slate-100 dark:bg-slate-800/60 md:bg-cyan-50 md:dark:bg-cyan-950/40 px-2.5 py-0.5 md:py-1 rounded-md font-bold text-slate-600 dark:text-slate-400 md:text-cyan-600 md:dark:text-cyan-400"
                 >
                   {tag}
                 </span>
               ))}
             </div>
-            <h2 className="font-semibold text-4xl">{news.allNews[0].title}</h2>
-            <p>{truncateText(news.allNews[0].content, 200)}</p>
 
-            <div className="flex flex-row gap-1 items-center">
-              <div className="flex flex-row items-center gap-2">
+            <h2 className="font-bold text-lg md:text-3xl lg:text-4xl text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors duration-200 leading-snug md:leading-tight tracking-tight">
+              {news.allNews[0].title}
+            </h2>
+
+            <p className="text-slate-500 dark:text-slate-400 text-sm mt-2 md:mt-3 line-clamp-2 md:line-clamp-4 leading-relaxed">
+              {news.allNews[0].content}
+            </p>
+
+            <div className="mt-5 md:mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2.5 md:gap-3 text-sm text-slate-500">
+              <div className="hidden md:block shrink-0">
                 <ClientAvatar name={news.allNews[0].author.fullName} />
-                <p className="font-semibold">
-                  {news.allNews[0].author.fullName}
-                </p>
               </div>
-              <Dot size={10} className="text-gray-500" />
-              <time
-                dateTime="ISO"
-                itemProp="datePublished"
-                className="flex flex-row gap-1 text-sm text-gray-500"
-              >
-                <span className="font-semibold">
-                  {mainNewsDay}
+              <div className="flex flex-row items-center gap-2.5 md:block">
+                <span className="font-semibold text-slate-700 dark:text-slate-300 md:text-slate-800 md:dark:text-slate-200 md:leading-none md:block">
+                  {news.allNews[0].author.fullName}
                 </span>
-                <span>{mainNewsMonth}</span>
-              </time>
+                <Dot size={12} className="text-slate-300 md:hidden" />
+                <time
+                  dateTime="ISO"
+                  itemProp="datePublished"
+                  className="text-xs text-slate-400 md:mt-1 md:block"
+                >
+                  {mainNewsDay} {mainNewsMonth}
+                </time>
+              </div>
             </div>
           </div>
         </Link>
@@ -186,19 +201,19 @@ const NewsList = () => {
 
       <ul
         role="list"
-        className="grid grid-cols-1 gap-[40px] sm:grid-cols-2 lg:grid-cols-3 mt-10"
+        className="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 mt-12 md:mt-10 md:border-t md:border-slate-100 md:dark:border-slate-800 md:pt-10"
       >
-        {news.allNews.map((singleNews, index) => {
-          const { day, month } = formatDayAndMonthWords(singleNews.createdAt)
-          if (index !== 0) {
-            return (
-              <li key={singleNews._id}>
-                <article itemScope itemType="https://schema.org/Article">
-                  <Link
-                    href={`/news/${singleNews._id}`}
-                    className="group flex flex-col"
-                  >
-                    <figure className="relative aspect-[4/3] overflow-hidden rounded-xl mb-3">
+        {news.allNews.slice(1).map((singleNews) => {
+          const { day, month } = formatDayAndMonthWords(singleNews.createdAt);
+          return (
+            <li key={singleNews._id} className="flex">
+              <article itemScope itemType="https://schema.org/Article" className="flex flex-col w-full">
+                <Link
+                  href={`/news/${singleNews._id}`}
+                  className="group flex flex-col h-full justify-between"
+                >
+                  <div className="w-full">
+                    <figure className="relative aspect-[16/10] md:aspect-[4/3] overflow-hidden rounded-xl mb-4 bg-muted shadow-xs">
                       <Image
                         src={imageUrl + singleNews.image || CONTENT_PLACEHOLDER}
                         alt={singleNews.title}
@@ -206,15 +221,15 @@ const NewsList = () => {
                         priority
                         unoptimized={isDev}
                         itemProp="image"
-                        className="rounded-xl object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="object-cover group-hover:scale-102 transition-transform duration-500 ease-out"
                       />
                     </figure>
 
-                    <div className="flex gap-1.5 mb-2 flex-wrap">
+                    <div className="flex gap-1.5 flex-wrap mb-3">
                       {singleNews.tags.map((tag, index) => (
                         <span
                           key={tag + index}
-                          className="text-xs capitalize bg-slate-100 px-3 py-1 rounded-xl font-semibold text-cyan-500 mt-3"
+                          className="text-[10px] uppercase tracking-wider bg-slate-100 dark:bg-slate-800/60 px-2.5 py-0.5 rounded-md font-bold text-slate-600 dark:text-slate-400"
                         >
                           {tag}
                         </span>
@@ -222,40 +237,35 @@ const NewsList = () => {
                     </div>
 
                     <h3
-                      className="font-semibold text-lg mt-1 h-[56px]"
+                      className="font-bold text-lg text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors duration-200 line-clamp-2 leading-snug tracking-tight"
                       itemProp="headline"
                     >
                       {singleNews.title}
                     </h3>
 
-                    <p className="line-clamp-2line-clamp-2 mt-2 pb-4">
-                      {truncateText(singleNews.content, 150)}
+                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-2 line-clamp-2 leading-relaxed">
+                      {singleNews.content}
                     </p>
+                  </div>
 
-                    <footer className="mt-auto pt-2 flex flex-row items-center gap-1 text-sm border-t pt-4 text-gray-500">
-                      <span itemProp="author" className="font-semibold">
-                        {singleNews.author.fullName}
-                      </span>
-                      <Dot size={10} />
-                      <time
-                        dateTime="ISO"
-                        itemProp="datePublished"
-                        className="flex flex-row gap-1"
-                      >
-                        <span>{day}</span>
-                        <span>{month}</span>
-                      </time>
-                    </footer>
-                  </Link>
-                </article>
-              </li>
-            );
-          }
+                  <footer className="mt-5 pt-4 flex items-center gap-2.5 text-sm border-t border-slate-100 dark:border-slate-800 text-slate-500">
+                    <span itemProp="author" className="font-semibold text-slate-700 dark:text-slate-300">
+                      {singleNews.author.fullName}
+                    </span>
+                    <Dot size={12} className="text-slate-300" />
+                    <time dateTime="ISO" itemProp="datePublished" className="text-xs text-slate-400">
+                      {day} {month}
+                    </time>
+                  </footer>
+                </Link>
+              </article>
+            </li>
+          );
         })}
       </ul>
 
       {renderPagination()}
-    </>
+    </div>
   );
 };
 

@@ -33,9 +33,11 @@ export interface TourType {
 export interface ITourWithTourSetFields extends TourType {
   isHot: boolean;
   minPrice: number;
+  discountPrice?: number;
   hotelLocation: string;
   nextStartDate: string;
   durationDays: number;
+  saleDeadline: string;
 } 
 
 export interface ISingleTour extends TourType {
@@ -48,15 +50,17 @@ export interface TourMutation {
   countryCode: string;
   category: string;
   baseAdvantages: string[];
-  images: File[];
+  images: (File | string)[];
 }
 
 export interface GetToursParams {
   page?: number,
   limit: number,
   categoryId?: string | null,
-  search?: string,
+  search?: string | null,
   isPublished?: string | boolean,
   countryCode?: string | null,
   sort?: string | null;
+  isHot?: boolean;
+  hasDiscount?: boolean;
 }

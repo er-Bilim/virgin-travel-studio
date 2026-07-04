@@ -85,9 +85,9 @@ const TourDetailView = ({ id }: Props) => {
   }
 
   const selectedTourSet: TourSetType =
-    tour.tourSets.find((tourSet) => tourSet._id === selectedSetId) ??
-    tour.tourSets[0] ??
-    null;
+    tour.tourSets.find((tourSet) => tourSet._id === selectedSetId)
+      ?? tour.tourSets[0]
+      ?? null;
 
   if (!selectedTourSet) {
     return (
@@ -251,6 +251,7 @@ const TourDetailView = ({ id }: Props) => {
     <>
       {selectedTourSet._id && (
         <OrderCard
+            key={selectedTourSet._id}
           isOpen={isOrderOpen}
           onClose={closeModalOrder}
           tourSetId={selectedTourSet._id}

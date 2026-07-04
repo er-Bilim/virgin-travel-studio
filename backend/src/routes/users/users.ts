@@ -100,6 +100,8 @@ usersRouter.post('/sessions', async (req, res, next) => {
             });
         }
 
+
+
         user.token = createRefreshToken(user.id);
         await user.save();
         res.cookie('refreshToken', user.token, {

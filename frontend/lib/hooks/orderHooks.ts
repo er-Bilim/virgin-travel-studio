@@ -3,6 +3,7 @@ import {
   deleteOrder,
   getOneOrder,
   getOrders,
+  getOrdersStats,
   postOrder,
   updateOrder
 } from '@/services/orders';
@@ -26,6 +27,14 @@ export const useOrders = (
   });
 };
 
+export const useOrderStats = () => {
+  return useQuery({
+    queryKey: ['order-stats'],
+    queryFn: getOrdersStats,
+    refetchInterval: 60_000,
+  });
+};
+
 export const useOneOrder = (id: string) => {
   return useQuery({
     queryKey: ['order', id], 
@@ -42,6 +51,10 @@ export const useCreateOrder = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
     },
+    onError: (error: AxiosError<GlobalError>) => {
+      const data = error.response?.data;
+      toast.error(data?.error ?? 'Ошибка при оформлении заявки');
+    }
   });
 };
 
@@ -53,7 +66,6 @@ export const useUpdateOrder = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       queryClient.invalidateQueries({ queryKey: ['order', variables.id] });
-      toast.success('Заявка обновлена');
     },
     onError: (err: AxiosError<GlobalError>) => {
       const data = err.response?.data;

@@ -6,6 +6,9 @@ dotenv.config();
 import cookieParser from 'cookie-parser';
 import config from './config.js';
 import apiRouter from './routes/api.route.js';
+import { GridFSBucket } from 'mongodb';
+
+let gridFSBucket: GridFSBucket;
 
 const app: Express = express();
 app.use(
@@ -25,8 +28,16 @@ app.use((_req: Request, res: Response) => {
   });
 });
 
+app.set('trust proxy', true);
+
 const run = async () => {
   await mongoose.connect(config.db);
+
+  if (mongoose.connection.db) {
+    gridFSBucket = new GridFSBucket(mongoose.connection.db, {
+      bucketName: 'uploads',
+    });
+  }
 
   app.listen(config.port, () => {
     console.log(`http://localhost:${config.port}/api`);
@@ -38,3 +49,4 @@ const run = async () => {
 };
 
 run().catch((error) => console.error(error));
+export const getGridFSBucket = () => gridFSBucket;

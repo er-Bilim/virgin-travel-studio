@@ -12,5 +12,7 @@ export interface IContactSettings {
   telegram?: string;
   instagram?: string;
   facebook?: string;
+  mapEmbedUrl?: string,
+  logo?: string | FileList;
   workingHours: IWorkingHours;
 }

@@ -16,8 +16,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Loader } from "lucide-react";
-import {cn} from "@/lib/utils";
+import { Loader } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 type DataTableProps<TData, TValue> = {
   columns: ColumnDef<TData, TValue>[];
@@ -36,22 +36,22 @@ type DataTableProps<TData, TValue> = {
 };
 
 declare module '@tanstack/react-table' {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    interface ColumnMeta<TData, TValue> {
-        className?: string;
-    }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  interface ColumnMeta<TData, TValue> {
+    className?: string;
+  }
 }
 
 export function DataTable<TData, TValue>({
-                                             columns,
-                                             data,
-                                             isLoading,
-                                             isError,
-                                             pagination,
-                                             className,
-                                             headerRowClassName,
-                                             rowClassName,
-                                             onRowClick
+  columns,
+  data,
+  isLoading,
+  isError,
+  pagination,
+  className,
+  headerRowClassName,
+  rowClassName,
+  onRowClick,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -60,27 +60,27 @@ export function DataTable<TData, TValue>({
   });
   if (isLoading) {
     return (
-        <div className="rounded-2xl border bg-white">
-          <div className="p-8 text-center text-gray-500">
-            <Loader className="animate-spin w-5 h-5 mx-auto" />
-          </div>
+      <div className="rounded-2xl border bg-white">
+        <div className="p-8 text-center text-gray-500">
+          <Loader className="animate-spin w-5 h-5 mx-auto" />
         </div>
+      </div>
     );
   }
 
   if (isError) {
     return (
-        <div className="rounded-2xl border bg-white overflow-hidden">
-            <Table className={cn("w-full table-fixed", className)}>
-                <TableBody>
-                    <TableRow>
-                        <TableCell colSpan={columns.length}>
-                            <div className="p-6 text-center text-gray-500">Нет данных</div>
-                        </TableCell>
-                    </TableRow>
-                </TableBody>
-            </Table>
-        </div>
+      <div className="rounded-2xl border bg-white overflow-hidden">
+        <Table className={cn('w-full table-fixed', className)}>
+          <TableBody>
+            <TableRow>
+              <TableCell colSpan={columns.length}>
+                <div className="p-6 text-center text-gray-500">Нет данных</div>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </div>
     );
   }
 

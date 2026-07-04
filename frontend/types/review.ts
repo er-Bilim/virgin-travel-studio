@@ -1,3 +1,5 @@
+import type {TourType} from "@/types/tour";
+
 export interface IReviewMutation {
   tourId?: string;
   rating: number;
@@ -16,6 +18,9 @@ export interface IReview {
   createdDate: string;
   updatedDate: string;
   companyReply?: string | null;
+  tourId: TourType;
+  isModerated: "pending" | "approved" | "rejected";
+  featuredOnHomepage: boolean;
 }
 
 export interface IPaginationReviews {

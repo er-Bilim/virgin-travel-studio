@@ -21,6 +21,8 @@ import {
 } from '@/components/ui/dialog';
 import TourSetsTable from '@/components/dashboard/tourSets/TourSetsDashboards/TourSetsTable';
 import { toast } from 'sonner';
+import TourSetReviewsManager
+  from "@/components/dashboard/tourSets/TourSetReviewsManager";
 
 export default function TourDetails() {
   const { id } = useParams();
@@ -208,6 +210,8 @@ export default function TourDetails() {
           baseToursPath={baseToursPath}
           userRole={user?.role}
         />
+
+        <TourSetReviewsManager tourId={tour._id} />
       </div>
 
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>

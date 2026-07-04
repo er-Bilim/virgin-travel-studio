@@ -3,6 +3,7 @@ import axiosApi from '@/lib/axiosApi';
 import type {
   GetToursParams,
   ISingleTour,
+  ITourWithTourSetFields,
   TourCategoryType,
   TourMutation,
   ToursGetResponse,
@@ -15,8 +16,10 @@ export const getTours = async ({
   categoryId,
   search,
   isPublished,
-    countryCode,
-  sort
+  countryCode,
+  sort,
+    isHot,
+    hasDiscount
 }: GetToursParams): Promise<ToursGetResponse> => {
   const params: Record<string, string | undefined | number> = {};
 
@@ -25,6 +28,8 @@ export const getTours = async ({
   if (search) params.search = search;
   if (isPublished) params.isPublished = String(isPublished);
   if (countryCode) params.countryCode = countryCode;
+  if (isHot) params.isHot = 'true';
+  if (hasDiscount) params.hasDiscount = 'true';
 
   params.page = Number(page);
   params.limit = Number(limit);
@@ -34,9 +39,17 @@ export const getTours = async ({
   return res.data;
 };
 
-export const getTourById = async (id: string): Promise<ISingleTour> => {
-  const res = await axiosApi.get<ISingleTour>(`/tours/${id}`);
-  return res.data;
+export const getPopularTours = async (limit = 6): Promise<ITourWithTourSetFields[]> => {
+  const {data} = await axiosApi(`/tours/popular?limit=${limit}`);
+  return data;
+}
+
+export const getTourById = async (id: string, ip?: string): Promise<ISingleTour> => {
+  const {data} = await axiosApi.get<ISingleTour>(`/tours/${id}` , {
+    headers: ip ? { 'X-Forwarded-For': ip } : undefined,
+  });
+
+  return data;
 };
 
 export const getTourCategories = async (): Promise<TourCategoryType[]> => {
@@ -61,7 +74,16 @@ const buildTourFormData = (data: TourMutation) => {
     .forEach((adv: string) => formData.append('baseAdvantages', adv));
 
   if (data.images && data.images.length > 0) {
-    data.images.forEach((file: File) => formData.append('images', file));
+    data.images.forEach((item) => {
+      if (typeof item === 'string') {
+        formData.append('imagesOrder', item);
+      } else {
+        formData.append('images', item);
+        formData.append('imagesOrder', 'NEW_FILE');
+      }
+    });
+  } else {
+    formData.append('imagesOrder', 'EMPTY');
   }
 
   return formData;

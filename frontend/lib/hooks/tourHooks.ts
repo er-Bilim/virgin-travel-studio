@@ -3,6 +3,7 @@ import {
   createTour,
   deleteTour,
   getCountries,
+  getPopularTours,
   getTourById,
   getTourCategories,
   getTours,
@@ -14,27 +15,58 @@ import type {GetToursParams, TourMutation} from '@/types/tour';
 import type {AxiosError} from 'axios';
 import type {GlobalError} from '@/types/error';
 
-export const useTours = (
-{  page,
+export const useTours = ({
+  page,
   limit,
   categoryId,
   search,
   isPublished,
-    countryCode,
-  sort} : GetToursParams
-) => {
+  countryCode,
+  sort,
+    isHot,
+    hasDiscount,
+}: GetToursParams) => {
   return useQuery({
-    queryKey: ['tours', page, limit, categoryId, search, isPublished, sort, countryCode,],
-    queryFn: () => getTours({page, limit, categoryId, search, isPublished, sort, countryCode,}),
+    queryKey: [
+      'tours',
+      page,
+      limit,
+      categoryId,
+      search,
+      isPublished,
+      sort,
+      countryCode,
+        isHot,
+        hasDiscount,
+    ],
+    queryFn: () =>
+      getTours({
+        page,
+        limit,
+        categoryId,
+        search,
+        isPublished,
+        sort,
+        countryCode,
+        isHot,
+        hasDiscount
+      }),
   });
 };
+
+export const usePopularTours = (limit: number) => {
+  return useQuery({
+    queryKey: ['tours', 'popular', limit],
+    queryFn: () => getPopularTours(limit),
+  })
+}
 
 export const useCountries = () => {
   return useQuery({
     queryKey: ['countries'],
     queryFn: getCountries,
   });
-}
+};
 
 export const useGetTourCategories = () => {
   return useQuery({

@@ -3,6 +3,7 @@ import type {
     ContractFormValues,
     OrderMutationType,
     OrderPostType,
+    OrderStats,
     OrderType,
     PaginatedOrdersResponse
 } from '@/types/order';
@@ -20,6 +21,11 @@ export const getOrders = async (
   return result.data;
 }
 
+export const getOrdersStats = async () => {
+    const result = await axiosApi.get<OrderStats>('/orders/stats');
+    return result.data;
+};
+
 export const getOneOrder = async (id: string): Promise<OrderType> => {
   const result = await axiosApi.get(`/orders/${id}`);
   return result.data;
@@ -30,7 +36,10 @@ export const postOrder = async (data: OrderPostType) => {
   return result.data;
 };
 
-export const updateOrder = async (id: string, data: OrderMutationType) => {
+export const updateOrder = async (
+  id: string,
+  data: OrderMutationType,
+): Promise<OrderType> => {
   const result = await axiosApi.patch(`/orders/${id}`, data);
   return result.data;
 };

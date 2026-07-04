@@ -17,6 +17,8 @@ export interface ContactSettingsFields {
   telegram?: string;
   instagram?: string;
   facebook?: string;
+  mapEmbedUrl?: string,
+  logo?: string;
   workingHours?: {
     weekdays: TimeRange;
     saturday: WeekendRange;

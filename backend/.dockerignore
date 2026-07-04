@@ -1,0 +1,15 @@
+node_modules
+dist
+.git
+.gitignore
+*.log
+npm-debug.log*
+
+# Env files — inject via docker-compose env_file
+.env
+.env.*
+!.env.template
+
+# public/ is copied fully into the image.
+# images/ and videos/ are then overlaid by named volumes in docker-compose
+# so user uploads persist across container restarts without touching logo / seeds.
