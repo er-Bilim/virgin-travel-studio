@@ -11,7 +11,7 @@ import { VideoInput } from './VideoInput';
 import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog/ConfirmDialog'; 
 import AdvantageItem from './advantages/advantageItem';
 
-import type { HomepageSettingsMutationData, AdvantagesFields } from '@/types/homepageSettings';
+import type { HomepageSettingsMutationData } from '@/types/homepageSettings';
 import {
   mutateCreateHomepageSettings,
   mutateHomepageSettings,

@@ -9,7 +9,6 @@ import validateObjectId from '@/middlewares/validateObjectId.js';
 import { getGridFSBucket } from '@/index.js';
 import { uploadImageToGridFS } from '@/lib/gridfs.js';
 import { ObjectId } from 'mongodb';
-import { log } from 'console';
 
 const newsRouter = express.Router();
 
@@ -28,6 +27,10 @@ newsRouter.get(
         tags?: { $in: string[] };
         title?: { $regex: string; $options: 'i' };
         author?: string;
+        createdAt?: {
+          $gte?: Date;
+          $lte?: Date;
+        };
       } = {};
 
       const rawPage = Number.parseInt(req.query.page as string, 10);
@@ -79,6 +82,25 @@ newsRouter.get(
       if (typeof authorId === 'string') {
         if (authorId.trim().length > 0) {
           query.author = authorId;
+        }
+      }
+
+      const startDate = req.query.startDate;
+      const endDate = req.query.endDate;
+
+      if (typeof startDate === 'string' || typeof endDate === 'string') {
+        query.createdAt = {};
+
+        if (typeof startDate === 'string' && startDate.trim()) {
+          const from = new Date(startDate);
+          from.setHours(0, 0, 0, 0);
+          query.createdAt.$gte = from;
+        }
+
+        if (typeof endDate === 'string' && endDate.trim()) {
+          const to = new Date(endDate);
+          to.setHours(23, 59, 59, 999);
+          query.createdAt.$lte = to;
         }
       }
 

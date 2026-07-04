@@ -66,10 +66,29 @@ export const latestNewsQueryOptions = {
   queryFn: () => getNews({ page: 1, limit: 5, isPublished: 'true' }),
 };
 
-export const useNews = ({page, limit, searchText, isPublished, authorId, tags}: GetNewsParams) => {
+export const useNews = ({
+                          page,
+                          limit,
+                          searchText,
+                          isPublished,
+                          authorId,
+                          tags,
+                          startDate,
+                          endDate,
+                        }: GetNewsParams) => {
   return useQuery({
-    queryKey: ['news', page, limit, searchText, isPublished, authorId, tags],
-    queryFn: () => getNews({page, limit, searchText, isPublished, authorId, tags}),
+    queryKey: ['news', page, limit, searchText, isPublished, authorId, tags, startDate, endDate],
+    queryFn: () =>
+        getNews({
+          page,
+          limit,
+          searchText,
+          isPublished,
+          authorId,
+          tags,
+          startDate,
+          endDate,
+        }),
   });
 };
 
