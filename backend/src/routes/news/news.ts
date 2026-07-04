@@ -3,9 +3,13 @@ import mongoose from 'mongoose';
 import News from '@/model/New/News.js';
 import auth, { authOrNot, type RequestWithUser } from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
-import { imagesUpload } from '@/middlewares/multer.js';
+import { imageMemoryUpload, imagesUpload } from '@/middlewares/multer.js';
 import type { NewsFields } from '@/types/news.types.js';
 import validateObjectId from '@/middlewares/validateObjectId.js';
+import { getGridFSBucket } from '@/index.js';
+import { uploadImageToGridFS } from '@/lib/gridfs.js';
+import { ObjectId } from 'mongodb';
+import { log } from 'console';
 
 const newsRouter = express.Router();
 
@@ -150,7 +154,7 @@ newsRouter.post(
   '/',
   auth,
   permit('ADMIN', 'MANAGER'),
-  imagesUpload.single('image'),
+  imageMemoryUpload.single('image'),
   async (req, res, next) => {
     try {
       const { title, content, tags } = req.body;
@@ -165,10 +169,15 @@ newsRouter.post(
               .filter(Boolean)
           : [];
 
+      let imageId: string | null = null;
+      if (req.file) {
+        imageId = await uploadImageToGridFS(req.file);
+      }
+
       const news = new News({
         title,
         content,
-        image: req.file ? 'images/' + req.file.filename : null,
+        image: imageId,
         tags: parsedTags,
         author: user._id,
       });
@@ -191,6 +200,30 @@ newsRouter.post(
   },
 );
 
+newsRouter.get('/image/:id', async (req, res, next) => {
+  try {
+    const bucket = getGridFSBucket();
+    const _id = new ObjectId(req.params.id);
+    const files = await bucket.find({ _id }).toArray();
+
+    if (!files || files.length === 0) {
+      return res.status(404).send({
+        error: 'Изображение не найдено',
+      });
+    }
+
+    const file = files[0];
+    res.set(
+      'Content-Type',
+      file?.metadata?.contentType || 'application/octet-stream',
+    );
+
+    bucket.openDownloadStream(_id).pipe(res);
+  } catch (error) {
+    next(error);
+  }
+});
+
 newsRouter.delete(
   '/:id',
   auth,
@@ -200,6 +233,8 @@ newsRouter.delete(
     const { id } = req.params;
 
     try {
+      const bucket = getGridFSBucket();
+      const news = await News.findById(id);
       const { deletedCount } = await News.deleteOne({ _id: id });
       if (!deletedCount) {
         return res.status(404).send({
@@ -207,6 +242,15 @@ newsRouter.delete(
         });
       }
 
+      if (news && news.image) {
+        try {
+          await bucket.delete(new ObjectId(news.image));
+        } catch (error) {
+          console.error(error);
+        }
+      }
+      
+      await News.deleteOne({ _id: id });
       return res.send({
         message: 'Новость удалена',
       });
@@ -274,7 +318,17 @@ newsRouter.patch(
       }
 
       if (req.file) {
-        updateData.image = 'images/' + req.file.filename;
+        const imageId = await uploadImageToGridFS(req.file);
+
+        if (news.image) {
+          try {
+            await getGridFSBucket().delete(new ObjectId(news.image));
+          } catch (e) {
+            console.error(e);
+          }
+        }
+
+        updateData.image = imageId;
       }
 
       const updated = await News.findByIdAndUpdate(id, updateData, {
