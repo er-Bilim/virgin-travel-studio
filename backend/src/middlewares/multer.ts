@@ -3,6 +3,8 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { randomUUID } from 'crypto';
 import config from '@/config.js';
+import fileFilterImage from '@/lib/fileFilter.js';
+
 
 const imageStorage = multer.diskStorage({
   destination: async (_req, _file, cb) => {
@@ -36,21 +38,20 @@ export const videosUpload = multer({
     fileSize: 15 * 1024 * 1024,
   },
   fileFilter: (_req, file, callback) => {
-    const allowedMimeTypes = ['video/mp4', 'video/webm'];
-
-    if (allowedMimeTypes.includes(file.mimetype)) {
-      callback(null, true);
-    } else {
-      callback(
-        new Error(
-          'Недопустимый формат. Пожалуйста, загрузите видео в формате MP4 или WebM.',
-        ),
-      );
-    }
+    fileFilterImage({ file, callback });
   },
 });
 
 export const imagesUpload = multer({ storage: imageStorage });
+export const imageMemoryUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 15 * 1024 * 1024,
+  },
+  fileFilter: (_req, file, callback) => {
+    fileFilterImage({ file, callback });
+  },
+});
 
 export const combinedUpload = multer({
   storage: multer.diskStorage({
@@ -76,30 +77,6 @@ export const combinedUpload = multer({
   },
 
   fileFilter: (_req, file, callback) => {
-    if (file.fieldname === 'video') {
-      const allowedVideoTypes = ['video/mp4', 'video/webm'];
-      if (allowedVideoTypes.includes(file.mimetype)) {
-        return callback(null, true);
-      }
-      return callback(
-        new Error('Недопустимый формат видео. Разрешены только MP4 и WebM.'),
-      );
-    }
-
-    if (file.fieldname === 'image' || file.fieldname.startsWith('advantages')) {
-      const allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp'];
-      if (allowedImageTypes.includes(file.mimetype)) {
-        return callback(null, true);
-      }
-      return callback(
-        new Error(
-          'Недопустимый формат изображения. Разрешены JPEG, PNG и WebP.',
-        ),
-      );
-    }
-
-    callback(
-      new Error(`Неизвестное поле для загрузки файлов: ${file.fieldname}`),
-    );
+    fileFilterImage({ file, callback });  
   },
 });
