@@ -1,25 +1,27 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
-import type { AxiosError } from 'axios';
-import { Loader2, Layout, Compass, FileText, Plus } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Spinner } from '@/components/ui/spinner';
-import { imageUrl, inputClass } from '@/lib/constants';
-import { VideoInput } from './VideoInput';
-import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog/ConfirmDialog'; 
+import {useEffect, useState} from 'react';
+import {useFieldArray, useForm} from 'react-hook-form';
+import type {AxiosError} from 'axios';
+import {Compass, FileText, Layout, Loader2, Plus} from 'lucide-react';
+import {Input} from '@/components/ui/input';
+import {Spinner} from '@/components/ui/spinner';
+import {imageUrl, inputClass} from '@/lib/constants';
+import {VideoInput} from './VideoInput';
+import {
+  ConfirmDialog
+} from '@/components/dashboard/ConfirmDialog/ConfirmDialog';
 import AdvantageItem from './advantages/advantageItem';
 
-import type { HomepageSettingsMutationData, AdvantagesFields } from '@/types/homepageSettings';
+import type {HomepageSettingsMutationData} from '@/types/homepageSettings';
 import {
   mutateCreateHomepageSettings,
   mutateHomepageSettings,
   useHomepageSettings,
 } from '@/lib/hooks/homepageSettingsHooks';
-import type { GlobalError } from '@/types/error';
-import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
+import type {GlobalError} from '@/types/error';
+import {Button} from '@/components/ui/button';
+import {toast} from 'sonner';
 
 type FormTab = 'hero' | 'sections' | 'innerPages';
 
