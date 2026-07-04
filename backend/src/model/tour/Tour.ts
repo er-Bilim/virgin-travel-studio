@@ -26,7 +26,8 @@ const TourSchema = new Schema(
       required: [true, 'Описание тура обязательно для заполнения'],
     },
     images: {
-      type: [String],
+      type: [Schema.Types.ObjectId], 
+      default: [],
     },
     category: {
       type: Schema.Types.ObjectId,
@@ -52,7 +53,7 @@ const TourSchema = new Schema(
       type: Number,
       default: 0,
       min: 0,
-    }
+    },
   },
   {
     timestamps: true,

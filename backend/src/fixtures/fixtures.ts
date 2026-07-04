@@ -11,7 +11,9 @@ import ContactSettings from '../model/contactSettings/ContactSettings.js';
 import AboutUs from '../model/aboutUs/AboutUs.js';
 import path from 'path';
 import fs from 'fs/promises';
-import {fileURLToPath} from 'url';
+import { fileURLToPath } from 'url';
+import { GridFSBucket } from 'mongodb';
+import seedImageToGridFs from './helpers/seedImageToGridFS.js'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,6 +28,15 @@ const getJson = async (fileName: string) => {
 const run = async () => {
   await mongoose.connect(config.db);
   const db = mongoose.connection;
+
+  let bucket: GridFSBucket | undefined | null;
+
+  if (db.db) {
+    bucket = new GridFSBucket(db.db, {
+      bucketName: 'uploads',
+    });
+  }
+
   try {
     const collections = [
       'users',
@@ -42,6 +53,8 @@ const run = async () => {
     for (const collectionName of collections) {
       try {
         await db.dropCollection(collectionName);
+        await db.dropCollection('uploads.files');
+        await db.dropCollection('uploads.chunks');
       } catch (e) {
         const err = e as { code?: number };
         if (err.code === 26) {
@@ -88,6 +101,12 @@ const run = async () => {
             const toursData = await getJson(collectionName + '.json');
 
             for (const tourData of toursData) {
+              if (tourData.images) {
+                const promises = tourData.images.map((imagePath: string) =>
+                  seedImageToGridFs(bucket!, imagePath),
+                );
+                tourData.images = await Promise.all(promises);
+              }
               const tour = new Tour(tourData);
               await tour.save();
             }

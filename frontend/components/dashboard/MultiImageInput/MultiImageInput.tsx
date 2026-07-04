@@ -36,7 +36,7 @@ const MultiImageInput: React.FC<Props> = ({
 
     const newPreviews = value.map((item) => {
       if (typeof item === 'string') {
-        return item.startsWith('http') ? item : `${imageUrl}${item}`;
+        return item.startsWith('http') ? item : `${imageUrl}api/tours/image/${item}`;
       }
       const blobUrl = URL.createObjectURL(item);
       objectUrls.push(blobUrl);

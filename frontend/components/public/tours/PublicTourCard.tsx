@@ -19,7 +19,9 @@ type Props = {
 
 const PublicTourCard = ({ tour }: Props) => {
   const image =
-    tour.images.length > 0 ? imageUrl + tour.images[0] : BasePhoto.src;
+    tour.images.length > 0
+      ? imageUrl + `api/tours/image/${tour.images[0]}`
+      : BasePhoto.src;
 
   const { day, month } = formatDayAndMonthWords(tour.nextStartDate);
   const { day: saleDay, month: saleMonth } = tour.saleDeadline
