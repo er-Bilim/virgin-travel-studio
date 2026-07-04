@@ -38,8 +38,6 @@ const NewsDetailView = ({ id }: Props) => {
 
   const imageSrc: string = `${imageUrl}api/news/image/${news.image}`;
 
-  console.log(imageSrc);
-
   const paragraphs: string[] = news.content
     .split(/\n+/)
     .map((paragraph) => paragraph.trim())
