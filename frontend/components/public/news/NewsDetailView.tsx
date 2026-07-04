@@ -36,7 +36,9 @@ const NewsDetailView = ({ id }: Props) => {
 
   const words: number = news.content.trim().split(/\s+/).length;
 
-  const imageSrc: string = `${imageUrl}${news.image}`;
+  const imageSrc: string = `${imageUrl}api/news/image/${news.image}`;
+
+  console.log(imageSrc);
 
   const paragraphs: string[] = news.content
     .split(/\n+/)

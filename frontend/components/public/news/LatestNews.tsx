@@ -7,6 +7,8 @@ import ErrorState from '@/components/shared/ErrorState';
 import LatestNewsSkeleton from '@/components/shared/skeletons/LatestNewsSkeleton';
 import { useNews } from '@/lib/hooks/newsHooks';
 import Link from 'next/link';
+import CONTENT_PLACEHOLDER from '@/assets/placeholders/content_placeholder.png';
+
 
 const LatestNews = () => {
   const limit: number = 5;
@@ -72,7 +74,7 @@ const LatestNews = () => {
                 <div className="aspect-[16/10] overflow-hidden lg:aspect-auto lg:h-[400px]">
                   {featured.image ? (
                     <img
-                      src={imageUrl + featured.image}
+                      src={`${imageUrl}api/news/image/${featured.image}` || CONTENT_PLACEHOLDER}
                       alt={featured.title}
                       className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                     />
@@ -132,7 +134,7 @@ const LatestNews = () => {
                     <div className="w-30 shrink-0 overflow-hidden sm:w-50">
                       {singleNews.image ? (
                         <img
-                          src={imageUrl + singleNews.image}
+                          src={`${imageUrl}api/news/image/${singleNews.image}` || CONTENT_PLACEHOLDER}
                           alt={singleNews.title}
                           className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                         />
