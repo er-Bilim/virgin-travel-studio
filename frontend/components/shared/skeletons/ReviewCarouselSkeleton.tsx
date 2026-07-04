@@ -1,22 +1,7 @@
-import { IoSparkles } from 'react-icons/io5';
-
 const ReviewCarouselSkeleton = () => {
 
   return (
     <section>
-      <div className="mb-9">
-        <p className="mb-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-cyan-800">
-          <IoSparkles className="size-[15px]" />
-          Отзывы
-        </p>
-        <h2 className="text-3xl font-bold tracking-tight text-navy-800">
-          Что говорят путешественники
-        </h2>
-        <p className="mt-2 max-w-md text-[15px] text-muted-foreground">
-          Реальные впечатления тех, кто уже съездил с нами
-        </p>
-      </div>
-
       <div className="flex gap-[22px] overflow-hidden">
         {Array.from({ length: 3 }).map((_, index) => (
           <div

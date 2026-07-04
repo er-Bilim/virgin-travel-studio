@@ -61,6 +61,11 @@ const useCreateNews = (setError: UseFormSetError<NewsMutation>) => {
 };
 export default useCreateNews;
 
+export const latestNewsQueryOptions = {
+  queryKey: ['news', 1, 5, undefined, 'true', undefined, undefined] as const,
+  queryFn: () => getNews({ page: 1, limit: 5, isPublished: 'true' }),
+};
+
 export const useNews = ({page, limit, searchText, isPublished, authorId, tags}: GetNewsParams) => {
   return useQuery({
     queryKey: ['news', page, limit, searchText, isPublished, authorId, tags],

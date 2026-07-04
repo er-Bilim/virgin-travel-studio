@@ -6,7 +6,7 @@ import type {
   OrderPayment,
   OrderStatus,
   PassportPayload,
-  PopulatedOrder
+  PopulatedOrder,
 } from '@/types/orders.types.js';
 import mongoose, {Types} from 'mongoose';
 import validateObjectId from '@/middlewares/validateObjectId.js';
@@ -127,11 +127,14 @@ ordersRouter.get(
         user.role === 'MANAGER' ? {managerId: user._id} : {};
 
       const now = new Date();
-      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const todayStart = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+      );
       const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
       const [statusCounts, completedToday, monthRevenue] = await Promise.all([
-
         Order.aggregate([
           {$match: baseQuery},
           {$group: {_id: '$status', count: {$sum: 1}}},
@@ -166,10 +169,10 @@ ordersRouter.get(
       ]);
 
       const byStatus = Object.fromEntries(
-        statusCounts.map((s: {
-          _id: string;
-          count: number
-        }) => [s._id, s.count]),
+        statusCounts.map((s: { _id: string; count: number }) => [
+          s._id,
+          s.count,
+        ]),
       );
 
       res.send({
@@ -196,12 +199,13 @@ ordersRouter.get(
   async (req, res, next) => {
     try {
       const {id} = req.params;
+      const {user} = req as RequestWithUser;
 
       const order = await Order.findById(id)
         .populate('managerId', 'fullName phone')
         .populate({
           path: 'tourSetId',
-          select: 'startDate endDate price hotelName',
+          select: 'startDate endDate price hotelName totalSeats bookedSeats',
           populate: {
             path: 'tourId',
             select: 'title category',
@@ -215,6 +219,15 @@ ordersRouter.get(
         .lean();
 
       if (!order) return res.status(404).send({error: 'Заявка не найдена'});
+
+      if (
+        user.role === 'MANAGER' &&
+        order.managerId &&
+        order.managerId._id.toString() !== user._id.toString()
+      ) {
+        return res.status(403).send({error: 'Доступ к чужой заявке запрещен'});
+      }
+
       res.send(order);
     } catch (e) {
       next(e);
@@ -234,7 +247,9 @@ ordersRouter.post('/', async (req, res, next) => {
       }
 
       if (!tourSet.hasAvailableSeats()) {
-        return res.status(400).send({error: 'Извините, все места в этом туре уже заняты'});
+        return res
+          .status(400)
+          .send({error: 'Извините, все места в этом туре уже заняты'});
       }
     }
 
@@ -295,7 +310,6 @@ ordersRouter.post('/', async (req, res, next) => {
 });
 
 async function update_tourSet(tourSetId: Types.ObjectId, step: 1 | -1 = 1) {
-
   const validationQuery =
     step === 1
       ? {$expr: {$lt: ['$bookedSeats', '$totalSeats']}}
@@ -358,193 +372,233 @@ ordersRouter.patch(
       }
 
       const order = await Order.findById(id);
-
       if (!order) return res.status(404).send({error: 'Заявка не найдена'});
 
-      order.managerId = user._id;
-      if (clientName) order.clientName = clientName;
-      if (clientPhone) order.clientPhone = clientPhone;
-      if (order.status === 'NEW') order.status = 'IN_PROGRESS';
-      if (rejectionReason) order.rejectionReason = rejectionReason;
-
-
-      if (paymentMethod !== undefined) {
-        const allowedPayments: OrderPayment[] = ['CASH', 'CARD', 'QR', 'BANK'];
-        if (!allowedPayments.includes(paymentMethod as OrderPayment)) {
-          return res.status(400).send({error: 'Недопустимый вид оплаты'});
+      if (status === 'NEW' && order.managerId) {
+        if (order.status === 'COMPLETED' || order.status === 'REJECTED') {
+          return res.status(400).send({
+            error:
+              'Нельзя вернуть завершенный или отклоненный заказ в общий пул',
+          });
         }
-        order.paymentMethod = paymentMethod;
 
-        if (paymentAmount === undefined || paymentAmount === null || Number(paymentAmount) <= 0) {
-          return res.status(400).send({error: 'Сумма оплаты обязательна и должна быть больше 0, если указан способ оплаты'});
+        if (user.role === 'MANAGER' && !order.managerId.equals(user._id)) {
+          return res
+            .status(403)
+            .send({error: 'Вы не можете отказаться от чужой заявки'});
         }
-      } else if (paymentAmount !== undefined && paymentAmount !== null) {
-        return res.status(400).send({error: 'Способ оплаты обязателен, если указана сумма оплаты'});
-      }
 
-      if (paymentAmount !== undefined && paymentAmount !== null) {
-        const parsedAmount = Number(paymentAmount);
-        if (isNaN(parsedAmount) || parsedAmount < 0) {
-          return res.status(400).send({ error: 'Недопустимая сумма оплаты' });
+        order.managerId = null;
+        order.status = 'NEW';
+      } else {
+        if (
+          user.role === 'MANAGER' &&
+          order.managerId &&
+          !order.managerId.equals(user._id)
+        ) {
+          return res
+            .status(403)
+            .send({error: 'Эта заявка уже занята другим менеджером'});
         }
-        order.paymentAmount = parsedAmount;
-      }
 
-      if (status && status === 'COMPLETED') {
-        const booked = await update_tourSet(order.tourSetId);
-
-        if (!booked) {
-          return res.status(400).send('Нет свободных мест!');
+        if (!order.managerId) {
+          order.managerId = user._id;
         }
+
+        if (clientName) order.clientName = clientName;
+        if (clientPhone) order.clientPhone = clientPhone;
+        if (order.status === 'NEW') order.status = 'IN_PROGRESS';
+        if (rejectionReason) order.rejectionReason = rejectionReason;
+
+        if (paymentMethod !== undefined) {
+          const allowedPayments: OrderPayment[] = ['CASH', 'CARD', 'QR', 'BANK'];
+          if (!allowedPayments.includes(paymentMethod as OrderPayment)) {
+            return res.status(400).send({error: 'Недопустимый вид оплаты'});
+          }
+          order.paymentMethod = paymentMethod;
+
+          if (paymentAmount === undefined || paymentAmount === null || Number(paymentAmount) <= 0) {
+            return res.status(400).send({error: 'Сумма оплаты обязательна и должна быть больше 0, если указан способ оплаты'});
+          }
+        } else if (paymentAmount !== undefined && paymentAmount !== null) {
+          return res.status(400).send({error: 'Способ оплаты обязателен, если указана сумма оплаты'});
+        }
+
+        if (paymentAmount !== undefined && paymentAmount !== null) {
+          const parsedAmount = Number(paymentAmount);
+          if (isNaN(parsedAmount) || parsedAmount < 0) {
+            return res.status(400).send({error: 'Недопустимая сумма оплаты'});
+          }
+          order.paymentAmount = parsedAmount;
+        }
+
+        if (status && status === 'COMPLETED' && order.status !== 'COMPLETED') {
+          const booked = await update_tourSet(order.tourSetId);
+          if (!booked) {
+            return res.status(400).send({ error: 'Нет свободных мест!' });
+          }
+        }
+
+        if (status && status === 'REJECTED' && order.status !== 'REJECTED') {
+          const unBooked = await update_tourSet(order.tourSetId, -1);
+          if (!unBooked)
+            return res.status(400).send({ error: 'Ошибка при снятии брони!' });
+        }
+
+        if (status) order.status = status as OrderStatus;
       }
 
-      if (status && status === 'REJECTED') {
-        const unBooked = await update_tourSet(order.tourSetId, -1);
-        if (!unBooked) return res.status(400).send('Ошибка при снятии брони!');
+        await order.save();
+
+        const updatedOrder = await Order.findById(order._id)
+          .populate('managerId', 'fullName phone')
+          .populate({
+            path: 'tourSetId',
+            populate: {path: 'tourId', select: 'title'},
+          });
+
+        res.send({message: 'Статус успешно обновлен', order: updatedOrder});
       }
-
-      if (status) order.status = status as OrderStatus;
-
-      await order.save();
-
-      const updatedOrder = await Order.findById(order._id)
-        .populate('managerId', 'fullName phone')
-        .populate({
-          path: 'tourSetId',
-          populate: {path: 'tourId', select: 'title'},
-        });
-
-      res.send({message: 'Статус успешно обновлен', order: updatedOrder});
-    } catch (e) {
-      if (e instanceof mongoose.Error.ValidationError) {
-        return res
-          .status(400)
-          .send({error: 'Ошибка валидации', details: e.errors});
+    catch
+      (e)
+      {
+        if (e instanceof mongoose.Error.ValidationError) {
+          return res
+            .status(400)
+            .send({error: 'Ошибка валидации', details: e.errors});
+        }
+        next(e);
       }
-      next(e);
     }
-  },
-);
+  ,
+  )
+    ;
 
-ordersRouter.delete(
-  '/:id',
-  auth,
-  permit('ADMIN', 'MANAGER'),
-  validateObjectId(),
-  async (req, res, next) => {
-    const {id} = req.params;
-    const {user} = req as RequestWithUser;
+    ordersRouter.delete(
+      '/:id',
+      auth,
+      permit('ADMIN', 'MANAGER'),
+      validateObjectId(),
+      async (req, res, next) => {
+    const { id } = req.params;
+    const { user } = req as RequestWithUser;
 
-    if (user.status === 'banned') {
-      return res.status(401).send({error: 'Менеджер недоступен'});
-    }
 
-    try {
-      const {deletedCount} = await Order.deleteOne({_id: id as string});
-      if (!deletedCount) {
-        return res.status(404).send({
-          error: 'Заявка не найдена',
-        });
-      }
+        if (user.status === 'banned') {
+          return res.status(401).send({error: 'Менеджер недоступен'});
+        }
 
-      return res.send({
-        message: 'Заявка удалена',
-      });
-    } catch (e) {
-      next(e);
-    }
-  },
-);
+        try {
+          const {deletedCount} = await Order.deleteOne({_id: id as string});
+          if (!deletedCount) {
+            return res.status(404).send({
+              error: 'Заявка не найдена',
+            });
+          }
 
-ordersRouter.post(
-  '/:id/generate-contract',
-  auth,
-  permit('ADMIN', 'MANAGER'),
-  validateObjectId(),
-  async (req, res, next) => {
-    try {
-      const {id} = req.params;
-      const body = req.body as PassportPayload;
+          return res.send({
+            message: 'Заявка удалена',
+          });
+        } catch (e) {
+          next(e);
+        }
+      },
+    );
 
-      const {passportNumber, passportIssuedBy, passportIssueDate, birthDate} =
-        body;
+    ordersRouter.post(
+      '/:id/generate-contract',
+      auth,
+      permit('ADMIN', 'MANAGER'),
+      validateObjectId(),
+      async (req, res, next) => {
+        try {
+          const {id} = req.params;
+          const body = req.body as PassportPayload;
 
-      const requiredFields = [
-        passportNumber,
-        passportIssuedBy,
-        passportIssueDate,
-        birthDate,
-      ];
+          const {
+            passportNumber,
+            passportIssuedBy,
+            passportIssueDate,
+            birthDate
+          } =
+            body;
 
-      if (requiredFields.some((v) => !v || v.trim() === '')) {
-        return res.status(400).send({error: 'Не все данные указаны'});
-      }
+          const requiredFields = [
+            passportNumber,
+            passportIssuedBy,
+            passportIssueDate,
+            birthDate,
+          ];
 
-      const order = await Order.findById(id)
-        .populate({
-          path: 'tourSetId',
-          populate: {path: 'tourId'},
-        })
-        .populate('managerId', 'fullName phone')
-        .lean<PopulatedOrder>();
+          if (requiredFields.some((v) => !v || v.trim() === '')) {
+            return res.status(400).send({error: 'Не все данные указаны'});
+          }
 
-      if (!order) return res.status(404).send({error: 'Заявка не найдена.'});
+          const order = await Order.findById(id)
+            .populate({
+              path: 'tourSetId',
+              populate: {path: 'tourId'},
+            })
+            .populate('managerId', 'fullName phone')
+            .lean<PopulatedOrder>();
 
-      if (order.status !== 'CONTRACT_PENDING')
-        return res.status(400).send({
-          error:
-            'Контракт недоступен для генерации только в состоянии CONTRACT_PENDING',
-        });
+          if (!order) return res.status(404).send({error: 'Заявка не найдена.'});
 
-      const contractData: ContractData = {
-        client: {
-          name: order.clientName,
-          phone: order.clientPhone,
-          passportNumber,
-          passportIssuedBy,
-          passportIssueDate,
-          birthDate,
-        },
-        tour: {
-          title: order.tourSetId?.tourId?.title,
-          startDate: order.tourSetId?.startDate,
-          endDate: order.tourSetId?.endDate,
-          price: order.tourSetId?.price,
-          hotel: order.tourSetId?.hotelName,
-        },
-        manager: {
-          name: order.managerId?.fullName,
-          phone: order.managerId?.phone,
-        },
-      };
+          if (order.status !== 'CONTRACT_PENDING')
+            return res.status(400).send({
+              error:
+                'Контракт недоступен для генерации только в состоянии CONTRACT_PENDING',
+            });
 
-      const browser = await getBrowser();
-      const page = await browser.newPage();
+          const contractData: ContractData = {
+            client: {
+              name: order.clientName,
+              phone: order.clientPhone,
+              passportNumber,
+              passportIssuedBy,
+              passportIssueDate,
+              birthDate,
+            },
+            tour: {
+              title: order.tourSetId?.tourId?.title,
+              startDate: order.tourSetId?.startDate,
+              endDate: order.tourSetId?.endDate,
+              price: order.tourSetId?.price,
+              hotel: order.tourSetId?.hotelName,
+            },
+            manager: {
+              name: order.managerId?.fullName,
+              phone: order.managerId?.phone,
+            },
+          };
 
-      try {
-        await page.setContent(buildContractHTML(contractData), {
-          waitUntil: 'load',
-        });
+          const browser = await getBrowser();
+          const page = await browser.newPage();
 
-        const pdfBuffer = await page.pdf({
-          format: 'A4',
-          printBackground: true,
-        });
+          try {
+            await page.setContent(buildContractHTML(contractData), {
+              waitUntil: 'load',
+            });
 
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader(
-          'Content-Disposition',
-          `attachment; filename=contract.pdf`,
-        );
+            const pdfBuffer = await page.pdf({
+              format: 'A4',
+              printBackground: true,
+            });
 
-        return res.end(pdfBuffer);
-      } finally {
-        await page.close();
-      }
-    } catch (e) {
-      next(e);
-    }
-  },
-);
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader(
+              'Content-Disposition',
+              `attachment; filename=contract.pdf`,
+            );
 
-export default ordersRouter;
+            return res.end(pdfBuffer);
+          } finally {
+            await page.close();
+          }
+        } catch (e) {
+          next(e);
+        }
+      },
+    );
+
+    export default ordersRouter;

@@ -144,7 +144,7 @@ export default function OrderTable () {
 
 if (isPending) {
   return (
-    <div className="rounded-2xl border bg-white">
+    <div className="p-8 space-y-8 bg-gray-50">
       <div className="p-8 text-center text-gray-500">
         <Loader className="animate-spin w-5 h-5 mx-auto" />
       </div>
@@ -154,7 +154,7 @@ if (isPending) {
 
   return (
     <>
-      <div className="p-2 py-4 md:p-8 rounded-3xl space-y-8 bg-gray-50">
+      <div className="p-8 space-y-8 bg-gray-50">
         <div className="flex flex-wrap sm:justify-between gap-4 items-center">
           <h1 className="text-3xl font-bold tracking-tight text-[#1E2B6D]">
             Заявки

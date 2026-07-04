@@ -1,6 +1,7 @@
 'use client';
 
 import ClientAvatar from '@/components/shared/ClientAvatar';
+import ErrorState from '@/components/shared/ErrorState';
 import Rating from '@/components/shared/Rating';
 import ReviewCarouselSkeleton from '@/components/shared/skeletons/ReviewCarouselSkeleton';
 import {
@@ -20,12 +21,14 @@ import {
   Compass,
 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { IoSparkles } from 'react-icons/io5';
 
 const ReviewsCarousel = () => {
-  const { data: reviews, isLoading } = useGetFeaturedReviews();
+  const { data: reviews, isLoading, isError, refetch } = useGetFeaturedReviews();
   const [api, setApi] = useState<CarouselApi>();
+  const router = useRouter();
 
   const [canScrollPrev, setCanScrollPrev] = useState<boolean>(false);
   const [canScrollNext, setCanScrollNext] = useState<boolean>(false);
@@ -50,7 +53,11 @@ const ReviewsCarousel = () => {
   }, [api]);
 
   if (isLoading) {
-    return <ReviewCarouselSkeleton/>
+    return <ReviewCarouselSkeleton />;
+  }
+
+  if (isError) {
+    return <ErrorState onRetry={refetch} />;
   }
 
   return (
@@ -68,12 +75,15 @@ const ReviewsCarousel = () => {
                   return (
                     <CarouselItem
                       key={review._id}
-                      className="basis-1/2 lg:basis-1/3"
+                      className="basis-full sm:basis-1/2 lg:basis-1/3"
                     >
                       <article
                         itemScope
                         itemType="https://schema.org/Review"
-                        className="flex h-full w-full flex-col rounded-[20px] border border-border p-[26px]"
+                        className="flex h-full w-full flex-col rounded-[20px] border border-border p-5 sm:p-[26px] hover:border-cyan-500 hover:text-cyan-600 cursor-pointer duration-300"
+                        onClick={() =>
+                          router.push(`/tours/${review.tourId._id}`)
+                        }
                       >
                         <div
                           aria-hidden="true"
@@ -104,7 +114,7 @@ const ReviewsCarousel = () => {
 
                         <p
                           itemProp="reviewBody"
-                          className="mb-5 flex-1 text-[15px] leading-relaxed text-ink"
+                          className="mb-5 flex-1 text-[15px] leading-relaxed text-ink "
                         >
                           {review.comment}
                         </p>
@@ -161,7 +171,7 @@ const ReviewsCarousel = () => {
               onClick={() => api?.scrollPrev()}
               aria-label="назад"
               className={cn(
-                'flex size-11 items-center justify-center rounded-full border border-border bg-white text-navy-700 transition',
+                'flex size-10 sm:size-11 items-center justify-center rounded-full border border-border bg-white text-navy-700 transition',
                 canScrollPrev
                   ? 'hover:border-navy-700 hover:bg-navy-700 hover:text-white cursor-pointer'
                   : 'border-gray-200 text-gray-200',
@@ -174,7 +184,7 @@ const ReviewsCarousel = () => {
               onClick={() => api?.scrollNext()}
               aria-label="вперед"
               className={cn(
-                'flex size-11 items-center justify-center rounded-full border border-border bg-white text-navy-700 transition',
+                'flex size-10 sm:size-11 items-center justify-center rounded-full border border-border bg-white text-navy-700 transition',
                 canScrollNext
                   ? 'hover:border-navy-700 hover:bg-navy-700 hover:text-white cursor-pointer'
                   : 'border-gray-200 text-gray-200',
@@ -187,7 +197,7 @@ const ReviewsCarousel = () => {
         </>
       ) : (
         <>
-          <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-6 py-12 text-center">
+          <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-5 py-10 sm:px-6 sm:py-12 text-center">
             <div className="mb-[18px] flex size-16 items-center justify-center rounded-[18px] border border-border bg-white">
               <MessageCircleHeart />
             </div>
@@ -196,10 +206,10 @@ const ReviewsCarousel = () => {
               Скоро здесь появятся отзывы
             </h3>
 
-                      <p className="mb-[22px] max-w-[380px] text-sm leading-relaxed text-muted-foreground">
-            Мы готовим истории наших путешественников. Поделитесь своими впечатлениями
-            о поездке. Лучшие отзывы попадут на главную страницу
-          </p>
+            <p className="mb-[22px] max-w-[380px] text-sm leading-relaxed text-muted-foreground">
+              Мы готовим истории наших путешественников. Поделитесь своими
+              впечатлениями о поездке. Лучшие отзывы попадут на главную страницу
+            </p>
 
             <Link
               href="/tours"

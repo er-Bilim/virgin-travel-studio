@@ -9,14 +9,6 @@ interface TourLite {
   category: CategoryLite;
 }
 
-export type OrderStatus =
-  | 'NEW'
-  | 'IN_PROGRESS'
-  | 'CONTRACT_PENDING'
-  | 'COMPLETED'
-  | 'REJECTED';
-
-
 export type OrderPayment =
   | 'CASH'
   | 'CARD'
@@ -36,6 +28,8 @@ interface ToursetLite {
   price: number;
   hotelName: string;
   tourId: TourLite;
+  bookedSeats: number;
+  totalSeats: number;
 }
 
 export interface OrderType {
@@ -46,6 +40,8 @@ export interface OrderType {
   status: string;
   rejectionReason: string | null;
   managerId: ManagerLite | null;
+  visibleId: string;
+  createdAt: string;
   paymentMethod?: OrderPayment;
   paymentAmount?: number;
 }
@@ -104,6 +100,12 @@ export interface ContractFormValues {
   birthDate: string;
 }
 
+export type OrderStatus =
+  | 'NEW'
+  | 'IN_PROGRESS'
+  | 'CONTRACT_PENDING'
+  | 'COMPLETED'
+  | 'REJECTED';
 
   export interface OrderStats {
     byStatus: {
