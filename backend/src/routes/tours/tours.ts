@@ -1,7 +1,7 @@
 import express from 'express';
 import auth, {authOrNot, type RequestWithUser} from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
-import {imagesUpload, imageMemoryUpload} from '@/middlewares/multer.js';
+import {imageMemoryUpload} from '@/middlewares/multer.js';
 import Tour from '@/model/tour/Tour.js';
 import mongoose, {type PipelineStage} from 'mongoose';
 import validateObjectId from '@/middlewares/validateObjectId.js';
@@ -13,8 +13,6 @@ import telegramMessage, {
   aggregate_tour,
   type TourDocumentType,
 } from '@/utils/bot/telegram.js';
-import path from 'path';
-import fs from 'fs/promises';
 import TourView from '@/model/tour/TourView.js';
 import {buildTourPipeline} from '@/aggregations/tours.pipeline.js';
 import { uploadImageToGridFS } from '@/lib/gridfs.js';
@@ -207,7 +205,7 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
           title: 1,
           description: 1,
           images: 1,
-          baseAdventages: 1,
+          baseAdvantages: 1,
           isPublished: 1,
           rating: 1,
           ratingCount: 1,
