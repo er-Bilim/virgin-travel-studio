@@ -250,7 +250,6 @@ newsRouter.delete(
         }
       }
       
-      await News.deleteOne({ _id: id });
       return res.send({
         message: 'Новость удалена',
       });

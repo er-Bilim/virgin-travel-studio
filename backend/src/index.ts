@@ -49,4 +49,4 @@ const run = async () => {
 };
 
 run().catch((error) => console.error(error));
-export const getGridFSBucket = () => gridFSBucket;
+export const getGridFSBucket = (): GridFSBucket => gridFSBucket;
