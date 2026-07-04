@@ -38,7 +38,7 @@ const PaymentForm: React.FC<Props> = ({ orderId }) => {
   } = useForm<PaymentFormValues>({
     defaultValues: {
       paymentMethod: 'CASH',
-      paymentAmount: undefined,
+      paymentAmount: 0,
     },
   });
 

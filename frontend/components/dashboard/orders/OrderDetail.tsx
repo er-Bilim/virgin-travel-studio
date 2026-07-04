@@ -157,31 +157,31 @@ export default function OrderDetail() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 items-start text-lg border-b border-gray-200 pb-4 mt-18">
           <h2 className="md:col-span-2text-xl border-b border-gray-100 pb-2">
             Тур{' '}
-            <span className="font-bold ">{order.tourSetId.tourId.title}</span>
+            <span className="font-bold ">{order.tourSetId?.tourId?.title}</span>
           </h2>
 
           <p>
             Категория:{' '}
             <span className="font-medium">
-              {order.tourSetId.tourId.category.title}
+             {order.tourSetId?.tourId?.title}
             </span>
           </p>
 
           <p>
             Даты:{' '}
             <span className="font-bold">
-              {format(new Date(order.tourSetId.startDate), 'dd.MM.yyyy')} -{' '}
-              {format(new Date(order.tourSetId.endDate), 'dd.MM.yyyy')}
+              {format(new Date(order.tourSetId?.startDate), 'dd.MM.yyyy')} -{' '}
+              {format(new Date(order.tourSetId?.endDate), 'dd.MM.yyyy')}
             </span>
           </p>
 
           <p>
-            Цена: <span className="font-medium">{order.tourSetId.price}</span>
+            Цена: <span className="font-medium">{order.tourSetId?.price}</span>
           </p>
 
           <p>
             Отель:{' '}
-            <span className="font-medium">{order.tourSetId.hotelName}</span>
+            <span className="font-medium">{order.tourSetId?.hotelName}</span>
           </p>
         </div>
 

@@ -374,10 +374,20 @@ ordersRouter.patch(
           return res.status(400).send({error: 'Недопустимый вид оплаты'});
         }
         order.paymentMethod = paymentMethod;
+
+        if (paymentAmount === undefined || paymentAmount === null || Number(paymentAmount) <= 0) {
+          return res.status(400).send({error: 'Сумма оплаты обязательна и должна быть больше 0, если указан способ оплаты'});
+        }
+      } else if (paymentAmount !== undefined && paymentAmount !== null) {
+        return res.status(400).send({error: 'Способ оплаты обязателен, если указана сумма оплаты'});
       }
 
       if (paymentAmount !== undefined && paymentAmount !== null) {
-        order.paymentAmount = Number(paymentAmount);
+        const parsedAmount = Number(paymentAmount);
+        if (isNaN(parsedAmount) || parsedAmount < 0) {
+          return res.status(400).send({ error: 'Недопустимая сумма оплаты' });
+        }
+        order.paymentAmount = parsedAmount;
       }
 
       if (status && status === 'COMPLETED') {

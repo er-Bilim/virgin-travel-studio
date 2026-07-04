@@ -80,10 +80,31 @@ const OrderSchema = new Schema(
         ],
         message: 'Недопустимый способ оплаты',
       },
+      validate: {
+        validator: function (this: any, v: string | undefined) {
+          if (v && (this.paymentAmount === undefined || this.paymentAmount <= 0)) {
+            return false;
+          }
+          if (!v && (this.paymentAmount !== undefined && this.paymentAmount !== null)) {
+            return false;
+          }
+          return true;
+        },
+        message: 'Сумма оплаты обязательна и должна быть больше 0, если указан способ оплаты. Способ оплаты не может быть указан без суммы.',
+      },
     },
     paymentAmount: {
       type: Number,
-      min: 0
+      min: [0, 'Сумма оплаты не может быть отрицательной'],
+      validate: {
+        validator: function (this: any, v: number | undefined) {
+          if ((v !== undefined && v !== null) && !this.paymentMethod) {
+            return false;
+          }
+          return true;
+        },
+        message: 'Способ оплаты обязателен, если указана сумма оплаты.',
+      },
     },
 
     customTour: {

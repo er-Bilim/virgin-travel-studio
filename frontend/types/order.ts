@@ -67,6 +67,8 @@ export interface OrderMutationType {
   status?: string;
   rejectionReason?: string | null;
   managerId: string | null | undefined;
+  paymentMethod?: OrderPayment;
+  paymentAmount?: number;
 }
 
 export interface OrderPostType {
@@ -102,12 +104,6 @@ export interface ContractFormValues {
   birthDate: string;
 }
 
-export type OrderStatus =
-  | 'NEW'
-  | 'IN_PROGRESS'
-  | 'CONTRACT_PENDING'
-  | 'COMPLETED'
-  | 'REJECTED';
 
   export interface OrderStats {
     byStatus: {

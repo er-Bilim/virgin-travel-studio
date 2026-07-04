@@ -10,78 +10,90 @@ import {applyExcelStyles} from "@/utils/excel/applyExcelStyles.js";
 import auth, {type RequestWithUser} from "@/middlewares/auth.js";
 import permit from "@/middlewares/permit.js";
 
-
 async function getDailyManagerReport(req: Request, res: Response, next: NextFunction) {
-    try {
-        const reqUser  = (req as RequestWithUser).user;
-        const { from, to, managerId } = req.query;
+  try {
+    const reqUser = (req as RequestWithUser).user;
+    const {from, to, managerId} = req.query;
 
-        if (managerId && typeof managerId !== 'string') {
-            return res.status(400).json({ error: 'managerId должен быть строкой' });
+    if (managerId && typeof managerId !== 'string') {
+      return res.status(400).json({error: 'managerId должен быть строкой'});
+    }
+
+    if (from && typeof from !== 'string') {
+      return res.status(400).json({error: '"from" должен быть строкой'});
+    }
+
+    if (to && typeof to !== 'string') {
+      return res.status(400).json({error: '"to" должен быть строкой'});
+    }
+
+    const fromDate = from ? parseDate(from as string) : undefined;
+    const toDate = to ? parseDate(to as string) : undefined;
+
+    if (from && !fromDate) {
+      return res.status(400).json({error: 'Неправильная "from" дата'});
+    }
+
+    if (to && !toDate) {
+      return res.status(400).json({error: 'Неправильная "to" дата'});
+    }
+
+    let managerObjectId: Types.ObjectId | undefined;
+
+    if (reqUser.role === 'MANAGER' && managerId) {
+      return res.status(403).json({
+        error: 'Менеджер не может запрашивать отчеты других менеджеров',
+      });
+    }
+
+    if (reqUser.role === 'MANAGER') {
+      managerObjectId = reqUser._id;
+    } else if (reqUser.role === 'ADMIN') {
+      if (typeof managerId === 'string') {
+        if (!mongoose.Types.ObjectId.isValid(managerId)) {
+          return res.status(400).json({error: 'Неверный managerId'});
         }
+        managerObjectId = new Types.ObjectId(managerId);
+      }
+    }
 
-        if (from && typeof from !== 'string') {
-            return res.status(400).json({ error: '"from" должен быть строкой' });
-        }
+    if (fromDate && toDate && fromDate > toDate) {
+      return res.status(400).json({
+        error: '"from" не должен быть больше "to"',
+      });
+    }
 
-        if (to && typeof to !== 'string') {
-            return res.status(400).json({ error: '"to" должен быть строкой' });
-        }
+    const diffDays =
+      fromDate && toDate
+        ? Math.ceil((toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60 * 24))
+        : 0;
 
-        const fromDate = parseDate(from);
-        const toDate = parseDate(to);
+    if (diffDays > 31) {
+      return res.status(400).json({
+        error: 'Диапазон дат слишком большой (максимум 31 день)',
+      });
+    }
 
-        if (from && !fromDate) {
-            return res.status(400).json({ error: 'Неправильная "from" дата' });
-        }
+    const endOfDay = toDate ? new Date(toDate.setHours(23, 59, 59, 999)) : null;
 
-        if (to && !toDate) {
-            return res.status(400).json({ error: 'Неправильная "to" дата' });
-        }
-
-        let managerObjectId: Types.ObjectId | undefined;
-
-        if (reqUser.role === 'MANAGER' && managerId) {
-            return res.status(403).json({
-                error: 'Менеджер не может запрашивать отчеты других менеджеров',
-            });
-        }
-
-        if (reqUser.role === 'MANAGER') {
-            managerObjectId = reqUser._id;
-        } else if (reqUser.role === 'ADMIN') {
-            if (typeof managerId === 'string') {
-                if (!mongoose.Types.ObjectId.isValid(managerId)) {
-                    return res.status(400).json({ error: 'Неверный managerId' });
-                }
-                managerObjectId = new Types.ObjectId(managerId);
-            }
-        }
-
-        if (fromDate && toDate && fromDate > toDate) {
-            return res.status(400).json({
-                error: '"from" не должен быть больше "to"',
-            });
-        }
-
-        const diffDays =
-            fromDate && toDate
-                ? Math.ceil((toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60 * 24))
-                : 0;
-
-        if (diffDays > 31) {
-            return res.status(400).json({
-                error: 'Диапазон дат слишком большой (максимум 31 день)',
-            });
-        }
-
-        const endOfDay =
-            toDate ? new Date(toDate.setHours(23, 59, 59, 999)) : null;
-
-        const data = await mongoose.connection
-            .collection('users')
-            .aggregate([
-                {
+    const data = await mongoose.connection
+      .collection('users')
+      .aggregate([
+        {
+          $match: {
+            role: 'MANAGER',
+            ...(managerObjectId && {_id: managerObjectId}),
+          },
+        },
+        {
+          $lookup: {
+            from: 'orders',
+            localField: '_id',
+            foreignField: 'managerId',
+            pipeline: [
+              ...(fromDate || endOfDay
+                ? [
+                  {
                     $match: {
                       createdAt: {
                         ...(fromDate && {$gte: fromDate}),
@@ -91,7 +103,6 @@ async function getDailyManagerReport(req: Request, res: Response, next: NextFunc
                   },
                 ]
                 : []),
-
               {
                 $lookup: {
                   from: 'toursets',
@@ -110,7 +121,6 @@ async function getDailyManagerReport(req: Request, res: Response, next: NextFunc
             as: 'orders',
           },
         },
-
         {
           $addFields: {
             newOrders: {
@@ -159,8 +169,8 @@ async function getDailyManagerReport(req: Request, res: Response, next: NextFunc
                   input: '$orders',
                   as: 'o',
                   cond: {$eq: ['$$o.status', 'CONTRACT_PENDING']},
-                }
-              }
+                },
+              },
             },
 
             revenueCash: {
@@ -173,8 +183,8 @@ async function getDailyManagerReport(req: Request, res: Response, next: NextFunc
                       cond: {
                         $and: [
                           {$in: ['$$o.status', ['COMPLETED', 'CONTRACT_PENDING']]},
-                          {$eq: ['$$o.paymentMethod', 'CASH']}
-                        ]
+                          {$eq: ['$$o.paymentMethod', 'CASH']},
+                        ],
                       },
                     },
                   },
@@ -194,9 +204,9 @@ async function getDailyManagerReport(req: Request, res: Response, next: NextFunc
                       as: 'o',
                       cond: {
                         $and: [
-                          {$in: ['$$o.status', ['COMPLETED', 'CONTRACT_PENDING']]},
-                          {$eq: ['$$o.paymentMethod', 'CARD']}
-                        ]
+                          {$in: ['$$o.status', ['COMPLETED']]},
+                          {$eq: ['$$o.paymentMethod', 'CARD']},
+                        ],
                       },
                     },
                   },
@@ -216,9 +226,9 @@ async function getDailyManagerReport(req: Request, res: Response, next: NextFunc
                       as: 'o',
                       cond: {
                         $and: [
-                          {$in: ['$$o.status', ['COMPLETED', 'CONTRACT_PENDING']]},
-                          {$eq: ['$$o.paymentMethod', 'QR']}
-                        ]
+                          {$in: ['$$o.status', ['COMPLETED']]},
+                          {$eq: ['$$o.paymentMethod', 'QR']},
+                        ],
                       },
                     },
                   },
@@ -238,9 +248,9 @@ async function getDailyManagerReport(req: Request, res: Response, next: NextFunc
                       as: 'o',
                       cond: {
                         $and: [
-                          {$in: ['$$o.status', ['COMPLETED', 'CONTRACT_PENDING']]},
-                          {$eq: ['$$o.paymentMethod', 'BANK']}
-                        ]
+                          {$in: ['$$o.status', ['COMPLETED']]},
+                          {$eq: ['$$o.paymentMethod', 'BANK']},
+                        ],
                       },
                     },
                   },
@@ -253,7 +263,6 @@ async function getDailyManagerReport(req: Request, res: Response, next: NextFunc
             },
           },
         },
-
         {
           $project: {
             _id: 0,
@@ -297,23 +306,14 @@ async function getDailyManagerReport(req: Request, res: Response, next: NextFunc
 
     const buffer = await workbook.xlsx.writeBuffer();
 
-    res.setHeader(
-      'Access-Control-Expose-Headers',
-      'Content-Disposition'
-    );
-
+    res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
     res.setHeader(
       'Content-Type',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     );
-
-    res.setHeader(
-      'Content-Disposition',
-      'attachment; filename="daily.xlsx"'
-    );
+    res.setHeader('Content-Disposition', 'attachment; filename="daily.xlsx"');
 
     return res.end(buffer);
-
   } catch (e) {
     next(e);
   }
@@ -323,7 +323,7 @@ async function getTourRosterReport(req: Request, res: Response, next: NextFuncti
   try {
     const {tourSetId} = req.params as { tourSetId: string };
 
-    const orders = await Order.find({
+    const orders = (await Order.find({
       tourSetId: new mongoose.Types.ObjectId(tourSetId),
       status: 'COMPLETED',
     })
@@ -332,7 +332,7 @@ async function getTourRosterReport(req: Request, res: Response, next: NextFuncti
         populate: {path: 'tourId'},
       })
       .populate('managerId')
-      .lean() as unknown as PopulatedOrder[];
+      .lean()) as unknown as PopulatedOrder[];
 
     if (!orders.length) return res.status(404).send({error: 'Заявки не найдены'});
 
@@ -340,9 +340,10 @@ async function getTourRosterReport(req: Request, res: Response, next: NextFuncti
       const d = new Date(date);
       if (isNaN(d.getTime())) return '';
 
-      return `${String(d.getDate()).padStart(2, '0')}.${String(
-        d.getMonth() + 1,
-      ).padStart(2, '0')}.${d.getFullYear()}`;
+      return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(
+        2,
+        '0'
+      )}.${d.getFullYear()}`;
     };
 
     const data = orders.map((o) => ({
@@ -352,9 +353,7 @@ async function getTourRosterReport(req: Request, res: Response, next: NextFuncti
       tour: o.tourSetId?.tourId?.title ?? '',
       dates:
         o.tourSetId?.startDate && o.tourSetId?.endDate
-          ? `${formatDate(o.tourSetId.startDate)} - ${formatDate(
-            o.tourSetId.endDate,
-          )}`
+          ? `${formatDate(o.tourSetId.startDate)} - ${formatDate(o.tourSetId.endDate)}`
           : '',
       hotel: o.tourSetId?.hotelName ?? '',
       manager: o.managerId?.fullName ?? '',
@@ -384,20 +383,12 @@ async function getTourRosterReport(req: Request, res: Response, next: NextFuncti
 
     const buffer = await workbook.xlsx.writeBuffer();
 
-    res.setHeader(
-      'Access-Control-Expose-Headers',
-      'Content-Disposition'
-    );
-
+    res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
     res.setHeader(
       'Content-Type',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     );
-
-    res.setHeader(
-      'Content-Disposition',
-      'attachment; filename="tour-roster.xlsx"'
-    );
+    res.setHeader('Content-Disposition', 'attachment; filename="tour-roster.xlsx"');
 
     return res.end(buffer);
   } catch (e) {
@@ -408,6 +399,12 @@ async function getTourRosterReport(req: Request, res: Response, next: NextFuncti
 const reportsRouter = Router();
 
 reportsRouter.get('/daily-manager', auth, permit('ADMIN', 'MANAGER'), getDailyManagerReport);
-reportsRouter.get('/tour-roster/:tourSetId',auth, permit('ADMIN', 'MANAGER'), validateObjectId('tourSetId'), getTourRosterReport,);
+reportsRouter.get(
+  '/tour-roster/:tourSetId',
+  auth,
+  permit('ADMIN', 'MANAGER'),
+  validateObjectId('tourSetId'),
+  getTourRosterReport
+);
 
 export default reportsRouter;
