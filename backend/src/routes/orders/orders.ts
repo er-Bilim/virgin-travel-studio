@@ -415,7 +415,7 @@ ordersRouter.patch(
           if (!allowedPayments.includes(paymentMethod as OrderPayment)) {
             return res.status(400).send({error: 'Недопустимый вид оплаты'});
           }
-          order.paymentMethod = paymentMethod;
+          order.paymentMethod = paymentMethod as OrderPayment;
 
           if (paymentAmount === undefined || paymentAmount === null || Number(paymentAmount) <= 0) {
             return res.status(400).send({error: 'Сумма оплаты обязательна и должна быть больше 0, если указан способ оплаты'});

@@ -81,7 +81,7 @@ const OrderSchema = new Schema(
         message: 'Недопустимый способ оплаты',
       },
       validate: {
-        validator: function (this: any, v: string | undefined) {
+        validator: function (this: IOrder, v: string | undefined) {
           if (v && (this.paymentAmount === undefined || this.paymentAmount <= 0)) {
             return false;
           }
@@ -97,7 +97,7 @@ const OrderSchema = new Schema(
       type: Number,
       min: [0, 'Сумма оплаты не может быть отрицательной'],
       validate: {
-        validator: function (this: any, v: number | undefined) {
+        validator: function (this: IOrder, v: number | undefined) {
           if ((v !== undefined && v !== null) && !this.paymentMethod) {
             return false;
           }
