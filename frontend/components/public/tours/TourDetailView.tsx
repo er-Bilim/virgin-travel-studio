@@ -19,8 +19,7 @@ import {
   UsersRound
 } from 'lucide-react';
 import {useMemo, useState} from 'react';
-import CreateReviewForm
-  from '@/components/public/reviews/form/CreateReviewForm';
+import CreateReviewForm from '@/components/public/reviews/form/CreateReviewForm';
 import {
   formatDayAndMonthWords,
   formatToReadablePrice,
@@ -40,6 +39,7 @@ import OrderCard from '@/components/dashboard/orders/OrderCard';
 import TourDetailLoading from '@/app/(public)/tours/[slug]/loading';
 import type {DateRange} from 'react-day-picker';
 import {DateRangePicker} from '@/components/shared/DateRangePicker';
+import {cn} from '@/lib/utils';
 
 interface Props {
   id: string;
@@ -86,8 +86,8 @@ const TourDetailView = ({ id }: Props) => {
 
   const selectedTourSet: TourSetType =
     tour.tourSets.find((tourSet) => tourSet._id === selectedSetId)
-      ?? tour.tourSets[0]
-      ?? null;
+    ?? tour.tourSets[0]
+    ?? null;
 
   if (!selectedTourSet) {
     return (
@@ -138,7 +138,7 @@ const TourDetailView = ({ id }: Props) => {
     Math.ceil(
       (new Date(selectedTourSet.endDate).getTime() -
         new Date(selectedTourSet.startDate).getTime()) /
-        (1000 * 3600 * 24),
+      (1000 * 3600 * 24),
     ),
   );
   const nights = Math.max(days - 1, 0);
@@ -161,72 +161,71 @@ const TourDetailView = ({ id }: Props) => {
 
     if (isReviewsError) {
       return (
-        <p className="text-lg text-muted-foreground font-semibold">Ошибка</p>
+        <p className="text-lg text-muted-foreground font-semibold text-center">Ошибка</p>
       );
     }
 
     if (!reviews?.length) {
       return (
-        <div className="border-1 border-[var(--border)] rounded-xl p-4 text-gray-600 h-35 flex flex-col justify-center gap-4 items-center">
-          <p className="text-gray-400 bg-gray-200 p-3 rounded-full">
-            <MessageSquareDashed />
+        <div className="border border-[var(--border)] rounded-xl p-6 text-gray-600 h-35 flex flex-col justify-center gap-3 items-center max-w-2xl mx-auto w-full">
+          <p className="text-gray-400 bg-gray-200 p-2.5 rounded-full">
+            <MessageSquareDashed className="size-5" />
           </p>
-          <p>Здесь появятся отзывы путешественников.</p>
+          <p className="text-sm text-center">Здесь появятся отзывы путешественников.</p>
         </div>
       );
     }
 
     return (
-      <>
+      <div className="flex flex-col gap-4 w-full max-w-2xl mx-auto">
         {reviews.map((review) => (
           <Review review={review} key={review._id} />
         ))}
-      </>
+      </div>
     );
   };
 
-  const renderRating = () => {
+  const renderRating = (centered = false) => {
     return (
-      <div className="flex gap-1 items-center">
-        <Star className="stroke-2 stroke-yellow-400 text-yellow-400" />
-        <span className="text-[var(--primary)] font-semibold">
+      <div className={cn(
+        "flex flex-wrap gap-1 items-center text-sm sm:text-base",
+        centered ? "justify-center lg:justify-start" : "justify-start"
+      )}>
+        <Star className="stroke-2 size-4 sm:size-5 fill-yellow-400 text-yellow-400" />
+        <span className="text-[var(--primary)] font-bold">
           {tour.rating > 0 ? tour.rating : 'нет оценок :('}
         </span>
-        <Dot className="stroke-1 size-4" />
-        <p className="font-semibold flex gap-1">
+        <Dot className="stroke-1 size-4 text-gray-400" />
+        <div className="font-semibold flex gap-1 text-gray-600">
           {tour.ratingCount > 0 ? tour.ratingCount : 'нет'}
           <span className="font-normal">
             {pluralize(tour.ratingCount, 'отзыв', 'отзыва', 'отзывов')}
           </span>
-        </p>
+        </div>
       </div>
     );
   };
 
   const renderPrice = () => {
-    const defaultPriceJSX = (
-      <>
-        <p>{defaultPriceInfo.price}</p>
-      </>
-    );
+    const defaultPriceJSX = <p>{defaultPriceInfo.price}</p>;
 
     if (discountPriceInfo) {
       return (
-        <div className="flex flex-col items-start">
-          <div className="text-gray-400 text-xs inline-flex flex-row gap-1">
+        <div className="flex flex-col items-start w-full">
+          <div className="text-gray-400 text-xs inline-flex flex-row gap-1 items-center">
             <div className="line-through">{defaultPriceJSX}</div>
-            <p className="text-sm lowercase text-gray-400 text-xs">
+            <p className="lowercase text-gray-400 text-xs">
               {defaultPriceInfo.currency}
             </p>
           </div>
-          <div className="text-3xl text-white font-semibold">
-            <span className="text-green-400">{discountPriceInfo.price}</span>
-            <span className="text-sm font-normal">
+          <div className="text-2xl sm:text-3xl text-white font-bold mt-0.5">
+            <span className="text-green-400">{discountPriceInfo.price} </span>
+            <span className="text-sm font-normal text-gray-300">
               {discountPriceInfo.currency}
             </span>
           </div>
-          <div className="bg-red-500 text-white rounded-xl px-4 py-1 mt-4 inline-flex gap-1 text-sm font-semibold items-center">
-            <BadgePercent className="size-4 stroke-3 me-1" />
+          <div className="bg-red-500 text-white rounded-xl px-3 py-1 mt-3 flex flex-wrap gap-1 text-xs font-semibold items-center shadow-sm">
+            <BadgePercent className="size-3.5 stroke-[2.5]" />
             <span>Скидка до</span>
             <span>{saleDeadlineDay}</span>
             <span>{saleDeadlineMonth}</span>
@@ -236,14 +235,12 @@ const TourDetailView = ({ id }: Props) => {
     }
 
     return (
-      <>
-        <div className="text-3xl text-white font-semibold">
-          <span>{defaultPriceInfo.price}</span>
-          <span className="text-lg font-normal text-gray-400">
-            {defaultPriceInfo.currency}
-          </span>
-        </div>
-      </>
+      <div className="text-2xl sm:text-3xl text-white font-bold">
+        <span>{defaultPriceInfo.price} </span>
+        <span className="text-base font-normal text-gray-400">
+          {defaultPriceInfo.currency}
+        </span>
+      </div>
     );
   };
 
@@ -251,7 +248,7 @@ const TourDetailView = ({ id }: Props) => {
     <>
       {selectedTourSet._id && (
         <OrderCard
-            key={selectedTourSet._id}
+          key={selectedTourSet._id}
           isOpen={isOrderOpen}
           onClose={closeModalOrder}
           tourSetId={selectedTourSet._id}
@@ -262,319 +259,269 @@ const TourDetailView = ({ id }: Props) => {
         />
       )}
 
-      <section aria-labelledby="tour-title" className="mt-10">
-        <Breadcrumbs
-          items={[
-            { label: 'Туры', href: '/tours' },
-            {
-              label: tour.category.title,
-              href: `/tours?category=${tour.category._id}`,
-            },
-            { label: tour.title },
-          ]}
-          className="mb-10"
-        />
-        <div className="relative">
-          <div className="flex items-center gap-4 absolute z-1 top-3 left-3 text-xs">
-            {selectedTourSet.isHot && (
-              <p className="flex gap-1 bg-blur bg-red-500 text-red-50 border-1 border-red-500 rounded-4xl uppercase font-semibold px-4 py-2 items-center">
-                <Flame className="size-4 stroke-3" />
-                Горящий
+      <div>
+        <section aria-labelledby="tour-title" className="mt-6 sm:mt-10">
+          <Breadcrumbs
+            items={[
+              { label: 'Туры', href: '/tours' },
+              {
+                label: tour.category.title,
+                href: `/tours?category=${tour.category._id}`,
+              },
+              { label: tour.title },
+            ]}
+            className="mb-6 sm:mb-10 text-xs sm:text-sm overflow-x-auto whitespace-nowrap scrollbar-none"
+          />
+
+          <div className="relative rounded-2xl overflow-hidden">
+            <div className="flex flex-wrap gap-2 absolute z-10 top-3 left-3 text-[10px] sm:text-xs">
+              {selectedTourSet.isHot && (
+                <p className="flex gap-1 bg-red-500 text-red-50 border border-red-500 rounded-full uppercase font-bold px-3 py-1.5 items-center backdrop-blur-md bg-opacity-90 shadow-sm">
+                  <Flame className="size-3.5 stroke-[2.5]" />
+                  Горящий
+                </p>
+              )}
+              <p className="flex gap-2 bg-white/90 text-slate-700 border border-slate-200 rounded-full uppercase font-bold px-3 py-1.5 backdrop-blur-md shadow-sm">
+                {tour.category.title}
               </p>
-            )}
-            <p className="flex gap-2 bg-slate-100 text-slate-500 border-1 border-slate-500 rounded-4xl uppercase font-semibold px-4 py-2">
-              {tour.category.title}
-            </p>
+            </div>
+            <TourGallery images={tour.images} title={tour.title} />
           </div>
-          <TourGallery images={tour.images} title={tour.title} />
-        </div>
 
-        <header>
-          <h1
-            id="tour-title"
-            className="text-[var(--primary)] font-semibold text-[1.8rem] mt-7"
-          >
-            {tour.title}
-          </h1>
+          <header className="mt-5 sm:mt-7">
+            <h1
+              id="tour-title"
+              className="text-[var(--primary)] font-bold text-xl sm:text-2xl md:text-[1.8rem] leading-tight"
+            >
+              {tour.title}
+            </h1>
 
-          <div className="flex text-gray-500 gap-6 text-sm mt-3">
-            <div className="flex gap-1 items-center">
-              <MapPin className="stroke-1" />
-              <span>{selectedTourSet.hotelLocation}</span>
-            </div>
-
-            {renderRating()}
-          </div>
-        </header>
-      </section>
-
-      <div className="grid grid-cols-[1fr_420px] gap-6 mb-10">
-        <div className="flex flex-col gap-6">
-          <section aria-labelledby="description-title" className="mt-6">
-            <h2 id="description-title" className="font-semibold text-[1.3rem]">
-              Описание
-            </h2>
-            <p className="mt-3">{tour.description}</p>
-          </section>
-
-          <section aria-labelledby="logistics-title">
-            <h2 id="logistics-title" className="sr-only">
-              Логистика
-            </h2>
-            <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-              <article className="rounded-2xl border border-[var(--border)] bg-gray-50 p-4">
-                <span className="mb-3 inline-flex size-9 items-center justify-center rounded-[10px] bg-[var(--navy-700)] text-cyan-400">
-                  <Clock3 className="size-4.5" />
-                </span>
-                <p className="text-xs uppercase tracking-wide text-gray-400">
-                  Длительность
-                </p>
-                <p className="mt-0.5 font-semibold text-[var(--primary)]">
-                  {days} дней
-                </p>
-              </article>
-
-              <article className="rounded-2xl border border-[var(--border)] bg-gray-50 p-4">
-                <span className="mb-3 inline-flex size-9 items-center justify-center rounded-[10px] bg-[var(--navy-700)] text-cyan-400">
-                  <Plane className="size-4.5" />
-                </span>
-                <p className="text-xs uppercase tracking-wide text-gray-400">
-                  Перелёт
-                </p>
-                <p className="mt-0.5 font-semibold text-[var(--primary)]">
-                  Включён
-                </p>
-              </article>
-
-              <article className="rounded-2xl border border-[var(--border)] bg-gray-50 p-4">
-                <span className="mb-3 inline-flex size-9 items-center justify-center rounded-[10px] bg-[var(--navy-700)] text-cyan-400">
-                  <MapPin className="size-4.5" />
-                </span>
-                <p className="text-xs uppercase tracking-wide text-gray-400">
-                  Направление
-                </p>
-                <p className="mt-0.5 font-semibold text-[var(--primary)]">
-                  {tour.category.title}
-                </p>
-              </article>
-
-              <article className="rounded-2xl border border-[var(--border)] bg-gray-50 p-4">
-                <span className="mb-3 inline-flex size-9 items-center justify-center rounded-[10px] bg-[var(--navy-700)] text-cyan-400">
-                  <CalendarHeart className="size-4.5" />
-                </span>
-                <p className="text-xs uppercase tracking-wide text-gray-400">
-                  Заездов
-                </p>
-                <p className="mt-0.5 font-semibold text-[var(--primary)] inline-flex gap-1">
-                  <span>{activeSetsCount}</span>
-                  <span>
-                    {pluralize(activeSetsCount, 'дата', 'даты', 'дат')}
-                  </span>
-                </p>
-              </article>
-            </div>
-          </section>
-
-          <section aria-labelledby="advantages-title">
-            <h2 id="advantages-title" className="font-semibold text-[1.3rem]">
-              Преимущества тура
-            </h2>
-            <ul className="flex flex-wrap gap-2.5 mt-5">
-              {tour.baseAdvantages.map((advantage, index) => (
-                <li
-                  key={advantage + index}
-                  className="inline-flex items-center gap-3 rounded-xl border border-[var(--silver)] bg-white px-4 py-3"
-                >
-                  <span className="advantage-check inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-white">
-                    <Check className="size-3.5" strokeWidth={2.5} />
-                  </span>
-                  <span className="text-sm font-medium text-[var(--primary)]">
-                    {advantage}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <section
-            aria-labelledby="where-to-go-title"
-            className="border-t border-border pt-10"
-          >
-            <div className="flex justify-between items-start gap-3">
-              <h2
-                id="where-to-go-title"
-                className="font-semibold text-[1.3rem] mb-5"
-              >
-                Когда поехать
-              </h2>
-              <DateRangePicker
-                  value={dateRange}
-                  onChange={setDateRange}
-                  className="w-64"
-              />
-            </div>
-
-            <div className="flex flex-col gap-5">
-              {dateRange?.from && visibleTours?.length === 0 &&
-                  <span>Заездов на эту дату не найдено</span>
-              }
-              {visibleTours?.map((tourSet) => (
-                <TourSetCard
-                  key={tourSet._id}
-                  tourSet={tourSet}
-                  getTourSet={setSelectedSetId}
-                  id={selectedTourSet._id}
-                />
-              ))}
-            </div>
-          </section>
-
-          <section className="border-t border-border pt-10">
-            <CreateReviewForm tourId={id} />
-
-            <div className="flex items-center direction-row  border-t border-border pt-5 mt-8 justify-between">
-              <h2 id="reviews-title" className="font-semibold text-[1.3rem]">
-                Отзывы путешественников
-              </h2>
+            <div className="flex flex-col sm:flex-row sm:items-center text-gray-500 gap-2 sm:gap-6 text-xs sm:text-sm mt-3 border-b border-slate-100 pb-4">
+              <div className="flex gap-1.5 items-center">
+                <MapPin className="stroke-2 size-4 text-gray-400" />
+                <span className="font-medium text-gray-600">{selectedTourSet.hotelLocation}</span>
+              </div>
               {renderRating()}
             </div>
-            <div className="flex flex-col gap-3 mt-6">{renderReviews()}</div>
-            {hasNextPage && (
-              <button
-                type="button"
-                aria-label="загрузить еще отзывов"
-                className="text-center border-1 border-[var(--silver)] rounded-lg p-3 mt-5 w-full font-semibold cursor-pointer"
-                onClick={() => fetchNextPage()}
-                disabled={isFetchingNextPage}
-              >
-                {isFetchingNextPage ? <Spinner /> : `Загрузить еще`}
-              </button>
-            )}
-          </section>
-        </div>
+          </header>
+        </section>
 
-        <aside aria-labelledby="booking-title relative">
-          <div className="border-1 border-[var(--border)] rounded-2xl text-[var(--navy-700)] relative">
-            {selectedTourSet.isHot && (
-              <div className="absolute -top-2 right-3 text-xs py-1 px-3 uppercase text-red-50 bg-red-500 flex flex-row items-center gap-1.5 rounded-xl font-semibold tracking-wide">
-                <Flame className="size-4 stroke-3" />
-                <span>горящий</span>
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8 mt-6 mb-10 items-start">
+
+          <div className="flex flex-col gap-8 lg:col-start-1">
+            <section aria-labelledby="description-title">
+              <h2 id="description-title" className="font-bold text-lg sm:text-[1.3rem] text-[var(--primary)]">
+                Описание
+              </h2>
+              <p className="mt-2.5 text-sm sm:text-base text-gray-600 leading-relaxed whitespace-pre-line">{tour.description}</p>
+            </section>
+
+            <section aria-labelledby="logistics-title">
+              <h2 id="logistics-title" className="sr-only">Логистика</h2>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {[
+                  { icon: <Clock3 className="size-4" />, label: "Длительность", value: `${days} дней` },
+                  { icon: <Plane className="size-4" />, label: "Перелёт", value: "Включён" },
+                  { icon: <MapPin className="size-4" />, label: "Направление", value: tour.category.title },
+                  { icon: <CalendarHeart className="size-4" />, label: "Заездов", value: `${activeSetsCount} ${pluralize(activeSetsCount, 'дата', 'даты', 'дат')}` }
+                ].map((item, i) => (
+                  <article key={i} className="rounded-xl border border-slate-100 bg-slate-50/50 p-3 sm:p-4 flex flex-col justify-between min-h-[100px]">
+                    <span className="mb-2 inline-flex size-8 items-center justify-center rounded-lg bg-[var(--navy-700)] text-cyan-400 shrink-0">
+                      {item.icon}
+                    </span>
+                    <div>
+                      <p className="text-[10px] uppercase tracking-wider font-bold text-gray-400">{item.label}</p>
+                      <p className="mt-0.5 font-bold text-xs sm:text-sm text-[var(--primary)] truncate">{item.value}</p>
+                    </div>
+                  </article>
+                ))}
               </div>
-            )}
-            <div className="bg-[var(--card-foreground)] p-4 rounded-t-2xl">
-              <div className="text-cyan-400 inline-flex items-center">
-                <Dot />
-                <h2
-                  id="booking-title"
-                  className="uppercase text-xs font-semibold"
-                >
-                  Выбранный заезд
+            </section>
+
+            <section aria-labelledby="advantages-title">
+              <h2 id="advantages-title" className="font-bold text-lg sm:text-[1.3rem] text-[var(--primary)]">
+                Преимущества тура
+              </h2>
+              <ul className="flex flex-wrap gap-2 mt-4">
+                {tour.baseAdvantages.map((advantage, index) => (
+                  <li
+                    key={advantage + index}
+                    className="inline-flex items-center gap-2.5 rounded-xl border border-slate-100 bg-white px-3.5 py-2.5 shadow-sm text-xs sm:text-sm"
+                  >
+                    <span className="advantage-check inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white">
+                      <Check className="size-3 stroke-[3]" />
+                    </span>
+                    <span className="font-medium text-slate-700">{advantage}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            <section aria-labelledby="where-to-go-title" className="border-t border-slate-100 pt-8">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+                <h2 id="where-to-go-title" className="font-bold text-lg sm:text-[1.3rem] text-[var(--primary)]">
+                  Когда поехать
                 </h2>
+                <DateRangePicker
+                  value={dateRange}
+                  onChange={setDateRange}
+                  className="w-full sm:w-64"
+                />
               </div>
 
-              {renderPrice()}
-            </div>
-
-            <div className="px-4">
-              <dl className="flex flex-col gap-5 border-t border-border pt-5 text-sm">
-                <div className="flex items-center justify-between">
-                  <dt className="text-muted-foreground inline-flex gap-2 items-center">
-                    <Calendar1 className="stroke-1 size-4.5" />
-                    <p>Даты</p>
-                  </dt>
-                  <dd className="font-semibold text-foreground flex gap-1">
-                    <p className="after:content-['–'] after:ml-2 after:text-gray-500">
-                      <span className="me-1">{startDay}</span>
-                      <span>{startMonth}</span>
-                    </p>
-                    <p>
-                      <span className="me-1">{endDay}</span>
-                      <span>{endMonth}</span>
-                    </p>
-                  </dd>
-                </div>
-
-                <div className="flex items-center justify-between ">
-                  <dt className="text-muted-foreground inline-flex gap-2 items-center">
-                    <Clock3 className="stroke-1 size-4.5" />
-                    <p>Длительность</p>
-                  </dt>
-                  <dd className="font-semibold text-foreground">
-                    <span>
-                      {days} дн. / {nights} ноч.
-                    </span>
-                  </dd>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <dt className="text-muted-foreground inline-flex gap-2 items-center">
-                    <UsersRound className="stroke-1 size-4.5" />
-                    <p>Свободно</p>
-                  </dt>
-                  <dd className="font-semibold text-amber-600">
-                    <SeatsIndicator
-                      free={freeSeats}
-                      total={selectedTourSet.totalSeats}
-                    />
-                  </dd>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <dt className="text-muted-foreground inline-flex gap-2 items-center">
-                    <Hotel className="stroke-1 size-4.5" />
-                    <p>Отель</p>
-                  </dt>
-                  <dd className="font-semibold text-right">
-                    <span className="text-right">
-                      {selectedTourSet.hotelName}
-                    </span>
-                    <span className="block font-normal text-muted-foreground mt-0.5 text-right">
-                      {selectedTourSet.hotelLocation}
-                    </span>
-                  </dd>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <dt className="text-muted-foreground inline-flex gap-2 items-center">
-                    <Plane className="stroke-1 size-4.5" />
-                    <p>Перелёт</p>
-                  </dt>
-                  <dd className="font-semibold text-right">
-                    <span>{selectedTourSet.airline}</span>
-                    <span className="block font-normal text-muted-foreground mt-0.5">
-                      {selectedTourSet.flightDetails}
-                    </span>
-                  </dd>
-                </div>
-              </dl>
-
-              <div className="mt-5 flex gap-y-3 flex-col">
-                <button
-                  type="button"
-                  aria-label="Оставить заявку"
-                  onClick={() => openModalOrder()}
-                  className="w-full cursor-pointer bg-[var(--primary)] text-gray-50 rounded-lg py-4 font-semibold transition duration-300 ease-in-out hover:bg-[var(--primary)]/80 hover:border-[var(--primary)] border-1 inline-flex items-center gap-4 justify-center"
-                >
-                  <Send className="text-cyan-400 size-6" />
-                  <span>Оставить заявку</span>
-                </button>
-                <button
-                  className="flex gap-2 justify-center items-center text-center w-full cursor-pointer text-[var(--primary)] border-1 border-gray-400 rounded-lg py-2 font-semibold transition duration-300 ease-in-out hover:bg-green-500 hover:text-green-50"
-                  onClick={handleWhatsAppClick}
-                  type="button"
-                  aria-label="Связаться через WhatsAppу"
-                >
-                  <FaWhatsapp className="size-9" />
-                  <p>WhatsApp</p>
-                </button>
+              <div className="flex flex-col gap-4">
+                {dateRange?.from && visibleTours?.length === 0 &&
+                  <span className="text-sm text-muted-foreground text-center bg-slate-50 p-6 rounded-xl border border-dashed">Заездов на эту дату не найдено</span>
+                }
+                {visibleTours?.map((tourSet) => (
+                  <TourSetCard
+                    key={tourSet._id}
+                    tourSet={tourSet}
+                    getTourSet={setSelectedSetId}
+                    id={selectedTourSet._id}
+                  />
+                ))}
               </div>
-              <p className="text-sm mt-5 mb-4 flex gap-3 items-center justify-center text-gray-400">
-                <ShieldCog className="size-5" />
-                <span>С вами свяжутся в течение часа</span>
-              </p>
-            </div>
+            </section>
           </div>
-        </aside>
+
+          <aside aria-labelledby="booking-title" className="lg:col-start-2 lg:row-start-1 lg:sticky lg:top-6 w-full">
+            <div className="border border-slate-100 rounded-2xl text-[var(--navy-700)] shadow-sm bg-white overflow-hidden relative">
+              {selectedTourSet.isHot && (
+                <div className="absolute top-3 right-3 text-[10px] py-1 px-2.5 uppercase text-red-50 bg-red-500 flex items-center gap-1 rounded-lg font-bold tracking-wider shadow-sm">
+                  <Flame className="size-3.5 stroke-[2.5]" />
+                  <span>горящий</span>
+                </div>
+              )}
+
+              <div className="bg-[var(--navy-700)] p-4 sm:p-5">
+                <div className="text-cyan-400 inline-flex items-center text-xs font-bold uppercase tracking-wider mb-1">
+                  <Dot className="size-6 -ml-2 text-cyan-400 animate-pulse" />
+                  <h2 id="booking-title">Выбранный заезд</h2>
+                </div>
+                {renderPrice()}
+              </div>
+
+              <div className="p-4 sm:p-5">
+                <dl className="flex flex-col gap-4 text-xs sm:text-sm">
+                  <div className="flex items-center justify-between gap-4 py-1 border-b border-slate-50">
+                    <dt className="text-muted-foreground inline-flex gap-2 items-center shrink-0">
+                      <Calendar1 className="stroke-[1.5] size-4 text-slate-400" />
+                      <span>Даты</span>
+                    </dt>
+                    <dd className="font-bold text-slate-800 text-right flex flex-wrap gap-1 justify-end">
+                      <span>{startDay} {startMonth}</span>
+                      <span className="text-slate-400 mx-0.5">—</span>
+                      <span>{endDay} {endMonth}</span>
+                    </dd>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-4 py-1 border-b border-slate-50">
+                    <dt className="text-muted-foreground inline-flex gap-2 items-center shrink-0">
+                      <Clock3 className="stroke-[1.5] size-4 text-slate-400" />
+                      <span>Длительность</span>
+                    </dt>
+                    <dd className="font-bold text-slate-800 text-right">
+                      {days} дн. / {nights} ноч.
+                    </dd>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-4 py-1 border-b border-slate-50">
+                    <dt className="text-muted-foreground inline-flex gap-2 items-center shrink-0">
+                      <UsersRound className="stroke-[1.5] size-4 text-slate-400" />
+                      <span>Свободно</span>
+                    </dt>
+                    <dd className="font-bold text-amber-600 text-right">
+                      <SeatsIndicator
+                        free={freeSeats}
+                        total={selectedTourSet.totalSeats}
+                      />
+                    </dd>
+                  </div>
+
+                  <div className="flex items-start justify-between gap-4 py-1 border-b border-slate-50">
+                    <dt className="text-muted-foreground inline-flex gap-2 items-center shrink-0 mt-0.5">
+                      <Hotel className="stroke-[1.5] size-4 text-slate-400" />
+                      <span>Отель</span>
+                    </dt>
+                    <dd className="font-bold text-slate-800 text-right max-w-[60%]">
+                      <span className="block truncate">{selectedTourSet.hotelName}</span>
+                      <span className="block font-normal text-xs text-muted-foreground mt-0.5 line-clamp-1">
+                        {selectedTourSet.hotelLocation}
+                      </span>
+                    </dd>
+                  </div>
+
+                  <div className="flex items-start justify-between gap-4 py-1">
+                    <dt className="text-muted-foreground inline-flex gap-2 items-center shrink-0 mt-0.5">
+                      <Plane className="stroke-[1.5] size-4 text-slate-400" />
+                      <span>Перелёт</span>
+                    </dt>
+                    <dd className="font-bold text-slate-800 text-right max-w-[60%]">
+                      <span className="block truncate">{selectedTourSet.airline}</span>
+                      <span className="block font-normal text-xs text-muted-foreground mt-0.5 line-clamp-1">
+                        {selectedTourSet.flightDetails}
+                      </span>
+                    </dd>
+                  </div>
+                </dl>
+
+                <div className="mt-5 flex gap-2.5 flex-col">
+                  <button
+                    type="button"
+                    aria-label="Оставить заявку"
+                    onClick={() => openModalOrder()}
+                    className="w-full cursor-pointer bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-white rounded-xl py-3.5 font-bold transition inline-flex items-center gap-3 justify-center text-sm shadow-sm active:scale-[0.99]"
+                  >
+                    <Send className="text-cyan-400 size-4.5 stroke-[2.5]" />
+                    <span>Оставить заявку</span>
+                  </button>
+                  <button
+                    className="flex gap-2.5 justify-center items-center text-center w-full cursor-pointer text-slate-700 bg-white border border-slate-200 rounded-xl py-2.5 font-bold transition hover:bg-emerald-500 hover:text-white hover:border-emerald-500 text-sm active:scale-[0.99]"
+                    onClick={handleWhatsAppClick}
+                    type="button"
+                    aria-label="Связаться через WhatsApp"
+                  >
+                    <FaWhatsapp className="size-5 text-emerald-500 transition-colors current-color" />
+                    <span>Написать в WhatsApp</span>
+                  </button>
+                </div>
+                <p className="text-xs mt-4 flex gap-2 items-center justify-center text-gray-400 font-medium">
+                  <ShieldCog className="size-4 text-slate-400" />
+                  <span>С вами свяжутся in течение часа</span>
+                </p>
+              </div>
+            </div>
+          </aside>
+
+          <section className="border-t border-slate-100 pt-8 lg:col-start-1">
+            <div className="max-w-2xl mx-auto lg:mx-0 w-full">
+              <CreateReviewForm tourId={id} />
+
+              <div className="flex flex-col items-center lg:items-start border-t border-slate-100 pt-6 mt-8 text-center lg:text-left gap-2">
+                <h2 id="reviews-title" className="font-bold text-lg sm:text-[1.3rem] text-[var(--primary)]">
+                  Отзывы путешественников
+                </h2>
+                {renderRating(true)}
+              </div>
+
+              <div className="mt-6 w-full">{renderReviews()}</div>
+
+              {hasNextPage && (
+                <button
+                  type="button"
+                  aria-label="загрузить еще отзывов"
+                  className="text-center text-xs sm:text-sm border border-slate-200 bg-white rounded-xl p-3 mt-5 w-full font-bold cursor-pointer transition hover:bg-slate-50 active:scale-[0.99]"
+                  onClick={() => fetchNextPage()}
+                  disabled={isFetchingNextPage}
+                >
+                  {isFetchingNextPage ? <Spinner /> : `Загрузить еще`}
+                </button>
+              )}
+            </div>
+          </section>
+
+        </div>
       </div>
     </>
   );
