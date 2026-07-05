@@ -40,7 +40,7 @@ export interface ITourWithTourSetFields extends TourType {
 export default async function telegramMessage(tour: ITourWithTourSetFields) {
 
     const text = formatTourText(tour);
-    const photo_url = `${config.corsOrigin}/api/tours/image/${tour.images[0]}`; // tour.images[0];
+    const photo_url = `${config.corsOrigin}/api/tours/image/${tour.images[0]}`;   // tour.images[0];
     const url = `${config.tgApi}${config.botToken}/sendPhoto`;
 
     const result = await fetch(url, {
