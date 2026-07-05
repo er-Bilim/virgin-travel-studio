@@ -3,7 +3,7 @@ import {
   cn,
   formatDayAndMonthWords,
   formatToReadablePrice,
-} from '../../../lib/utils';
+} from '@/lib/utils';
 import {
   ArrowBigRight,
   CircleCheck,

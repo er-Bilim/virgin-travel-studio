@@ -58,8 +58,8 @@ const TourDetailView = ({ id }: Props) => {
       const start = new Date(ts.startDate);
 
       if (dateRange.from && start < dateRange.from) return false;
-      if (dateRange.to && start > dateRange.to) return false;
-      return true;
+      return !(dateRange.to && start > dateRange.to);
+
     });
   },[tour?.tourSets, dateRange]);
 
