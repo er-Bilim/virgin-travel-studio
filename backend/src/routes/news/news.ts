@@ -88,16 +88,19 @@ newsRouter.get(
       const startDate = req.query.startDate;
       const endDate = req.query.endDate;
 
-      if (typeof startDate === 'string' || typeof endDate === 'string') {
+      const hasStart = typeof startDate === 'string' && startDate.trim();
+      const hasEnd = typeof endDate === 'string' && endDate.trim();
+
+      if (hasStart || hasEnd) {
         query.createdAt = {};
 
-        if (typeof startDate === 'string' && startDate.trim()) {
+        if (hasStart) {
           const from = new Date(startDate);
           from.setHours(0, 0, 0, 0);
           query.createdAt.$gte = from;
         }
 
-        if (typeof endDate === 'string' && endDate.trim()) {
+        if (hasEnd) {
           const to = new Date(endDate);
           to.setHours(23, 59, 59, 999);
           query.createdAt.$lte = to;
