@@ -92,18 +92,31 @@ newsRouter.get(
       const hasEnd = typeof endDate === 'string' && endDate.trim();
 
       if (hasStart || hasEnd) {
-        query.createdAt = {};
+        const createdAt: {
+          $gte?: Date;
+          $lte?: Date;
+        } = {};
 
         if (hasStart) {
           const from = new Date(startDate);
-          from.setHours(0, 0, 0, 0);
-          query.createdAt.$gte = from;
+
+          if (!Number.isNaN(from.getTime())) {
+            from.setHours(0, 0, 0, 0);
+            createdAt.$gte = from;
+          }
         }
 
         if (hasEnd) {
           const to = new Date(endDate);
-          to.setHours(23, 59, 59, 999);
-          query.createdAt.$lte = to;
+
+          if (!Number.isNaN(to.getTime())) {
+            to.setHours(23, 59, 59, 999);
+            createdAt.$lte = to;
+          }
+        }
+
+        if (Object.keys(createdAt).length > 0) {
+          query.createdAt = createdAt;
         }
       }
 
