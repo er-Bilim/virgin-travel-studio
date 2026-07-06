@@ -6,12 +6,30 @@ import {
   QueryClient,
 } from '@tanstack/react-query';
 
-const NewsPage = async () => {
+type Props = {
+  searchParams: Promise<{
+    startDate?: string;
+    endDate?: string;
+  }>;
+};
+
+const NewsPage = async ({ searchParams }: Props) => {
   const qc = new QueryClient();
+  const params = await searchParams;
+
+  const startDate = params.startDate || null;
+  const endDate = params.endDate || null;
 
   await qc.prefetchQuery({
-    queryKey: ['news', 1, 7, undefined, 'true', undefined, null, null, null],
-    queryFn: () => getNews({ page: 1, limit: 7, isPublished: 'true' }),
+    queryKey: ['news', 1, 7, undefined, 'true', undefined, null, startDate, endDate],
+    queryFn: () =>
+        getNews({
+          page: 1,
+          limit: 7,
+          isPublished: 'true',
+          startDate,
+          endDate,
+        }),
   });
 
   return (

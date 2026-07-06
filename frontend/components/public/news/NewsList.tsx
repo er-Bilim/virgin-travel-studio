@@ -69,6 +69,15 @@ const NewsList = () => {
   };
 
   const applyDateFilter = () => {
+    if (
+        draftStartDate &&
+        draftEndDate &&
+        new Date(draftStartDate) > new Date(draftEndDate)
+    ) {
+      toast.error('Дата "С даты" не может быть позже даты "По дату"');
+      return;
+    }
+
     const params = new URLSearchParams(searchParams.toString());
 
     if (draftStartDate) {
