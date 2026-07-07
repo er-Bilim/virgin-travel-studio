@@ -32,8 +32,8 @@ const ReviewSchema = new Schema<ReviewFields>(
     },
 
     image: {
-      type: String,
-      default: null,
+      type: [Schema.Types.ObjectId],
+      default: [],
     },
 
     companyReply: {
