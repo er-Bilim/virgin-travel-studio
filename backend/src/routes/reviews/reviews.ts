@@ -450,7 +450,6 @@ reviewsRouter.delete(
         return res.status(404).send({ error: 'Отзыв не найден' });
       }
 
-      await deleteFile(deletedReview.image);
       res.send({ message: 'Отзыв успешно удален' });
     } catch (e) {
       next(e);

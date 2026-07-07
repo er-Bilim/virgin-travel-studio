@@ -11,7 +11,7 @@ import {
 import CreateReviewForm
   from '@/components/public/reviews/form/CreateReviewForm';
 import {useModalStore} from '@/lib/stores/modalStore';
-import {imageUrl} from '@/lib/constants';
+import {apiURL, imageUrl} from '@/lib/constants';
 import type {IReview} from '@/types/review';
 import {
   useAdminReviews,
@@ -225,7 +225,7 @@ const TourSetReviewsManager = ({tourId}: Props) => {
 
               {review.image && (
                 <img
-                  src={imageUrl + review.image}
+                  src={apiURL + "/reviews/image/" + review.image}
                   alt={`Фото отзыва ${review.clientName}`}
                   className="mt-3 sm:mt-4 h-24 w-24 sm:h-32 sm:w-32 rounded-xl sm:rounded-2xl object-cover"
                 />
