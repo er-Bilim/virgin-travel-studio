@@ -1,13 +1,13 @@
 'use client';
 
-import { CalendarDays } from 'lucide-react';
-import { imageUrl } from '@/lib/constants';
-import { formatDayAndMonthWords, truncateText } from '@/lib/utils';
+import {CalendarDays} from 'lucide-react';
+import {imageUrl} from '@/lib/constants';
+import {formatDayAndMonthWords, truncateText} from '@/lib/utils';
 import ErrorState from '@/components/shared/ErrorState';
-import LatestNewsSkeleton from '@/components/shared/skeletons/LatestNewsSkeleton';
-import { useNews } from '@/lib/hooks/newsHooks';
+import LatestNewsSkeleton
+  from '@/components/shared/skeletons/LatestNewsSkeleton';
+import {useNews} from '@/lib/hooks/newsHooks';
 import Link from 'next/link';
-import CONTENT_PLACEHOLDER from '@/assets/placeholders/content_placeholder.png';
 
 const LatestNews = () => {
   const limit: number = 5;
