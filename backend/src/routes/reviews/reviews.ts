@@ -163,9 +163,10 @@ reviewsRouter.get('/public/featured', async (_req, res, next) => {
 
 reviewsRouter.get('/image/:id', validateObjectId(), async (req, res, next) => {
   try {
+    const { id } = req.params;
     const bucket = getGridFSBucket();
-    const _id = new ObjectId(req.params.id);
-    const files = await bucket.find({ _id }).toArray();
+    const fileId = new ObjectId(id as string);
+    const files = await bucket.find({ _id: fileId }).toArray();
 
     if (!files || files.length === 0) {
       return res.status(404).send({
@@ -179,7 +180,7 @@ reviewsRouter.get('/image/:id', validateObjectId(), async (req, res, next) => {
       file?.metadata?.contentType || 'application/octet-stream',
     );
 
-    bucket.openDownloadStream(_id).pipe(res);
+    bucket.openDownloadStream(fileId).pipe(res);
   } catch (error) {
     next(error);
   }
