@@ -161,7 +161,7 @@ reviewsRouter.get('/public/featured', async (_req, res, next) => {
   }
 });
 
-reviewsRouter.get('/image/:id', async (req, res, next) => {
+reviewsRouter.get('/image/:id', validateObjectId(), async (req, res, next) => {
   try {
     const bucket = getGridFSBucket();
     const _id = new ObjectId(req.params.id);
