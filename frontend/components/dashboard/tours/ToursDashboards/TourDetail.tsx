@@ -10,7 +10,7 @@ import {
 import { useUser } from '@/lib/hooks/authHooks';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, Globe, GlobeLock, ArrowLeft } from 'lucide-react';
-import { imageUrl } from '@/lib/constants';
+import { apiURL } from '@/lib/constants';
 import Link from 'next/link';
 import {
   Dialog,
@@ -187,7 +187,7 @@ export default function TourDetails() {
                   .map((img, idx) => (
                     <img
                       key={idx}
-                      src={imageUrl + img}
+                      src={apiURL + "/tours/image/" + img}
                       className="w-full h-20 object-cover rounded-lg border"
                       alt=""
                     />
