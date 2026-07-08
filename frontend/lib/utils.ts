@@ -3,6 +3,9 @@ import {twMerge} from 'tailwind-merge';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
 import countries from './countries';
+import type {AllowedImageMimeType, ImageValidationResult} from '@/types/multiImage';
+import {IMAGE_UPLOAD} from '@/lib/constants';
+import imageCompression from 'browser-image-compression';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -135,3 +138,33 @@ export const getCountryOptions = (): { code: string, name: string }[] => {
 
   return countryOptions;
 }
+
+export const validateImageFile = (file: File): ImageValidationResult => {
+  if (!IMAGE_UPLOAD.ALLOWED_MIME_TYPES.includes(file.type as AllowedImageMimeType)) {
+    return { valid: false, error: 'Допустимые форматы: JPEG, PNG, WEBP' };
+  }
+
+  if (file.size > IMAGE_UPLOAD.MAX_FILE_SIZE_BYTES) {
+    const maxMb = IMAGE_UPLOAD.MAX_FILE_SIZE_BYTES / (1024 * 1024);
+    return { valid: false, error: `Файл больше ${maxMb} МБ` };
+  }
+
+  return { valid: true };
+}
+
+export const compressImage = async (file: File): Promise<File> => {
+  try {
+    const compressed = await imageCompression(file, {
+      maxSizeMB: IMAGE_UPLOAD.COMPRESSION.MAX_SIZE_MB,
+      maxWidthOrHeight: IMAGE_UPLOAD.COMPRESSION.MAX_WIDTH_OR_HEIGHT,
+      useWebWorker: true,
+      fileType: 'image/jpeg',
+    });
+
+    if (compressed.size >= file.size) return file;
+
+    return compressed;
+  } catch {
+    throw new Error('Не удалось обработать файл — возможно, он повреждён');
+  }
+};

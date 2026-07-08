@@ -33,7 +33,7 @@ export const queryConfig = {
 } satisfies ConstructorParameters<typeof QueryClient>[0];
 
 export const IMAGE_UPLOAD = {
-  MAX_FILE_SIZE_BYTES: 5 * 1024 * 1024,
+  MAX_FILE_SIZE_BYTES: 10 * 1024 * 1024,
   ALLOWED_MIME_TYPES: ['image/png', 'image/jpeg', 'image/webp'] as const,
   MAX_FILES: 5,
   COMPRESSION: {
