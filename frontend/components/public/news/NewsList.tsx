@@ -144,7 +144,7 @@ const NewsList = () => {
         >
           <figure className="relative aspect-[16/10] md:aspect-[4/3] w-full overflow-hidden rounded-xl md:rounded-2xl bg-muted shadow-xs">
             <Image
-              src={imageUrl + news.allNews[0].image || CONTENT_PLACEHOLDER}
+              src={news.allNews[0].image ? `${imageUrl}api/news/image/${news.allNews[0].image}` : CONTENT_PLACEHOLDER}
               alt={news.allNews[0].title}
               fill
               priority
@@ -215,7 +215,7 @@ const NewsList = () => {
                   <div className="w-full">
                     <figure className="relative aspect-[16/10] md:aspect-[4/3] overflow-hidden rounded-xl mb-4 bg-muted shadow-xs">
                       <Image
-                        src={imageUrl + singleNews.image || CONTENT_PLACEHOLDER}
+                        src={singleNews.image ? `${imageUrl}api/news/image/${singleNews.image}` : CONTENT_PLACEHOLDER}
                         alt={singleNews.title}
                         fill
                         priority

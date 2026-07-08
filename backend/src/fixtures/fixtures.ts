@@ -13,7 +13,7 @@ import path from 'path';
 import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { GridFSBucket } from 'mongodb';
-import seedImageToGridFs from './helpers/seedImageToGridFS.js'
+import seedImageToGridFs from './helpers/seedImageToGridFs.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,7 +23,7 @@ const getJson = async (fileName: string) => {
   const data = await fs.readFile(filePath, 'utf8');
 
   return JSON.parse(data);
-}
+};
 
 const run = async () => {
   await mongoose.connect(config.db);
@@ -47,7 +47,7 @@ const run = async () => {
       'orders',
       'reviews',
       'contactsettings',
-      'aboutus'
+      'aboutus',
     ];
 
     for (const collectionName of collections) {
@@ -92,6 +92,9 @@ const run = async () => {
             const newsData = await getJson(collectionName + '.json');
 
             for (const newData of newsData) {
+              if (newData.image && bucket) {
+                newData.image = await seedImageToGridFs(bucket, newData.image);
+              }
               const news = new News(newData);
               await news.save();
             }
@@ -150,17 +153,16 @@ const run = async () => {
             console.log('Настройки контактов успешно созданы');
             break;
 
-            case 'aboutus':
-              const aboutUsData = await getJson(collectionName + '.json');
+          case 'aboutus':
+            const aboutUsData = await getJson(collectionName + '.json');
 
-              for (const aboutData of aboutUsData) {
-                const aboutUs = new AboutUs(aboutData);
-                await aboutUs.save();
-              }
-              console.log('О нас успешно создано');
-              break;
+            for (const aboutData of aboutUsData) {
+              const aboutUs = new AboutUs(aboutData);
+              await aboutUs.save();
+            }
+            console.log('О нас успешно создано');
+            break;
         }
-
       } catch (e) {
         const err = e as { code?: number };
         if (err.code === 26) {
@@ -172,7 +174,6 @@ const run = async () => {
         throw e;
       }
     }
-
 
     console.log('Fixtures created successfully!');
   } finally {

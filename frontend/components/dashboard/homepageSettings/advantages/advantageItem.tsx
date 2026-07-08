@@ -52,7 +52,6 @@ export default function AdvantageItem({
       setPreviewSrc(undefined);
     }
 
-    // Функция очистки памяти при размонтировании карточки или смене картинки
     return () => {
       if (objectUrl) {
         URL.revokeObjectURL(objectUrl);

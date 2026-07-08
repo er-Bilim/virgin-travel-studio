@@ -9,6 +9,12 @@ interface TourLite {
   category: CategoryLite;
 }
 
+export type OrderPayment =
+  | 'CASH'
+  | 'CARD'
+  | 'QR'
+  | 'BANK';
+
 interface ManagerLite {
   _id: string;
   fullName: string;
@@ -36,6 +42,8 @@ export interface OrderType {
   managerId: ManagerLite | null;
   visibleId: string;
   createdAt: string;
+  paymentMethod?: OrderPayment;
+  paymentAmount?: number;
 }
 
 export interface PaginatedOrdersResponse {
@@ -55,6 +63,8 @@ export interface OrderMutationType {
   status?: string;
   rejectionReason?: string | null;
   managerId: string | null | undefined;
+  paymentMethod?: OrderPayment;
+  paymentAmount?: number;
 }
 
 export interface OrderPostType {

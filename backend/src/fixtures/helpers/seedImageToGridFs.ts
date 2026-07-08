@@ -21,11 +21,9 @@ const seedImageToGridFs = async (
 
   return new Promise((resolve, reject) => {
     const stream = bucket.openUploadStream(cleanName, {
-      metadata: {
-        contentType: CONTENT_TYPES[ext] || 'application/octet-stream',
-      },
-    });
-
+       metadata: { contentType: CONTENT_TYPES[ext] || 'application/octet-stream' },
+     });
+    
     stream.on('error', reject);
     stream.on('finish', () => resolve(stream.id.toString()));
     stream.end(buffer);
