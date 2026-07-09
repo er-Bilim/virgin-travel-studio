@@ -56,36 +56,48 @@ const MultiImageInput: React.FC<Props> = ({
     };
   }, [value, showPreviews]);
 
-  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    const availableSlots = maxFiles - value.length;
+ const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+   const files = Array.from(e.target.files || []);
+   const availableSlots = maxFiles - value.length;
 
-    const accepted: File[] = [];
-    const newRejected: RejectedFile[] = [];
+   const accepted: File[] = [];
+   const newRejected: RejectedFile[] = [];
 
-    files.slice(0, availableSlots).forEach((file) => {
-      const result = validateImageFile(file);
-      if (result.valid) {
-        accepted.push(file);
-      } else {
-        newRejected.push({
-          id: `${file.name}-${file.size}-${Date.now()}`,
-          name: file.name,
-          error: result.error!,
-        });
-      }
-    });
+   files.forEach((file) => {
+     const result = validateImageFile(file);
 
-    if (newRejected.length > 0) {
-      setRejected((prev) => [...prev, ...newRejected]);
-    }
+     if (result.valid) {
+       accepted.push(file);
+     } else {
+       newRejected.push({
+         id: `${file.name}-${file.size}-${Date.now()}`,
+         name: file.name,
+         error: result.error!,
+       });
+     }
+   });
 
-    if (accepted.length > 0) {
-      onChange([...value, ...accepted]);
-    }
+   const filesToAdd = accepted.slice(0, availableSlots);
+   const excessAccepted = accepted.slice(availableSlots);
 
-    if (inputRef.current) inputRef.current.value = '';
-  };
+   excessAccepted.forEach((file) => {
+     newRejected.push({
+       id: `${file.name}-${file.size}-${Date.now()}`,
+       name: file.name,
+       error: `Превышено максимальное количество файлов (${maxFiles})`,
+     });
+   });
+
+   if (newRejected.length > 0) {
+     setRejected((prev) => [...prev, ...newRejected]);
+   }
+
+   if (filesToAdd.length > 0) {
+     onChange([...value, ...filesToAdd]);
+   }
+
+   if (inputRef.current) inputRef.current.value = '';
+ };
 
   const removeFile = (indexToRemove: number) => {
     onChange(value.filter((_, i) => i !== indexToRemove));
