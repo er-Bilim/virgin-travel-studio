@@ -1,16 +1,16 @@
-import { Badge } from "@/components/ui/badge";
+import {Badge} from "@/components/ui/badge";
 import BasePhoto from "@/components/assets/lake.webp";
 import {
   Card,
 } from "@/components/ui/card";
-import type { TourType } from "@/types/tour";
-import { imageUrl } from "@/lib/constants";
+import type {TourType} from "@/types/tour";
+import {imageUrl} from "@/lib/constants";
 
 interface Props {
   tour: TourType;
 }
 
-export function TourCard({ tour }: Props) {
+export function TourCard({tour}: Props) {
   const image =
     tour.images.length > 0 ? imageUrl + tour.images[0] : BasePhoto.src;
 
@@ -45,12 +45,15 @@ export function TourCard({ tour }: Props) {
 
           <div className="mb-6 flex gap-2">
             {tour.baseAdvantages.map((advantage) => (
-              <div key={advantage} className="rounded-xl bg-white/10 px-3 py-2 backdrop-blur">
+              <div
+                key={advantage}
+                className="rounded-xl bg-white/10 px-3 py-2 backdrop-blur"
+              >
                 {advantage}
               </div>
             ))}
           </div>
-{/* 
+          {/*
           <Button
             onClick={() =>
               
