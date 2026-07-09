@@ -6,3 +6,9 @@ export interface ImageValidationResult {
   valid: boolean;
   error?: string;
 }
+
+export interface RejectedFile {
+  id: string;
+  name: string;
+  error: string;
+}

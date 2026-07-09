@@ -168,3 +168,6 @@ export const compressImage = async (file: File): Promise<File> => {
     throw new Error('Не удалось обработать файл — возможно, он повреждён');
   }
 };
+
+export const getFileKey = (item: File | string): string =>
+  typeof item === 'string' ? item : `${item.name}-${item.size}-${item.lastModified}`;

@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-import { Camera, X, ArrowLeft } from 'lucide-react';
-import { imageUrl } from '@/lib/constants';
+import React, {useEffect, useRef, useState} from 'react';
+import {AlertCircle, ArrowLeft, Camera, X} from 'lucide-react';
+import {IMAGE_UPLOAD, imageUrl} from '@/lib/constants';
+import {getFileKey, validateImageFile} from '@/lib/utils';
+import type {RejectedFile} from '@/types/multiImage';
 
 interface Props {
   name: string;
@@ -15,35 +17,39 @@ interface Props {
 }
 
 const MultiImageInput: React.FC<Props> = ({
-                                            name,
-                                            label,
-                                            onChange,
-                                            value = [],
-                                            maxFiles = 5,
-                                            showPreviews = true,
-                                            allowReorder = false,
-                                          }) => {
+  name,
+  label,
+  onChange,
+  value = [],
+  maxFiles = IMAGE_UPLOAD.MAX_FILES,
+  showPreviews = true,
+  allowReorder = false,
+}) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [previews, setPreviews] = useState<string[]>([]);
+  const [previews, setPreviews] = useState<Record<string, string>>({});
+  const [rejected, setRejected] = useState<RejectedFile[]>([]);
 
   useEffect(() => {
     if (!showPreviews) {
-      setPreviews([]);
+      setPreviews({});
       return;
     }
 
     const objectUrls: string[] = [];
+    const next: Record<string, string> = {};
 
-    const newPreviews = value.map((item) => {
+    value.forEach((item) => {
+      const key = getFileKey(item);
       if (typeof item === 'string') {
-        return item.startsWith('http') ? item : `${imageUrl}${item}`;
+        next[key] = item.startsWith('http') ? item : `${imageUrl}${item}`;
+        return;
       }
       const blobUrl = URL.createObjectURL(item);
       objectUrls.push(blobUrl);
-      return blobUrl;
+      next[key] = blobUrl;
     });
 
-    setPreviews(newPreviews);
+    setPreviews(next);
 
     return () => {
       objectUrls.forEach((url) => URL.revokeObjectURL(url));
@@ -52,14 +58,41 @@ const MultiImageInput: React.FC<Props> = ({
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    const updatedFiles = [...value, ...files].slice(0, maxFiles);
-    onChange(updatedFiles);
+    const availableSlots = maxFiles - value.length;
+
+    const accepted: File[] = [];
+    const newRejected: RejectedFile[] = [];
+
+    files.slice(0, availableSlots).forEach((file) => {
+      const result = validateImageFile(file);
+      if (result.valid) {
+        accepted.push(file);
+      } else {
+        newRejected.push({
+          id: `${file.name}-${file.size}-${Date.now()}`,
+          name: file.name,
+          error: result.error!,
+        });
+      }
+    });
+
+    if (newRejected.length > 0) {
+      setRejected((prev) => [...prev, ...newRejected]);
+    }
+
+    if (accepted.length > 0) {
+      onChange([...value, ...accepted]);
+    }
+
     if (inputRef.current) inputRef.current.value = '';
   };
 
   const removeFile = (indexToRemove: number) => {
-    const updatedFiles = value.filter((_, i) => i !== indexToRemove);
-    onChange(updatedFiles);
+    onChange(value.filter((_, i) => i !== indexToRemove));
+  };
+
+  const dismissRejected = (id: string) => {
+    setRejected((prev) => prev.filter((r) => r.id !== id));
   };
 
   const moveLeft = (index: number) => {
@@ -76,7 +109,7 @@ const MultiImageInput: React.FC<Props> = ({
       <input
         type="file"
         multiple
-        accept="image/*"
+        accept={IMAGE_UPLOAD.ALLOWED_MIME_TYPES.join(',')}
         onChange={onFileChange}
         ref={inputRef}
         name={name}
@@ -108,50 +141,80 @@ const MultiImageInput: React.FC<Props> = ({
         </button>
       </div>
 
-      {showPreviews && previews.length > 0 && (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-5 mt-2">
-          {previews.map((url, index) => (
-            <div
-              key={index}
-              className="relative aspect-square rounded-lg border border-input overflow-hidden bg-background group"
-            >
-              <img
-                src={url}
-                alt={`Preview ${index + 1}`}
-                className="h-full w-full object-cover"
-              />
+      <p className="text-xs text-muted-foreground">
+        JPEG, PNG или WEBP, до {IMAGE_UPLOAD.MAX_FILE_SIZE_BYTES / (1024 * 1024)} МБ
+      </p>
 
-              <div className="absolute inset-0   group-hover:bg-black/40 transition-colors flex items-center justify-center gap-2">
-                <div className="absolute right-1.5 top-1.5">
-                  {allowReorder && index > 0 && (
+      {rejected.length > 0 && (
+        <ul className="space-y-1">
+          {rejected.map((r) => (
+            <li
+              key={r.id}
+              className="flex items-center justify-between gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-xs text-red-600"
+            >
+              <span className="flex items-center gap-1.5 truncate">
+                <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">{r.name}</span> — {r.error}
+              </span>
+              <button type="button" onClick={() => dismissRejected(r.id)}>
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {showPreviews && value.length > 0 && (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-5 mt-2">
+          {value.map((item, index) => {
+            const key = getFileKey(item);
+            const url = previews[key];
+
+            return (
+              <div
+                key={key}
+                className="relative aspect-square rounded-lg border border-input overflow-hidden bg-background group"
+              >
+                {url && (
+                  <img
+                    src={url}
+                    alt={`Preview ${index + 1}`}
+                    className="h-full w-full object-cover"
+                  />
+                )}
+
+                <div className="absolute inset-0 group-hover:bg-black/40 transition-colors flex items-center justify-center gap-2">
+                  <div className="absolute right-1.5 top-1.5">
+                    {allowReorder && index > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => moveLeft(index)}
+                        className="p-1.5 bg-white rounded-full text-gray-700 hover:text-[#1E2B6D] transition-colors mr-1.5"
+                        title="Сдвинуть влево"
+                      >
+                        <ArrowLeft className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+
                     <button
                       type="button"
-                      onClick={() => moveLeft(index)}
-                      className="p-1.5 bg-white rounded-full text-gray-700 hover:text-[#1E2B6D] transition-colors mr-1.5"
-                      title="Сдвинуть влево"
+                      onClick={() => removeFile(index)}
+                      className="p-1.5 bg-white rounded-full text-red-500 hover:text-red-700 transition-colors cursor-pointer"
+                      title="Удалить"
                     >
-                      <ArrowLeft className="h-3.5 w-3.5" />
+                      <X className="h-3.5 w-3.5" />
                     </button>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={() => removeFile(index)}
-                    className="p-1.5 bg-white rounded-full text-red-500 hover:text-red-700 transition-colors"
-                    title="Удалить"
-                  >
-                    <X className="h-3.5 w-3.5" />
-                  </button>
+                  </div>
                 </div>
-              </div>
 
-              {index === 0 && (
-                <span className="absolute top-1.5 left-1.5 bg-[#1E2B6D] text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm">
-                  Главное
-                </span>
-              )}
-            </div>
-          ))}
+                {index === 0 && (
+                  <span className="absolute top-1.5 left-1.5 bg-[#1E2B6D] text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm">
+                    Главное
+                  </span>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
