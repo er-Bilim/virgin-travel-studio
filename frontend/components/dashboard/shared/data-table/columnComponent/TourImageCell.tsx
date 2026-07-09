@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import {
     Dialog,
-    DialogContent,
+    DialogContent, DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -60,6 +60,9 @@ export const TourImageCell = ({ tour }: TourImageCellProps) => {
                         Просмотр изображения
                     </DialogTitle>
                 </DialogHeader>
+                <DialogDescription className="sr-only">
+                    Изображение тура
+                </DialogDescription>
 
                 <div className="flex items-center justify-center">
                     <img

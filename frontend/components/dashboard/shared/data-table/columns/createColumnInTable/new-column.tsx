@@ -7,7 +7,7 @@ import {
 } from '@/components/dashboard/shared/data-table/columns/createActionsColumn';
 import {
   Dialog,
-  DialogContent,
+  DialogContent, DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger
@@ -49,6 +49,7 @@ export const getNewsColumns = ({
             <button
               type="button"
               className="text-blue-600 hover:underline text-sm"
+              aria-label="Просмотр изображения"
             >
               Посмотреть
             </button>
@@ -60,6 +61,9 @@ export const getNewsColumns = ({
                 Просмотр изображения
               </DialogTitle>
             </DialogHeader>
+            <DialogDescription className="sr-only">
+              Картинка новости
+            </DialogDescription>
 
             <div className="flex items-center justify-center">
               <img

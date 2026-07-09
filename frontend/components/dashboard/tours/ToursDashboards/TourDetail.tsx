@@ -14,7 +14,7 @@ import { imageUrl } from '@/lib/constants';
 import Link from 'next/link';
 import {
   Dialog,
-  DialogContent,
+  DialogContent, DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -219,6 +219,9 @@ export default function TourDetails() {
           <DialogHeader className="pr-8">
             <DialogTitle>Вы уверены, что хотите удалить этот тур?</DialogTitle>
           </DialogHeader>
+          <DialogDescription className="sr-only">
+            Диалоговое окно удаление тура
+          </DialogDescription>
           <DialogFooter>
             <Button
               variant="outline"

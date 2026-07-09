@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
-  DialogContent,
+  DialogContent, DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -115,6 +115,10 @@ const OrderCard = ({
             </span>
           </div>
         </DialogHeader>
+
+        <DialogDescription className="sr-only">
+          Пожалуйста, заполните форму ниже для продолжения.
+        </DialogDescription>
 
         <form onSubmit={handleSubmit(onSubmit)} className="p-5 sm:p-6 bg-white">
           <div className="grid gap-4">

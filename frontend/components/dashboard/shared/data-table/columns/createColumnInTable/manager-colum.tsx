@@ -1,12 +1,13 @@
 import type {IUser} from '@/types/user';
 import type {ColumnDef} from '@tanstack/react-table';
 import {Button} from '@/components/ui/button';
-import { Eye, Lock, LockOpen } from 'lucide-react';
+import {Eye, Lock, LockOpen} from 'lucide-react';
+import type { UserStatus} from '@/lib/constants';
 import {
-    USER_STATUS_COLORS,
-    USER_STATUS_LABELS,
-    UserStatus
+  USER_STATUS_COLORS,
+  USER_STATUS_LABELS
 } from '@/lib/constants';
+
 import {Badge} from '@/components/ui/badge';
 
 
@@ -52,6 +53,8 @@ export const getManagersColumns = ({
               e.stopPropagation();
               onView(set);
             }}
+            aria-label="Посмотреть профиль"
+
           >
             <Eye className="w-4 h-4" />
           </Button>
@@ -62,6 +65,7 @@ export const getManagersColumns = ({
               e.stopPropagation();
               onBanned(set);
             }}
+            aria-label={set.status === 'banned' ? "Разблокировать пользователя" : "Заблокировать пользователя"}
           >
             {set.status === 'banned' ? (
               <LockOpen className="w-4 h-4" />

@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 import {
   Dialog,
-  DialogContent,
+  DialogContent, DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -483,6 +483,9 @@ export default function OrderDetail() {
               Вы уверены, что хотите удалить эту заявку?
             </DialogTitle>
           </DialogHeader>
+          <DialogDescription className="sr-only">
+            Диалоговое окно удаление заявки
+          </DialogDescription>
           <DialogFooter className="mt-4 flex-col sm:flex-row gap-2">
             <Button
               variant="outline"
@@ -517,6 +520,9 @@ export default function OrderDetail() {
                 : 'Она будет убрана из вашего списка и вернется в общую панель заявок со статусом «Новая».'}
             </p>
           </DialogHeader>
+          <DialogDescription className="sr-only">
+            Диалоговое окно отозвание заявки
+          </DialogDescription>
           <DialogFooter className="mt-4 flex-col sm:flex-row gap-2">
             <Button
               variant="outline"
@@ -539,11 +545,11 @@ export default function OrderDetail() {
         </DialogContent>
       </Dialog>
 
-      <Modal id="contractModal" title="Впишите данные">
+      <Modal id="contractModal" title="Впишите данные" description="Форма создание контракта">
         <ContractForm orderId={order._id} />
       </Modal>
 
-      <Modal id="paymentModal" title="Фиксация оплаты">
+      <Modal id="paymentModal" title="Фиксация оплаты" description="Форма создание оплаты">
         <PaymentForm orderId={order._id} />
       </Modal>
 

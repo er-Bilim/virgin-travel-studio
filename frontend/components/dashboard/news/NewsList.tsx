@@ -4,7 +4,7 @@ import {useDeleteNews, useNews, usePublicateNews} from '@/lib/hooks/newsHooks';
 import {Button} from '@/components/ui/button';
 import {
   Dialog,
-  DialogContent,
+  DialogContent, DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger
@@ -140,6 +140,9 @@ export default function NewsList() {
             </DialogTrigger>
             <DialogContent className="sm:max-w-2xl">
               <CreateNewsForm onSuccess={() => setIsCreateOpen(false)} />
+              <DialogDescription className="sr-only">
+                Форма ддя создание новостей
+              </DialogDescription>
             </DialogContent>
           </Dialog>
         </div>
@@ -198,7 +201,7 @@ export default function NewsList() {
         headerRowClassName={headerRowClassName}
         rowClassName={rowClassName}
         className={tableClassName}
-        onRowClick={(news) => {
+        onRowClickAction={(news) => {
           setView(news);
           openModal("detailedNews")
         }
@@ -234,6 +237,7 @@ export default function NewsList() {
       <Modal
         id="detailedNews"
         title="Детальная информация о новости"
+        description="Детальная информация о новости"
       >
         <div className="max-h-[90vh] overflow-y-auto">
           {view && <NewsDetailedInfo oneNews={view} />}
@@ -246,8 +250,8 @@ export default function NewsList() {
         description="Это действие нельзя отменить"
         loading={isDeleting}
         confirmText="Удалить"
-        onCancel={() => setNewsToDelete(null)}
-        onConfirm={confirmDelete}
+        onCancelAction={() => setNewsToDelete(null)}
+        onConfirmAction={confirmDelete}
       />
 
       <Dialog

@@ -1,15 +1,14 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import News from '@/model/New/News.js';
-import auth, { authOrNot, type RequestWithUser } from '@/middlewares/auth.js';
+import auth, {authOrNot, type RequestWithUser} from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
-import { imageMemoryUpload, imagesUpload } from '@/middlewares/multer.js';
-import type { NewsFields } from '@/types/news.types.js';
+import {imageMemoryUpload, imagesUpload} from '@/middlewares/multer.js';
+import type {NewsFields} from '@/types/news.types.js';
 import validateObjectId from '@/middlewares/validateObjectId.js';
-import { getGridFSBucket } from '@/index.js';
-import { uploadImageToGridFS } from '@/lib/gridfs.js';
-import { ObjectId } from 'mongodb';
-import { log } from 'console';
+import {getGridFSBucket} from '@/index.js';
+import {uploadImageToGridFS} from '@/lib/gridfs.js';
+import {ObjectId} from 'mongodb';
 
 const newsRouter = express.Router();
 

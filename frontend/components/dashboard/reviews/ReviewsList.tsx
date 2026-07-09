@@ -156,7 +156,7 @@ export default function ReviewsList() {
           headerRowClassName={headerRowClassName}
           rowClassName={rowClassName}
           className={tableClassName}
-          onRowClick={(review) => {
+          onRowClickAction={(review) => {
             const currentPath = window.location.pathname;
             const basePath = currentPath.startsWith('/manager')
               ? '/manager'
@@ -202,8 +202,8 @@ export default function ReviewsList() {
           description="Это действие нельзя отменить"
           loading={isDeleting}
           confirmText="Удалить"
-          onCancel={() => setReviewToDelete(null)}
-          onConfirm={confirmDelete}
+          onCancelAction={() => setReviewToDelete(null)}
+          onConfirmAction={confirmDelete}
         />
       </div>
     </>

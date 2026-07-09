@@ -151,7 +151,7 @@ export const StatsWidgets = () => {
         <Modal id="reportAllManagers" title="Выберете даты для отчета">
           <DateRangePicker
               value={dateRange}
-              onChange={setDateRange}
+              onChangeAction={setDateRange}
               disableFuture
           />
           {errorReport && <p className="text-sm text-red-500">{errorReport}</p>}
