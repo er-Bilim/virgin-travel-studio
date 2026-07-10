@@ -119,6 +119,7 @@ const OrderSchema = new Schema(
         endDate: Date,
         hotel: { type: String, trim: true },
         description: { type: String, trim: true },
+        activities: [{ type: String, trim: true }]
       },
       required: function (this: IOrder) {
         return this.type === 'CUSTOM';
