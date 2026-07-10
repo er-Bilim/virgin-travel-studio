@@ -3,9 +3,9 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Dot, Newspaper, AlignStartVertical } from 'lucide-react';
-import { toast } from 'sonner';
 import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 import ClientAvatar from '@/components/shared/ClientAvatar';
+import ErrorState from '@/components/shared/ErrorState';
 import { useState } from 'react';
 import { PaginationCustom } from '@/components/pagination/PaginationCustom';
 import NewsSkeleton from './NewsSkeleton';
@@ -30,12 +30,14 @@ const NewsList = () => {
     data: news,
     isPending: newsPending,
     isError: newsError,
+    refetch: refetchNews,
   } = useNews({ page, limit, tags: tag });
 
   const {
     data: tags,
     isLoading: tagsLoading,
     isError: tagsError,
+    refetch: refetchTags,
   } = useGetNewsTags();
 
   const tagsSettingsCombobox = {
@@ -57,7 +59,14 @@ const NewsList = () => {
   }
 
   if (newsError || !news || tagsError || !tags) {
-    return toast.error('Что-то пошло не так');
+    return (
+      <div className="py-16 sm:py-20">
+        <ErrorState onRetry={() => {
+          void refetchNews();
+          void refetchTags();
+        }} />
+      </div>
+    );
   }
 
   if (!news.allNews.length) {
