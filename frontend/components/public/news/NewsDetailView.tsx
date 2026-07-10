@@ -3,12 +3,12 @@
 import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 import ClientAvatar from '@/components/shared/ClientAvatar';
 import { Spinner } from '@/components/ui/spinner';
+import ErrorState from '@/components/shared/ErrorState';
 import { useGetSingleNews } from '@/lib/hooks/newsHooks';
-import { toast } from 'sonner';
 import {
   cn,
   formatDayAndMonthWords,
-} from '../../../lib/utils';
+} from '@/lib/utils';
 import { Clock, Dot } from 'lucide-react';
 import Image from 'next/image';
 import { imageUrl, isDev } from '@/lib/constants';
@@ -22,14 +22,18 @@ interface Props {
 const NewsDetailView = ({ id }: Props) => {
   const pathname = usePathname();
   const url = `${process.env.NEXT_PUBLIC_SITE_URL}${pathname}`;
-  const { data: news, isLoading, isError } = useGetSingleNews(id);
+  const { data: news, isLoading, isError, refetch } = useGetSingleNews(id);
 
   if (isLoading) {
     return <Spinner />;
   }
 
   if (isError || !news) {
-    return toast.error('Что-то пошло не так');
+    return (
+      <div className="py-16 sm:py-20">
+        <ErrorState onRetry={refetch} />
+      </div>
+    );
   }
 
   const { day, month, year } = formatDayAndMonthWords(news.createdAt)
@@ -44,7 +48,7 @@ const NewsDetailView = ({ id }: Props) => {
     .filter(Boolean);
 
   return (
-    <section className="mt-10">
+    <section className="mt-5">
       <Breadcrumbs
         items={[{ label: 'Новости', href: '/news' }, { label: news.title }]}
       />
