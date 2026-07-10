@@ -14,7 +14,7 @@ interface Props {
 const NewsDetailPage = async ({ params }: Props) => {
   const { id } = await params;
   const qc = new QueryClient();
-  const limit: number = 3;
+  const limit: number = 5;
 
   await Promise.all([
     qc.prefetchQuery({

@@ -84,7 +84,7 @@ const NewsDetailView = ({ id, tourLimit }: Props) => {
             <ul
               aria-label="Теги статьи"
               role="list"
-              className="flex flex-row gap-3 lowercase"
+              className="flex flex-wrap gap-3 lowercase"
             >
               {news.tags.length > 0 &&
                 news.tags.map((tag, index) => (
@@ -104,12 +104,12 @@ const NewsDetailView = ({ id, tourLimit }: Props) => {
               {news.title}
             </h1>
 
-            <div className="text-sm flex flex-row justify-between items-center">
-              <div className="flex flex-row items-center gap-3 mt-5">
+            <div className="mt-5 text-sm flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-row items-center gap-3">
                 <ClientAvatar name={news.author.fullName} size="lg" />
                 <div className="flex flex-col text-[var(--primary)]">
                   <p className="font-semibold">{news.author.fullName}</p>
-                  <div className="flex flex-row items-center gap-2 text-gray-500">
+                  <div className="flex flex-wrap items-center gap-2 text-gray-500">
                     <div>
                       <p className="flex gap-1 text-gray-500">
                         <span className="font-semibold">{day}</span>
@@ -234,7 +234,7 @@ const NewsDetailView = ({ id, tourLimit }: Props) => {
                 Соберите тур мечты под себя
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-white/60">
-                Маршрут, отель, даты – а остальное мы возьмём на себя.
+                Маршрут, отель, даты – а остальное мы возьмём на себя
               </p>
               <Link
                 href="/tours/custom"
