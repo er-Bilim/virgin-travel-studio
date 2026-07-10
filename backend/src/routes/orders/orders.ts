@@ -434,14 +434,14 @@ ordersRouter.patch(
 
         if (status && status === 'COMPLETED' && order.status !== 'COMPLETED') {
           const booked = await update_tourSet(order.tourSetId);
-          if (!booked) {
+          if (!booked && order.type === "STANDARD") {
             return res.status(400).send({ error: 'Нет свободных мест!' });
           }
         }
 
         if (status && status === 'REJECTED' && order.status !== 'REJECTED') {
           const unBooked = await update_tourSet(order.tourSetId, -1);
-          if (!unBooked)
+          if (!unBooked && tour.type === "STANDARD")
             return res.status(400).send({ error: 'Ошибка при снятии брони!' });
         }
 
