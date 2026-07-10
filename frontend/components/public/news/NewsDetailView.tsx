@@ -2,7 +2,6 @@
 
 import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 import ClientAvatar from '@/components/shared/ClientAvatar';
-import { Spinner } from '@/components/ui/spinner';
 import { useGetSingleNews } from '@/lib/hooks/newsHooks';
 import {
   cn,
