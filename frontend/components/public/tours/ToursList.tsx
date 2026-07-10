@@ -7,20 +7,21 @@ import {
   ArrowBigDown,
   ArrowBigUp,
   CalendarPlus2,
+  CloudOff,
   Compass,
   Globe,
   House,
   Paintbrush,
-  RefreshCw,
+  RotateCw,
   Search,
   Star,
-  WifiOff
 } from 'lucide-react';
 
 import {PaginationCustom} from '@/components/pagination/PaginationCustom';
 import PublicTourCard from '@/components/public/tours/PublicTourCard';
 import {Breadcrumbs} from '@/components/shared/Breadcrumbs';
 import Sort from '@/components/shared/Sort';
+import StateCard from '@/components/shared/StateCard';
 import FilterCombobox from '../../shared/FilterCombobox';
 
 import {useGetTourCategories, useTours} from '@/lib/hooks/tourHooks';
@@ -128,40 +129,28 @@ const ToursList = () => {
 
   if (isToursError) {
     return (
-      <section className="mx-auto max-w-[640px] px-4 py-24 text-center flex flex-col items-center justify-center">
-        <div className="mb-5 inline-flex p-5 items-center justify-center rounded-full bg-red-50 text-red-500">
-          <WifiOff className="size-8" aria-hidden="true" />
-        </div>
-
-        <h2 className="mb-2 text-2xl font-black text-gray-900">
-          Не удалось загрузить туры
-        </h2>
-
-        <p className="mb-6 text-sm text-muted-foreground max-w-sm">
-          Что-то пошло не так – возможно, возникли проблемы с подключением.
-          Попробуйте обновить страницу.
-        </p>
-
-        <div className="flex justify-center gap-3 flex-wrap">
-          <button
-            type="button"
-            onClick={() => handleRefetch()}
-            className="inline-flex rounded-xl items-center px-5 py-2.5 cursor-pointer bg-[#1E2B6D] text-white hover:bg-[#152054] transition font-medium text-sm shadow-sm"
-          >
-            <RefreshCw
-              className="size-4 mr-2 animate-spin-slow"
-              aria-hidden="true"
-            />
-            Повторить
-          </button>
-          <Link
-            href="/"
-            className="inline-flex rounded-xl items-center px-5 py-2.5 cursor-pointer border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 transition font-medium text-sm"
-          >
-            <House className="size-4 mr-2" aria-hidden="true" />
-            На главную
-          </Link>
-        </div>
+      <section className="mx-auto max-w-[640px] px-4 py-16 sm:py-24">
+        <StateCard
+          icon={CloudOff}
+          iconClassName="mb-5 flex size-16 items-center justify-center rounded-[18px] bg-red-50 text-red-500"
+          title="Не удалось загрузить туры"
+          description="Что-то пошло не так – возможно, возникли проблемы с подключением. Попробуйте обновить страницу."
+          actions={[
+            {
+              type: 'button',
+              onClick: handleRefetch,
+              label: 'Повторить',
+              icon: RotateCw,
+            },
+            {
+              type: 'link',
+              href: '/',
+              label: 'На главную',
+              icon: House,
+              variant: 'secondary',
+            },
+          ]}
+        />
       </section>
     );
   }
@@ -256,21 +245,21 @@ const ToursList = () => {
 
         <div className="flex gap-2">
           <button
-              type="button"
-              onClick={() => toggleParam('isHot', isHot)}
-              className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition cursor-pointer ${
-                isHot ? 'bg-red-500 text-white border-red-500' : 'bg-white text-gray-600 border-gray-300 hover:border-red-400'
-              }`}
+            type="button"
+            onClick={() => toggleParam('isHot', isHot)}
+            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition cursor-pointer ${
+              isHot ? 'bg-red-500 text-white border-red-500' : 'bg-white text-gray-600 border-gray-300 hover:border-red-400'
+            }`}
           >
             🔥 Горящие
           </button>
 
           <button
-              type="button"
-              onClick={() => toggleParam('hasDiscount', hasDiscount)}
-              className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition cursor-pointer ${
-                hasDiscount ? 'bg-green-500 text-white border-green-500' : 'bg-white text-gray-600 border-gray-300 hover:border-green-400'
-              }`}
+            type="button"
+            onClick={() => toggleParam('hasDiscount', hasDiscount)}
+            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition cursor-pointer ${
+              hasDiscount ? 'bg-green-500 text-white border-green-500' : 'bg-white text-gray-600 border-gray-300 hover:border-green-400'
+            }`}
           >
             % Скидка
           </button>

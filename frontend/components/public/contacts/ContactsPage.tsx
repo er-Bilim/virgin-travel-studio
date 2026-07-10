@@ -3,7 +3,7 @@
 import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AlertTriangle, Clock, Mail, MapPin, MessageSquare, Phone, Send } from 'lucide-react';
+import { Clock, CloudOff, Mail, MapPin, MessageSquare, Phone, RotateCw, Send } from 'lucide-react';
 import {
   Accordion,
   AccordionContent,
@@ -11,6 +11,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import ShareButton from '@/components/public/buttons/share/ShareButton';
+import StateCard from '@/components/shared/StateCard';
 import { useContacts } from '@/lib/hooks/contactSettings';
 import { usePublicFaqs } from '@/lib/hooks/faq';
 
@@ -68,21 +69,21 @@ export default function ContactsPage() {
 
   if (isError || isFaqError) {
     return (
-      <div className="w-full py-24 text-center flex flex-col items-center justify-center">
-        <div className="mb-5 inline-flex p-5 items-center justify-center rounded-full bg-red-50 text-red-500">
-          <AlertTriangle className="size-8" aria-hidden="true" />
-        </div>
-        <h1 className="text-2xl font-black text-gray-900 mb-2">Упс, что-то пошло не так</h1>
-        <p className="mb-6 text-sm text-muted-foreground max-w-sm mx-auto px-4">
-          Не удалось загрузить контактную информацию. Пожалуйста, проверьте
-          подключение к интернету или попробуйте обновить страницу.
-        </p>
-        <Button
-          onClick={() => window.location.reload()}
-          className="bg-[#1E2B6D] hover:bg-blue-900 w-full sm:w-auto text-white font-medium text-sm rounded-xl px-5 py-2.5"
-        >
-          Обновить страницу
-        </Button>
+      <div className="w-full py-16 sm:py-24">
+        <StateCard
+          icon={CloudOff}
+          iconClassName="mb-5 flex size-16 items-center justify-center rounded-[18px] bg-red-50 text-red-500"
+          title="Упс, что-то пошло не так"
+          description="Не удалось загрузить контактную информацию. Пожалуйста, проверьте подключение к интернету или попробуйте обновить страницу."
+          actions={[
+            {
+              type: 'button',
+              onClick: () => window.location.reload(),
+              label: 'Обновить страницу',
+              icon: RotateCw,
+            },
+          ]}
+        />
       </div>
     );
   }
