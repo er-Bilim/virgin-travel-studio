@@ -441,7 +441,7 @@ ordersRouter.patch(
 
         if (status && status === 'REJECTED' && order.status !== 'REJECTED') {
           const unBooked = await update_tourSet(order.tourSetId, -1);
-          if (!unBooked && tour.type === "STANDARD")
+          if (!unBooked && order.type === "STANDARD")
             return res.status(400).send({ error: 'Ошибка при снятии брони!' });
         }
 
