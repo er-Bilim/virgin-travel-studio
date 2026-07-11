@@ -40,7 +40,10 @@ export const StatsWidgets = () => {
 
   const onBtnDateClick = (button: string) => {
     const to = new Date();
+    to.setHours(23, 59, 59, 999);
+
     const from = new Date();
+    from.setHours(0, 0, 0, 0);
 
     switch (button) {
       case 'Сегодня':
