@@ -73,6 +73,7 @@ export default function CategoriesManagePage() {
       {title: data.title.trim()},
       {
         onSuccess: () => {
+          setPage(1);
           reset();
           toast.success('Категория успешно создана');
         },
