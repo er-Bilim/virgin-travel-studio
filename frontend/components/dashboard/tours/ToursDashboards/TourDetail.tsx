@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useParams, useRouter, usePathname } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import {
   useTourById,
   useDeleteTour,
@@ -21,17 +21,13 @@ import {
 } from '@/components/ui/dialog';
 import TourSetsTable from '@/components/dashboard/tourSets/TourSetsDashboards/TourSetsTable';
 import { toast } from 'sonner';
-import TourSetReviewsManager
-  from "@/components/dashboard/tourSets/TourSetReviewsManager";
+import TourSetReviewsManager from '@/components/dashboard/tourSets/TourSetReviewsManager';
 
 export default function TourDetails() {
   const { id } = useParams();
   const router = useRouter();
   const user = useUser().data;
-  const pathname = usePathname();
-  const baseToursPath = pathname.startsWith('/admin')
-    ? '/admin/tours'
-    : '/manager/tours';
+  const baseToursPath = '/admin/tours';
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 

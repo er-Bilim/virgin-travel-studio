@@ -158,28 +158,10 @@ export const dashboardMenuItems: DashboardMenuItem[] = [
     icon: LayoutDashboard,
   },
   {
-    label: 'Новости',
-    href: '/manager/news',
-    roles: ['MANAGER'],
-    icon: Newspaper,
-  },
-  {
-    label: 'Туры',
-    href: '/manager/tours',
-    roles: ['MANAGER'],
-    icon: Plane,
-  },
-  {
     label: 'Заявки',
     href: '/manager/leads',
     roles: ['MANAGER'],
     icon: FolderOpen,
-  },
-  {
-    label: 'Отзывы',
-    href: '/manager/reviews',
-    roles: ['MANAGER'],
-    icon: Star,
   },
 ];
 
