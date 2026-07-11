@@ -190,7 +190,7 @@ tourSetsRouter.get(
 tourSetsRouter.post(
   '/',
   auth,
-  permit('ADMIN', 'MANAGER'),
+  permit('ADMIN'),
   async (req, res, next) => {
     try {
       const {
@@ -267,7 +267,7 @@ tourSetsRouter.post(
 tourSetsRouter.patch(
   '/:id',
   auth,
-  permit('ADMIN', 'MANAGER'),
+  permit('ADMIN'),
   validateObjectId(),
   async (req, res, next) => {
     const { id } = req.params;
@@ -334,7 +334,7 @@ tourSetsRouter.patch(
 tourSetsRouter.delete(
   '/:id',
   auth,
-  permit('ADMIN', 'MANAGER'),
+  permit('ADMIN'),
   validateObjectId(),
   async (req, res, next) => {
     const { id } = req.params;
