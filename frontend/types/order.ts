@@ -9,11 +9,7 @@ interface TourLite {
   category: CategoryLite;
 }
 
-export type OrderPayment =
-  | 'CASH'
-  | 'CARD'
-  | 'QR'
-  | 'BANK';
+export type OrderPayment = 'CASH' | 'CARD' | 'QR' | 'BANK';
 
 interface ManagerLite {
   _id: string;
@@ -32,9 +28,18 @@ interface ToursetLite {
   totalSeats: number;
 }
 
-export interface OrderType {
+interface CustomTour {
+  countryCode: string;
+  startDate: string;
+  endDate: string;
+  hotel: string;
+  description: string;
   _id: string;
-  tourSetId: ToursetLite;
+  activities: string[];
+}
+
+interface OrderBase {
+  _id: string;
   clientPhone: string;
   clientName: string;
   status: string;
@@ -45,6 +50,18 @@ export interface OrderType {
   paymentMethod?: OrderPayment;
   paymentAmount?: number;
 }
+
+export type StandardOrder = OrderBase & {
+  type: 'STANDARD';
+  tourSetId: ToursetLite;
+};
+
+export type CustomOrder = OrderBase & {
+  type: 'CUSTOM';
+  customTour: CustomTour;
+};
+
+export type OrderType = CustomOrder | StandardOrder;
 
 export interface PaginatedOrdersResponse {
   orders: OrderType[];
@@ -101,20 +118,16 @@ export interface ContractFormValues {
 }
 
 export type OrderStatus =
-  | 'NEW'
-  | 'IN_PROGRESS'
-  | 'CONTRACT_PENDING'
-  | 'COMPLETED'
-  | 'REJECTED';
+  'NEW' | 'IN_PROGRESS' | 'CONTRACT_PENDING' | 'COMPLETED' | 'REJECTED';
 
-  export interface OrderStats {
-    byStatus: {
-      NEW: number;
-      IN_PROGRESS: number;
-      CONTRACT_PENDING: number;
-      COMPLETED: number;
-      REJECTED: number;
-    };
-    completedToday: number;
-    monthRevenue: number;
-  }
+export interface OrderStats {
+  byStatus: {
+    NEW: number;
+    IN_PROGRESS: number;
+    CONTRACT_PENDING: number;
+    COMPLETED: number;
+    REJECTED: number;
+  };
+  completedToday: number;
+  monthRevenue: number;
+}
