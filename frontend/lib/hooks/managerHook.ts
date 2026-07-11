@@ -36,11 +36,9 @@ export const useCreateManager = (
 
   return useMutation({
     mutationFn: createManager,
-    onSuccess: async (newManager) => {
+    onSuccess: async () => {
       toast.success('Менеджер успешно создался!');
-      queryClient.setQueryData<IUser[]>(['managers'], (old = []) => {
-        return [newManager, ...old];
-      });
+      queryClient.invalidateQueries({ queryKey: ['managers']})
     },
     onError: (err: AxiosError<GlobalError>) => {
       const data = err.response?.data;
@@ -72,20 +70,16 @@ export const useUpdateManager = (setError: UseFormSetError<ManagerUpdateMutation
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: ManagerUpdateMutation }) =>
       updateManager(id, data),
-    onSuccess: async (updatedManager) => {
+    onSuccess: async () => {
       toast.success('Менеджер успешно обновлен!');
-      queryClient.setQueryData<IUser[]>(['managers'], (old = []) =>
-        old.map((manager) =>
-          manager._id === updatedManager._id ? updatedManager : manager,
-        ),
-      );
+      queryClient.invalidateQueries({queryKey: ['managers']});
     },
     onError: (err: AxiosError<GlobalError>) => {
       const data = err.response?.data;
 
       if (!data) {
         return toast.error(
-          'Не удалось создать менеджера. Проверьте соединение и попробуйте снова.',
+          'Не удалось обновить менеджера. Проверьте соединение и попробуйте снова.',
         );
       }
 
@@ -100,7 +94,7 @@ export const useUpdateManager = (setError: UseFormSetError<ManagerUpdateMutation
       }
 
       toast.error(
-        data.error || 'Не удалось создать менеджера. Попробуйте снова.',
+        data.error || 'Не удалось обновить менеджера. Попробуйте снова.',
       );
     },
   });
