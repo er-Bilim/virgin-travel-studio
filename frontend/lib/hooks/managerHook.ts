@@ -7,7 +7,7 @@ import {
   updateManager,
 } from '@/services/manager';
 import type {UseFormSetError} from 'react-hook-form';
-import type {IUser, ManagerMutation, ManagerUpdateMutation} from '@/types/user';
+import type {ManagerMutation, ManagerUpdateMutation} from '@/types/user';
 import type {AxiosError} from 'axios';
 import {toast} from 'sonner';
 import type {GlobalError} from '@/types/error';
