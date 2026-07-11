@@ -152,12 +152,6 @@ export const dashboardMenuItems: DashboardMenuItem[] = [
     icon: CircleUser,
   },
   {
-    label: 'Панель',
-    href: '/manager/dashboard',
-    roles: ['MANAGER'],
-    icon: LayoutDashboard,
-  },
-  {
     label: 'Новости',
     href: '/manager/news',
     roles: ['MANAGER'],
