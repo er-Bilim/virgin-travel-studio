@@ -1,6 +1,11 @@
 import NewsDetailView from '@/components/public/news/NewsDetailView';
 import { getNewsById } from '@/services/news';
-import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query';
+import { getPopularTours } from '@/services/tours';
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from '@tanstack/react-query';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -9,15 +14,22 @@ interface Props {
 const NewsDetailPage = async ({ params }: Props) => {
   const { id } = await params;
   const qc = new QueryClient();
+  const limit: number = 5;
 
-  await qc.prefetchQuery({
-    queryKey: ['news', 'single', id],
-    queryFn: () =>  getNewsById(id)
-  })
+  await Promise.all([
+    qc.prefetchQuery({
+      queryKey: ['news', 'single', id],
+      queryFn: () => getNewsById(id),
+    }),
+    qc.prefetchQuery({
+      queryKey: ['tours', 'popular', limit],
+      queryFn: () => getPopularTours(limit),
+    }),
+  ]);
 
   return (
     <HydrationBoundary state={dehydrate(qc)}>
-      <NewsDetailView id={id}/>
+      <NewsDetailView id={id} tourLimit={limit}/>
     </HydrationBoundary>
   );
 };
