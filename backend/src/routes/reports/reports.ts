@@ -1,14 +1,14 @@
-import {Router, type Request, type Response, type NextFunction} from 'express';
+import {type NextFunction, type Request, type Response, Router} from 'express';
 import mongoose, {Types} from 'mongoose';
 import ExcelJS from 'exceljs';
 
 import Order from '@/model/order/Order.js';
 import validateObjectId from '@/middlewares/validateObjectId.js';
-import type {PopulatedOrder} from "@/types/reports.types.js";
-import {parseDate} from "@/utils/excel/parseDate.js";
-import {applyExcelStyles} from "@/utils/excel/applyExcelStyles.js";
-import auth, {type RequestWithUser} from "@/middlewares/auth.js";
-import permit from "@/middlewares/permit.js";
+import type {PopulatedOrder} from '@/types/reports.types.js';
+import {parseDate} from '@/utils/excel/parseDate.js';
+import {applyExcelStyles} from '@/utils/excel/applyExcelStyles.js';
+import auth, {type RequestWithUser} from '@/middlewares/auth.js';
+import permit from '@/middlewares/permit.js';
 
 async function getDailyManagerReport(req: Request, res: Response, next: NextFunction) {
   try {
@@ -68,7 +68,7 @@ async function getDailyManagerReport(req: Request, res: Response, next: NextFunc
         ? Math.ceil((toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60 * 24))
         : 0;
 
-    if (diffDays > 31) {
+    if (diffDays > 92) {
       return res.status(400).json({
         error: 'Диапазон дат слишком большой (максимум 31 день)',
       });

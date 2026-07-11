@@ -1,11 +1,12 @@
 import {
-  FileUser,
   CircleUser,
+  FileUser,
   FolderOpen,
   LayoutDashboard,
   type LucideIcon,
   Newspaper,
-  Plane, Star,
+  Plane,
+  Star,
   Tags,
   Users
 } from 'lucide-react';
@@ -30,6 +31,8 @@ export const queryConfig = {
     },
   },
 } satisfies ConstructorParameters<typeof QueryClient>[0];
+
+export const REPORT_BUTTONS: string[] = ["Сегодня", "Неделя", "Месяц", "3 месяца"] as const;
 
 export enum UserStatus {
   BANNED = 'banned',
