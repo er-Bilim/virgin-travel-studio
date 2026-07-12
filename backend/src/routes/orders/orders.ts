@@ -6,7 +6,7 @@ import type {
   OrderPayment,
   OrderStatus,
   PassportPayload,
-  PopulatedOrder,
+  PopulatedOrder
 } from '@/types/orders.types.js';
 import mongoose, {Types} from 'mongoose';
 import validateObjectId from '@/middlewares/validateObjectId.js';
@@ -184,7 +184,7 @@ ordersRouter.get(
           REJECTED: byStatus.REJECTED ?? 0,
         },
         completedToday,
-        monthRevenue: monthRevenue[0]?.total ?? 0,
+        monthRevenue: user.role === 'ADMIN' ? monthRevenue[0]?.total ?? 0 : undefined,
       });
     } catch (e) {
       next(e);
