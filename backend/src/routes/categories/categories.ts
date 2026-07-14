@@ -8,7 +8,7 @@ import Tour from '@/model/tour/Tour.js';
 
 const categoriesRouter = express.Router();
 
-categoriesRouter.post('/', auth, permit('ADMIN', 'MANAGER'), async (req, res, next) => {
+categoriesRouter.post('/', auth, permit('ADMIN'), async (req, res, next) => {
   const {title} = req.body;
   if (typeof title !== 'string' || title.trim() === '') {
     return res.status(400).send({error: 'Название обязательно'});
@@ -61,7 +61,7 @@ categoriesRouter.get('/', async (req, res) => {
 categoriesRouter.delete(
   '/:id',
   auth,
-  permit('ADMIN', 'MANAGER'),
+  permit('ADMIN'),
   validateObjectId(),
   async (req, res, next) => {
     const {id} = req.params;
