@@ -68,7 +68,7 @@ async function getDailyManagerReport(req: Request, res: Response, next: NextFunc
         ? Math.ceil((toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60 * 24))
         : 0;
 
-    if (diffDays > 92) {
+    if (diffDays > 93) {
       return res.status(400).json({
         error: 'Диапазон дат слишком большой (максимум 31 день)',
       });
