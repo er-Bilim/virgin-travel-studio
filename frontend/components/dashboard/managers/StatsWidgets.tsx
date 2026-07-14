@@ -6,6 +6,10 @@ import {
   formatToReadablePrice,
   isJsonBlob,
   isValidReportDate,
+  cn,
+  downloadBlobFile,
+  formatToReadablePrice,
+  isJsonBlob,
   parseBlobError
 } from '@/lib/utils';
 import {
@@ -29,6 +33,7 @@ import type {DateRange} from 'react-day-picker';
 import {reportsManager} from '@/services/reports';
 import type {BlobError} from '@/types/error';
 import {REPORT_BUTTONS} from '@/lib/constants';
+
 
 export const StatsWidgets = () => {
   const { data, isLoading, isError } = useOrderStats();
@@ -146,19 +151,27 @@ export const StatsWidgets = () => {
       iconBg: 'bg-green-200',
       value: data.completedToday,
     },
-    {
-      key: 'revenue',
-      label: 'Выручка за месяц',
-      icon: CircleDollarSign,
-      colorClass: 'bg-purple-100 text-purple-700',
-      iconBg: 'bg-purple-200',
-      value: formatToReadablePrice(data.monthRevenue).price,
-    },
+    ...(user?.role === 'ADMIN'
+    ? [
+        {
+          key: 'revenue',
+          label: 'Выручка за месяц',
+          icon: CircleDollarSign,
+          colorClass: 'bg-purple-100 text-purple-700',
+          iconBg: 'bg-purple-200',
+          value: formatToReadablePrice(data.monthRevenue).price,
+        },
+      ]
+    : []),
   ];
   
   return (
       <>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 mt-5">
+        <div className={cn(
+            'grid gap-4 mt-5',
+            user?.role === 'ADMIN' ? 'grid-cols-1 md:grid-cols-4' : 'grid-cols-1 md:grid-cols-3'
+            )}
+        >
           {widgets.map(({ key, label, icon: Icon, colorClass, iconBg, value }) => (
               <div
                   key={key}
@@ -176,15 +189,18 @@ export const StatsWidgets = () => {
               </div>
           ))}
         </div>
-        <div className="flex justify-end mt-4">
-          <Button
-              className="w-full justify-center gap-2 bg-[#1E2B6D] hover:bg-[#162356] sm:w-auto"
-              onClick={() => openModal('reportAllManagers')}
-          >
-            <Download className="h-4 w-4 shrink-0" />
-            <span>{user?.role === 'MANAGER' ? `Получить отчет по ${user.fullName}` : "Отчет по всем менеджерам"}</span>
-          </Button>
-        </div>
+
+        {user?.role === 'ADMIN' &&
+            <div className="flex justify-end mt-4">
+              <Button
+                  className="w-full justify-center gap-2 bg-[#1E2B6D] hover:bg-[#162356] sm:w-auto"
+                  onClick={() => openModal('reportAllManagers')}
+              >
+                <Download className="h-4 w-4 shrink-0" />
+                <span>Отчет по всем менеджерам</span>
+              </Button>
+            </div>
+        }
 
         <Modal id="reportAllManagers" title="Выберете даты для отчета">
           <div className="flex justify-content-start align-items-center gap-2">
