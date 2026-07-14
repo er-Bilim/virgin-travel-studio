@@ -32,6 +32,7 @@ export const queryConfig = {
   },
 } satisfies ConstructorParameters<typeof QueryClient>[0];
 
+export const REPORT_BUTTONS: string[] = ["Сегодня", "Неделя", "Месяц", "3 месяца"] as const;
 export const IMAGE_UPLOAD = {
   MAX_FILE_SIZE_BYTES: 10 * 1024 * 1024,
   ALLOWED_MIME_TYPES: ['image/png', 'image/jpeg', 'image/webp'] as const,

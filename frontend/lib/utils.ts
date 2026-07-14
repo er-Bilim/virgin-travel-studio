@@ -3,6 +3,7 @@ import {twMerge} from 'tailwind-merge';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
 import countries from './countries';
+import type {DateRange} from 'react-day-picker';
 import type {AllowedImageMimeType, ImageValidationResult} from '@/types/multiImage';
 import {IMAGE_UPLOAD} from '@/lib/constants';
 import imageCompression from 'browser-image-compression';
@@ -128,6 +129,21 @@ export const pluralize = (
 export const formatDate = (date: string): string => {
   return dayjs(date).locale('ru').format('D MMMM YYYY');
 };
+
+ export const isValidReportDate = (date?: DateRange): string | null => {
+    if (!date?.from || !date?.to) {
+      return 'Выберите дату';
+    }
+
+    const maxRangeMs = 1000 * 60 * 60 * 24 * 31 * 3;
+    const diff = date?.to.getTime() - date?.from.getTime();
+
+    if (diff > maxRangeMs) {
+      return 'Диапазон дат слишком большой (максимум 3 месяца)';
+    }
+
+    return null;
+  };
 
 export const getCountryOptions = (): { code: string, name: string }[] => {
   const countryOptions = Object.entries(countries.getNames('ru', {select: 'official'})).map(([code, name]) => ({

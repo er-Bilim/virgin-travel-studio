@@ -2,6 +2,10 @@
 
 import {useOrderStats} from '@/lib/hooks/orderHooks';
 import {
+  downloadBlobFile,
+  formatToReadablePrice,
+  isJsonBlob,
+  isValidReportDate,
   cn,
   downloadBlobFile,
   formatToReadablePrice,
@@ -28,6 +32,7 @@ import {useState} from 'react';
 import type {DateRange} from 'react-day-picker';
 import {reportsManager} from '@/services/reports';
 import type {BlobError} from '@/types/error';
+import {REPORT_BUTTONS} from '@/lib/constants';
 
 
 export const StatsWidgets = () => {
@@ -38,13 +43,42 @@ export const StatsWidgets = () => {
   const [errorReport, setErrorReport] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
 
+  const onBtnDateClick = (button: string) => {
+    const to = new Date();
+    to.setHours(23, 59, 59, 999);
+
+    const from = new Date();
+    from.setHours(0, 0, 0, 0);
+
+    switch (button) {
+      case 'Сегодня':
+        break;
+      case 'Неделя':
+        from.setDate(from.getDate() - 7);
+        break;
+      case 'Месяц':
+        from.setMonth(from.getMonth() - 1);
+        break;
+      case '3 месяца':
+        from.setMonth(from.getMonth() - 3);
+    }
+
+    setDateRange({from, to});
+  };
+
   const downloadReport = async () => {
+    const validationError = isValidReportDate(dateRange);
+    if (validationError) {
+      setErrorReport(validationError);
+      return;
+    }
+
+    setIsDownloading(true);
     try {
       const res = await reportsManager({
         from: dateRange?.from?.toISOString(),
         to: dateRange?.to?.toISOString(),
       });
-      setIsDownloading(true);
       downloadBlobFile({
         blob: res.data,
         disposition: res.headers?.["content-disposition"],
@@ -169,6 +203,19 @@ export const StatsWidgets = () => {
         }
 
         <Modal id="reportAllManagers" title="Выберете даты для отчета">
+          <div className="flex justify-content-start align-items-center gap-2">
+            {REPORT_BUTTONS.map((button) => (
+                <Button
+                    key={button}
+                    type="button"
+                    className="cursor-pointer bg-[#1E2B6D] hover:bg-[#162356]"
+                    onClick={() => onBtnDateClick(button)}
+                >
+                  {button}
+                </Button>
+            ))}
+          </div>
+
           <DateRangePicker
               value={dateRange}
               onChange={setDateRange}
