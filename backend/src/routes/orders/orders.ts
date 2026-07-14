@@ -93,7 +93,7 @@ ordersRouter.get(
             select: 'title',
           },
         })
-        .sort({createdAt: -1})
+        .sort(view === 'my' ? { assignedAt: -1 } : { createdAt: -1 })
         .skip(skip)
         .limit(limit)
         .lean();
@@ -403,6 +403,7 @@ ordersRouter.patch(
 
         if (!order.managerId) {
           order.managerId = user._id;
+          order.assignedAt = new Date();
         }
 
         if (clientName) order.clientName = clientName;
