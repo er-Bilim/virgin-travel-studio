@@ -177,10 +177,10 @@ export default function ManagersPage() {
           </div>
         </div>
 
-        <Modal id="reportAllManagers" title="Выберете даты для отчета">
+        <Modal id="reportAllManagers" title="Выберете даты для отчета" description="Отчеты для менеджеров">
           <DateRangePicker
             value={dateRange}
-            onChange={setDateRange}
+            onChangeAction={setDateRange}
             disableFuture
           />
           {errorReport && <p className="text-sm text-red-500">{errorReport}</p>}
@@ -192,7 +192,7 @@ export default function ManagersPage() {
           </Button>
         </Modal>
 
-        <Modal id="createManager" title="Создание менеджера">
+        <Modal id="createManager" title="Создание менеджера" description="Форма создание менеджеров">
           <CreateManagerForm />
         </Modal>
 
@@ -204,7 +204,7 @@ export default function ManagersPage() {
           headerRowClassName={headerRowClassName}
           rowClassName={rowClassName}
           className={tableClassName}
-          onRowClick={(user) => route.push(`managers/${user._id}`)}
+          onRowClickAction={(user) => route.push(`managers/${user._id}`)}
         />
 
         <ConfirmDialog
@@ -213,8 +213,8 @@ export default function ManagersPage() {
           description="Это действие нельзя отменить"
           loading={isChanging}
           confirmText={`${data?.find((m) => m._id === managerToChange)?.status !== 'banned' ? 'Забанить' : 'Разбанить'}`}
-          onCancel={() => setManagerToChange(null)}
-          onConfirm={confirmSetStatus}
+          onCancelAction={() => setManagerToChange(null)}
+          onConfirmAction={confirmSetStatus}
         />
       </div>
     );

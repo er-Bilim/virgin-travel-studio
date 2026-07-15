@@ -238,11 +238,22 @@ const TourSetReviewsManager = ({ tourId }: Props) => {
         </div>
       )}
 
-      <Modal id={ADD_REVIEW_MODAL_ID} title="Добавить отзыв">
-        <CreateReviewForm tourId={tourId} onSuccess={closeModal} />
+      <Modal
+        id={ADD_REVIEW_MODAL_ID}
+        title="Добавить отзыв"
+        description="Форма создание отзыва"
+      >
+        <CreateReviewForm
+          tourId={tourId}
+          onSuccess={closeModal}
+        />
       </Modal>
 
-      <Modal id={REPLY_MODAL_ID} title="Ответить от имени Virgin Travel">
+      <Modal
+        id={REPLY_MODAL_ID}
+        title="Ответить от имени Virgin Travel"
+        description="Форма создание ответа компании на отзыв"
+      >
         <div className="space-y-4">
           <textarea
             value={replyText}
@@ -267,8 +278,8 @@ const TourSetReviewsManager = ({ tourId }: Props) => {
         description="Это действие нельзя отменить."
         confirmText="Удалить"
         loading={isDeleting}
-        onCancel={() => setReviewToDelete(null)}
-        onConfirm={handleDelete}
+        onCancelAction={() => setReviewToDelete(null)}
+        onConfirmAction={handleDelete}
       />
     </section>
   );

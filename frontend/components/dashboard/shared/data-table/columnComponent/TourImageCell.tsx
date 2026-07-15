@@ -3,6 +3,7 @@ import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -49,10 +50,15 @@ export const TourImageCell = ({ tour }: TourImageCellProps) => {
           </button>
         </DialogTrigger>
 
-        <DialogContent className="max-w-4xl flex flex-col items-center">
-          <DialogHeader>
-            <DialogTitle className="sr-only">Просмотр изображения</DialogTitle>
-          </DialogHeader>
+            <DialogContent className="max-w-4xl flex flex-col items-center">
+                <DialogHeader>
+                    <DialogTitle className="sr-only">
+                        Просмотр изображения
+                    </DialogTitle>
+                </DialogHeader>
+              <DialogDescription className="sr-only">
+                Изображение тура
+              </DialogDescription>
 
           <div className="relative flex h-[20vh] w-full items-center justify-center">
             <Image

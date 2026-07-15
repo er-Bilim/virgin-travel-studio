@@ -123,10 +123,11 @@ export default function Manager() {
       <Modal
         id="reportManager"
         title="Отчет по менеджеру"
+        description="Отчеты для менеджеров"
       >
         <DateRangePicker
           value={dateRange}
-          onChange={setDateRange}
+          onChangeAction={setDateRange}
           disableFuture
         />
         {errorReport && (
@@ -146,8 +147,8 @@ export default function Manager() {
         description="Это действие нельзя отменить"
         loading={isChanging}
         confirmText={`${manager?.status !== 'banned' ? 'Забанить' : 'Разбанить'}`}
-        onCancel={() => setManagerToChange(null)}
-        onConfirm={confirmSetStatus}
+        onCancelAction={() => setManagerToChange(null)}
+        onConfirmAction={confirmSetStatus}
       />
     </section>
   );

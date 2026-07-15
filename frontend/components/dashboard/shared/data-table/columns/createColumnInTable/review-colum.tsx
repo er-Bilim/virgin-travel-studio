@@ -43,6 +43,7 @@ export const getReviewColumns = ({
               <button
                 type="button"
                 className="text-blue-600 hover:underline text-sm"
+                aria-label="Просмотр тура"
               >
                 Посмотреть тур
               </button>
@@ -95,6 +96,9 @@ export const getReviewColumns = ({
   {
     accessorKey: 'clientName',
     header: 'Имя клиента',
+    meta: {
+      className: 'hidden md:table-cell',
+    },
     cell: ({ row }) => {
       const author = row.original.clientName;
       return (
@@ -105,6 +109,9 @@ export const getReviewColumns = ({
   {
     accessorKey: 'comment',
     header: 'Текст отзыва',
+    meta: {
+      className: 'hidden xl:table-cell',
+    },
     cell: ({ row }) => {
       const text = row.original.comment;
       return (
@@ -181,6 +188,9 @@ export const getReviewColumns = ({
   {
     accessorKey: 'featuredOnHomepage',
     header: 'на главной',
+    meta: {
+      className: 'hidden lg:table-cell',
+    },
     cell: ({ row }) => {
       const review = row.original;
 

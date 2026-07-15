@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { createActionsColumn } from '@/components/dashboard/shared/data-table/columns/createActionsColumn';
 import {
   Dialog,
-  DialogContent,
+  DialogContent, DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -42,23 +42,27 @@ export const getNewsColumns = ({
       }
 
       return (
-        <div onClick={(e) => e.stopPropagation()}>
-          <Dialog>
-            <DialogTrigger asChild>
-              <button
-                type="button"
-                className="text-blue-600 hover:underline text-sm"
-              >
-                Посмотреть
-              </button>
-            </DialogTrigger>
+          <div onClick={(e) => e.stopPropagation()}>
+        <Dialog>
+          <DialogTrigger asChild>
+            <button
+              type="button"
+              className="text-blue-600 hover:underline text-sm"
+              aria-label="Просмотр изображения"
+            >
+              Посмотреть
+            </button>
+          </DialogTrigger>
 
-            <DialogContent className="max-w-4xl flex flex-col items-center">
-              <DialogHeader>
-                <DialogTitle className="sr-only">
-                  Просмотр изображения
-                </DialogTitle>
-              </DialogHeader>
+          <DialogContent className="max-w-4xl flex flex-col items-center">
+            <DialogHeader>
+              <DialogTitle className="sr-only">
+                Просмотр изображения
+              </DialogTitle>
+            </DialogHeader>
+            <DialogDescription className="sr-only">
+              Картинка новости
+            </DialogDescription>
 
               <div className="relative flex h-[20vh] w-full items-center justify-center">
                 <Image
