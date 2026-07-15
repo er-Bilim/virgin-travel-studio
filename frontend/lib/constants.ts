@@ -174,7 +174,7 @@ export const dashboardMenuItems: DashboardMenuItem[] = [
     href: '/manager/leads',
     roles: ['MANAGER'],
     icon: FolderOpen,
-    }
+  }
 ];
 
 export const roleDashboardPaths: Record<UserRole, string> = {
