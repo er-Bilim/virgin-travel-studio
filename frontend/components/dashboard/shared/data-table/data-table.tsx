@@ -1,13 +1,13 @@
 'use client';
 
-import type { ColumnDef } from '@tanstack/react-table';
+import type {ColumnDef} from '@tanstack/react-table';
 import {
   flexRender,
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import type { PaginationType } from '@/types/pagination';
-import { PaginationCustom } from '@/components/pagination/PaginationCustom';
+import type {PaginationType} from '@/types/pagination';
+import {PaginationCustom} from '@/components/pagination/PaginationCustom';
 import {
   Table,
   TableBody,
@@ -16,8 +16,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Loader } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import {Loader} from 'lucide-react';
+import {cn} from '@/lib/utils';
 
 type DataTableProps<TData, TValue> = {
   columns: ColumnDef<TData, TValue>[];
@@ -32,7 +32,7 @@ type DataTableProps<TData, TValue> = {
 
   headerRowClassName?: string;
   rowClassName?: string | ((row: TData) => string);
-  onRowClick?: (row: TData) => void;
+  onRowClickAction?: (row: TData) => void;
 };
 
 declare module '@tanstack/react-table' {
@@ -43,16 +43,16 @@ declare module '@tanstack/react-table' {
 }
 
 export function DataTable<TData, TValue>({
-  columns,
-  data,
-  isLoading,
-  isError,
-  pagination,
-  className,
-  headerRowClassName,
-  rowClassName,
-  onRowClick,
-}: DataTableProps<TData, TValue>) {
+                                           columns,
+                                           data,
+                                           isLoading,
+                                           isError,
+                                           pagination,
+                                           className,
+                                           headerRowClassName,
+                                           rowClassName,
+                                           onRowClickAction,
+                                         }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
@@ -90,20 +90,33 @@ export function DataTable<TData, TValue>({
         <Table className={cn('w-full', className)}>
           <TableHeader className="max-sm:hidden">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className={headerRowClassName}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    className={cn(header.column.columnDef.meta?.className)}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
+              <TableRow
+                key={headerGroup.id}
+                className={headerRowClassName}
+              >
+                {headerGroup.headers.map((header) => {
+                  const isSorted = header.column.getIsSorted();
+                  const ariaSort = isSorted === 'asc'
+                    ? 'ascending'
+                    : isSorted === 'desc'
+                      ? 'descending'
+                      : 'none';
+
+                  return (
+                    <TableHead
+                      key={header.id}
+                      className={cn(header.column.columnDef.meta?.className)}
+                      aria-sort={header.column.getCanSort() ? ariaSort : undefined}
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
                           header.column.columnDef.header,
                           header.getContext(),
                         )}
-                  </TableHead>
-                ))}
+                    </TableHead>
+                  )
+                })}
               </TableRow>
             ))}
           </TableHeader>
@@ -121,10 +134,10 @@ export function DataTable<TData, TValue>({
                     key={row.id}
                     className={cn(
                       rowClass,
-                      onRowClick && 'cursor-pointer hover:bg-muted/50',
+                      onRowClickAction && 'cursor-pointer hover:bg-muted/50',
                       'max-sm:flex max-sm:flex-col max-sm:border-b max-sm:p-4 max-sm:gap-2',
                     )}
-                    onClick={() => onRowClick?.(row.original)}
+                    onClick={() => onRowClickAction?.(row.original)}
                   >
                     {row.getVisibleCells().map((cell) => {
                       const headerLabel =

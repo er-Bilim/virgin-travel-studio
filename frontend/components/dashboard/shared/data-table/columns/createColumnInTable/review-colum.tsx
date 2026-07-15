@@ -43,6 +43,7 @@ export const getReviewColumns = ({
               <button
                 type="button"
                 className="text-blue-600 hover:underline text-sm"
+                aria-label="Просмотр тура"
               >
                 Посмотреть тур
               </button>

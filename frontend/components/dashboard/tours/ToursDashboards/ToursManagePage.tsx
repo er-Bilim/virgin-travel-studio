@@ -211,8 +211,8 @@ export default function ToursManagePage() {
         description="Это действие нельзя отменить"
         loading={isDeleting}
         confirmText="Удалить"
-        onCancel={() => setTourToDelete(null)}
-        onConfirm={confirmDelete}
+        onCancelAction={() => setTourToDelete(null)}
+        onConfirmAction={confirmDelete}
       />
 
       {isLoading ? (
@@ -250,7 +250,7 @@ export default function ToursManagePage() {
           headerRowClassName={headerRowClassName}
           rowClassName={rowClassName}
           className={tableClassName}
-          onRowClick={(tour) => router.push(`${path}/${tour._id}`)}
+          onRowClickAction={(tour) => router.push(`${path}/${tour._id}`)}
         />
       )}
     </div>

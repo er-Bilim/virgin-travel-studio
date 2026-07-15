@@ -34,6 +34,7 @@ export default function ReviewsList() {
   const { mutate: updateReview } = useApproveReview();
   const { mutate: featureReview } = useFeatureReview();
 
+
   const {
     data: reviewsData,
     isLoading,
@@ -46,40 +47,39 @@ export default function ReviewsList() {
   });
 
   const reviews = reviewsData?.reviews;
-
   const columns = useMemo(
-      () =>
-          getReviewColumns({
-            onView: (review: IReview) => {
-              const currentPath = window.location.pathname;
-              const basePath = currentPath.startsWith('/manager')
-                  ? '/manager'
-                  : '/admin';
+    () =>
+      getReviewColumns({
+        onView: (review: IReview) => {
+          const currentPath = window.location.pathname;
+          const basePath = currentPath.startsWith('/manager')
+            ? '/manager'
+            : '/admin';
 
-              router.push(
-                  `${basePath}/tours/${review.tourId._id}#review-${review._id}`,
-              );
-            },
+          router.push(
+            `${basePath}/tours/${review.tourId._id}#review-${review._id}`,
+          );
+        },
 
-            onDelete: (review: IReview) => {
-              setReviewToDelete(review._id);
-            },
+        onDelete: (review: IReview) => {
+          setReviewToDelete(review._id);
+        },
 
-            onTogglePublish: (review: IReview) => {
-              const status =
-                  review.isModerated === 'approved' ? 'rejected' : 'approved';
+        onTogglePublish: (review: IReview) => {
+          const status =
+            review.isModerated === 'approved' ? 'rejected' : 'approved';
 
-              updateReview({
-                id: review._id,
-                isModerated: status,
-              });
-            },
+          updateReview({
+            id: review._id,
+            isModerated: status,
+          });
+        },
 
-            onCheckedChange: (review: IReview) => {
-              featureReview(review._id);
-            },
-          }),
-      [featureReview, router, updateReview],
+        onCheckedChange: (review: IReview) => {
+          featureReview(review._id);
+        },
+      }),
+    [featureReview, router, updateReview],
   );
 
   const confirmDelete = () => {
@@ -121,7 +121,7 @@ export default function ReviewsList() {
             Отзывы
           </h1>
 
-          <div className="w-full min-w-0 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-4">
             <Tabs
                 value={modearateStatusFilter}
                 onValueChange={(value) => {
@@ -154,7 +154,6 @@ export default function ReviewsList() {
                 >
                   Одобренные отзывы
                 </TabsTrigger>
-
                 <TabsTrigger
                     value="rejected"
                     className="shrink-0 whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium text-gray-500 transition-all hover:text-[#1E2B6D] data-[state=active]:bg-white data-[state=active]:text-[#1E2B6D] data-[state=active]:shadow-sm"
@@ -174,14 +173,14 @@ export default function ReviewsList() {
         </div>
 
         <DataTable
-            data={reviews || []}
-            columns={columns}
-            isError={isError}
-            isLoading={isLoading}
-            headerRowClassName={headerRowClassName}
-            rowClassName={rowClassName}
-            className={tableClassName}
-            onRowClick={handleRowClick}
+          data={reviews || []}
+          columns={columns}
+          isError={isError}
+          isLoading={isLoading}
+          headerRowClassName={headerRowClassName}
+          rowClassName={rowClassName}
+          className={tableClassName}
+          onRowClickAction={handleRowClick}
         />
 
         {isError && (
@@ -215,13 +214,13 @@ export default function ReviewsList() {
             )}
 
         <ConfirmDialog
-            open={Boolean(reviewToDelete)}
-            title="Вы уверены, что хотите удалить отзыв?"
-            description="Это действие нельзя отменить"
-            loading={isDeleting}
-            confirmText="Удалить"
-            onCancel={() => setReviewToDelete(null)}
-            onConfirm={confirmDelete}
+          open={!!reviewToDelete}
+          title="Вы уверенны что хотите удалить отзыв?"
+          description="Это действие нельзя отменить"
+          loading={isDeleting}
+          confirmText="Удалить"
+          onCancelAction={() => setReviewToDelete(null)}
+          onConfirmAction={confirmDelete}
         />
       </div>
   );

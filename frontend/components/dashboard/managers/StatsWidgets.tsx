@@ -93,7 +93,7 @@ export const StatsWidgets = () => {
         return;
       }
 
-      setErrorReport('Неизвестная ошибка при генерации отчёта');
+      setErrorReport("Неизвестная ошибка при генерации отчёта");
     } finally {
       setIsDownloading(false);
     }
@@ -218,7 +218,7 @@ export const StatsWidgets = () => {
 
         <DateRangePicker
           value={dateRange}
-          onChange={setDateRange}
+          onChangeAction={setDateRange}
           disableFuture
         />
         {errorReport && <p className="text-sm text-red-500">{errorReport}</p>}

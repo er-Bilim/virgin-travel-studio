@@ -12,7 +12,7 @@ import {useState} from "react";
 
 type Props = {
     value: DateRange | undefined;
-    onChange: (range: DateRange | undefined) => void;
+    onChangeAction: (range: DateRange | undefined) => void;
     placeholder?: string;
     disableFuture?: boolean;
     maxDate?: Date;
@@ -22,7 +22,7 @@ type Props = {
 
 export function DateRangePicker({
                                     value,
-                                    onChange,
+                                  onChangeAction,
                                     placeholder = "Выберите диапазон дат",
                                     disableFuture,
                                     maxDate,
@@ -76,7 +76,7 @@ export function DateRangePicker({
                     autoFocus
                     mode="range"
                     selected={value}
-                    onSelect={onChange}
+                    onSelect={onChangeAction}
                     numberOfMonths={numberOfMonths}
                     disabled={(date) => {
                         if (disableFuture && date > today) return true;
