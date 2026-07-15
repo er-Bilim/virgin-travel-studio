@@ -1,24 +1,38 @@
 'use client';
 
 import {useOrderStats} from '@/lib/hooks/orderHooks';
-import {downloadBlobFile, formatToReadablePrice, isJsonBlob, parseBlobError} from '@/lib/utils';
+import {
+  downloadBlobFile,
+  formatToReadablePrice,
+  isJsonBlob,
+  isValidReportDate,
+  cn,
+  downloadBlobFile,
+  formatToReadablePrice,
+  isJsonBlob,
+  parseBlobError
+} from '@/lib/utils';
 import {
   CheckCircle,
   CircleDollarSign,
-  Clock, Download,
+  Clock,
+  Download,
   FileText,
   TrendingUp
 } from 'lucide-react';
 import {Spinner} from '@/components/ui/spinner';
 import {useUser} from '@/lib/hooks/authHooks';
-import {Button} from "@/components/ui/button";
-import {Modal} from "@/components/shared/Modal";
-import {DateRangePicker} from "@/components/dashboard/shared/date-range-picker/DateRangePicker";
-import {useModalStore} from "@/lib/stores/modalStore";
-import {useState} from "react";
-import type {DateRange} from "react-day-picker";
-import {reportsManager} from "@/services/reports";
-import type {BlobError} from "@/types/error";
+import {Button} from '@/components/ui/button';
+import {Modal} from '@/components/shared/Modal';
+import {
+  DateRangePicker
+} from '@/components/dashboard/shared/date-range-picker/DateRangePicker';
+import {useModalStore} from '@/lib/stores/modalStore';
+import {useState} from 'react';
+import type {DateRange} from 'react-day-picker';
+import {reportsManager} from '@/services/reports';
+import type {BlobError} from '@/types/error';
+import {REPORT_BUTTONS} from '@/lib/constants';
 
 
 export const StatsWidgets = () => {
@@ -29,13 +43,42 @@ export const StatsWidgets = () => {
   const [errorReport, setErrorReport] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
 
+  const onBtnDateClick = (button: string) => {
+    const to = new Date();
+    to.setHours(23, 59, 59, 999);
+
+    const from = new Date();
+    from.setHours(0, 0, 0, 0);
+
+    switch (button) {
+      case 'Сегодня':
+        break;
+      case 'Неделя':
+        from.setDate(from.getDate() - 7);
+        break;
+      case 'Месяц':
+        from.setMonth(from.getMonth() - 1);
+        break;
+      case '3 месяца':
+        from.setMonth(from.getMonth() - 3);
+    }
+
+    setDateRange({from, to});
+  };
+
   const downloadReport = async () => {
+    const validationError = isValidReportDate(dateRange);
+    if (validationError) {
+      setErrorReport(validationError);
+      return;
+    }
+
+    setIsDownloading(true);
     try {
       const res = await reportsManager({
         from: dateRange?.from?.toISOString(),
         to: dateRange?.to?.toISOString(),
       });
-      setIsDownloading(true);
       downloadBlobFile({
         blob: res.data,
         disposition: res.headers?.["content-disposition"],
@@ -108,19 +151,27 @@ export const StatsWidgets = () => {
       iconBg: 'bg-green-200',
       value: data.completedToday,
     },
-    {
-      key: 'revenue',
-      label: 'Выручка за месяц',
-      icon: CircleDollarSign,
-      colorClass: 'bg-purple-100 text-purple-700',
-      iconBg: 'bg-purple-200',
-      value: formatToReadablePrice(data.monthRevenue).price,
-    },
+    ...(user?.role === 'ADMIN'
+    ? [
+        {
+          key: 'revenue',
+          label: 'Выручка за месяц',
+          icon: CircleDollarSign,
+          colorClass: 'bg-purple-100 text-purple-700',
+          iconBg: 'bg-purple-200',
+          value: formatToReadablePrice(data.monthRevenue).price,
+        },
+      ]
+    : []),
   ];
   
   return (
       <>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 mt-5">
+        <div className={cn(
+            'grid gap-4 mt-5',
+            user?.role === 'ADMIN' ? 'grid-cols-1 md:grid-cols-4' : 'grid-cols-1 md:grid-cols-3'
+            )}
+        >
           {widgets.map(({ key, label, icon: Icon, colorClass, iconBg, value }) => (
               <div
                   key={key}
@@ -138,17 +189,33 @@ export const StatsWidgets = () => {
               </div>
           ))}
         </div>
-        <div className="flex justify-end mt-4">
-          <Button
-              className="w-full justify-center gap-2 bg-[#1E2B6D] hover:bg-[#162356] sm:w-auto"
-              onClick={() => openModal('reportAllManagers')}
-          >
-            <Download className="h-4 w-4 shrink-0" />
-            <span>{user?.role === 'MANAGER' ? `Получить отчет по ${user.fullName}` : "Отчет по всем менеджерам"}</span>
-          </Button>
-        </div>
+
+        {user?.role === 'ADMIN' &&
+            <div className="flex justify-end mt-4">
+              <Button
+                  className="w-full justify-center gap-2 bg-[#1E2B6D] hover:bg-[#162356] sm:w-auto"
+                  onClick={() => openModal('reportAllManagers')}
+              >
+                <Download className="h-4 w-4 shrink-0" />
+                <span>Отчет по всем менеджерам</span>
+              </Button>
+            </div>
+        }
 
         <Modal id="reportAllManagers" title="Выберете даты для отчета">
+          <div className="flex justify-content-start align-items-center gap-2">
+            {REPORT_BUTTONS.map((button) => (
+                <Button
+                    key={button}
+                    type="button"
+                    className="cursor-pointer bg-[#1E2B6D] hover:bg-[#162356]"
+                    onClick={() => onBtnDateClick(button)}
+                >
+                  {button}
+                </Button>
+            ))}
+          </div>
+
           <DateRangePicker
               value={dateRange}
               onChange={setDateRange}

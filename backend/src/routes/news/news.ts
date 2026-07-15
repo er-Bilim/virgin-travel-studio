@@ -191,7 +191,7 @@ newsRouter.get(
 newsRouter.post(
   '/',
   auth,
-  permit('ADMIN', 'MANAGER'),
+  permit('ADMIN'),
   imageMemoryUpload.single('image'),
   async (req, res, next) => {
     try {
@@ -265,7 +265,7 @@ newsRouter.get('/image/:id', async (req, res, next) => {
 newsRouter.delete(
   '/:id',
   auth,
-  permit('ADMIN', 'MANAGER'),
+  permit('ADMIN'),
   validateObjectId(),
   async (req, res, next) => {
     const { id } = req.params;
@@ -300,7 +300,7 @@ newsRouter.delete(
 newsRouter.patch(
   '/:id/isPublished',
   auth,
-  permit('ADMIN', 'MANAGER'),
+  permit('ADMIN'),
   validateObjectId(),
   async (req, res, next) => {
     const { id } = req.params;
@@ -325,7 +325,7 @@ newsRouter.patch(
 newsRouter.patch(
   '/:id/edit',
   auth,
-  permit('ADMIN', 'MANAGER'),
+  permit('ADMIN'),
   validateObjectId(),
   imagesUpload.single('image'),
   async (req, res, next) => {

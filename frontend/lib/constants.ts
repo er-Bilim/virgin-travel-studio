@@ -1,11 +1,12 @@
 import {
-  FileUser,
   CircleUser,
+  FileUser,
   FolderOpen,
   LayoutDashboard,
   type LucideIcon,
   Newspaper,
-  Plane, Star,
+  Plane,
+  Star,
   Tags,
   Users
 } from 'lucide-react';
@@ -30,6 +31,17 @@ export const queryConfig = {
     },
   },
 } satisfies ConstructorParameters<typeof QueryClient>[0];
+
+export const REPORT_BUTTONS: string[] = ["Сегодня", "Неделя", "Месяц", "3 месяца"] as const;
+export const IMAGE_UPLOAD = {
+  MAX_FILE_SIZE_BYTES: 10 * 1024 * 1024,
+  ALLOWED_MIME_TYPES: ['image/png', 'image/jpeg', 'image/webp'] as const,
+  MAX_FILES: 5,
+  COMPRESSION: {
+    MAX_SIZE_MB: 1,
+    MAX_WIDTH_OR_HEIGHT: 1600,
+  },
+} as const;
 
 export enum UserStatus {
   BANNED = 'banned',
@@ -158,28 +170,10 @@ export const dashboardMenuItems: DashboardMenuItem[] = [
     icon: LayoutDashboard,
   },
   {
-    label: 'Новости',
-    href: '/manager/news',
-    roles: ['MANAGER'],
-    icon: Newspaper,
-  },
-  {
-    label: 'Туры',
-    href: '/manager/tours',
-    roles: ['MANAGER'],
-    icon: Plane,
-  },
-  {
     label: 'Заявки',
     href: '/manager/leads',
     roles: ['MANAGER'],
     icon: FolderOpen,
-  },
-  {
-    label: 'Отзывы',
-    href: '/manager/reviews',
-    roles: ['MANAGER'],
-    icon: Star,
   },
 ];
 

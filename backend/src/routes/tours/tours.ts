@@ -277,7 +277,7 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
   }
 });
 
-toursRouter.get('/countries', async (req, res, next) => {
+toursRouter.get('/countries', async (_req, res, next) => {
   try {
     const countries = await Tour.distinct('countryCode');
 
@@ -397,7 +397,7 @@ toursRouter.get(
 toursRouter.post(
   '/',
   auth,
-  permit('ADMIN', 'MANAGER'),
+  permit('ADMIN'),
   imagesUpload.array('images', 5),
   async (req, res, next) => {
     try {
@@ -446,7 +446,7 @@ toursRouter.post(
 toursRouter.patch(
   '/:id',
   auth,
-  permit('ADMIN', 'MANAGER'),
+  permit('ADMIN'),
   validateObjectId(),
   imagesUpload.array('images', 5),
   async (req, res, next) => {
