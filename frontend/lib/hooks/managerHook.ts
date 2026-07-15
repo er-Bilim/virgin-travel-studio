@@ -1,10 +1,10 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {
   createManager,
+  setStatusManager,
   getManagers,
   getOneManager,
-  setStatusManager,
-  updateManager
+  updateManager,
 } from '@/services/manager';
 import type {UseFormSetError} from 'react-hook-form';
 import type {ManagerMutation, ManagerUpdateMutation} from '@/types/user';
