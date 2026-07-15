@@ -40,6 +40,7 @@ interface Props {
 
 export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
   const router = useRouter();
+  const baseToursPath = '/admin/tours';
   const { data: categoriesData, isLoading: isCatsLoading } = useCategories();
   const { mutate: createTour, isPending: isCreating } = useCreateTour();
   const { mutate: updateTour, isPending: isUpdating } = useUpdateTour();
@@ -81,7 +82,7 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
       createTour(data, {
         onSuccess: () => {
           reset();
-          router.push('/manager/tours');
+          router.push(baseToursPath);
         },
       });
     } else {
@@ -91,7 +92,7 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
         { id: tourId, data },
         {
           onSuccess: () => {
-            router.push('/manager/tours');
+            router.push(baseToursPath);
           },
         },
       );

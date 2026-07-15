@@ -1,13 +1,14 @@
 'use client';
 
 import {CalendarDays} from 'lucide-react';
-import {imageUrl} from '@/lib/constants';
+import {imageUrl, isDev} from '@/lib/constants';
 import {formatDayAndMonthWords, truncateText} from '@/lib/utils';
 import ErrorState from '@/components/shared/ErrorState';
 import LatestNewsSkeleton
   from '@/components/shared/skeletons/LatestNewsSkeleton';
 import {useNews} from '@/lib/hooks/newsHooks';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const LatestNews = () => {
   const limit: number = 5;
@@ -70,12 +71,15 @@ const LatestNews = () => {
                 href={`/news/${featured._id}`}
                 className="group flex w-full flex-col overflow-hidden rounded-3xl border border-border bg-card transition duration-300 hover:-translate-y-1 hover:border-cyan-500"
               >
-                <div className="aspect-[16/10] overflow-hidden lg:aspect-auto lg:h-[400px]">
+                <div className="relative aspect-[16/10] overflow-hidden lg:aspect-auto lg:h-[400px]">
                   {featured.image ? (
-                    <img
+                    <Image
                       src={`${imageUrl}api/news/image/${featured.image}`}
                       alt={featured.title}
                       className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                      unoptimized={isDev}
+                      priority
+                      fill
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center bg-muted text-sm text-muted-foreground">
@@ -130,14 +134,15 @@ const LatestNews = () => {
                     href={`/news/${singleNews._id}`}
                     className="group flex flex-1 overflow-hidden rounded-2xl border border-border bg-card transition duration-300 hover:-translate-y-1 hover:border-cyan-500"
                   >
-                    <div className="w-30 shrink-0 overflow-hidden sm:w-50">
+                    <div className="relative w-30 shrink-0 overflow-hidden sm:w-50">
                       {singleNews.image ? (
-                        <img
-                          src={
-                            `${imageUrl}api/news/image/${singleNews.image}`
-                          }
+                        <Image
+                          src={`${imageUrl}api/news/image/${singleNews.image}`}
                           alt={singleNews.title}
-                          className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                          fill
+                          sizes="(min-width: 640px) 200px, 120px"
+                          unoptimized={isDev}
+                          className="object-cover transition duration-300 group-hover:scale-105"
                         />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center bg-muted text-xs text-muted-foreground">

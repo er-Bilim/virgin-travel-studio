@@ -1,14 +1,14 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import News from '@/model/New/News.js';
-import auth, {authOrNot, type RequestWithUser} from '@/middlewares/auth.js';
+import auth, { authOrNot, type RequestWithUser } from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
-import {imageMemoryUpload, imagesUpload} from '@/middlewares/multer.js';
-import type {NewsFields} from '@/types/news.types.js';
+import { imageMemoryUpload, imagesUpload } from '@/middlewares/multer.js';
+import type { NewsFields } from '@/types/news.types.js';
 import validateObjectId from '@/middlewares/validateObjectId.js';
-import {getGridFSBucket} from '@/index.js';
-import {uploadImageToGridFS} from '@/lib/gridfs.js';
-import {ObjectId} from 'mongodb';
+import { getGridFSBucket } from '@/index.js';
+import { uploadImageToGridFS } from '@/lib/gridfs.js';
+import { ObjectId } from 'mongodb';
 
 const newsRouter = express.Router();
 
@@ -152,7 +152,7 @@ newsRouter.get(
 newsRouter.post(
   '/',
   auth,
-  permit('ADMIN', 'MANAGER'),
+  permit('ADMIN'),
   imageMemoryUpload.single('image'),
   async (req, res, next) => {
     try {
@@ -226,7 +226,7 @@ newsRouter.get('/image/:id', async (req, res, next) => {
 newsRouter.delete(
   '/:id',
   auth,
-  permit('ADMIN', 'MANAGER'),
+  permit('ADMIN'),
   validateObjectId(),
   async (req, res, next) => {
     const { id } = req.params;
@@ -261,7 +261,7 @@ newsRouter.delete(
 newsRouter.patch(
   '/:id/isPublished',
   auth,
-  permit('ADMIN', 'MANAGER'),
+  permit('ADMIN'),
   validateObjectId(),
   async (req, res, next) => {
     const { id } = req.params;
@@ -286,7 +286,7 @@ newsRouter.patch(
 newsRouter.patch(
   '/:id/edit',
   auth,
-  permit('ADMIN', 'MANAGER'),
+  permit('ADMIN'),
   validateObjectId(),
   imagesUpload.single('image'),
   async (req, res, next) => {

@@ -1,25 +1,27 @@
-import {Badge} from "@/components/ui/badge";
-import BasePhoto from "@/components/assets/lake.webp";
-import {
-  Card,
-} from "@/components/ui/card";
-import type {TourType} from "@/types/tour";
-import {imageUrl} from "@/lib/constants";
+import { Badge } from '@/components/ui/badge';
+import BasePhoto from '@/components/assets/lake.webp';
+import { Card } from '@/components/ui/card';
+import type { TourType } from '@/types/tour';
+import { imageUrl, isDev } from '@/lib/constants';
+import Image from 'next/image';
 
 interface Props {
   tour: TourType;
 }
 
-export function TourCard({tour}: Props) {
+export function TourCard({ tour }: Props) {
   const image =
     tour.images.length > 0 ? imageUrl + tour.images[0] : BasePhoto.src;
 
   return (
     <Card className="group relative mx-auto h-[420px] w-full overflow-hidden rounded-3xl border-0 bg-black text-white shadow-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)]">
-      <img
+      <Image
         src={image}
-        alt="tour"
-        className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+        alt={tour.title ?? 'Фото тура'}
+        fill
+        sizes="(min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw"
+        unoptimized={isDev}
+        className="object-cover transition-transform duration-700 group-hover:scale-110"
       />
 
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
@@ -38,7 +40,9 @@ export function TourCard({tour}: Props) {
 
         <div>
           <div className="mb-5">
-            <h2 className="text-xl md:text-2xl font-black leading-none">{tour.title}</h2>
+            <h2 className="text-xl md:text-2xl font-black leading-none">
+              {tour.title}
+            </h2>
 
             <p className="mt-3 text-zinc-300">{tour.description}</p>
           </div>
@@ -56,7 +60,7 @@ export function TourCard({tour}: Props) {
           {/*
           <Button
             onClick={() =>
-              
+
             }
             className="h-14 w-full rounded-2xl bg-white text-lg font-bold text-black hover:bg-zinc-200"
           >

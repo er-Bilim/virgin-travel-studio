@@ -10,7 +10,7 @@ import {
   CarouselItem,
   type CarouselApi,
 } from '@/components/ui/carousel';
-import { imageUrl } from '@/lib/constants';
+import { imageUrl, isDev } from '@/lib/constants';
 import { useGetFeaturedReviews } from '@/lib/hooks/reviewHooks';
 import { cn, formatDayAndMonthWords } from '@/lib/utils';
 import {
@@ -20,13 +20,19 @@ import {
   MessageCircleHeart,
   Compass,
 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { IoSparkles } from 'react-icons/io5';
 
 const ReviewsCarousel = () => {
-  const { data: reviews, isLoading, isError, refetch } = useGetFeaturedReviews();
+  const {
+    data: reviews,
+    isLoading,
+    isError,
+    refetch,
+  } = useGetFeaturedReviews();
   const [api, setApi] = useState<CarouselApi>();
   const router = useRouter();
 
@@ -120,12 +126,12 @@ const ReviewsCarousel = () => {
                         </p>
 
                         {review.image && (
-                          <div className="mb-5 aspect-video overflow-hidden rounded-[13px]">
-                            <img
+                          <div className="relative mb-5 aspect-video overflow-hidden rounded-[13px]">
+                            <Image
                               src={`${imageUrl}${review.image}`}
                               alt={`Фото к отзыву от ${review.clientName}`}
-                              loading="lazy"
                               className="size-full object-cover"
+                              unoptimized={isDev}
                             />
                           </div>
                         )}
