@@ -27,6 +27,10 @@ newsRouter.get(
         tags?: { $in: string[] };
         title?: { $regex: string; $options: 'i' };
         author?: string;
+        createdAt?: {
+          $gte?: Date;
+          $lte?: Date;
+        };
       } = {};
 
       const rawPage = Number.parseInt(req.query.page as string, 10);
@@ -78,6 +82,41 @@ newsRouter.get(
       if (typeof authorId === 'string') {
         if (authorId.trim().length > 0) {
           query.author = authorId;
+        }
+      }
+
+      const startDate = req.query.startDate;
+      const endDate = req.query.endDate;
+
+      const hasStart = typeof startDate === 'string' && startDate.trim();
+      const hasEnd = typeof endDate === 'string' && endDate.trim();
+
+      if (hasStart || hasEnd) {
+        const createdAt: {
+          $gte?: Date;
+          $lte?: Date;
+        } = {};
+
+        if (hasStart) {
+          const from = new Date(startDate);
+
+          if (!Number.isNaN(from.getTime())) {
+            from.setHours(0, 0, 0, 0);
+            createdAt.$gte = from;
+          }
+        }
+
+        if (hasEnd) {
+          const to = new Date(endDate);
+
+          if (!Number.isNaN(to.getTime())) {
+            to.setHours(23, 59, 59, 999);
+            createdAt.$lte = to;
+          }
+        }
+
+        if (Object.keys(createdAt).length > 0) {
+          query.createdAt = createdAt;
         }
       }
 

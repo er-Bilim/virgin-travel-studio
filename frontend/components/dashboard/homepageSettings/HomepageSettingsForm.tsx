@@ -12,8 +12,7 @@ import {
   ConfirmDialog
 } from '@/components/dashboard/ConfirmDialog/ConfirmDialog';
 import AdvantageItem from './advantages/advantageItem';
-
-import type {HomepageSettingsMutationData} from '@/types/homepageSettings';
+import type { HomepageSettingsMutationData } from '@/types/homepageSettings';
 import {
   mutateCreateHomepageSettings,
   mutateHomepageSettings,
