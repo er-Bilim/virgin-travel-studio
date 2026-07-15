@@ -1,7 +1,7 @@
 'use client';
 
 import {CalendarDays} from 'lucide-react';
-import {imageUrl} from '@/lib/constants';
+import {imageUrl, isDev} from '@/lib/constants';
 import {formatDayAndMonthWords, truncateText} from '@/lib/utils';
 import ErrorState from '@/components/shared/ErrorState';
 import LatestNewsSkeleton
