@@ -4,7 +4,7 @@ import {
   DialogContent,
   DialogTrigger,
   DialogTitle,
-  DialogClose,
+  DialogClose, DialogDescription,
 } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { apiURL, isDev } from '@/lib/constants';
@@ -54,6 +54,9 @@ const ReviewPhoto = ({ src, authorName, rating }: Props) => {
         <VisuallyHidden>
           <DialogTitle>Фото от {authorName}</DialogTitle>
         </VisuallyHidden>
+        <DialogDescription className="sr-only">
+          Фото отзыва
+        </DialogDescription>
 
         <figure className="flex flex-col overflow-hidden rounded-lg bg-card">
           <div className="flex flex-1 items-center justify-center bg-black/95">

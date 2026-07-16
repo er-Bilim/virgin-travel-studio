@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useParams, useRouter, usePathname } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import {
   useTourById,
   useDeleteTour,
@@ -10,28 +10,25 @@ import {
 import { useUser } from '@/lib/hooks/authHooks';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, Globe, GlobeLock, ArrowLeft } from 'lucide-react';
-import { imageUrl } from '@/lib/constants';
+import { imageUrl, isDev } from '@/lib/constants';
 import Link from 'next/link';
 import {
   Dialog,
-  DialogContent,
+  DialogContent, DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
 import TourSetsTable from '@/components/dashboard/tourSets/TourSetsDashboards/TourSetsTable';
 import { toast } from 'sonner';
-import TourSetReviewsManager
-  from "@/components/dashboard/tourSets/TourSetReviewsManager";
+import TourSetReviewsManager from '@/components/dashboard/tourSets/TourSetReviewsManager';
+import Image from 'next/image';
 
 export default function TourDetails() {
   const { id } = useParams();
   const router = useRouter();
   const user = useUser().data;
-  const pathname = usePathname();
-  const baseToursPath = pathname.startsWith('/admin')
-    ? '/admin/tours'
-    : '/manager/tours';
+  const baseToursPath = '/admin/tours';
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -182,16 +179,21 @@ export default function TourDetails() {
             </h3>
             <div className="grid grid-cols-2 gap-2">
               {tour.images?.length > 0 ? (
-                tour.images
-                  ?.slice(0, 4)
-                  .map((img, idx) => (
-                    <img
-                      key={idx}
+                tour.images?.slice(0, 4).map((img, idx) => (
+                  <div
+                    key={idx}
+                    className="relative h-20 w-full overflow-hidden rounded-lg border"
+                  >
+                    <Image
                       src={imageUrl + img}
-                      className="w-full h-20 object-cover rounded-lg border"
-                      alt=""
+                      alt={`${tour.title} — фото ${idx + 1}`}
+                      fill
+                      sizes="120px"
+                      unoptimized={isDev}
+                      className="object-cover"
                     />
-                  ))
+                  </div>
+                ))
               ) : (
                 <p className="text-[10px] text-gray-400 font-medium">
                   Изображений пока нет.
@@ -219,6 +221,9 @@ export default function TourDetails() {
           <DialogHeader className="pr-8">
             <DialogTitle>Вы уверены, что хотите удалить этот тур?</DialogTitle>
           </DialogHeader>
+          <DialogDescription className="sr-only">
+            Диалоговое окно удаление тура
+          </DialogDescription>
           <DialogFooter>
             <Button
               variant="outline"

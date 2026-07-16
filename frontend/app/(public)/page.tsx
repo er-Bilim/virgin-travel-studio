@@ -14,6 +14,13 @@ import { getPopularTours } from '@/services/tours';
 import { queryConfig } from '@/lib/constants';
 import { getPublicFeaturedReviews } from '@/services/reviews';
 import { latestNewsQueryOptions } from '@/lib/hooks/newsHooks';
+import { buildMetadata } from '@/lib/seo';
+
+export const metadata = buildMetadata(
+    'Virgin Travel Studio — путешествия и туры',
+    'Подберите готовый тур или создайте индивидуальное путешествие вместе с Virgin Travel Studio.',
+    '/',
+);
 
 const Home = async () => {
   const limit: number = 4;

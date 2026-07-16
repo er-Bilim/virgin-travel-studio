@@ -25,6 +25,7 @@ export interface IOrder extends Document {
   managerId?: Types.ObjectId | null;
   createdAt: Date;
   updatedAt: Date;
+  assignedAt?: Date | null;
   customTour?: {
     countryCode?: string;
     startDate?: Date;

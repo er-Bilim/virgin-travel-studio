@@ -1,16 +1,17 @@
 'use client';
 
 import {
-  useEffect,
-  useRef,
-  useState,
   type ChangeEvent,
   type DragEvent,
   type MouseEvent,
+  useEffect,
+  useRef,
+  useState
 } from 'react';
-import { UploadCloud, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import {Loader2, UploadCloud, X} from 'lucide-react';
+import {cn, compressImage, validateImageFile} from '@/lib/utils';
 import useObjectUrl from '@/lib/hooks/useObjectUrl';
+import {IMAGE_UPLOAD} from '@/lib/constants';
 
 interface Props {
   id: string;
@@ -34,6 +35,8 @@ const PhotoDropzone: React.FC<Props> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const blobUrlRef = useRef<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [localError, setLocalError] = useState<string | null>(null);
 
   const preview = useObjectUrl(value);
   const fileName = value instanceof File ? value.name : '';
@@ -44,14 +47,36 @@ const PhotoDropzone: React.FC<Props> = ({
     };
   }, []);
 
-  const accept = (file: File) => {
-    if (!file.type.startsWith('image/')) return;
+  const accept = async (file: File) => {
+    setLocalError(null);
 
-    if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current);
+    const result = validateImageFile(file);
+    if (!result.valid) {
+      setLocalError(result.error!);
+      return;
+    }
 
-    const url = URL.createObjectURL(file);
-    blobUrlRef.current = url;
-    onFile(file);
+    setIsProcessing(true);
+
+    try {
+      const compressed = await compressImage(file);
+
+     const compressedFile = compressed instanceof File
+         ? compressed
+         : new File([compressed], file.name, {
+           type: file.type,
+         });
+
+      if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current);
+      const url = URL.createObjectURL(compressed);
+      blobUrlRef.current = url;
+
+      onFile(compressedFile);
+    } catch (e) {
+      setLocalError(e instanceof Error ? e.message : 'Не удалось обработать файл');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const onInputChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -60,7 +85,7 @@ const PhotoDropzone: React.FC<Props> = ({
     if (!files) return;
     if (!files[0]) return;
 
-    accept(files[0]);
+    void accept(files[0]);
   };
 
   const clear = (event: MouseEvent<HTMLButtonElement>) => {
@@ -71,6 +96,7 @@ const PhotoDropzone: React.FC<Props> = ({
       blobUrlRef.current = null;
     }
 
+    setLocalError(null);
     if (inputRef.current) inputRef.current.value = '';
     onFile(null);
   };
@@ -91,9 +117,15 @@ const PhotoDropzone: React.FC<Props> = ({
       return file.type.startsWith('image/');
     });
 
-    if (!file) return;
-    accept(file);
+    if (!file) {
+      setLocalError('Перетащите файл изображения');
+      return;
+    }
+
+    void accept(file);
   };
+
+  const displayError = error || localError;
 
   return (
     <div className={cn(className)}>
@@ -102,7 +134,7 @@ const PhotoDropzone: React.FC<Props> = ({
         aria-label={label}
         ref={inputRef}
         type="file"
-        accept="image/*"
+        accept={IMAGE_UPLOAD.ALLOWED_MIME_TYPES.join(',')}
         name={name}
         className="hidden"
         onChange={onInputChange}
@@ -148,15 +180,27 @@ const PhotoDropzone: React.FC<Props> = ({
               : 'border-input bg-background hover:bg-accent/30'
           }`}
         >
-          <UploadCloud className="size-6 text-muted-foreground" />
-          <p className="text-sm text-muted-foreground flex gap-1">
-            Перетащите фото или
-            <span className="font-medium text-foreground">выберите файл</span>
-          </p>
+          {isProcessing ? (
+              <>
+                <Loader2 className="size-6 animate-spin text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">Обработка фото...</p>
+              </>
+          ) : (
+              <>
+                <UploadCloud className="size-6 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground flex gap-1">
+                  Перетащите фото или
+                  <span className="font-medium text-foreground">выберите файл</span>
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  JPEG, PNG, WEBP до {IMAGE_UPLOAD.MAX_FILE_SIZE_BYTES / (1024 * 1024)} МБ
+                </p>
+              </>
+          )}
         </div>
       )}
 
-      {error && <p className="text-sm text-red-500">{error}</p>}
+      {displayError && <p className="text-sm mt-2 text-red-500">{displayError}</p>}
     </div>
   );
 };
