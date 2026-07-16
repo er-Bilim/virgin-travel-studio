@@ -19,9 +19,14 @@ import FilterCombobox from '@/components/shared/FilterCombobox';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 const NewsList = () => {
-  const [page, setPage] = useState(1);
-  const limit = 7;
   const searchParams = useSearchParams();
+  const pageParam = searchParams.get('page');
+  const initialPage = (() => {
+    const parsed = parseInt(pageParam ?? '1', 10);
+    return isFinite(parsed) && parsed > 0 ? parsed : 1;
+  })();
+  const [page, setPage] = useState(initialPage);
+  const limit = 7;
   const tag = searchParams.get('tags');
 
   const router = useRouter();
@@ -116,9 +121,11 @@ const NewsList = () => {
     return <NewsSkeleton />;
   }
 
-  if (newsError || !news || tagsError || !tags) {
-    return toast.error('Что-то пошло не так');
+  if (newsError || !news || tagsError) {
+    toast.error('Что-то пошло не так');
+    return null;
   }
+
 
   const mainNews = news.allNews[0];
 
@@ -216,7 +223,7 @@ const NewsList = () => {
           </span>
 
                 <FilterCombobox
-                    options={tags}
+                    options={tags ?? []}
                     labelKey="tag"
                     settings={tagsSettingsCombobox}
                     queryParamsKey="tag"
