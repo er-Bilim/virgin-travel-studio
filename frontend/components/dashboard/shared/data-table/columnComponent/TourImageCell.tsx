@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dialog';
 
 import type { TourType } from '@/types/tour';
-import { imageUrl, isDev } from '@/lib/constants';
+import { apiURL, isDev } from '@/lib/constants';
 import Image from 'next/image';
 
 type TourImageCellProps = {
@@ -62,7 +62,7 @@ export const TourImageCell = ({ tour }: TourImageCellProps) => {
 
           <div className="relative flex h-[20vh] w-full items-center justify-center">
             <Image
-              src={imageUrl + validImages[currentIndex]}
+              src={apiURL + '/tours/image/' + validImages[currentIndex]}
               alt={tour.title}
               fill
               sizes="(min-width: 1024px) 896px, 100vw"
