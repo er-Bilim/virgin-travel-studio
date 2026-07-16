@@ -40,7 +40,8 @@ export interface ITourWithTourSetFields extends TourType {
 export default async function telegramMessage(tour: ITourWithTourSetFields) {
 
     const text = formatTourText(tour);
-    const photo_url = `${config.corsOrigin}/api/tours/image/${tour.images[0]}`;   // tour.images[0];
+    // const photo_url = `${config.corsOrigin}/api/tours/image/${tour.images[0]}`;   // tour.images[0];
+    const photo_url = `https://imgs.search.brave.com/X3RlYWP5-cxhIVKxzW-C-UZU3YuVcTkNDHciYyyh5Gc/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdDIu/ZGVwb3NpdHBob3Rv/cy5jb20vNzk3MjAy/Ni8xMTkxNi9pLzQ1/MC9kZXBvc2l0cGhv/dG9zXzExOTE2NDg4/Mi1zdG9jay1waG90/by1jYXVjYXN1cy1t/b3VudGFpbnMtZ2Vv/cmdpYS5qcGc`;
     const url = `${config.tgApi}${config.botToken}/sendPhoto`;
 
     const result = await fetch(url, {
