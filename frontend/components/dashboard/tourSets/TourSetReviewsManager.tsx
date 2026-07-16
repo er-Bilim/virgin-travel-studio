@@ -1,23 +1,21 @@
 'use client';
 
-import {useEffect, useState} from 'react';
-import {MessageSquareReply, Plus, Star, Trash2} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { MessageSquareReply, Plus, Star, Trash2 } from 'lucide-react';
 
-import {Button} from '@/components/ui/button';
-import {Modal} from '@/components/shared/Modal';
-import {
-  ConfirmDialog
-} from '@/components/dashboard/ConfirmDialog/ConfirmDialog';
-import CreateReviewForm
-  from '@/components/public/reviews/form/CreateReviewForm';
-import {useModalStore} from '@/lib/stores/modalStore';
-import {imageUrl} from '@/lib/constants';
-import type {IReview} from '@/types/review';
+import { Button } from '@/components/ui/button';
+import { Modal } from '@/components/shared/Modal';
+import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog/ConfirmDialog';
+import CreateReviewForm from '@/components/public/reviews/form/CreateReviewForm';
+import { useModalStore } from '@/lib/stores/modalStore';
+import { imageUrl, isDev } from '@/lib/constants';
+import type { IReview } from '@/types/review';
 import {
   useAdminReviews,
   useDeleteReview,
   useUpdateReview,
 } from '@/lib/hooks/reviewHooks';
+import Image from 'next/image';
 
 type Props = {
   tourId: string;
@@ -26,17 +24,17 @@ type Props = {
 const ADD_REVIEW_MODAL_ID = 'add-tour-review-modal';
 const REPLY_MODAL_ID = 'reply-tour-review-modal';
 
-const TourSetReviewsManager = ({tourId}: Props) => {
-  const {openModal, closeModal} = useModalStore();
+const TourSetReviewsManager = ({ tourId }: Props) => {
+  const { openModal, closeModal } = useModalStore();
 
   const [reviewToDelete, setReviewToDelete] = useState<IReview | null>(null);
   const [replyReview, setReplyReview] = useState<IReview | null>(null);
   const [replyText, setReplyText] = useState('');
 
-  const {data: reviewsData, isLoading, isError} = useAdminReviews({tourId});
+  const { data: reviewsData, isLoading, isError } = useAdminReviews({ tourId });
   const reviews = reviewsData?.reviews || [];
-  const {mutate: deleteReview, isPending: isDeleting} = useDeleteReview();
-  const {mutate: updateReview, isPending: updatingReply} = useUpdateReview();
+  const { mutate: deleteReview, isPending: isDeleting } = useDeleteReview();
+  const { mutate: updateReview, isPending: updatingReply } = useUpdateReview();
 
   useEffect(() => {
     const hash = window.location.hash;
@@ -46,12 +44,12 @@ const TourSetReviewsManager = ({tourId}: Props) => {
         const element = document.querySelector(hash);
 
         if (element) {
-          element.scrollIntoView({ behavior: "smooth", block: "center" });
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-          element.classList.add("bg-yellow-50/80");
+          element.classList.add('bg-yellow-50/80');
 
           setTimeout(() => {
-            element.classList.remove("bg-yellow-50/80");
+            element.classList.remove('bg-yellow-50/80');
           }, 2500);
         }
       }, 150);
@@ -152,7 +150,7 @@ const TourSetReviewsManager = ({tourId}: Props) => {
                   </h3>
 
                   <div className="mt-1 flex items-center gap-1 text-amber-500">
-                    {Array.from({length: review.rating}).map((_, index) => (
+                    {Array.from({ length: review.rating }).map((_, index) => (
                       <Star
                         key={index}
                         className="h-3 w-3 sm:h-4 sm:w-4 fill-amber-500"
@@ -170,7 +168,9 @@ const TourSetReviewsManager = ({tourId}: Props) => {
                     onClick={() => handleReply(review)}
                   >
                     <MessageSquareReply className="mr-1 h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                    {review.companyReply ? 'Редактировать ответ' : 'Ответить от Virgin Travel'}
+                    {review.companyReply
+                      ? 'Редактировать ответ'
+                      : 'Ответить от Virgin Travel'}
                   </Button>
 
                   <Button
@@ -224,10 +224,13 @@ const TourSetReviewsManager = ({tourId}: Props) => {
               )}
 
               {review.image && (
-                <img
+                <Image
                   src={imageUrl + review.image}
                   alt={`Фото отзыва ${review.clientName}`}
-                  className="mt-3 sm:mt-4 h-24 w-24 sm:h-32 sm:w-32 rounded-xl sm:rounded-2xl object-cover"
+                  width={128}
+                  height={128}
+                  unoptimized={isDev}
+                  className="mt-3 h-24 w-24 rounded-xl object-cover sm:mt-4 sm:h-32 sm:w-32 sm:rounded-2xl"
                 />
               )}
             </article>
@@ -238,6 +241,7 @@ const TourSetReviewsManager = ({tourId}: Props) => {
       <Modal
         id={ADD_REVIEW_MODAL_ID}
         title="Добавить отзыв"
+        description="Форма создание отзыва"
       >
         <CreateReviewForm
           tourId={tourId}
@@ -248,14 +252,15 @@ const TourSetReviewsManager = ({tourId}: Props) => {
       <Modal
         id={REPLY_MODAL_ID}
         title="Ответить от имени Virgin Travel"
+        description="Форма создание ответа компании на отзыв"
       >
         <div className="space-y-4">
-                    <textarea
-                      value={replyText}
-                      onChange={(e) => setReplyText(e.target.value)}
-                      placeholder="Введите ответ компании..."
-                      className="min-h-24 sm:min-h-35 w-full rounded-xl sm:rounded-2xl border border-gray-200 p-3 sm:p-4 text-sm outline-none focus:border-[#1E2B6D]"
-                    />
+          <textarea
+            value={replyText}
+            onChange={(e) => setReplyText(e.target.value)}
+            placeholder="Введите ответ компании..."
+            className="min-h-24 sm:min-h-35 w-full rounded-xl sm:rounded-2xl border border-gray-200 p-3 sm:p-4 text-sm outline-none focus:border-[#1E2B6D]"
+          />
 
           <Button
             className="w-full bg-[#1E2B6D] hover:bg-[#162356]"
@@ -273,8 +278,8 @@ const TourSetReviewsManager = ({tourId}: Props) => {
         description="Это действие нельзя отменить."
         confirmText="Удалить"
         loading={isDeleting}
-        onCancel={() => setReviewToDelete(null)}
-        onConfirm={handleDelete}
+        onCancelAction={() => setReviewToDelete(null)}
+        onConfirmAction={handleDelete}
       />
     </section>
   );

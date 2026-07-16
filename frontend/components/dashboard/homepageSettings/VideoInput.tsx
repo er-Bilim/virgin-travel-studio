@@ -185,8 +185,8 @@ export const VideoInput = ({
         title="Вы уверены, что хотите удалить видеоролик?"
         description="Текущее фоновое видео будет убрано с главного экрана после сохранения настроек."
         confirmText="Удалить"
-        onCancel={() => setIsConfirmOpen(false)}
-        onConfirm={handleConfirmDelete}
+        onCancelAction={() => setIsConfirmOpen(false)}
+        onConfirmAction={handleConfirmDelete}
       />
 
       {localError && (

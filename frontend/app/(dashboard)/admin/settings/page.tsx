@@ -35,7 +35,7 @@ export default function Settings() {
           Редактировать контакты
         </Button>
 
-        <Modal id="contactsForm" title="Редактирование контактов">
+        <Modal id="contactsForm" title="Редактирование контактов" description="Форма редактирование контактов">
           <ContactSettingsForm />
         </Modal>
       </div>

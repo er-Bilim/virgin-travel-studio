@@ -168,7 +168,7 @@ export default function FaqManagement() {
         </SortableContext>
       </DndContext>
 
-      <Modal id="faqForm" title={selectedFaq ? "Редактирование вопроса" : "Новый вопрос FAQ"}>
+      <Modal id="faqForm" title={selectedFaq ? "Редактирование вопроса" : "Новый вопрос FAQ"} description="Часто задаваемые вопросы FAQ">
         <FaqForm faq={selectedFaq} onClose={closeModal} />
       </Modal>
 
@@ -178,8 +178,8 @@ export default function FaqManagement() {
         description="Вы собираетесь безвозвратно удалить этот вопрос из базы данных. Пользователи сайта больше не смогут его увидеть."
         loading={isDeleting}
         confirmText="Удалить"
-        onCancel={() => setDeleteId(null)}
-        onConfirm={() => deleteId && deleteFaq(deleteId, { onSuccess: () => setDeleteId(null) })}
+        onCancelAction={() => setDeleteId(null)}
+        onConfirmAction={() => deleteId && deleteFaq(deleteId, { onSuccess: () => setDeleteId(null) })}
       />
 
       <ConfirmDialog
@@ -192,8 +192,8 @@ export default function FaqManagement() {
         }
         loading={isToggling}
         confirmText={togglePublishData?.currentStatus ? "Скрыть" : "Опубликовать"}
-        onCancel={() => setTogglePublishData(null)}
-        onConfirm={() =>
+        onCancelAction={() => setTogglePublishData(null)}
+        onConfirmAction={() =>
           togglePublishData && togglePublish(togglePublishData.id, { onSuccess: () => setTogglePublishData(null) })
         }
       />

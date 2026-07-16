@@ -1,5 +1,5 @@
-import mongoose, { Schema, Types } from 'mongoose';
-import type { IOrder } from '@/types/orders.types.js';
+import mongoose, {Schema, Types} from 'mongoose';
+import type {IOrder} from '@/types/orders.types.js';
 
 const OrderSchema = new Schema(
   {
@@ -65,6 +65,10 @@ const OrderSchema = new Schema(
         message: 'Причина отказа обязательна, если установлен статус REJECTED',
       },
     },
+    assignedAt: {
+      type: Date,
+      default: null
+    },
     managerId: {
       type: Types.ObjectId,
       ref: 'User',
@@ -119,6 +123,7 @@ const OrderSchema = new Schema(
         endDate: Date,
         hotel: { type: String, trim: true },
         description: { type: String, trim: true },
+        activities: [{ type: String, trim: true }]
       },
       required: function (this: IOrder) {
         return this.type === 'CUSTOM';

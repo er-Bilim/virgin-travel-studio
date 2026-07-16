@@ -3,9 +3,10 @@
 import BasePhoto from '@/components/assets/lake.webp';
 import { Card } from '@/components/ui/card';
 import type { TourSetType } from '@/types/tourSets';
-import { imageUrl } from '@/lib/constants';
+import { imageUrl, isDev } from '@/lib/constants';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 interface Props {
   tourSet: TourSetType;
@@ -37,10 +38,12 @@ export function TourSetsCard({ tourSet, openModal }: Props) {
       }}
       className="group relative mx-auto h-[420px] w-full overflow-hidden rounded-3xl border-0 bg-black text-white shadow-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)]"
     >
-      <img
+      <Image
         src={image}
         alt="tour"
-        className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+        className="object-cover transition-transform duration-700 group-hover:scale-110"
+        fill
+        unoptimized={isDev}
       />
 
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />

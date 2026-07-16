@@ -12,8 +12,7 @@ import {
   ConfirmDialog
 } from '@/components/dashboard/ConfirmDialog/ConfirmDialog';
 import AdvantageItem from './advantages/advantageItem';
-
-import type {HomepageSettingsMutationData} from '@/types/homepageSettings';
+import type { HomepageSettingsMutationData } from '@/types/homepageSettings';
 import {
   mutateCreateHomepageSettings,
   mutateHomepageSettings,
@@ -497,11 +496,11 @@ export default function HomepageSettingsForm() {
         description="Обновленные заголовки, описания и медиафайлы сразу же вступят в силу на публичной части сайта."
         loading={isSaving}
         confirmText="Сохранить"
-        onCancel={() => {
+        onCancelAction={() => {
           setIsConfirmOpen(false);
           setPendingData(null);
         }}
-        onConfirm={handleConfirmSave}
+        onConfirmAction={handleConfirmSave}
       />
     </div>
   );

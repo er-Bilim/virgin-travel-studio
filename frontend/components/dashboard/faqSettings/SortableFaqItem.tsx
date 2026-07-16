@@ -42,7 +42,7 @@ export function SortableFaqItem({ faq, isReorderMode, onEdit, onDelete, onToggle
           <div
             {...attributes}
             {...listeners}
-            className="mt-1 cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 p-1 rounded-md hover:bg-gray-200/50 transition-colors shrink-0"
+            className="touch-none mt-1 cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 p-1 rounded-md hover:bg-gray-200/50 transition-colors shrink-0"
           >
             <GripVertical className="w-5 h-5" />
           </div>

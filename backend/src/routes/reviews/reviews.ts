@@ -160,7 +160,7 @@ reviewsRouter.get('/public/featured', async (_req, res, next) => {
 reviewsRouter.get(
   '/admin',
   auth,
-  permit('ADMIN', 'MANAGER'),
+  permit('ADMIN'),
   async (req, res, next) => {
     try {
       const rawPage = Number.parseInt(req.query.page as string, 10);
@@ -222,7 +222,7 @@ reviewsRouter.get(
 reviewsRouter.patch(
   '/:id/approve',
   auth,
-  permit('ADMIN', 'MANAGER'),
+  permit('ADMIN'),
   validateObjectId(),
   async (req, res, next) => {
     try {
@@ -283,7 +283,7 @@ reviewsRouter.patch(
 reviewsRouter.patch(
   '/:id/feature',
   auth,
-  permit('ADMIN', 'MANAGER'),
+  permit('ADMIN'),
   validateObjectId(),
   async (req, res, next) => {
     try {
@@ -311,7 +311,7 @@ reviewsRouter.patch(
 reviewsRouter.patch(
   '/:id',
   auth,
-  permit('ADMIN', 'MANAGER'),
+  permit('ADMIN'),
   validateObjectId(),
   imagesUpload.single('image'),
   async (req, res, next) => {
@@ -411,7 +411,7 @@ reviewsRouter.patch(
 reviewsRouter.delete(
   '/:id',
   auth,
-  permit('ADMIN', 'MANAGER'),
+  permit('ADMIN'),
   validateObjectId(),
   async (req, res, next) => {
     try {

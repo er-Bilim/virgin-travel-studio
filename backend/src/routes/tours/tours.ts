@@ -1,7 +1,7 @@
 import express from 'express';
 import auth, {authOrNot, type RequestWithUser} from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
-import {imagesUpload, imageMemoryUpload} from '@/middlewares/multer.js';
+import {imageMemoryUpload} from '@/middlewares/multer.js';
 import Tour from '@/model/tour/Tour.js';
 import mongoose, {type PipelineStage} from 'mongoose';
 import validateObjectId from '@/middlewares/validateObjectId.js';
@@ -280,7 +280,7 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
   }
 });
 
-toursRouter.get('/countries', async (req, res, next) => {
+toursRouter.get('/countries', async (_req, res, next) => {
   try {
     const countries = await Tour.distinct('countryCode');
 
@@ -424,7 +424,7 @@ toursRouter.get('/image/:id', async (req, res, next) => {
 toursRouter.post(
   '/',
   auth,
-  permit('ADMIN', 'MANAGER'),
+  permit('ADMIN'),
   imageMemoryUpload.array('images', 5),
   async (req, res, next) => {
     try {
@@ -475,7 +475,7 @@ toursRouter.post(
 toursRouter.patch(
   '/:id',
   auth,
-  permit('ADMIN', 'MANAGER'),
+  permit('ADMIN'),
   validateObjectId(),
   imageMemoryUpload.array('images', 5),
   async (req, res, next) => {
