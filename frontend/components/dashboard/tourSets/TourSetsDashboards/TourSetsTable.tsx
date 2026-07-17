@@ -184,7 +184,7 @@ export default function TourSetsTable({
           </div>
           <DateRangePicker
             value={dateRange}
-            onChange={setDateRange}
+            onChangeAction={setDateRange}
             numberOfMonths={isMobile ? 1 : 2}
             />
         </div>
@@ -371,7 +371,7 @@ export default function TourSetsTable({
             headerRowClassName={headerRowClassName}
             rowClassName={rowClassName}
             className={tableClassName}
-            onRowClick={(set) =>
+            onRowClickAction={(set) =>
               router.push(`${baseToursPath}/${tourId}/groups/${set._id}`)
             }
           />
@@ -395,8 +395,8 @@ export default function TourSetsTable({
         description="Это действие нельзя отменить"
         loading={isDeleting}
         confirmText="Удалить"
-        onCancel={() => setSetToDelete(null)}
-        onConfirm={confirmDelete}
+        onCancelAction={() => setSetToDelete(null)}
+        onConfirmAction={confirmDelete}
       />
     </div>
   );

@@ -6,7 +6,7 @@ import type {
   OrderPayment,
   OrderStatus,
   PassportPayload,
-  PopulatedOrder,
+  PopulatedOrder
 } from '@/types/orders.types.js';
 import mongoose, {Types} from 'mongoose';
 import validateObjectId from '@/middlewares/validateObjectId.js';
@@ -93,7 +93,7 @@ ordersRouter.get(
             select: 'title',
           },
         })
-        .sort({createdAt: -1})
+        .sort(view === 'my' ? { assignedAt: -1 } : { createdAt: -1 })
         .skip(skip)
         .limit(limit)
         .lean();
@@ -184,7 +184,7 @@ ordersRouter.get(
           REJECTED: byStatus.REJECTED ?? 0,
         },
         completedToday,
-        monthRevenue: monthRevenue[0]?.total ?? 0,
+        monthRevenue: user.role === 'ADMIN' ? monthRevenue[0]?.total ?? 0 : undefined,
       });
     } catch (e) {
       next(e);
@@ -403,6 +403,7 @@ ordersRouter.patch(
 
         if (!order.managerId) {
           order.managerId = user._id;
+          order.assignedAt = new Date();
         }
 
         if (clientName) order.clientName = clientName;
@@ -434,14 +435,14 @@ ordersRouter.patch(
 
         if (status && status === 'COMPLETED' && order.status !== 'COMPLETED') {
           const booked = await update_tourSet(order.tourSetId);
-          if (!booked) {
+          if (!booked && order.type === "STANDARD") {
             return res.status(400).send({ error: 'Нет свободных мест!' });
           }
         }
 
         if (status && status === 'REJECTED' && order.status !== 'REJECTED') {
           const unBooked = await update_tourSet(order.tourSetId, -1);
-          if (!unBooked)
+          if (!unBooked && order.type === "STANDARD")
             return res.status(400).send({ error: 'Ошибка при снятии брони!' });
         }
 

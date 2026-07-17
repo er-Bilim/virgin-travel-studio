@@ -27,12 +27,14 @@ export const createNews = async (data: NewsMutation) => {
 };
 
 export const getNews = async ({
-  page,
-  limit,
-  searchText,
-  isPublished,
-  authorId,
-  tags,
+                                page,
+                                limit,
+                                searchText,
+                                isPublished,
+                                authorId,
+                                tags,
+                                startDate,
+                                endDate,
 }: GetNewsParams): Promise<NewsData> => {
   const params: Record<string, string | undefined | number> = {};
 
@@ -40,6 +42,8 @@ export const getNews = async ({
   if (searchText) params.searchTitle = searchText;
   if (isPublished && isPublished !== 'all') params.isPublished = isPublished;
   if (authorId && authorId !== 'all') params.authorId = authorId;
+  if (startDate) params.startDate = startDate;
+  if (endDate) params.endDate = endDate;
   params.page = Number(page);
   params.limit = Number(limit);
 
