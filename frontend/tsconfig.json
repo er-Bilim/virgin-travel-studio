@@ -27,7 +27,8 @@
       "@/assets/*": ["./components/assets/*"],
       // "@/types/*": ["./types/*"],
       // "@/hooks/*": ["./hooks/*"]
-    }
+    },
+    "types": ["vitest/globals"]
   },
   "include": [
     "next-env.d.ts",
