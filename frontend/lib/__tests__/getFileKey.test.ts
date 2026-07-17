@@ -22,7 +22,7 @@ describe('getFileKey', () => {
       lastModified: 1784292239362,
     });
 
-    expect(getFileKey(a)).not.toBe(b);
+    expect(getFileKey(a)).not.toBe(getFileKey(b));
   });
   it('возвращает пустую строку как есть', () => {
     expect(getFileKey('')).toBe('');
