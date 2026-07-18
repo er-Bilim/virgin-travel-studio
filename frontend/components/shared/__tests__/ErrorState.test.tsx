@@ -12,7 +12,6 @@ describe('ErrorState', () => {
 
   it('рендерит заголовок и описание ошибки', async () => {
     render(<ErrorState onRetry={onRetry} />);
-    screen.debug();
     expect(
       screen.getByRole('heading', { name: 'Не удалось загрузить', level: 1 }),
     ).toBeInTheDocument();
