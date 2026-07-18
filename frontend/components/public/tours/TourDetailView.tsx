@@ -40,6 +40,7 @@ import TourDetailLoading from '@/app/(public)/tours/[slug]/loading';
 import type {DateRange} from 'react-day-picker';
 import {DateRangePicker} from '@/components/shared/DateRangePicker';
 import {cn} from '@/lib/utils';
+import ErrorState from '@/components/shared/ErrorState';
 
 interface Props {
   id: string;
@@ -47,7 +48,7 @@ interface Props {
 
 const TourDetailView = ({ id }: Props) => {
   const [isOrderOpen, setIsOrderOpen] = useState(false);
-  const { data: tour, isPending, isError } = useTourById(id);
+  const { data: tour, isPending, isError, refetch } = useTourById(id);
   const [selectedSetId, setSelectedSetId] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
@@ -78,8 +79,8 @@ const TourDetailView = ({ id }: Props) => {
 
   if (isError || !tour) {
     return (
-      <div className="py-20 text-center text-muted-foreground">
-        Не удалось загрузить тур
+      <div className="py-16 sm:py-20">
+        <ErrorState onRetry={refetch} />
       </div>
     );
   }
@@ -129,9 +130,6 @@ const TourDetailView = ({ id }: Props) => {
   const closeModalOrder = () => {
     setIsOrderOpen(false);
   };
-
-  if (!tour)
-    return <div className="text-center py-20 text-white">Тур не найден</div>;
 
   const days = Math.max(
     1,
@@ -260,7 +258,7 @@ const TourDetailView = ({ id }: Props) => {
       )}
 
       <div>
-        <section aria-labelledby="tour-title" className="mt-6 sm:mt-10">
+        <section aria-labelledby="tour-title" className="mt-5">
           <Breadcrumbs
             items={[
               { label: 'Туры', href: '/tours' },

@@ -7,7 +7,7 @@ import {
   cn,
   formatDayAndMonthWords,
   formatToReadablePrice,
-} from '../../../lib/utils';
+} from '@/lib/utils';
 import { ArrowRight, Clock, Dot } from 'lucide-react';
 import Image from 'next/image';
 import { imageUrl, isDev } from '@/lib/constants';
@@ -39,7 +39,7 @@ const NewsDetailView = ({ id, tourLimit }: Props) => {
 
   if (isError || !news) {
     return (
-      <div className="mt-15">
+      <div className="py-16 sm:py-20">
         <ErrorState onRetry={refetch} />
       </div>
     );

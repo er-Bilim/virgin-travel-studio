@@ -4,10 +4,11 @@ import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-  AlertTriangle,
+  CloudOff,
   HelpCircle,
   MessageSquare,
   Phone,
+  RotateCw,
   Send,
 } from 'lucide-react';
 import { useContacts } from '@/lib/hooks/contactSettings';
@@ -17,6 +18,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import StateCard from '@/components/shared/StateCard';
 import { usePublicFaqs } from '@/lib/hooks/faq';
 import type { Faq as FaqType } from '@/types/faq';
 
@@ -42,23 +44,21 @@ export function Faq() {
 
   if (isError) {
     return (
-      <div className="w-full py-24 text-center flex flex-col items-center justify-center">
-        <div className="w-16 h-16 md:w-20 md:h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-6">
-          <AlertTriangle className="w-8 h-8 md:w-10 md:h-10" />
-        </div>
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">
-          Упс, что-то пошло не так
-        </h1>
-        <p className="text-sm md:text-base text-slate-500 max-w-md mx-auto mb-8 px-4">
-          Не удалось загрузить список часто задаваемых вопросов. Пожалуйста,
-          проверьте интернет-соединение или обновите страницу.
-        </p>
-        <Button
-          onClick={() => window.location.reload()}
-          className="bg-[#1E2B6D] hover:bg-blue-900 w-full sm:w-auto rounded-xl px-6"
-        >
-          Обновить страницу
-        </Button>
+      <div className="w-full py-16 sm:py-24">
+        <StateCard
+          icon={CloudOff}
+          iconClassName="mb-5 flex size-16 items-center justify-center rounded-[18px] bg-red-50 text-red-500"
+          title="Упс, что-то пошло не так"
+          description="Не удалось загрузить список часто задаваемых вопросов. Пожалуйста, проверьте интернет-соединение или обновите страницу."
+          actions={[
+            {
+              type: 'button',
+              onClick: () => window.location.reload(),
+              label: 'Обновить страницу',
+              icon: RotateCw,
+            },
+          ]}
+        />
       </div>
     );
   }
