@@ -2,40 +2,45 @@ import mongoose from 'mongoose';
 import express from 'express';
 import type { ReviewFields } from '@/types/reviews.types.js';
 import Review from '@/model/review/Review.js';
-import { imagesUpload } from '@/middlewares/multer.js';
+import { imagesUpload, imageMemoryUpload } from '@/middlewares/multer.js';
 import auth from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
 import deleteFile from '@/utils/deleteFile.js';
 import validateObjectId from '@/middlewares/validateObjectId.js';
 import toggleBooleanFieldHelper from '@/helpers/toggleBooleanFieldHelper.js';
+import { uploadImageToGridFS } from '@/lib/gridfs.js';
+import { getGridFSBucket } from '@/index.js';
+import { ObjectId } from 'mongodb';
+
 
 const reviewsRouter = express.Router();
 
 reviewsRouter.post(
   '/',
-  imagesUpload.single('image'),
+  imageMemoryUpload.single('image'),
   async (req, res, next) => {
-    const currentFilePath = req.file?.path;
 
     try {
       const { clientName, tourId, rating, comment } = req.body;
 
       if (!clientName || !tourId || rating === undefined || !comment) {
-        await deleteFile(currentFilePath);
         return res
           .status(400)
           .send({ error: 'Заполните все обязательные поля' });
       }
 
       if (!mongoose.Types.ObjectId.isValid(tourId)) {
-        await deleteFile(currentFilePath);
         return res.status(400).send({ error: 'Неверный ID тура' });
+      }
+
+      let imageId: string | null = null;
+      if (req.file) {
+        imageId = await uploadImageToGridFS(req.file);
       }
 
       const tour = await mongoose.model('Tour').findById(tourId);
 
       if (!tour) {
-        await deleteFile(currentFilePath);
         return res.status(404).send({ error: 'Тур не найден' });
       }
 
@@ -44,7 +49,7 @@ reviewsRouter.post(
         tourId: new mongoose.Types.ObjectId(tourId),
         rating: Number(rating),
         comment,
-        image: req.file ? 'images/' + req.file.filename : null,
+        image: imageId,
         isModerated: 'pending',
       };
 
@@ -57,7 +62,6 @@ reviewsRouter.post(
       });
     } catch (e) {
       if (e instanceof mongoose.Error.ValidationError) {
-        await deleteFile(currentFilePath);
         return res
           .status(400)
           .send({ error: 'Ошибка валидации', details: e.errors });
@@ -152,6 +156,31 @@ reviewsRouter.get('/public/featured', async (_req, res, next) => {
     ]);
 
     return res.json(reviews);
+  } catch (error) {
+    next(error);
+  }
+});
+
+reviewsRouter.get('/image/:id', validateObjectId(), async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const bucket = getGridFSBucket();
+    const fileId = new ObjectId(id as string);
+    const files = await bucket.find({ _id: fileId }).toArray();
+
+    if (!files || files.length === 0) {
+      return res.status(404).send({
+        error: 'Изображение не найдено',
+      });
+    }
+
+    const file = files[0];
+    res.set(
+      'Content-Type',
+      file?.metadata?.contentType || 'application/octet-stream',
+    );
+
+    bucket.openDownloadStream(fileId).pipe(res);
   } catch (error) {
     next(error);
   }
@@ -313,9 +342,8 @@ reviewsRouter.patch(
   auth,
   permit('ADMIN'),
   validateObjectId(),
-  imagesUpload.single('image'),
+  imageMemoryUpload.single('image'),
   async (req, res, next) => {
-    const currentFilePath = req.file?.path;
 
     try {
       const { id } = req.params;
@@ -324,7 +352,6 @@ reviewsRouter.patch(
       const review = await Review.findById(id);
 
       if (!review) {
-        await deleteFile(currentFilePath);
         return res.status(404).send({ error: 'Отзыв не найден' });
       }
 
@@ -332,7 +359,6 @@ reviewsRouter.patch(
 
       if (clientName !== undefined) {
         if (typeof clientName !== 'string' || clientName.trim() === '') {
-          await deleteFile(currentFilePath);
           return res.status(400).send({ error: 'Имя клиента обязательно' });
         }
 
@@ -347,7 +373,6 @@ reviewsRouter.patch(
           numericRating < 1 ||
           numericRating > 5
         ) {
-          await deleteFile(currentFilePath);
 
           return res
             .status(400)
@@ -359,7 +384,6 @@ reviewsRouter.patch(
 
       if (comment !== undefined) {
         if (typeof comment !== 'string' || comment.trim() === '') {
-          await deleteFile(currentFilePath);
 
           return res.status(400).send({ error: 'Комментарий обязателен' });
         }
@@ -376,8 +400,13 @@ reviewsRouter.patch(
 
       const previousImage = review.image;
 
+      let imageId: string | null = null;
       if (req.file) {
-        updateData.image = 'images/' + req.file.filename;
+        imageId = await uploadImageToGridFS(req.file);
+      }
+
+      if (req.file) {
+        updateData.image = imageId;
       }
 
       const updatedReview = await Review.findByIdAndUpdate(id, updateData, {
@@ -394,7 +423,6 @@ reviewsRouter.patch(
         review: updatedReview,
       });
     } catch (e) {
-      await deleteFile(currentFilePath);
 
       if (e instanceof mongoose.Error.ValidationError) {
         return res.status(400).send({
@@ -423,7 +451,6 @@ reviewsRouter.delete(
         return res.status(404).send({ error: 'Отзыв не найден' });
       }
 
-      await deleteFile(deletedReview.image);
       res.send({ message: 'Отзыв успешно удален' });
     } catch (e) {
       next(e);
