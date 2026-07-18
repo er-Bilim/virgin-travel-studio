@@ -166,7 +166,7 @@ managersRouter.patch(
           await Order.updateMany(
             {
                 managerId: user._id,
-                status: 'IN_PROGRESS'
+                status: { $in: ['IN_PROGRESS', 'CONTRACT_PENDING'] }
             },
             {
                 $set: { managerId: admin._id },
