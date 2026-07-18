@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import axios from 'axios';
 import {
   dehydrate,
   HydrationBoundary,
@@ -44,21 +46,28 @@ const NewsDetailPage = async ({ params }: Props) => {
   const qc = new QueryClient();
   const limit = 5;
 
-  await Promise.all([
-    qc.prefetchQuery({
-      queryKey: ['news', 'single', id],
-      queryFn: () => getNewsById(id),
-    }),
-    qc.prefetchQuery({
-      queryKey: ['tours', 'popular', limit],
-      queryFn: () => getPopularTours(limit),
-    }),
-  ]);
+  try {
+    const news = await getNewsById(id);
+    qc.setQueryData(['news', 'single', id], news);
+  } catch (error) {
+    const status = axios.isAxiosError(error)
+      ? error.response?.status
+      : undefined;
+
+    if (status === 404 || status === 400) {
+      notFound();
+    }
+  }
+
+  await qc.prefetchQuery({
+    queryKey: ['tours', 'popular', limit],
+    queryFn: () => getPopularTours(limit),
+  });
 
   return (
-      <HydrationBoundary state={dehydrate(qc)}>
-        <NewsDetailView id={id} tourLimit={limit} />
-      </HydrationBoundary>
+    <HydrationBoundary state={dehydrate(qc)}>
+      <NewsDetailView id={id} tourLimit={limit} />
+    </HydrationBoundary>
   );
 };
 

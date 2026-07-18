@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
+import { notFound } from 'next/navigation';
+import axios from 'axios';
 import {
   dehydrate,
   HydrationBoundary,
@@ -50,10 +52,18 @@ const Tour = async ({ params }: Props) => {
   const { slug } = await params;
   const qc = new QueryClient();
 
-  await qc.prefetchQuery({
-    queryKey: ['tour', slug],
-    queryFn: () => getTourById(slug, userIp),
-  });
+  try {
+    const tour = await getTourById(slug, userIp);
+    qc.setQueryData(['tour', slug], tour);
+  } catch (error) {
+    const status = axios.isAxiosError(error)
+      ? error.response?.status
+      : undefined;
+
+    if (status === 404 || status === 400) {
+      notFound();
+    }
+  }
 
   return (
       <HydrationBoundary state={dehydrate(qc)}>

@@ -8,7 +8,7 @@ import { Modal } from '@/components/shared/Modal';
 import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog/ConfirmDialog';
 import CreateReviewForm from '@/components/public/reviews/form/CreateReviewForm';
 import { useModalStore } from '@/lib/stores/modalStore';
-import { imageUrl, isDev } from '@/lib/constants';
+import { apiURL, isDev } from '@/lib/constants';
 import type { IReview } from '@/types/review';
 import {
   useAdminReviews,
@@ -225,7 +225,7 @@ const TourSetReviewsManager = ({ tourId }: Props) => {
 
               {review.image && (
                 <Image
-                  src={imageUrl + review.image}
+                  src={apiURL + '/reviews/image/' + review.image}
                   alt={`Фото отзыва ${review.clientName}`}
                   width={128}
                   height={128}
@@ -243,10 +243,7 @@ const TourSetReviewsManager = ({ tourId }: Props) => {
         title="Добавить отзыв"
         description="Форма создание отзыва"
       >
-        <CreateReviewForm
-          tourId={tourId}
-          onSuccess={closeModal}
-        />
+        <CreateReviewForm tourId={tourId} onSuccess={closeModal} />
       </Modal>
 
       <Modal
