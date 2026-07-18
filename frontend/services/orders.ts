@@ -44,6 +44,11 @@ export const updateOrder = async (
   return result.data;
 };
 
+export const delegateOrder = async (id: string, managerId: string): Promise<{ message: string, order: OrderType }> => {
+    const result = await axiosApi.patch(`/orders/${id}`, { managerId });
+    return result.data;
+};
+
 export const deleteOrder = async (id: string) => {
   await axiosApi.delete(`/orders/${id}`);
 };

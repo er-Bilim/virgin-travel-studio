@@ -343,7 +343,8 @@ ordersRouter.patch(
         status,
         rejectionReason,
         paymentMethod,
-        paymentAmount
+        paymentAmount,
+        managerId
       } = req.body;
       const {user} = req as RequestWithUser;
 
@@ -373,6 +374,25 @@ ordersRouter.patch(
 
       const order = await Order.findById(id);
       if (!order) return res.status(404).send({error: 'Заявка не найдена'});
+
+      if (user.role === 'ADMIN' && typeof managerId === 'string') {
+        if (!mongoose.Types.ObjectId.isValid(managerId)) {
+          return res.status(400).send({error: 'Неверный ID менеджера'});
+        }
+
+        order.managerId = new mongoose.Types.ObjectId(managerId);
+
+        await order.save();
+
+        const delegatedOrder = await Order.findById(order._id)
+            .populate('managerId', 'fullName phone')
+            .populate({
+              path: 'tourSetId',
+              populate: {path: 'tourId', select: 'title'},
+            });
+
+        return res.send({message: 'Заявка переназначена', order: delegatedOrder});
+      }
 
       if (status === 'NEW' && order.managerId) {
         if (order.status === 'COMPLETED' || order.status === 'REJECTED') {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useSetStatusManager, useManagers } from '@/lib/hooks/managerHook';
+import {useManagers, useSetStatusManager} from '@/lib/hooks/managerHook';
 import {
     CreateManagerForm
 } from '@/components/dashboard/managers/CreateManagerForm';
@@ -66,6 +66,10 @@ export default function ManagersPage() {
     const { data = [], isLoading, isError } = useManagers({ fullName: fullName ?? undefined, status: status as UserStatus });
 
     useEffect(() => {
+        const currentFullName = searchParams.get('fullName') ?? '';
+
+        if (currentFullName === debouncedSearch) return;
+
         const params = new URLSearchParams(searchParams.toString());
         if (debouncedSearch) {
             params.set('fullName', debouncedSearch);
@@ -73,7 +77,7 @@ export default function ManagersPage() {
             params.delete('fullName');
         }
         route.push(`${pathname}?${params.toString()}`);
-    },[debouncedSearch]);
+    },[debouncedSearch, pathname, route, searchParams]);
 
     const downloadReport = async () => {
         try {

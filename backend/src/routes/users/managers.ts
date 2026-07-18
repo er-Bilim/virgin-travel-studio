@@ -24,7 +24,9 @@ managersRouter.get(
           query.fullName = { $regex: req.query.fullName.trim(), $options: 'i' };
       }
 
-      query.status = req.query.status === 'banned' ? 'banned' : 'active';
+      if (req.query.status === 'active' || req.query.status === 'banned') {
+          query.status = req.query.status
+      }
 
       const managers = await User.find(query).sort({ createdAt: -1 });
       res.send(managers);
