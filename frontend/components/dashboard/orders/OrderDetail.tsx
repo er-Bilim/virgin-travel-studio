@@ -13,6 +13,7 @@ import {ORDER_STATUS_LABELS} from '@/lib/constants';
 import {Button} from '@/components/ui/button';
 import {
   ArrowLeft,
+  ArrowLeftRight,
   Banknote,
   CircleCheckBig,
   Copy,
@@ -42,6 +43,7 @@ import type {CustomOrder, StandardOrder} from '@/types/order';
 import StandardOrderAside from './StandardOrderAside';
 import CustomOrderAside from './CustomOrderAside';
 import countries from '@/lib/countries';
+import {DelegateOrder} from '@/components/dashboard/orders/DelegateOrder';
 
 export default function OrderDetail() {
   const { id } = useParams();
@@ -262,13 +264,13 @@ export default function OrderDetail() {
 
                   <>
                     <Button
-                       className="group flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 h-11 px-4 rounded-xl border border-red-200 text-red-600 bg-white hover:bg-red-50 transition text-sm font-semibold cursor-pointer"
+                       className="group flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 h-11 px-4 rounded-xl border border-blue-200 text-blue-600 bg-white hover:bg-blue-50 transition text-sm font-semibold cursor-pointer"
                        type="button"
                        onClick={() => openModal('delegateOrder')}
-                   >
-                     <Trash className="w-4 h-4 shrink-0" />
-                     <span>Переназначить заявку</span>
-                   </Button>
+                    >
+                      <ArrowLeftRight className="w-4 h-4 shrink-0" />
+                      <span>Переназначить заявку</span>
+                    </Button>
 
                     <Button
                         className="group flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 h-11 px-4 rounded-xl border border-red-200 text-red-600 bg-white hover:bg-red-50 transition text-sm font-semibold cursor-pointer"
@@ -460,9 +462,7 @@ export default function OrderDetail() {
       </Modal>
 
       <Modal id="delegateOrder" title='Переназначить менеджера'>
-         <div>
-           Hello
-         </div>
+         <DelegateOrder orderId={order._id} currentManagerId={order.managerId?._id} />
       </Modal>
 
       <Modal id="paymentModal" title="Фиксация оплаты" description="Форма создание оплаты">
