@@ -1,6 +1,6 @@
 import {Router} from 'express';
 import permit from '@/middlewares/permit.js';
-import auth from '@/middlewares/auth.js';
+import auth, {type RequestWithUser} from '@/middlewares/auth.js';
 import User from '@/model/user/User.js';
 import mongoose from 'mongoose';
 import validateObjectId from '@/middlewares/validateObjectId.js';
@@ -146,6 +146,7 @@ managersRouter.patch(
     validateObjectId(),
     async (req, res, next) => {
     const id = req.params.id as string;
+    const { user: admin } = req as RequestWithUser;
 
     try {
         const user = await User.findById(id);
@@ -159,15 +160,14 @@ managersRouter.patch(
 
         if (user.status === 'active') {
           user.status = 'banned'
+
           await Order.updateMany(
             {
-              managerId: user._id,
-              status: {
-                $in: ['NEW', 'IN_PROGRESS', 'CONTRACT_PENDING'],
-              },
+                managerId: user._id,
+                status: 'IN_PROGRESS'
             },
             {
-              $unset: { managerId: 1 },
+                $set: { managerId: admin._id },
             },
           );
 
