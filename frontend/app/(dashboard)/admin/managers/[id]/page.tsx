@@ -7,7 +7,10 @@ import {
 } from '@/components/dashboard/managers/UpdateManagerForm';
 import OrderTable from '@/components/dashboard/orders/OrderTable';
 import {Button} from '@/components/ui/button';
-import {Delete, Download, Undo} from 'lucide-react';
+import {Delete, Download, KeyRound, Undo} from 'lucide-react';
+import {
+  ChangeManagerPasswordForm
+} from '@/components/dashboard/managers/ChangeManagerPasswordForm';
 import {useModalStore} from '@/lib/stores/modalStore';
 import {Modal} from '@/components/shared/Modal';
 import {
@@ -88,30 +91,36 @@ export default function Manager() {
 
   return (
     <section>
-      <div className="flex items-center justify-between flex-wrap mb-4">
+      <div className="flex flex-col gap-3 mb-4 sm:flex-row sm:items-center sm:justify-between sm:flex-wrap">
         <h1 className="text-2xl font-bold">Страница просмотра менеджера</h1>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-2 w-full sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
           <Button
-            className={manager?.status !== 'banned' ? "bg-destructive opacity-80 text-white hover:opacity-100" : "bg-emerald-600 text-white hover:opacity-100"}
+            className={`w-full justify-center sm:w-auto ${manager?.status !== 'banned' ? "bg-destructive opacity-80 text-white hover:opacity-100" : "bg-emerald-600 text-white hover:opacity-100"}`}
             onClick={() => setManagerToChange(id as string)}
           >
             {manager?.status !== 'banned' ? (
                 <>
-                  <Delete className="w-4 h-4" />Забанить <span className="block underline">{manager.fullName}</span>
+                  <Delete className="w-4 h-4" />Забанить <span className="block underline truncate">{manager.fullName}</span>
                 </>
               )
               :
               <>
-                <Undo className="w-4 h-4" />Разбанить <span className="block underline">{manager.fullName}</span>
+                <Undo className="w-4 h-4" />Разбанить <span className="block underline truncate">{manager.fullName}</span>
               </>
             }
 
           </Button>
           <Button
-            className="bg-[#1E2B6D] hover:bg-[#162356]"
+            className="w-full justify-center sm:w-auto bg-[#1E2B6D] hover:bg-[#162356]"
             onClick={() => openModal("reportManager")}
           >
-            <Download className="w-4 h-4 mr-2" /> Отчет по менеджеру <span className="block underline">{manager.fullName}</span>
+            <Download className="w-4 h-4 mr-2" /> Отчет по менеджеру <span className="block underline truncate">{manager.fullName}</span>
+          </Button>
+          <Button
+            className="w-full justify-center sm:w-auto bg-[#1E2B6D] hover:bg-[#162356]"
+            onClick={() => openModal("changeManagerPassword")}
+          >
+            <KeyRound className="w-4 h-4 mr-2" /> Сменить пароль <span className="block underline truncate">{manager.fullName}</span>
           </Button>
         </div>
       </div>
@@ -123,7 +132,6 @@ export default function Manager() {
       <Modal
         id="reportManager"
         title="Отчет по менеджеру"
-        description="Отчеты для менеджеров"
       >
         <DateRangePicker
           value={dateRange}
@@ -139,6 +147,13 @@ export default function Manager() {
         >
           Скачать отчет
         </Button>
+      </Modal>
+
+      <Modal
+        id="changeManagerPassword"
+        title="Смена пароля менеджера"
+      >
+        <ChangeManagerPasswordForm managerId={id as string} />
       </Modal>
 
       <ConfirmDialog
