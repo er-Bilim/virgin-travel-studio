@@ -17,10 +17,10 @@
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5e03",
-    "fullName": "client",
+    "fullName": "manager2",
     "phone": "0555172011",
     "password": "123456789",
-    "role": "CLIENT",
+    "role": "MANAGER",
     "status": "active"
   }
 ]
