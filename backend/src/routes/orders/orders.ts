@@ -328,7 +328,7 @@ ordersRouter.patch(
   permit('ADMIN', 'MANAGER'),
   async (req, res, next) => {
     try {
-      const {id} = req.params;
+      const { id } = req.params;
       const {
         clientName,
         clientPhone,
@@ -336,173 +336,194 @@ ordersRouter.patch(
         rejectionReason,
         paymentMethod,
         paymentAmount,
-        managerId
+        managerId,
       } = req.body;
-      const {user} = req as RequestWithUser;
+      const { user } = req as RequestWithUser;
 
-        if (user.status === 'banned') {
-          return res.status(403).send({error: 'Менеджер забанен'});
-        }
+      if (user.status === 'banned') {
+        return res.status(403).send({ error: 'Менеджер забанен' });
+      }
 
-        if (!mongoose.Types.ObjectId.isValid(id as string)) {
-          return res.status(400).send({error: 'Неверный ID'});
-        }
+      if (!mongoose.Types.ObjectId.isValid(id as string)) {
+        return res.status(400).send({ error: 'Неверный ID' });
+      }
 
-        const allowedStatuses: OrderStatus[] = [
-          'NEW',
-          'IN_PROGRESS',
-          'CONTRACT_PENDING',
-          'COMPLETED',
-          'REJECTED',
-        ];
+      // 1. Ищем заказ в БД
+      const order = await Order.findById(id);
+      if (!order) {
+        return res.status(404).send({ error: 'Заявка не найдена' });
+      }
 
+      const previousStatus = order.status;
+
+      // 2. Валидация передаваемого статуса
+      const allowedStatuses: OrderStatus[] = [
+        'NEW',
+        'IN_PROGRESS',
+        'CONTRACT_PENDING',
+        'COMPLETED',
+        'REJECTED',
+      ];
+
+      if (
+        status !== undefined &&
+        !allowedStatuses.includes(status as OrderStatus)
+      ) {
+        return res.status(400).send({ error: 'Недопустимый статус' });
+      }
+
+      // 3. Логика для ADMIN: Переназначение менеджера
       if (user.role === 'ADMIN' && typeof managerId === 'string') {
         if (!mongoose.Types.ObjectId.isValid(managerId)) {
-          return res.status(400).send({error: 'Неверный ID менеджера'});
+          return res.status(400).send({ error: 'Неверный ID менеджера' });
         }
 
         order.managerId = new mongoose.Types.ObjectId(managerId);
-
         await order.save();
 
         const delegatedOrder = await Order.findById(order._id)
-            .populate('managerId', 'fullName phone')
-            .populate({
-              path: 'tourSetId',
-              populate: {path: 'tourId', select: 'title'},
-            });
+          .populate('managerId', 'fullName phone')
+          .populate({
+            path: 'tourSetId',
+            populate: { path: 'tourId', select: 'title' },
+          });
 
-        return res.send({message: 'Заявка переназначена', order: delegatedOrder});
+        return res.send({
+          message: 'Заявка переназначена',
+          order: delegatedOrder,
+        });
       }
 
+      // 4. Логика сброса заказа в NEW (Отказ / Сброс в общий пул)
       if (status === 'NEW' && order.managerId) {
         if (order.status === 'COMPLETED' || order.status === 'REJECTED') {
           return res.status(400).send({
             error:
               'Нельзя вернуть завершенный или отклоненный заказ в общий пул',
           });
-        if (status !== undefined) {
-          if (!allowedStatuses.includes(status as OrderStatus)) {
-            return res.status(400).send({
-              error: 'Недопустимый статус',
-            });
-          }
         }
 
-        const order = await Order.findById(id);
-        if (!order) return res.status(404).send({error: 'Заявка не найдена'});
-
-        const previousStatus = order.status;
-
-        if (status === 'NEW' && order.managerId) {
-          if (order.status === 'COMPLETED' || order.status === 'REJECTED') {
-            return res.status(400).send({
-              error:
-                  'Нельзя вернуть завершенный или отклоненный заказ в общий пул',
-            });
-          }
-
-          if (user.role === 'MANAGER' && !order.managerId.equals(user._id)) {
-            return res
-                .status(403)
-                .send({error: 'Вы не можете отказаться от чужой заявки'});
-          }
-
-          order.managerId = null;
-          order.status = 'NEW';
-        } else {
-          if (
-              user.role === 'MANAGER' &&
-              order.managerId &&
-              !order.managerId.equals(user._id)
-          ) {
-            return res
-                .status(403)
-                .send({error: 'Эта заявка уже занята другим менеджером'});
-          }
-
-          if (!order.managerId) {
-            order.managerId = user._id;
-          }
-
-          if (clientName) order.clientName = clientName;
-          if (clientPhone) order.clientPhone = clientPhone;
-          if (order.status === 'NEW') order.status = 'IN_PROGRESS';
-          if (rejectionReason) order.rejectionReason = rejectionReason;
-
-          if (paymentMethod !== undefined) {
-            const allowedPayments: OrderPayment[] = ['CASH', 'CARD', 'QR', 'BANK'];
-            if (!allowedPayments.includes(paymentMethod as OrderPayment)) {
-              return res.status(400).send({error: 'Недопустимый вид оплаты'});
-            }
-            order.paymentMethod = paymentMethod as OrderPayment;
-
-            if (paymentAmount === undefined || paymentAmount === null || Number(paymentAmount) <= 0) {
-              return res.status(400).send({error: 'Сумма оплаты обязательна и должна быть больше 0, если указан способ оплаты'});
-            }
-          } else if (paymentAmount !== undefined && paymentAmount !== null) {
-            return res.status(400).send({error: 'Способ оплаты обязателен, если указана сумма оплаты'});
-          }
-
-          if (paymentAmount !== undefined && paymentAmount !== null) {
-            const parsedAmount = Number(paymentAmount);
-            if (isNaN(parsedAmount) || parsedAmount < 0) {
-              return res.status(400).send({error: 'Недопустимая сумма оплаты'});
-            }
-            order.paymentAmount = parsedAmount;
-          }
-
-          if (
-              status &&
-              status === 'COMPLETED' &&
-              previousStatus !== 'COMPLETED' &&
-              order.tourSetId
-          ) {
-            const tourSet = await TourSet.findById(order.tourSetId);
-            if (!tourSet) {
-              return res.status(400).send({error: 'Тур не найден'});
-            }
-            if (!tourSet.hasAvailableSeats()) {
-              return res.status(400).send({error: 'Нет свободных мест!'});
-            }
-          }
-
-          if (status) order.status = status as OrderStatus;
-        }
-
-        await order.save();
-
-        if (
-            order.tourSetId &&
-            previousStatus !== order.status &&
-            (previousStatus === 'COMPLETED' || order.status === 'COMPLETED')
-        ) {
-          await syncTourSetSeats(order.tourSetId);
-        }
-
-        const updatedOrder = await Order.findById(order._id)
-            .populate('managerId', 'fullName phone')
-            .populate({
-              path: 'tourSetId',
-              populate: {path: 'tourId', select: 'title'},
-            });
-
-        res.send({message: 'Статус успешно обновлен', order: updatedOrder});
-      }
-      catch
-          (e)
-      {
-        if (e instanceof mongoose.Error.ValidationError) {
+        if (user.role === 'MANAGER' && !order.managerId.equals(user._id)) {
           return res
-              .status(400)
-              .send({error: 'Ошибка валидации', details: e.errors});
+            .status(403)
+            .send({ error: 'Вы не можете отказаться от чужой заявки' });
         }
-        next(e);
+
+        order.managerId = null;
+        order.status = 'NEW';
+      } else {
+        // 5. Обычное обновление / Взятие заявки менеджером
+        if (
+          user.role === 'MANAGER' &&
+          order.managerId &&
+          !order.managerId.equals(user._id)
+        ) {
+          return res
+            .status(403)
+            .send({ error: 'Эта заявка уже занята другим менеджером' });
+        }
+
+        if (!order.managerId) {
+          order.managerId = user._id;
+        }
+
+        if (clientName) order.clientName = clientName;
+        if (clientPhone) order.clientPhone = clientPhone;
+        if (order.status === 'NEW') order.status = 'IN_PROGRESS';
+        if (rejectionReason) order.rejectionReason = rejectionReason;
+
+        // Обработка оплаты
+        if (paymentMethod !== undefined) {
+          const allowedPayments: OrderPayment[] = [
+            'CASH',
+            'CARD',
+            'QR',
+            'BANK',
+          ];
+          if (!allowedPayments.includes(paymentMethod as OrderPayment)) {
+            return res.status(400).send({ error: 'Недопустимый вид оплаты' });
+          }
+          order.paymentMethod = paymentMethod as OrderPayment;
+
+          if (
+            paymentAmount === undefined ||
+            paymentAmount === null ||
+            Number(paymentAmount) <= 0
+          ) {
+            return res
+              .status(400)
+              .send({
+                error:
+                  'Сумма оплаты обязательна и должна быть больше 0, если указан способ оплаты',
+              });
+          }
+        } else if (paymentAmount !== undefined && paymentAmount !== null) {
+          return res
+            .status(400)
+            .send({
+              error: 'Способ оплаты обязателен, если указана сумма оплаты',
+            });
+        }
+
+        if (paymentAmount !== undefined && paymentAmount !== null) {
+          const parsedAmount = Number(paymentAmount);
+          if (isNaN(parsedAmount) || parsedAmount < 0) {
+            return res.status(400).send({ error: 'Недопустимая сумма оплаты' });
+          }
+          order.paymentAmount = parsedAmount;
+        }
+
+        // Проверка мест при завершении заказа
+        if (
+          status &&
+          status === 'COMPLETED' &&
+          previousStatus !== 'COMPLETED' &&
+          order.tourSetId
+        ) {
+          const tourSet = await TourSet.findById(order.tourSetId);
+          if (!tourSet) {
+            return res.status(400).send({ error: 'Тур не найден' });
+          }
+          if (!tourSet.hasAvailableSeats()) {
+            return res.status(400).send({ error: 'Нет свободных мест!' });
+          }
+        }
+
+        if (status) order.status = status as OrderStatus;
       }
+
+      // 6. Сохранение и синхронизация мест
+      await order.save();
+
+      if (
+        order.tourSetId &&
+        previousStatus !== order.status &&
+        (previousStatus === 'COMPLETED' || order.status === 'COMPLETED')
+      ) {
+        await syncTourSetSeats(order.tourSetId);
+      }
+
+      const updatedOrder = await Order.findById(order._id)
+        .populate('managerId', 'fullName phone')
+        .populate({
+          path: 'tourSetId',
+          populate: { path: 'tourId', select: 'title' },
+        });
+
+      return res.send({
+        message: 'Статус успешно обновлен',
+        order: updatedOrder,
+      });
+    } catch (e) {
+      if (e instanceof mongoose.Error.ValidationError) {
+        return res
+          .status(400)
+          .send({ error: 'Ошибка валидации', details: e.errors });
+      }
+      next(e);
     }
-    ,
-)
-;
+  },
+);
 
 ordersRouter.delete(
     '/:id',

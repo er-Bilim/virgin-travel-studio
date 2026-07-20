@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/select';
 import MultiImageInput
   from '@/components/dashboard/MultiImageInput/MultiImageInput';
-import {inputClass} from '@/lib/constants';
+import {apiURL, inputClass} from '@/lib/constants';
 import {useCategories} from '@/lib/hooks/categoryHooks';
 import {useCreateTour, useUpdateTour} from '@/lib/hooks/tourHooks';
 import type {TourMutation} from '@/types/tour';
@@ -309,21 +309,28 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
           Фотографии (до 5 штук)
         </label>
 
-        {isEdit ? <Controller
-          control={control}
-          name="images"
-          render={({ field }) => (
-            <MultiImageInput
-              name="images"
-              label="Выберите изображения"
-              onChange={field.onChange}
-              value={field.value}
-              showPreviews={true}
-              allowReorder={true}
-            />
-          )}
-        />
-          :
+        {isEdit ? (
+          <Controller
+            control={control}
+            name="images"
+            render={({ field }) => {
+              const previews = field.value.map(item => {
+                if (typeof item === 'string') return `${apiURL}/tours/image/${item}`;
+                else return item
+              })
+              return (
+                <MultiImageInput
+                  name="images"
+                  label="Выберите изображения"
+                  onChange={field.onChange}
+                  value={field.value}
+                  previewsValues={previews}
+                  showPreviews={true}
+                  allowReorder={true}
+                />
+              );}}
+          />
+        ) : (
           <Controller
             control={control}
             name="images"
@@ -337,8 +344,7 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
               />
             )}
           />
-        }
-
+        )}
       </div>
 
       <button

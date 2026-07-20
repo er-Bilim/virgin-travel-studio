@@ -23,7 +23,11 @@ const fileFilterImage = ({
     );
   }
 
-  if (file.fieldname === 'image' || file.fieldname.startsWith('advantages')) {
+  if (
+    file.fieldname === 'image' ||
+    file.fieldname.startsWith('advantages') ||
+    file.fieldname === 'images'
+  ) {
     const allowedImageTypes = ALLOWED_IMAGE_TYPES;
     if (allowedImageTypes.includes(file.mimetype)) {
       return callback(null, true);

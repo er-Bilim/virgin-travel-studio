@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'fs/promises';
-import config from '@/config.js';
+import config from '../../config.js';
 import type { GridFSBucket } from 'mongodb';
 
 const CONTENT_TYPES: Record<string, string> = {

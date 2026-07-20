@@ -10,7 +10,7 @@ import {
 import { useUser } from '@/lib/hooks/authHooks';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, Globe, GlobeLock, ArrowLeft } from 'lucide-react';
-import { imageUrl, isDev } from '@/lib/constants';
+import { apiURL, isDev } from '@/lib/constants';
 import Link from 'next/link';
 import {
   Dialog,
@@ -185,7 +185,7 @@ export default function TourDetails() {
                     className="relative h-20 w-full overflow-hidden rounded-lg border"
                   >
                     <Image
-                      src={imageUrl + img}
+                      src={apiURL + '/tours/image/' + img}
                       alt={`${tour.title} — фото ${idx + 1}`}
                       fill
                       sizes="120px"

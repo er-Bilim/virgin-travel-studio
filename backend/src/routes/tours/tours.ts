@@ -1,7 +1,7 @@
 import express from 'express';
 import auth, {authOrNot, type RequestWithUser} from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
-import {imagesUpload} from '@/middlewares/multer.js';
+import {imageMemoryUpload} from '@/middlewares/multer.js';
 import Tour from '@/model/tour/Tour.js';
 import mongoose, {type PipelineStage} from 'mongoose';
 import validateObjectId from '@/middlewares/validateObjectId.js';
@@ -13,6 +13,9 @@ import path from 'path';
 import fs from 'fs/promises';
 import TourView from '@/model/tour/TourView.js';
 import {buildTourPipeline} from '@/aggregations/tours.pipeline.js';
+import { uploadImageToGridFS } from '@/lib/gridfs.js';
+import { getGridFSBucket } from '@/index.js';
+import { ObjectId } from 'mongodb';
 
 const toursRouter = express.Router();
 
@@ -394,11 +397,35 @@ toursRouter.get(
   },
 );
 
+toursRouter.get('/image/:id', async (req, res, next) => {
+    try {
+    const bucket = getGridFSBucket();
+    const _id = new ObjectId(req.params.id);
+    const files = await bucket.find({ _id }).toArray();
+
+    if (files.length === 0) {
+      return res.status(404).send({
+        error: 'Изображение не найдено',
+      });
+    }
+
+    const file = files[0];
+    res.set(
+      'Content-Type',
+      file?.metadata?.contentType || 'application/octet-stream',
+    );
+
+    bucket.openDownloadStream(_id).pipe(res);
+  } catch (error) {
+    next(error);
+  }
+})
+
 toursRouter.post(
   '/',
   auth,
   permit('ADMIN'),
-  imagesUpload.array('images', 5),
+  imageMemoryUpload.array('images', 5),
   async (req, res, next) => {
     try {
       const { title, description, countryCode, category, baseAdvantages } =
@@ -414,18 +441,20 @@ toursRouter.post(
             ? baseAdvantages
             : [];
 
-      const imagePaths = req.files
-        ? (req.files as Express.Multer.File[]).map(
-            (file) => 'images/' + file.filename,
+      const uploadPromises = req.files
+        ? (req.files as Express.Multer.File[]).map((file) =>
+            uploadImageToGridFS(file),
           )
         : [];
+
+      const imageIds = await Promise.all(uploadPromises);
 
       const tour = new Tour({
         title,
         description,
         countryCode: countryCode?.trim().toUpperCase(),
         category,
-        images: imagePaths,
+        images: imageIds,
         baseAdvantages: parsedAdvantages,
         isPublished: false,
       });
@@ -448,7 +477,7 @@ toursRouter.patch(
   auth,
   permit('ADMIN'),
   validateObjectId(),
-  imagesUpload.array('images', 5),
+  imageMemoryUpload.array('images', 5),
   async (req, res, next) => {
     const { id } = req.params;
 
@@ -500,7 +529,7 @@ toursRouter.patch(
           orderMap = [orderMap];
         }
 
-        const finalImages: string[] = [];
+        const finalImages: ObjectId[] = [];
         let newFileIndex = 0;
         const uploadedFiles = (req.files as Express.Multer.File[]) || [];
 
@@ -508,21 +537,26 @@ toursRouter.patch(
           const currentFile = uploadedFiles[newFileIndex];
 
           if (item === 'NEW_FILE' && currentFile) {
-            finalImages.push('images/' + currentFile.filename);
+            finalImages.push(new mongoose.Types.ObjectId(await uploadImageToGridFS(currentFile)));
             newFileIndex++;
           } else if (item !== 'NEW_FILE' && item !== 'EMPTY') {
-            finalImages.push(item);
+            finalImages.push(new mongoose.Types.ObjectId(item));
           }
         }
 
-        const imagesToDelete =
-          tour.images?.filter((oldImg) => !finalImages.includes(oldImg)) || [];
+        const finalImageIds = finalImages.map((id) => id.toString());
 
-        for (const imgPath of imagesToDelete) {
+        const imagesToDelete =
+          tour.images?.filter(
+            (oldImg) => !finalImageIds.includes(oldImg.toString()),
+          ) || [];
+        
+        const bucket = getGridFSBucket();
+        for (const imgId of imagesToDelete) {
           try {
-            await fs.unlink(path.join(process.cwd(), 'public', imgPath));
+            await bucket.delete(imgId);
           } catch (err) {
-            console.error(`Не удалось удалить файл ${imgPath}:`, err);
+            console.error(`Не удалось удалить файл ${imgId}:`, err);
           }
         }
 
@@ -560,6 +594,21 @@ toursRouter.delete(
           error:
             'Невозможно удалить тур, так как к нему привязаны активные потоки туров.',
         });
+      }
+
+      const tour = await Tour.findById(id as string);
+
+      if (tour && tour.images.length > 0) {
+        const bucket = getGridFSBucket();
+        try {
+          const deletePromises = tour.images.map((id) =>
+            bucket.delete(id),
+          );
+
+          await Promise.all(deletePromises);
+        } catch (error) {
+          console.error(error);
+        }
       }
 
       const result = await Tour.deleteOne({ _id: id });

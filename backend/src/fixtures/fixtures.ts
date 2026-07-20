@@ -104,6 +104,12 @@ const run = async () => {
             const toursData = await getJson(collectionName + '.json');
 
             for (const tourData of toursData) {
+              if (tourData.images) {
+                const promises = tourData.images.map((imagePath: string) =>
+                  seedImageToGridFs(bucket!, imagePath),
+                );
+                tourData.images = await Promise.all(promises);
+              }
               const tour = new Tour(tourData);
               await tour.save();
             }

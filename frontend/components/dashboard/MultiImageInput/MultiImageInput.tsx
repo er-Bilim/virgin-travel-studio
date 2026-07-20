@@ -11,6 +11,7 @@ interface Props {
   label: string;
   onChange: (files: (File | string)[]) => void;
   value: (File | string)[];
+  previewsValues?: (File | string)[];
   maxFiles?: number;
   showPreviews?: boolean;
   allowReorder?: boolean;
@@ -21,6 +22,7 @@ const MultiImageInput: React.FC<Props> = ({
   label,
   onChange,
   value = [],
+  previewsValues = [],
   maxFiles = IMAGE_UPLOAD.MAX_FILES,
   showPreviews = true,
   allowReorder = false,
@@ -38,13 +40,18 @@ const MultiImageInput: React.FC<Props> = ({
     const objectUrls: string[] = [];
     const next: Record<string, string> = {};
 
-    value.forEach((item) => {
+    value.forEach((item, index) => {
       const key = getFileKey(item);
-      if (typeof item === 'string') {
-        next[key] = item.startsWith('http') ? item : `${imageUrl}${item}`;
+      const previewSource = previewsValues[index] ?? item;
+
+      if (typeof previewSource === 'string') {
+        next[key] = previewSource.startsWith('http')
+          ? previewSource
+          : `${imageUrl}${previewSource}`;
         return;
       }
-      const blobUrl = URL.createObjectURL(item);
+
+      const blobUrl = URL.createObjectURL(previewSource);
       objectUrls.push(blobUrl);
       next[key] = blobUrl;
     });
@@ -54,7 +61,7 @@ const MultiImageInput: React.FC<Props> = ({
     return () => {
       objectUrls.forEach((url) => URL.revokeObjectURL(url));
     };
-  }, [value, showPreviews]);
+  }, [value, previewsValues, showPreviews]);
 
  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
    const files = Array.from(e.target.files || []);
@@ -94,6 +101,7 @@ const MultiImageInput: React.FC<Props> = ({
 
    if (filesToAdd.length > 0) {
      onChange([...value, ...filesToAdd]);
+     console.log(value);
    }
 
    if (inputRef.current) inputRef.current.value = '';
