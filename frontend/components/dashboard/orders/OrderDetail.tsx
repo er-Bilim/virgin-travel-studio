@@ -1,18 +1,19 @@
 'use client';
 
 import OrderManageForm from '@/components/dashboard/orders/OrderManageForm';
-import { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { useUser } from '@/lib/hooks/authHooks';
+import {useState} from 'react';
+import {useParams, useRouter} from 'next/navigation';
+import {useUser} from '@/lib/hooks/authHooks';
 import {
   useDeleteOrder,
   useOneOrder,
-  useUpdateOrder,
+  useUpdateOrder
 } from '@/lib/hooks/orderHooks';
-import { ORDER_STATUS_LABELS } from '@/lib/constants';
-import { Button } from '@/components/ui/button';
+import {ORDER_STATUS_LABELS} from '@/lib/constants';
+import {Button} from '@/components/ui/button';
 import {
   ArrowLeft,
+  ArrowLeftRight,
   Banknote,
   CircleCheckBig,
   Copy,
@@ -21,26 +22,28 @@ import {
   ScrollText,
   Trash,
   User,
-  UserMinus,
+  UserMinus
 } from 'lucide-react';
 import {
   Dialog,
-  DialogContent, DialogDescription,
+  DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog';
-import { toast } from 'sonner';
-import { useModalStore } from '@/lib/stores/modalStore';
-import { Modal } from '@/components/shared/Modal';
+import {toast} from 'sonner';
+import {useModalStore} from '@/lib/stores/modalStore';
+import {Modal} from '@/components/shared/Modal';
 import ContractForm from '@/components/dashboard/orders/ContractForm';
-import { Spinner } from '@/components/ui/spinner';
+import {Spinner} from '@/components/ui/spinner';
 import PaymentForm from '@/components/dashboard/orders/PaymentForm';
-import { cn, formatDayAndMonthWords } from '@/lib/utils';
-import type { CustomOrder, StandardOrder } from '@/types/order';
+import {cn, formatDayAndMonthWords} from '@/lib/utils';
+import type {CustomOrder, StandardOrder} from '@/types/order';
 import StandardOrderAside from './StandardOrderAside';
 import CustomOrderAside from './CustomOrderAside';
 import countries from '@/lib/countries';
+import {DelegateOrder} from '@/components/dashboard/orders/DelegateOrder';
 
 export default function OrderDetail() {
   const { id } = useParams();
@@ -258,14 +261,26 @@ export default function OrderDetail() {
               </button>
 
               {user?.role === 'ADMIN' && (
-                <Button
-                  className="group flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 h-11 px-4 rounded-xl border border-red-200 text-red-600 bg-white hover:bg-red-50 transition text-sm font-semibold cursor-pointer"
-                  type="button"
-                  onClick={() => setIsDeleteDialogOpen(true)}
-                >
-                  <Trash className="w-4 h-4 shrink-0" />
-                  <span>Удалить</span>
-                </Button>
+
+                  <>
+                    <Button
+                       className="group flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 h-11 px-4 rounded-xl border border-blue-200 text-blue-600 bg-white hover:bg-blue-50 transition text-sm font-semibold cursor-pointer"
+                       type="button"
+                       onClick={() => openModal('delegateOrder')}
+                    >
+                      <ArrowLeftRight className="w-4 h-4 shrink-0" />
+                      <span>Переназначить заявку</span>
+                    </Button>
+
+                    <Button
+                        className="group flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 h-11 px-4 rounded-xl border border-red-200 text-red-600 bg-white hover:bg-red-50 transition text-sm font-semibold cursor-pointer"
+                        type="button"
+                        onClick={() => setIsDeleteDialogOpen(true)}
+                    >
+                      <Trash className="w-4 h-4 shrink-0" />
+                      <span>Удалить</span>
+                    </Button>
+                  </>
               )}
 
               {['CONTRACT_PENDING', 'COMPLETED'].includes(order.status) && (
@@ -444,6 +459,10 @@ export default function OrderDetail() {
 
       <Modal id="contractModal" title="Впишите данные" description="Форма создание контракта">
         <ContractForm orderId={order._id} />
+      </Modal>
+
+      <Modal id="delegateOrder" title='Переназначить менеджера'>
+         <DelegateOrder orderId={order._id} currentManagerId={order.managerId?._id} />
       </Modal>
 
       <Modal id="paymentModal" title="Фиксация оплаты" description="Форма создание оплаты">
