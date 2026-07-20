@@ -544,8 +544,12 @@ toursRouter.patch(
           }
         }
 
+        const finalImageIds = finalImages.map((id) => id.toString());
+
         const imagesToDelete =
-          tour.images?.filter((oldImg) => !finalImages.includes(oldImg)) || [];
+          tour.images?.filter(
+            (oldImg) => !finalImageIds.includes(oldImg.toString()),
+          ) || [];
         
         const bucket = getGridFSBucket();
         for (const imgId of imagesToDelete) {

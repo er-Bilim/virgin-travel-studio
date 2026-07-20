@@ -15,6 +15,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { ...imageHost, pathname: '/images/**' },
       { ...imageHost, pathname: '/api/news/image/**' },
+      { ...imageHost, pathname: '/api/tours/image/**' },
     ],
   },
 };
