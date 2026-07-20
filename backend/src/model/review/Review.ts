@@ -32,7 +32,7 @@ const ReviewSchema = new Schema<ReviewFields>(
     },
 
     image: {
-      type: String,
+      type: Schema.Types.ObjectId,
       default: null,
     },
 

@@ -7,7 +7,7 @@ import {
   DialogClose, DialogDescription,
 } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import { imageUrl, isDev } from '@/lib/constants';
+import { apiURL, isDev } from '@/lib/constants';
 import Rating from '@/components/shared/Rating';
 import { X } from 'lucide-react';
 import ClientAvatar from '@/components/shared/ClientAvatar';
@@ -19,7 +19,7 @@ interface Props {
 }
 
 const ReviewPhoto = ({ src, authorName, rating }: Props) => {
-  const fullSrc = imageUrl + src;
+  const fullSrc = apiURL + '/reviews/image/' + src;
 
   return (
     <Dialog>

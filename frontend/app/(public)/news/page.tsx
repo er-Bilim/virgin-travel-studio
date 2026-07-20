@@ -47,10 +47,13 @@ const NewsPage = async ({ searchParams }: NewsPageProps) => {
   const startDate = params.startDate || null;
   const endDate = params.endDate || null;
 
+  const parsedPage = Number.parseInt(params.page ?? '1', 10);
+  const page = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+
   await qc.prefetchQuery({
     queryKey: [
       'news',
-      1,
+     page,
       7,
       undefined,
       'true',
@@ -61,7 +64,7 @@ const NewsPage = async ({ searchParams }: NewsPageProps) => {
     ],
     queryFn: () =>
       getNews({
-        page: 1,
+        page,
         limit: 7,
         isPublished: 'true',
         startDate,
@@ -75,10 +78,6 @@ const NewsPage = async ({ searchParams }: NewsPageProps) => {
     </HydrationBoundary>
   );
 };
-
-export const dynamic = 'force-dynamic';
-
-export default NewsPage;
 
 export const dynamic = 'force-dynamic';
 

@@ -14,7 +14,6 @@ import {
   CircleDollarSign,
   Clock,
   Download,
-  FileText,
   type LucideProps,
   TrendingUp,
 } from 'lucide-react';

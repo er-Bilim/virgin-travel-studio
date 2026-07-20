@@ -138,6 +138,12 @@ const run = async () => {
             const reviewsData = await getJson(collectionName + '.json');
 
             for (const reviewData of reviewsData) {
+              if (reviewData.image && bucket) {
+                reviewData.image = await seedImageToGridFs(
+                  bucket,
+                  reviewData.image,
+                );
+              }
               const review = new Review(reviewData);
               await review.save();
             }
