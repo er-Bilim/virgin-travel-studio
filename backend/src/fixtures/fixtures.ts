@@ -14,6 +14,7 @@ import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { GridFSBucket } from 'mongodb';
 import seedImageToGridFs from './helpers/seedImageToGridFs.js';
+import HomepageSettings from "@/model/homepageSettings/HomepageSettings.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -47,6 +48,7 @@ const run = async () => {
       'orders',
       'reviews',
       'contactsettings',
+      'homepagesettings',
       'aboutus',
     ];
 
@@ -157,6 +159,15 @@ const run = async () => {
               await contactSetting.save();
             }
             console.log('Настройки контактов успешно созданы');
+            break;
+
+          case 'homepagesettings':
+            const homepageSettingsData = await getJson(collectionName + '.json');
+            for (const homepageSettingData of homepageSettingsData) {
+              const contactSetting = new HomepageSettings(homepageSettingData);
+              await contactSetting.save();
+            }
+            console.log('Настройки главной страницы успешно созданы');
             break;
 
           case 'aboutus':

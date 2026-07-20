@@ -9,6 +9,7 @@ const HeroSection = () => {
     data: settings,
   } = useHomepageSettings();
 
+
   const videoSource = settings?.hero?.videoUrl
     ? `${imageUrl}${settings.hero.videoUrl}`
     : 'http://localhost:8000/videos/default.mp4';
