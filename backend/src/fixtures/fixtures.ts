@@ -164,8 +164,8 @@ const run = async () => {
           case 'homepagesettings':
             const homepageSettingsData = await getJson(collectionName + '.json');
             for (const homepageSettingData of homepageSettingsData) {
-              const contactSetting = new HomepageSettings(homepageSettingData);
-              await contactSetting.save();
+              const homepageSetting = new HomepageSettings(homepageSettingData);
+              await homepageSetting.save();
             }
             console.log('Настройки главной страницы успешно созданы');
             break;
