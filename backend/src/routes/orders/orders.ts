@@ -348,7 +348,6 @@ ordersRouter.patch(
         return res.status(400).send({ error: 'Неверный ID' });
       }
 
-      // 1. Ищем заказ в БД
       const order = await Order.findById(id);
       if (!order) {
         return res.status(404).send({ error: 'Заявка не найдена' });
@@ -356,7 +355,6 @@ ordersRouter.patch(
 
       const previousStatus = order.status;
 
-      // 2. Валидация передаваемого статуса
       const allowedStatuses: OrderStatus[] = [
         'NEW',
         'IN_PROGRESS',
@@ -372,7 +370,6 @@ ordersRouter.patch(
         return res.status(400).send({ error: 'Недопустимый статус' });
       }
 
-      // 3. Логика для ADMIN: Переназначение менеджера
       if (user.role === 'ADMIN' && typeof managerId === 'string') {
         if (!mongoose.Types.ObjectId.isValid(managerId)) {
           return res.status(400).send({ error: 'Неверный ID менеджера' });
@@ -394,7 +391,6 @@ ordersRouter.patch(
         });
       }
 
-      // 4. Логика сброса заказа в NEW (Отказ / Сброс в общий пул)
       if (status === 'NEW' && order.managerId) {
         if (order.status === 'COMPLETED' || order.status === 'REJECTED') {
           return res.status(400).send({
@@ -412,7 +408,6 @@ ordersRouter.patch(
         order.managerId = null;
         order.status = 'NEW';
       } else {
-        // 5. Обычное обновление / Взятие заявки менеджером
         if (
           user.role === 'MANAGER' &&
           order.managerId &&
@@ -432,7 +427,6 @@ ordersRouter.patch(
         if (order.status === 'NEW') order.status = 'IN_PROGRESS';
         if (rejectionReason) order.rejectionReason = rejectionReason;
 
-        // Обработка оплаты
         if (paymentMethod !== undefined) {
           const allowedPayments: OrderPayment[] = [
             'CASH',
@@ -473,7 +467,6 @@ ordersRouter.patch(
           order.paymentAmount = parsedAmount;
         }
 
-        // Проверка мест при завершении заказа
         if (
           status &&
           status === 'COMPLETED' &&
@@ -492,7 +485,6 @@ ordersRouter.patch(
         if (status) order.status = status as OrderStatus;
       }
 
-      // 6. Сохранение и синхронизация мест
       await order.save();
 
       if (
