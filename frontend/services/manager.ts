@@ -1,4 +1,4 @@
-import type {IUser, ManagerMutation, ManagerUpdateMutation} from '@/types/user';
+import type {IUser, ManagerMutation, ManagerPasswordMutation, ManagerUpdateMutation} from '@/types/user';
 import axiosApi from '@/lib/axiosApi';
 
 export const getManagers = async (filters: {
@@ -34,5 +34,16 @@ export const updateManager = async (id: string, data: ManagerUpdateMutation): Pr
 
 export const setStatusManager = async (id: string) => {
   const res = await axiosApi.patch(`/managers/${id}`);
+  return res.data;
+};
+
+export const changeManagerPassword = async (
+  id: string,
+  data: Pick<ManagerPasswordMutation, 'password'>,
+): Promise<{ message: string }> => {
+  const res = await axiosApi.patch<{ message: string }>(
+    `/managers/${id}/password`,
+    data,
+  );
   return res.data;
 };

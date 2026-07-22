@@ -1,5 +1,6 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {
+  changeManagerPassword,
   createManager,
   setStatusManager,
   getManagers,
@@ -7,7 +8,7 @@ import {
   updateManager,
 } from '@/services/manager';
 import type {UseFormSetError} from 'react-hook-form';
-import type {ManagerMutation, ManagerUpdateMutation} from '@/types/user';
+import type {IUser, ManagerMutation, ManagerPasswordMutation, ManagerUpdateMutation} from '@/types/user';
 import type {AxiosError} from 'axios';
 import {toast} from 'sonner';
 import type {GlobalError} from '@/types/error';
@@ -36,9 +37,11 @@ export const useCreateManager = (
 
   return useMutation({
     mutationFn: createManager,
-    onSuccess: async () => {
+    onSuccess: async (newManager) => {
       toast.success('Менеджер успешно создался!');
-      queryClient.invalidateQueries({ queryKey: ['managers']})
+      queryClient.setQueryData<IUser[]>(['managers'], (old = []) => {
+        return [newManager, ...old];
+      });
     },
     onError: (err: AxiosError<GlobalError>) => {
       const data = err.response?.data;
@@ -70,16 +73,20 @@ export const useUpdateManager = (setError: UseFormSetError<ManagerUpdateMutation
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: ManagerUpdateMutation }) =>
       updateManager(id, data),
-    onSuccess: async () => {
+    onSuccess: async (updatedManager) => {
       toast.success('Менеджер успешно обновлен!');
-      queryClient.invalidateQueries({queryKey: ['managers']});
+      queryClient.setQueryData<IUser[]>(['managers'], (old = []) =>
+        old.map((manager) =>
+          manager._id === updatedManager._id ? updatedManager : manager,
+        ),
+      );
     },
     onError: (err: AxiosError<GlobalError>) => {
       const data = err.response?.data;
 
       if (!data) {
         return toast.error(
-          'Не удалось обновить менеджера. Проверьте соединение и попробуйте снова.',
+          'Не удалось создать менеджера. Проверьте соединение и попробуйте снова.',
         );
       }
 
@@ -94,8 +101,40 @@ export const useUpdateManager = (setError: UseFormSetError<ManagerUpdateMutation
       }
 
       toast.error(
-        data.error || 'Не удалось обновить менеджера. Попробуйте снова.',
+        data.error || 'Не удалось создать менеджера. Попробуйте снова.',
       );
+    },
+  });
+};
+
+export const useChangeManagerPassword = (
+  setError: UseFormSetError<ManagerPasswordMutation>,
+) => {
+  return useMutation({
+    mutationFn: ({ id, password }: { id: string; password: string }) =>
+      changeManagerPassword(id, { password }),
+    onSuccess: () => {
+      toast.success('Пароль менеджера успешно изменён!');
+    },
+    onError: (err: AxiosError<GlobalError>) => {
+      const data = err.response?.data;
+
+      if (!data) {
+        return toast.error(
+          'Не удалось изменить пароль. Проверьте соединение и попробуйте снова.',
+        );
+      }
+
+      if ('details' in data && data.details) {
+        Object.entries(data.details).forEach(([field, value]) => {
+          if (field === 'password') {
+            setError('password', { type: 'server', message: value.message });
+          }
+        });
+        return;
+      }
+
+      toast.error(data.error || 'Не удалось изменить пароль. Попробуйте снова.');
     },
   });
 };

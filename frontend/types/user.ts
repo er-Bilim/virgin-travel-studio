@@ -1,20 +1,19 @@
-
 export type UserRole = 'ADMIN' | 'MANAGER' | 'CLIENT';
 
 export interface IUser {
-    _id: string;
-    fullName: string;
-    phone: string;
-    status: 'active' | 'banned';
-    role: UserRole;
-    createdAt: string;
-    updatedAt: string;
+  _id: string;
+  fullName: string;
+  phone: string;
+  status: 'active' | 'banned';
+  role: UserRole;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ManagerMutation {
-    fullName: string;
-    phone: string;
-    password: string;
+  fullName: string;
+  phone: string;
+  password: string;
 }
 
 export interface ManagerUpdateMutation {
@@ -23,12 +22,17 @@ export interface ManagerUpdateMutation {
   status: string;
 }
 
+export interface ManagerPasswordMutation {
+  password: string;
+  confirmPassword: string;
+}
+
 export interface LoginMutation {
-    phone: string;
-    password: string;
+  phone: string;
+  password: string;
 }
 
 export interface LoginResponse {
-    message: string;
-    user: IUser;
+  message: string;
+  user: IUser;
 }
