@@ -48,7 +48,7 @@ describe('Review', () => {
 
   it('рендерит фото при наличии image', () => {
     renderReview({ image: 'photo.png' });
-    expect(screen.getByTestId('review-photo')).toBeInTheDocument();
+    expect(screen.getByRole('img')).toBeInTheDocument();
   });
 
   it('не рендерит ответ компании без companyReply', () => {
