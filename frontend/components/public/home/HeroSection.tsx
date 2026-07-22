@@ -1,6 +1,6 @@
 'use client';
 
-import { imageUrl } from '@/lib/constants';
+import { apiURL } from '@/lib/constants';
 import { useHomepageSettings } from '@/lib/hooks/homepageSettingsHooks';
 
 const HeroSection = () => {
@@ -11,7 +11,7 @@ const HeroSection = () => {
 
 
   const videoSource = settings?.hero?.videoUrl
-    ? `${imageUrl}${settings.hero.videoUrl}`
+    ? `${apiURL}/homepage-settings/video/${settings.hero.videoUrl}`
     : 'http://localhost:8000/videos/default.mp4';
 
   return (
@@ -24,7 +24,7 @@ const HeroSection = () => {
           muted
           loop
           playsInline
-          poster="/images/poster.jpg"
+          poster={`${apiURL}/images/poster.jpg`}
         />
 
         <div className="absolute inset-0 bg-black/40" />
