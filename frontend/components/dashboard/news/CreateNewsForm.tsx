@@ -172,9 +172,9 @@ export default function CreateNewsForm({
                   <Trash2 className="h-4 w-4 text-red-500" />
                 </button>
               </div>
-              {errors.tags?.[i] && (
+              {errors.tags?.[i]?.value && (
                 <p className="text-red-500 text-[10px] ml-1">
-                  {errors.tags[i]?.message}
+                  {errors.tags[i]?.value.message}
                 </p>
               )}
             </div>
