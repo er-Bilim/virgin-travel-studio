@@ -39,3 +39,6 @@ Thumbs.db
 
 # images
 backend/public/images/
+
+# binary files
+a.out
