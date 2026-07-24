@@ -6,7 +6,7 @@ import type {AxiosError} from 'axios';
 import {Compass, FileText, Layout, Loader2, Plus} from 'lucide-react';
 import {Input} from '@/components/ui/input';
 import {Spinner} from '@/components/ui/spinner';
-import {imageUrl, inputClass} from '@/lib/constants';
+import {apiURL, inputClass} from '@/lib/constants';
 import {VideoInput} from './VideoInput';
 import {
   ConfirmDialog
@@ -283,7 +283,7 @@ export default function HomepageSettingsForm() {
                     watch={watch}
                     update={update}
                     remove={remove}
-                    imageUrl={imageUrl}
+                    imageUrl={`${apiURL}/homepage-settings/image/`}
                     inputClass={inputClass}
                   />
                 ))}

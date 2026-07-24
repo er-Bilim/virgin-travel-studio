@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import BasePhoto from '@/components/assets/lake.webp';
+import BasePhoto from '@/components/assets/placeholders/content_placeholder.png';
 import { imageUrl, isDev } from '@/lib/constants';
 import type { ITourWithTourSetFields } from '@/types/tour';
 import Image from 'next/image';
