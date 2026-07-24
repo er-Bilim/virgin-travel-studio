@@ -3,7 +3,8 @@
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
-  DialogContent, DialogDescription,
+  DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -14,10 +15,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import type { OrderPostType } from '@/types/order';
 import { useCreateOrder } from '@/lib/hooks/orderHooks';
 import { Calendar1, Tag, User, Phone, Send, ShieldCheck } from 'lucide-react';
-import {
-  formatDayAndMonthWords,
-  formatToReadablePrice,
-} from '@/lib/utils';
+import { formatDayAndMonthWords, formatToReadablePrice } from '@/lib/utils';
 import { X } from 'lucide-react';
 import { DialogClose } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
@@ -33,14 +31,14 @@ interface Props {
 }
 
 const OrderCard = ({
-                     isOpen,
-                     onClose,
-                     tourSetId,
-                     tourTitle,
-                     startDate,
-                     endDate,
-                     price,
-                   }: Props) => {
+  isOpen,
+  onClose,
+  tourSetId,
+  tourTitle,
+  startDate,
+  endDate,
+  price,
+}: Props) => {
   const {
     register,
     handleSubmit,
@@ -56,7 +54,12 @@ const OrderCard = ({
   const { mutate: postOrder } = useCreateOrder();
 
   const onSubmit: SubmitHandler<OrderPostType> = (data) => {
-    postOrder(data, {
+    const cleanedData = {
+      ...data,
+      clientPhone: data.clientPhone.replace(/[\s()-]/g, ''),
+    };
+
+    postOrder(cleanedData, {
       onSuccess: () => {
         onClose();
         toast.success(
@@ -74,7 +77,8 @@ const OrderCard = ({
 
   const priceInfo = formatToReadablePrice(price);
 
-  const { day: startDay, month: startMonth } = formatDayAndMonthWords(startDate);
+  const { day: startDay, month: startMonth } =
+    formatDayAndMonthWords(startDate);
   const { day: endDay, month: endMonth } = formatDayAndMonthWords(endDate);
 
   return (
@@ -123,14 +127,23 @@ const OrderCard = ({
         <form onSubmit={handleSubmit(onSubmit)} className="p-5 sm:p-6 bg-white">
           <div className="grid gap-4">
             <div className="grid gap-1.5">
-              <Label htmlFor="clientName" className="text-xs font-bold text-slate-500 uppercase tracking-wide">Ваше имя</Label>
+              <Label
+                htmlFor="clientName"
+                className="text-xs font-bold text-slate-500 uppercase tracking-wide"
+              >
+                Ваше имя
+              </Label>
               <div className="relative">
                 <User className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
                 <Input
                   id="clientName"
                   type="text"
                   placeholder="Как к вам обращаться"
-                  className={cn("pl-10 h-11 rounded-xl focus-visible:ring-[#031633]", errors.clientName && "border-red-500 focus-visible:ring-red-500")}
+                  className={cn(
+                    'pl-10 h-11 rounded-xl focus-visible:ring-[#031633]',
+                    errors.clientName &&
+                      'border-red-500 focus-visible:ring-red-500',
+                  )}
                   {...register('clientName', {
                     required: 'Поле обязательно',
                     validate: (value) =>
@@ -147,20 +160,29 @@ const OrderCard = ({
             </div>
 
             <div className="grid gap-1.5">
-              <Label htmlFor="phone" className="text-xs font-bold text-slate-500 uppercase tracking-wide">Телефон</Label>
+              <Label
+                htmlFor="phone"
+                className="text-xs font-bold text-slate-500 uppercase tracking-wide"
+              >
+                Телефон
+              </Label>
               <div className="relative">
                 <Phone className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
                 <Input
                   id="phone"
                   type="tel"
                   placeholder="+996 ___ ___ ___"
-                  className={cn("pl-10 h-11 rounded-xl focus-visible:ring-[#031633]", errors.clientPhone && "border-red-500 focus-visible:ring-red-500")}
+                  className={cn(
+                    'pl-10 h-11 rounded-xl focus-visible:ring-[#031633]',
+                    errors.clientPhone &&
+                      'border-red-500 focus-visible:ring-red-500',
+                  )}
                   {...register('clientPhone', {
                     required: 'Поле обязательно',
-                    setValueAs: (v: string) => v.replace(/[\s()-]/g, ''),
-                    pattern: {
-                      value: /^\+?[0-9]{9,15}$/,
-                      message: 'Введите корректный номер телефона',
+                    validate: (value) => {
+                      const cleaned = value.replace(/[\s()-]/g, '');
+                      const isValid = /^\+?[0-9]{9,15}$/.test(cleaned);
+                      return isValid || 'Введите корректный номер телефона';
                     },
                   })}
                 />
