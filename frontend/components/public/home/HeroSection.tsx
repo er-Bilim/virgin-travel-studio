@@ -2,6 +2,7 @@
 
 import { imageUrl } from '@/lib/constants';
 import { useHomepageSettings } from '@/lib/hooks/homepageSettingsHooks';
+import HERO_POSTER from '@/assets/placeholders/hero-poster.jpg';
 
 const HeroSection = () => {
   const { data: settings } = useHomepageSettings();
@@ -20,6 +21,7 @@ const HeroSection = () => {
           muted
           loop
           playsInline
+          poster={HERO_POSTER.src}
         />
 
         <div className="absolute inset-0 bg-black/40" />
