@@ -7,6 +7,7 @@ import { CircleCheck } from 'lucide-react';
 import SectionHeaderSkeleton from '@/components/shared/skeletons/SectionHeaderSkeleton';
 import ErrorState from '@/components/shared/ErrorState';
 import AdvantagesSkeleton from '@/components/shared/skeletons/AdvantagesSkeleton';
+import { useCallback } from 'react';
 
 export default function Advantages() {
   const {
@@ -17,9 +18,9 @@ export default function Advantages() {
   } = useHomepageSettings();
   const advantages = settings ? settings.advantages || [] : [];
 
-  const handleRefetch = () => {
+  const handleRefetch = useCallback(() => {
     refetchSettings();
-  };
+  }, [refetchSettings]);
 
   const renderSectionHeader = () => {
     if (isSettingsLoading) {
@@ -63,28 +64,26 @@ export default function Advantages() {
       {!isError && advantages.length > 0 && (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {advantages.map((adv) => (
-            <>
-              <article
-                className="group rounded-2xl border border-line bg-white p-6 shadow-soft transition hover:shadow-softlg hover:-translate-y-1"
-                key={adv._id}
-              >
-                <div className="ph mb-5 size-14 overflow-hidden rounded-2xl relative">
-                  <Image
-                    src={`${apiURL}/homepage-settings/image/${adv.image}`}
-                    alt={adv.title || 'Advantage image'}
-                    fill
-                    unoptimized={isDev}
-                    className="transition-transform duration-500 group-hover:scale-105"
-                  />
-                </div>
-                <h3 className="text-lg font-extrabold text-navy-800 leading-snug">
-                  {adv.title}
-                </h3>
-                <p className="mt-2 text-[15px] leading-relaxed text-navy-700/60">
-                  {adv.body}
-                </p>
-              </article>
-            </>
+            <article
+              className="group rounded-2xl border border-line bg-white p-6 shadow-soft transition hover:shadow-softlg hover:-translate-y-1"
+              key={adv._id}
+            >
+              <div className="mb-5 size-14 overflow-hidden rounded-2xl relative">
+                <Image
+                  src={`${apiURL}/homepage-settings/image/${adv.image}`}
+                  alt={adv.title || 'Advantage image'}
+                  fill
+                  unoptimized={isDev}
+                  className="transition-transform duration-500 group-hover:scale-105"
+                />
+              </div>
+              <h3 className="text-lg font-extrabold text-navy-800 leading-snug">
+                {adv.title}
+              </h3>
+              <p className="mt-2 text-[15px] leading-relaxed text-navy-700/60">
+                {adv.body}
+              </p>
+            </article>
           ))}
         </div>
       )}
