@@ -3,60 +3,88 @@
 import { useHomepageSettings } from '@/lib/hooks/homepageSettingsHooks';
 import { apiURL, isDev } from '@/lib/constants';
 import Image from 'next/image';
+import { CircleCheck } from 'lucide-react';
+import SectionHeaderSkeleton from '@/components/shared/skeletons/SectionHeaderSkeleton';
+import ErrorState from '@/components/shared/ErrorState';
+import AdvantagesSkeleton from '@/components/shared/skeletons/AdvantagesSkeleton';
 
 export default function Advantages() {
-  const { data, isPending, isError } = useHomepageSettings();
-  const advantages = data ? data.advantages || [] : [];
+  const {
+    data: settings,
+    isPending: isSettingsLoading,
+    isError,
+    refetch: refetchSettings,
+  } = useHomepageSettings();
+  const advantages = settings ? settings.advantages || [] : [];
 
-  if (isPending) {
+  const handleRefetch = () => {
+    refetchSettings();
+  };
+
+  const renderSectionHeader = () => {
+    if (isSettingsLoading) {
+      return <SectionHeaderSkeleton />;
+    }
+
     return (
-      <section className="my-24">
-        <p className="text-center text-muted-foreground">Загрузка...</p>
-      </section>
+      <>
+        <div>
+          <p className="mb-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-cyan-800">
+            <CircleCheck className="size-[18px]" />
+            Почему мы
+          </p>
+          <h2 className="text-3xl font-black tracking-tight text-navy-800">
+            Наши преимущества
+          </h2>
+          <p className="mt-3 max-w-xl text-muted-foreground text-[15px]">
+            Всё, что делает поездку с нами спокойной и предсказуемой
+          </p>
+        </div>
+      </>
     );
-  }
+  };
 
   return (
-    <>
-      {advantages.length > 0 && !isError && (
-        <>
-          <div className="my-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <h2 className="text-3xl font-black text-navy-700 md:text-4xl">
-              Наши преимущества
-            </h2>
-          </div>
-          <div className="flex flex-wrap gap-2 md:gap-4 justify-center">
-            {advantages.map((adv) => (
-              <article
-                key={adv._id}
-                className="group w-[350px] flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-gray-200"
-              >
-                {adv.image && (
-                  <div className="relative mb-5 flex h-48 w-full overflow-hidden rounded-xl bg-gray-50 text-navy-700 transition-colors duration-300 group-hover:bg-navy-800">
-                    <Image
-                      src={`${apiURL}/homepage-settings/image/${adv.image}`}
-                      alt={adv.title || 'Advantage image'}
-                      fill
-                      unoptimized={isDev}
-                      className="h-48 w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
-                )}
+    <section className="my-24 ">
+      <div className="mb-9 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        {renderSectionHeader()}
+      </div>
 
-                <div className="flex flex-1 flex-col">
-                  <h2 className="text-xl font-bold tracking-tight text-navy-700 transition-colors duration-300 group-hover:text-navy-900">
-                    {adv.title}
-                  </h2>
-
-                  <p className="mt-3 text-sm leading-relaxed text-gray-500 flex-1">
-                    {adv.body}
-                  </p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </>
+      {isSettingsLoading && (
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <AdvantagesSkeleton key={index} />
+          ))}
+        </div>
       )}
-    </>
+
+      {isError && <ErrorState onRetry={handleRefetch} />}
+
+      {!isError && advantages.length > 0 && (
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {advantages.map((adv) => (
+            <>
+              <article className="group rounded-2xl border border-line bg-white p-6 shadow-soft transition hover:shadow-softlg hover:-translate-y-1">
+                <div className="ph mb-5 size-14 overflow-hidden rounded-2xl relative">
+                  <Image
+                    src={`${apiURL}/homepage-settings/image/${adv.image}`}
+                    alt={adv.title || 'Advantage image'}
+                    fill
+                    unoptimized={isDev}
+                    className="h-48 w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+                <h3 className="text-lg font-extrabold text-navy-800 leading-snug">
+                  {adv.title}
+                </h3>
+                <p className="mt-2 text-[15px] leading-relaxed text-navy-700/60">
+                  {adv.body}
+                </p>
+              </article>
+            </>
+          ))}
+        </div>
+      )}
+    </section>
   );
 }
