@@ -49,7 +49,10 @@ homepageSettingsRouter.get('/video/:id', async (req, res, next) => {
         'Content-Type': contentType,
       });
 
-      bucket.openDownloadStream(_id, { start, end: end + 1 }).pipe(res);
+      bucket
+        .openDownloadStream(_id, { start, end: end + 1 })
+        .on('error', next)
+        .pipe(res);
     } else {
       res.writeHead(200, {
         'Content-Length': totalSize,
@@ -57,7 +60,7 @@ homepageSettingsRouter.get('/video/:id', async (req, res, next) => {
         'Accept-Ranges': 'bytes',
       });
 
-      bucket.openDownloadStream(_id).pipe(res);
+      bucket.openDownloadStream(_id).on('error', next).pipe(res);
     }
   } catch (error) {
     next(error);
@@ -80,7 +83,7 @@ homepageSettingsRouter.get('/image/:id', async (req, res, next) => {
       file?.metadata?.contentType || 'application/octet-stream',
     );
 
-    bucket.openDownloadStream(_id).pipe(res);
+    bucket.openDownloadStream(_id).on('error', next).pipe(res);
   } catch (error) {
     next(error);
   }
@@ -162,7 +165,11 @@ homepageSettingsRouter.post(
 
       const settings = new HomepageSettings({
         hero: hero
-          ? { videoUrl: uploadedVideoId, title: hero.title, subtitle: hero.subtitle }
+          ? {
+              videoUrl: uploadedVideoId,
+              title: hero.title,
+              subtitle: hero.subtitle,
+            }
           : undefined,
         advantages: parsedAdvantages,
         mainPopularTours: mainPopularTours
@@ -219,6 +226,7 @@ homepageSettingsRouter.put(
     const uploadedFiles = (req.files as Express.Multer.File[]) || [];
     let uploadedVideoId: string | null = null;
     const uploadedImageIds: string[] = [];
+    const oldFilesToDelete: string[] = [];
 
     try {
       const settings = await HomepageSettings.findOne();
@@ -241,14 +249,6 @@ homepageSettingsRouter.put(
         (file) => file.fieldname === 'video',
       );
 
-      if (currentVideo) {
-        if (settings.hero?.videoUrl) await deleteGridFSFile(settings.hero.videoUrl);
-        uploadedVideoId = await uploadVideoToGridFS(currentVideo);
-        settings.hero.videoUrl = uploadedVideoId;
-      } else if (deleteVideo === true || deleteVideo === 'true') {
-        if (settings.hero?.videoUrl) await deleteGridFSFile(settings.hero.videoUrl);
-        settings.hero.videoUrl = '';
-      }
       let advantagesData = req.body.advantages;
       if (typeof advantagesData === 'string') {
         try {
@@ -258,16 +258,11 @@ homepageSettingsRouter.put(
         }
       }
 
-      if (
-        !advantagesData ||
-        Object.keys(advantagesData).length === 0
-      ) {
+      if (!advantagesData || Object.keys(advantagesData).length === 0) {
         for (const existing of settings.advantages) {
-          if (existing.image) {
-            await deleteGridFSFile(existing.image);
-          }
+          if (existing.image) oldFilesToDelete.push(existing.image);
         }
-      
+
         settings.set('advantages', []);
         settings.markModified('advantages');
       }
@@ -276,7 +271,7 @@ homepageSettingsRouter.put(
         advantagesData &&
         typeof advantagesData === 'object' &&
         Object.keys(advantagesData).length > 0
-      )  {
+      ) {
         const keys = Object.keys(advantagesData);
 
         const incomingIds = new Set(
@@ -286,9 +281,11 @@ homepageSettingsRouter.put(
         );
 
         for (const existing of settings.advantages) {
-          const id = (existing._id as unknown as { toString(): string }).toString();
+          const id = (
+            existing._id as unknown as { toString(): string }
+          ).toString();
           if (!incomingIds.has(id)) {
-            if (existing.image) await deleteGridFSFile(existing.image);
+            if (existing.image) oldFilesToDelete.push(existing.image);
           }
         }
 
@@ -311,14 +308,17 @@ homepageSettingsRouter.put(
           }
 
           if (attachedFile) {
-            if (currentImageId) await deleteGridFSFile(currentImageId);
+            if (currentImageId) oldFilesToDelete.push(currentImageId);
             const newImageId = await uploadImageToGridFS(attachedFile);
             uploadedImageIds.push(newImageId);
             currentImageId = newImageId;
           } else if (advData.imageString === '') {
-            if (currentImageId) await deleteGridFSFile(currentImageId);
+            if (currentImageId) oldFilesToDelete.push(currentImageId);
             currentImageId = null;
-          } else if (typeof advData.imageString === 'string' && advData.imageString) {
+          } else if (
+            typeof advData.imageString === 'string' &&
+            advData.imageString
+          ) {
             currentImageId = advData.imageString;
           }
 
@@ -368,6 +368,17 @@ homepageSettingsRouter.put(
           settings.newsPage.subtitle = newsPage.subtitle;
       }
 
+      if (currentVideo) {
+        if (settings.hero?.videoUrl)
+          oldFilesToDelete.push(settings.hero.videoUrl);
+        uploadedVideoId = await uploadVideoToGridFS(currentVideo);
+        settings.hero.videoUrl = uploadedVideoId;
+      } else if (deleteVideo === true || deleteVideo === 'true') {
+        if (settings.hero?.videoUrl)
+          oldFilesToDelete.push(settings.hero.videoUrl);
+        settings.hero.videoUrl = '';
+      }
+
       settings.markModified('hero');
       settings.markModified('advantages');
 
@@ -379,6 +390,10 @@ homepageSettingsRouter.put(
       }
 
       await settings.save();
+
+      for (const oldId of oldFilesToDelete) {
+        await deleteGridFSFile(oldId);
+      }
 
       return res.send({
         message: 'Настройки страниц успешно обновлены',
