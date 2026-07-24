@@ -172,6 +172,16 @@ const run = async () => {
                   homepageSettingData.hero.videoUrl,
                 );
               }
+
+              if (homepageSettingData.advantages && bucket) {
+                for (const advantage of homepageSettingData.advantages) {
+                  advantage.image = await seedImageToGridFs(
+                    bucket,
+                    advantage.image,
+                  );
+                }
+              }
+
               const homepageSetting = new HomepageSettings(homepageSettingData);
               await homepageSetting.save();
             }
