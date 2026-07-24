@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import HeroSection from '../HeroSection';
 import { useHomepageSettings } from '@/lib/hooks/homepageSettingsHooks';
-import { imageUrl } from '@/lib/constants';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 vi.mock('@/lib/hooks/homepageSettingsHooks');
@@ -19,16 +18,21 @@ describe('HeroSection', () => {
     render(<HeroSection />);
 
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Путешествуй с нами' })
+      screen.getByRole('heading', { level: 1, name: 'Путешествуй с нами' }),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByText('Наша компания занимается проектированием премиальных туров.')
+      screen.getByText(
+        'Наша компания занимается проектированием премиальных туров.',
+      ),
     ).toBeInTheDocument();
 
     const video = document.querySelector('video');
     expect(video).toBeInTheDocument();
-    expect(video).toHaveAttribute('src', 'http://localhost:8000/videos/default.mp4');
+    expect(video).toHaveAttribute(
+      'src',
+      'http://localhost:8000/videos/default.mp4',
+    );
   });
 
   it('отображает кастомные заголовок, подзаголовок и видео из настроек', () => {
@@ -36,7 +40,7 @@ describe('HeroSection', () => {
       hero: {
         title: 'Уникальные путешествия',
         subtitle: 'Индивидуальные маршруты по всему миру',
-        videoUrl: '/videos/hero-custom.mp4',
+        videoUrl: 'hero-custom.mp4',
       },
     };
 
@@ -47,15 +51,18 @@ describe('HeroSection', () => {
     render(<HeroSection />);
 
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Уникальные путешествия' })
+      screen.getByRole('heading', { level: 1, name: 'Уникальные путешествия' }),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByText('Индивидуальные маршруты по всему миру')
+      screen.getByText('Индивидуальные маршруты по всему миру'),
     ).toBeInTheDocument();
 
     const video = document.querySelector('video');
-    expect(video).toHaveAttribute('src', `${imageUrl}/videos/hero-custom.mp4`);
+    expect(video).toHaveAttribute(
+      'src',
+      'http://localhost:8000/api/homepage-settings/video/hero-custom.mp4',
+    );
   });
 
   it('содержит корректные атрибуты фонового видео (autoplay, muted, loop)', () => {
