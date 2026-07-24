@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
       { ...imageHost, pathname: '/images/**' },
       { ...imageHost, pathname: '/api/news/image/**' },
       { ...imageHost, pathname: '/api/tours/image/**' },
+      { ...imageHost, pathname: '/api/reviews/image/**' },
       { ...imageHost, pathname: '/api/homepage-settings/image/**' },
     ],
   },
