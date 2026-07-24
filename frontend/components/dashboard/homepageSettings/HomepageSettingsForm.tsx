@@ -18,9 +18,9 @@ import {
   mutateHomepageSettings,
   useHomepageSettings,
 } from '@/lib/hooks/homepageSettingsHooks';
-import type {GlobalError} from '@/types/error';
-import {Button} from '@/components/ui/button';
-import {toast} from 'sonner';
+import type { GlobalError } from '@/types/error';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 type FormTab = 'hero' | 'sections' | 'innerPages';
 
@@ -54,9 +54,31 @@ export default function HomepageSettingsForm() {
     useHomepageSettings(true);
   const isNew = !currentSettings;
 
-  const { mutate, isPending: isSaving } = isNew
-    ? mutateCreateHomepageSettings()
-    : mutateHomepageSettings();
+  const { mutate: createSettings, isPending: isCreating } =
+    mutateCreateHomepageSettings();
+  const { mutate: updateSettings, isPending: isUpdating } =
+    mutateHomepageSettings();
+
+  const mutate = isNew ? createSettings : updateSettings;
+  const isSaving = isNew ? isCreating : isUpdating;
+
+  const defaultHomepageValues: HomepageSettingsMutationData = {
+    hero: { title: 'Путешествуйте по миру с комфортом', subtitle: '' },
+    mainPopularTours: { title: 'Популярные направления', subtitle: '' },
+    mainLatestNews: { title: 'Блог и новости компании', subtitle: '' },
+    reviewsPage: { title: 'Отзывы о нашей компании', subtitle: '' },
+    toursPage: {
+      badge: 'Наш каталог',
+      title: 'Найдите тур своей мечты',
+      subtitle: '',
+    },
+    newsPage: {
+      badge: 'Новости',
+      title: 'Будьте в курсе событий',
+      subtitle: '',
+    },
+    advantages: [],
+  };
 
   const {
     register,
@@ -68,9 +90,7 @@ export default function HomepageSettingsForm() {
     setError,
     formState: { errors },
   } = useForm<HomepageSettingsMutationData>({
-    defaultValues: currentSettings || {
-      advantages: [],
-    },
+    defaultValues: currentSettings || defaultHomepageValues,
   });
 
   useEffect(() => {
@@ -79,12 +99,7 @@ export default function HomepageSettingsForm() {
     }
   }, [currentSettings, reset]);
 
-  const {
-    fields,
-    update,
-    remove,
-    append,
-  } = useFieldArray({
+  const { fields, update, remove, append } = useFieldArray({
     control,
     name: 'advantages',
   });
@@ -102,7 +117,7 @@ export default function HomepageSettingsForm() {
 
     mutate(pendingData, {
       onSuccess: () => {
-        toast.success('Данные обновились!', { position: 'top-center'})
+        toast.success('Данные обновились!', { position: 'top-center' });
         setPendingData(null);
       },
       onError: (err: unknown) => {
@@ -274,7 +289,7 @@ export default function HomepageSettingsForm() {
               <div className="space-y-4">
                 {fields.map((field, index) => (
                   <AdvantageItem
-                    key={field.id}    
+                    key={field.id}
                     index={index}
                     field={field}
                     fieldError={errors.advantages?.[index]}
