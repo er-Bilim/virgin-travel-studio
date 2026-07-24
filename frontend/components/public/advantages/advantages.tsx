@@ -64,14 +64,17 @@ export default function Advantages() {
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {advantages.map((adv) => (
             <>
-              <article className="group rounded-2xl border border-line bg-white p-6 shadow-soft transition hover:shadow-softlg hover:-translate-y-1">
+              <article
+                className="group rounded-2xl border border-line bg-white p-6 shadow-soft transition hover:shadow-softlg hover:-translate-y-1"
+                key={adv._id}
+              >
                 <div className="ph mb-5 size-14 overflow-hidden rounded-2xl relative">
                   <Image
                     src={`${apiURL}/homepage-settings/image/${adv.image}`}
                     alt={adv.title || 'Advantage image'}
                     fill
                     unoptimized={isDev}
-                    className="h-48 w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="transition-transform duration-500 group-hover:scale-105"
                   />
                 </div>
                 <h3 className="text-lg font-extrabold text-navy-800 leading-snug">
