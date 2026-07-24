@@ -1,18 +1,14 @@
 'use client';
 
-import { apiURL } from '@/lib/constants';
+import { imageUrl } from '@/lib/constants';
 import { useHomepageSettings } from '@/lib/hooks/homepageSettingsHooks';
 
 const HeroSection = () => {
-
-  const {
-    data: settings,
-  } = useHomepageSettings();
-
+  const { data: settings } = useHomepageSettings();
 
   const videoSource = settings?.hero?.videoUrl
-    ? `${apiURL}/homepage-settings/video/${settings.hero.videoUrl}`
-    : 'http://localhost:8000/videos/default.mp4';
+    ? `${imageUrl}api/homepage-settings/video/${settings.hero.videoUrl}`
+    : `${imageUrl}videos/default.mp4`;
 
   return (
     <section aria-labelledby="hero-title">
@@ -24,7 +20,6 @@ const HeroSection = () => {
           muted
           loop
           playsInline
-          poster={`${apiURL}/images/poster.jpg`}
         />
 
         <div className="absolute inset-0 bg-black/40" />
@@ -40,7 +35,7 @@ const HeroSection = () => {
         </div>
       </div>
     </section>
-  )
+  );
 };
 
 export default HeroSection;
