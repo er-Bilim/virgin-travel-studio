@@ -113,7 +113,7 @@ const CreateReviewForm = ({
         setSubmitted(true);
 
         reset({
-          clientName: '',
+          clientName: data.clientName,
           rating: 0,
           comment: '',
           image: null,
