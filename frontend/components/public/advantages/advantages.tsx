@@ -1,7 +1,7 @@
 'use client';
 
 import { useHomepageSettings } from '@/lib/hooks/homepageSettingsHooks';
-import { imageUrl, isDev } from '@/lib/constants';
+import { apiURL, isDev } from '@/lib/constants';
 import Image from 'next/image';
 
 export default function Advantages() {
@@ -34,7 +34,7 @@ export default function Advantages() {
                 {adv.image && (
                   <div className="relative mb-5 flex h-48 w-full overflow-hidden rounded-xl bg-gray-50 text-navy-700 transition-colors duration-300 group-hover:bg-navy-800">
                     <Image
-                      src={imageUrl + adv.image}
+                      src={`${apiURL}/homepage-settings/image/${adv.image}`}
                       alt={adv.title || 'Advantage image'}
                       fill
                       unoptimized={isDev}
