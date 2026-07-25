@@ -65,7 +65,7 @@ const ReviewsCarousel = () => {
   if (isError) {
     return <ErrorState onRetry={refetch} />;
   }
-
+  
   return (
     <>
       {reviews && reviews.length > 0 ? (
@@ -75,7 +75,7 @@ const ReviewsCarousel = () => {
               {reviews &&
                 reviews.map((review) => {
                   const { day, month } = formatDayAndMonthWords(
-                    review.createdDate,
+                    review.createdAt,
                   );
 
                   return (
@@ -128,9 +128,10 @@ const ReviewsCarousel = () => {
                         {review.image && (
                           <div className="relative mb-5 aspect-video overflow-hidden rounded-[13px]">
                             <Image
-                              src={`${imageUrl}${review.image}`}
+                              src={`${imageUrl}api/reviews/image/${review.image}`}
                               alt={`Фото к отзыву от ${review.clientName}`}
                               className="size-full object-cover"
+                              fill
                               unoptimized={isDev}
                             />
                           </div>
