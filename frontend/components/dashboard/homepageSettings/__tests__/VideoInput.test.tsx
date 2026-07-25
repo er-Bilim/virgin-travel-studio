@@ -1,8 +1,8 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { useForm } from 'react-hook-form';
-import { VideoInput } from '../VideoInput';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
-import type { HomepageSettingsMutationData } from '@/types/homepageSettings';
+import {fireEvent, render, screen, waitFor} from '@testing-library/react';
+import {useForm} from 'react-hook-form';
+import {VideoInput} from '../VideoInput';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import type {HomepageSettingsMutationData} from '@/types/homepageSettings';
 
 vi.mock('@/lib/constants', () => ({
   imageUrl: 'http://localhost:8000/',
@@ -94,7 +94,7 @@ describe('VideoInput', () => {
   });
 
   it('не показывает кнопку удаления и не даёт выбрать файл, если disabled=true', () => {
-    const { container } = render(
+    const {} = render(
       <Wrapper defaultValues={{ hero: { videoUrl: 'hero.mp4' } }} disabled />,
     );
     expect(screen.queryByTitle('Удалить видеоролик')).not.toBeInTheDocument();

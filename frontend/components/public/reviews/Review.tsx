@@ -9,7 +9,7 @@ interface Props {
 }
 
 const Review = ({ review }: Props) => {
-  const { day, month, year } = formatDayAndMonthWords(review.createdDate);
+  const { day, month, year } = formatDayAndMonthWords(review.createdAt);
 
   return (
     <div className="border border-slate-100 p-3 min-[340px]:p-4 sm:p-5 rounded-2xl bg-gray-50/60 w-full transition shadow-sm hover:shadow-md/5">
