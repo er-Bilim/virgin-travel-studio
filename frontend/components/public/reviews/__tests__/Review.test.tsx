@@ -7,7 +7,7 @@ const baseReview = {
   clientName: 'Людмила Андреева',
   comment: 'Отличный тур, всё понравилось',
   rating: 5,
-  createdDate: '2026-06-15T12:00:00Z',
+  createdAt: '2026-06-15T12:00:00Z',
   image: null,
   companyReply: null,
 } as unknown as IReview;

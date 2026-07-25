@@ -6,6 +6,7 @@ import clsx from 'clsx';
 import { LogOut } from 'lucide-react';
 import { dashboardMenuItems, roleDashboardPaths } from '@/lib/constants';
 import { useLogout, useUser } from '@/lib/hooks/authHooks';
+import { toast } from 'sonner';
 
 type Props = {
   open: boolean;
@@ -28,6 +29,8 @@ const MobileSidebar = ({ open, onClose }: Props) => {
   const handleLogout = async () => {
     try {
       await logoutMutation.mutateAsync();
+    } catch {
+      toast.error('Не удалось завершить сессию на сервере');
     } finally {
       onClose();
       router.push('/login');

@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -63,7 +64,7 @@ export default function OrderManageForm({ initialValues, orderId }: Props) {
         },
         onError: () => {
           toast.error('Ошибка при обновлении на сервере');
-        }
+        },
       },
     );
   };
@@ -92,7 +93,10 @@ export default function OrderManageForm({ initialValues, orderId }: Props) {
   }));
 
   return (
-    <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-5 w-full">
+    <form
+      onSubmit={handleSubmit(onSubmit, onError)}
+      className="space-y-5 w-full"
+    >
       <div className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
@@ -166,12 +170,12 @@ export default function OrderManageForm({ initialValues, orderId }: Props) {
                           className={cn(
                             'flex items-center gap-2 w-full p-2.5 rounded-xl border text-left transition-all h-full min-h-[48px] select-none cursor-pointer',
                             isActive &&
-                            'border-cyan-600 bg-cyan-600 text-white shadow-sm font-bold',
+                              'border-cyan-600 bg-cyan-600 text-white shadow-sm font-bold',
                             isCompleted &&
-                            'border-emerald-100 bg-emerald-50/50 text-emerald-800 font-medium',
+                              'border-emerald-100 bg-emerald-50/50 text-emerald-800 font-medium',
                             !isActive &&
-                            !isCompleted &&
-                            'border-slate-200 bg-white text-slate-500 hover:bg-slate-100/70',
+                              !isCompleted &&
+                              'border-slate-200 bg-white text-slate-500 hover:bg-slate-100/70',
                           )}
                         >
                           <div
@@ -180,8 +184,8 @@ export default function OrderManageForm({ initialValues, orderId }: Props) {
                               isActive && 'bg-white text-cyan-600',
                               isCompleted && 'bg-emerald-600 text-white',
                               !isActive &&
-                              !isCompleted &&
-                              'bg-slate-100 text-slate-400',
+                                !isCompleted &&
+                                'bg-slate-100 text-slate-400',
                             )}
                           >
                             {isCompleted ? (
@@ -266,7 +270,10 @@ export default function OrderManageForm({ initialValues, orderId }: Props) {
             <div className="mt-3">
               <Input
                 {...register('rejectionReason', {
-                  required: currentStatus === 'REJECTED' ? 'Укажите причину отказа' : false,
+                  required:
+                    currentStatus === 'REJECTED'
+                      ? 'Укажите причину отказа'
+                      : false,
                 })}
                 placeholder="Например: Клиент передумал лететь..."
                 className={cn(
@@ -284,12 +291,20 @@ export default function OrderManageForm({ initialValues, orderId }: Props) {
               )}
             </div>
           </DialogHeader>
+          <DialogDescription className="sr-only">
+            Диалоговое окно указания причины отмены заявки
+          </DialogDescription>
           <DialogFooter className="mt-2 flex-col sm:flex-row gap-2">
             <Button
               variant="outline"
               type="button"
               onClick={() => {
-                setValue('status', initialValues.status !== 'REJECTED' ? initialValues.status : 'IN_PROGRESS');
+                setValue(
+                  'status',
+                  initialValues.status !== 'REJECTED'
+                    ? initialValues.status
+                    : 'IN_PROGRESS',
+                );
                 clearErrors('rejectionReason');
                 setValue('rejectionReason', '');
                 setIsModalOpen(false);

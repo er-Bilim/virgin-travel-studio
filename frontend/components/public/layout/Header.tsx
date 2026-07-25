@@ -17,7 +17,7 @@ export default function Header() {
   const pathname = usePathname();
 
   const { data: contacts } = useContacts();
-  const logoSrc = contacts?.logo ? imageUrl + contacts.logo : iconLogo;
+  const logoSrc = contacts?.logo ? imageUrl + contacts.logo : iconLogo.src;
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
