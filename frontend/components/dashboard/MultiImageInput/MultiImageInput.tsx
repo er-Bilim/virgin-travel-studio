@@ -16,13 +16,14 @@ interface Props {
   showPreviews?: boolean;
   allowReorder?: boolean;
 }
+const EMPTY_FILES: (File | string)[] = [];
 
 const MultiImageInput: React.FC<Props> = ({
   name,
   label,
   onChange,
-  value = [],
-  previewsValues = [],
+  value = EMPTY_FILES,
+  previewsValues = EMPTY_FILES,
   maxFiles = IMAGE_UPLOAD.MAX_FILES,
   showPreviews = true,
   allowReorder = false,
@@ -101,7 +102,6 @@ const MultiImageInput: React.FC<Props> = ({
 
    if (filesToAdd.length > 0) {
      onChange([...value, ...filesToAdd]);
-     console.log(value);
    }
 
    if (inputRef.current) inputRef.current.value = '';

@@ -15,6 +15,7 @@ interface Props {
 const FileInput: React.FC<Props> = ({
   name,
   label,
+  
   id,
   onChange,
   editImage = null,
