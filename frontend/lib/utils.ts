@@ -187,8 +187,8 @@ export const getCountryOptions = (): { code: string; name: string }[] => {
 };
 
 export const validateImageFile = (file: File): ImageValidationResult => {
-  if (
-    !IMAGE_UPLOAD.ALLOWED_MIME_TYPES.includes(file.type as AllowedImageMimeType)
+if (
+  !IMAGE_UPLOAD.ALLOWED_MIME_TYPES.includes(file.type as AllowedImageMimeType)
   ) {
     return { valid: false, error: 'Допустимые форматы: JPEG, PNG, WEBP' };
   }
