@@ -15,7 +15,7 @@ export interface IReview {
   rating: number;
   comment: string;
   image: string | null;
-  createdDate: string;
+  createdAt: string;
   updatedDate: string;
   companyReply?: string | null;
   tourId: TourType;
