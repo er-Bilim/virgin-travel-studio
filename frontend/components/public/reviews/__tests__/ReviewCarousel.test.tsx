@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import ReviewsCarousel from '../ReviewsCarousel';
 import { useGetFeaturedReviews } from '@/lib/hooks/reviewHooks';
 import { useRouter } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 
 vi.mock('@/lib/hooks/reviewHooks', () => ({ useGetFeaturedReviews: vi.fn() }));
 vi.mock('next/navigation', () => ({ useRouter: vi.fn() }));
@@ -20,13 +21,10 @@ vi.mock('@/components/shared/Rating', () => ({
   ),
 }));
 
-import { useEffect, useRef } from 'react';
-
 const scrollPrev = vi.fn();
 const scrollNext = vi.fn();
 
 vi.mock('@/components/ui/carousel', () => {
-  const { useEffect, useRef } = require('react');
   return {
     Carousel: ({
       children,
