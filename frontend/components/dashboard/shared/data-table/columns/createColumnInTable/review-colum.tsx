@@ -4,6 +4,7 @@ import { createActionsColumn } from '@/components/dashboard/shared/data-table/co
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -53,6 +54,10 @@ export const getReviewColumns = ({
               <DialogHeader>
                 <DialogTitle>Информация о туре</DialogTitle>
               </DialogHeader>
+
+              <DialogDescription className="sr-only">
+                Диалоговое для отзыва
+              </DialogDescription>
 
               <div className="flex flex-col gap-3">
                 {tour?.images && tour.images.length > 0 && (

@@ -6,6 +6,7 @@ import clsx from 'clsx';
 import { LogOut } from 'lucide-react';
 import { dashboardMenuItems, roleDashboardPaths } from '@/lib/constants';
 import { useLogout, useUser } from '@/lib/hooks/authHooks';
+import { toast } from 'sonner';
 
 const Sidebar = () => {
   const pathname = usePathname();
@@ -23,6 +24,8 @@ const Sidebar = () => {
   const handleLogout = async () => {
     try {
       await logoutMutation.mutateAsync();
+    } catch {
+      toast.error('Не удалось завершить сессию на сервере');
     } finally {
       router.push('/login');
     }
