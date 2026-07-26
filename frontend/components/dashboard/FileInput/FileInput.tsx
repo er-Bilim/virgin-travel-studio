@@ -25,7 +25,7 @@ const FileInput: React.FC<Props> = ({
   const blobUrlRef = useRef<string | null>(null);
   const [fileName, setFileName] = useState('');
   const [preview, setPreview] = useState<string | null>(
-    editImage ? `${imageUrl}${previewUrl}${editImage}` : null,
+    editImage ? `${imageUrl}${previewUrl ?? ''}${editImage}` : null,
   );
   useEffect(() => {
     return () => {

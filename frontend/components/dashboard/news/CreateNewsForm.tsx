@@ -202,7 +202,7 @@ export default function CreateNewsForm({
             label="Добавить"
             onChange={fileChangeHandler}
             editImage={editImage}
-            previewUrl="api/news/image/`"
+            previewUrl="api/news/image/"
           />
         ) : (
           <FileInput
