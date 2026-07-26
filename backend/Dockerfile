@@ -34,7 +34,6 @@ COPY . .
 RUN npm run build
 
 RUN mkdir -p public/logo public/videos && \
-    cp seed-assets/videos/default.mp4 public/videos/default.mp4 && \
     chown -R nodeuser:nodejs /app
 
 USER nodeuser
