@@ -383,7 +383,11 @@ ordersRouter.patch(
         return res.status(400).send({ error: 'Недопустимый статус' });
       }
 
-      if (user.role === 'ADMIN' && typeof managerId === 'string') {
+      if (
+        user.role === 'ADMIN' &&
+        typeof managerId === 'string' &&
+        order.managerId?.toString() !== managerId
+      ) {
         if (!mongoose.Types.ObjectId.isValid(managerId)) {
           return res.status(400).send({ error: 'Неверный ID менеджера' });
         }
