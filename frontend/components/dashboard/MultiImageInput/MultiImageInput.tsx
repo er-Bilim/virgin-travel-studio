@@ -2,7 +2,7 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 import {AlertCircle, ArrowLeft, Camera, X} from 'lucide-react';
-import {IMAGE_UPLOAD, imageUrl} from '@/lib/constants';
+import {IMAGE_UPLOAD } from '@/lib/constants';
 import {getFileKey, validateImageFile} from '@/lib/utils';
 import type {RejectedFile} from '@/types/multiImage';
 
@@ -31,7 +31,7 @@ const MultiImageInput: React.FC<Props> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const [previews, setPreviews] = useState<Record<string, string>>({});
   const [rejected, setRejected] = useState<RejectedFile[]>([]);
-
+  
   useEffect(() => {
     if (!showPreviews) {
       setPreviews({});
@@ -46,9 +46,7 @@ const MultiImageInput: React.FC<Props> = ({
       const previewSource = previewsValues[index] ?? item;
 
       if (typeof previewSource === 'string') {
-        next[key] = previewSource.startsWith('http')
-          ? previewSource
-          : `${imageUrl}${previewSource}`;
+        next[key] = previewSource;
         return;
       }
 
