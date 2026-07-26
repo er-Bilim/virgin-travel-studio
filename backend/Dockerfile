@@ -20,17 +20,24 @@ RUN apt-get update && apt-get install -y \
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
+RUN groupadd --system --gid 1001 nodejs && \
+    useradd --system --uid 1001 --gid nodejs nodeuser
+
 WORKDIR /app
 
 COPY package*.json ./
-
 
 RUN npm ci
 
 COPY . .
 
-RUN mkdir -p public/images public/videos
+RUN npm run build
+
+RUN mkdir -p public/logo public/videos && \
+    chown -R nodeuser:nodejs /app
+
+USER nodeuser
 
 EXPOSE 8000
 
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "start:prod"]

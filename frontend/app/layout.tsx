@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   title: 'Virgin Travel',
   description: '',
   icons: {
-    icon: `${process.env.NEXT_BACK_URL}/logo/logo.png`,
+    icon: `/logo/logo.png`,
   },
 };
 
