@@ -15,9 +15,13 @@ import type {UserRole} from '@/types/user';
 import type {QueryClient} from '@tanstack/react-query';
 
 export const isDev = process.env.NODE_ENV === 'development';
-export const apiURL = process.env.NEXT_API_URL || 'http://localhost:8000/api';
-const _rawImageUrl = process.env.NEXT_IMAGE_URL || 'http://localhost:8000';
-export const imageUrl = _rawImageUrl.endsWith('/') ? _rawImageUrl : _rawImageUrl + '/';
+
+export const apiURL =
+  typeof window !== 'undefined'
+    ? '/api'
+    : (process.env.NEXT_API_URL?.trim() || 'http://localhost:8000/api');
+
+export const imageUrl = '/';
 export const toursLimitPag = 9;
 
 

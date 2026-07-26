@@ -31,22 +31,22 @@
       {
         "title": "Лучшие цены",
         "body": "Честные цены без скрытых комиссий и дополнительных платежей.",
-        "image": "images/badge-percent.png"
+        "image": "images/stamb_1.png"
       },
       {
         "title": "Поддержка 24/7",
         "body": "Всегда на связи и готовы помочь в любой ситуации.",
-        "image": "images/24-hours-support.png"
+        "image": "images/stamb_1.png"
       },
       {
         "title": "Проверенные отели",
         "body": "Только надежные отели и качественный сервис.",
-        "image": "images/hotel.png"
+        "image": "images/stamb_1.png"
       },
       {
         "title": "Быстрое бронирование",
         "body": "Оформите путешествие онлайн всего за несколько минут.",
-        "image": "images/deadline.png"
+        "image": "images/stamb_1.png"
       }
     ]
   }

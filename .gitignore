@@ -23,6 +23,7 @@ logs/
 .env.development.local
 .env.test.local
 .env.production.local
+.env.production
 
 # Backend specific (Express)
 /uploads/
@@ -37,8 +38,11 @@ Thumbs.db
 # Optional: TypeScript cache
 *.tsbuildinfo
 
-# images
+# Runtime upload dirs — not tracked; source of truth is MongoDB GridFS
 backend/public/images/
+backend/public/videos/
+
+# seed-assets/ IS tracked in git — needed for `npm run seed` on first deploy
 
 # binary files
 a.out

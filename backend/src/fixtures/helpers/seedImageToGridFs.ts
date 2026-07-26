@@ -19,7 +19,7 @@ const seedImageToGridFs = async (
   const folder = normalized.includes('/') ? path.dirname(normalized) : 'images';
   const cleanName = path.basename(normalized);
 
-  const filePath = path.join(config.publicPath, folder, cleanName);
+  const filePath = path.join(config.seedAssetsPath, folder, cleanName);
   const buffer = await fs.readFile(filePath);
   const ext = path.extname(cleanName).toLowerCase();
 
