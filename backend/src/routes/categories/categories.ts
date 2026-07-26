@@ -84,7 +84,6 @@ categoriesRouter.delete(
       }
       return res.send({message: 'Категория успешно удалена'});
     } catch (e) {
-      console.log(e);
       next(e);
     }
   },

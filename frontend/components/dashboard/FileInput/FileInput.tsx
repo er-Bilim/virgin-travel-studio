@@ -27,7 +27,6 @@ const FileInput: React.FC<Props> = ({
   const [preview, setPreview] = useState<string | null>(
     editImage ? `${imageUrl}${previewUrl}${editImage}` : null,
   );
-  console.log(preview);
   useEffect(() => {
     return () => {
       if (blobUrlRef.current) {
