@@ -1,0 +1,70 @@
+import type { MetaType } from './meta';
+import type { TourSetType } from './tourSets';
+
+export interface TourCategoryType {
+  _id: string;
+  title: string;
+}
+
+export interface CategoryTypeResponse {
+  categories: TourCategoryType[];
+  meta: MetaType;
+}
+
+export interface ToursGetResponse {
+  tours: ITourWithTourSetFields[];
+  meta: MetaType;
+}
+
+export interface TourType {
+  _id: string;
+  title: string;
+  countryCode: string;
+  description: string;
+  images: string[];
+  category: TourCategoryType;
+  baseAdvantages: string[];
+  rating: number;
+  ratingCount: number;
+  isPublished: boolean;
+  createdAt: string;
+}
+
+export interface ITourWithTourSetFields extends TourType {
+  isHot: boolean;
+  minPrice: number;
+  discountPrice?: number;
+  hotelLocation: string;
+  nextStartDate: string;
+  durationDays: number;
+  saleDeadline: string;
+}
+
+export interface ISingleTour extends TourType {
+  tourSets: TourSetType[];
+}
+
+export interface TourMutation {
+  title: string;
+  description: string;
+  countryCode: string;
+  category: string;
+  baseAdvantages: string[];
+  images: (File | string)[];
+}
+
+export type TourFormValues = Omit<TourMutation, 'baseAdvantages'> & {
+  baseAdvantages: { value: string }[];
+};
+
+export interface GetToursParams {
+  page?: number;
+  limit: number;
+  categoryId?: string | null;
+  search?: string | null;
+  isPublished?: string | boolean;
+  countryCode?: string | null;
+  sort?: string | null;
+  isHot?: boolean;
+  hasDiscount?: boolean;
+}

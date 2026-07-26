@@ -1,0 +1,113 @@
+# Qodo Merge / PR-Agent configuration
+# Docs: https://qodo-merge-docs.qodo.ai/
+
+[pr_reviewer]
+require_score_review = true
+require_tests_review = true
+require_security_review = true
+require_estimate_effort_to_review = true
+num_max_findings = 5
+inline_code_comments = true
+persistent_comment = true
+extra_instructions = """
+Отвечай на русском языке.
+
+РЕЖИМ: СТРОГИЙ. Найди ВСЕ потенциальные проблемы, не только критичные.
+Цель — поймать как можно больше реальных проблем, даже мелких,
+если они могут вызвать баг, регрессию или ухудшить качество кода.
+
+Это fullstack монорепо virgin-travel с двумя пакетами.
+
+BACKEND (/backend):
+- Node.js + Express 5.2 (новый, async error handling из коробки)
+- TypeScript 6 ESM (type: module, NodeNext, strict + noUncheckedIndexedAccess + exactOptionalPropertyTypes)
+- MongoDB через Mongoose 9
+- Auth: jsonwebtoken 9 + argon2 + cookie-parser
+- Файлы: multer 2.x (лимиты + fileFilter обязательны, проверяй MIME), exceljs
+- CORS: пакет cors 2.x — проверяй что origin не '*' для роутов с credentials
+- dotenv 17, запуск через tsx (без билда в dev)
+
+FRONTEND (/frontend):
+- Next.js 16 (App Router) + React 19.2
+- TypeScript 5 strict + verbatimModuleSyntax + noUnusedLocals
+- Состояние: Zustand 5; серверные данные: TanStack Query 5
+- UI: единый пакет radix-ui (новый unified API, не отдельные @radix-ui/*), shadcn/ui CLI v4
+- Стили: Tailwind 4 (CSS-first config через @theme в globals.css, без tailwind.config.js),
+  tw-animate-css, tailwind-merge, clsx, class-variance-authority
+- Формы: react-hook-form 7 (валидация ручная, zod не используется в проекте)
+- Таблицы: TanStack Table 8
+- Уведомления: sonner
+- Иконки: lucide-react + react-icons (обе используются осознанно)
+- Даты: date-fns 4 + dayjs (обе осознанно)
+- Карусели: embla-carousel-react (проверяй a11y: aria-label, keyboard nav)
+- HTTP: axios 1.x
+
+ИЩИ ОСОБЕННО ВНИМАТЕЛЬНО:
+- null/undefined обращения, оптимистичные типы (as Type, !), необработанные ошибки
+- утечки чувствительных данных (password, refreshToken, токены) в ответах API
+- race conditions, отсутствие AbortController/AbortSignal
+- лишние ре-рендеры, нестабильные queryKeys, useEffect+fetch вместо TanStack Query
+- N+1 в Mongoose, отсутствие lean()/select/индексов
+- слабая валидация входа на бэке, отсутствие проверки ownership ресурса
+- React-ошибки: хуки в условиях, мутация state, отсутствие ключей в списках
+- a11y проблемы: отсутствие aria-label на кнопках-иконках, отсутствие keyboard nav
+- CORS с '*' и credentials, JWT без secret из env, multer без limits/fileFilter
+- Strict TS: indexed access без narrowing, exactOptionalPropertyTypes путаница
+
+ЧЕГО НЕ ДЕЛАТЬ:
+- Не предлагай миграции стека (Express→Fastify, Zustand→Redux, axios→fetch, Mongoose→Prisma)
+- Не унифицируй date-fns/dayjs, lucide/react-icons — это осознанно
+- Не предлагай zod/yup если их нет в текущем PR — отдельное архитектурное решение
+- Не придирайся к консистентному стилю, JSDoc, тривиальным комментариям
+- Не предлагай добавить тесты в каждый PR (упомяни один раз)
+"""
+
+[pr_description]
+publish_labels = true
+add_original_user_description = true
+extra_instructions = """
+Отвечай на русском языке. Описание делай кратким:
+2-3 предложения о сути изменений, затем bullet-list ключевых правок.
+Если PR затрагивает оба пакета — раздели на секции ## Backend и ## Frontend.
+Метки выбирай из: feature, bugfix, refactor, security, performance, ui, docs, chore.
+"""
+
+[pr_code_suggestions]
+num_code_suggestions = 8
+commitable_code_suggestions = true
+focus_only_on_problems = true
+extra_instructions = """
+Отвечай на русском языке.
+
+Предлагай КОНКРЕТНЫЕ ИСПРАВЛЕНИЯ С КОДОМ для:
+- багов (edge cases, off-by-one, null/undefined, неправильная логика)
+- багов типов (нарушения strict TS, неправильные дженерики, any/as без причины)
+- безопасности (XSS, инъекции, утечки данных, слабая криптография, отсутствие auth)
+- производительности (N+1 в Mongoose, лишние ре-рендеры, отсутствие мемоизации в горячих местах)
+- утечек памяти (необработанные подписки, незакрытые стримы, забытые cleanup в useEffect)
+- race conditions (async handlers, оптимистичные обновления, отсутствие AbortController)
+- нарушений React-правил (хуки в условиях, мутация state, отсутствие ключей)
+- a11y проблем (aria-label, keyboard nav, semantic HTML)
+
+ФОРМАТ: каждое предложение — конкретный фрагмент кода с до/после.
+Не пиши абстрактных советов вроде «улучшите валидацию» — давай ИМЕННО код.
+
+НЕ ПРЕДЛАГАЙ:
+- переименования, перестановки, косметику
+- комментарии или JSDoc
+- замену работающих паттернов на «более идиоматичные» без явной выгоды
+- premature мемоизацию (useMemo/useCallback где она не нужна)
+
+Учитывай:
+- noUncheckedIndexedAccess: arr[0], obj[key] это T | undefined
+- exactOptionalPropertyTypes: { x?: T } ≠ { x: T | undefined }
+- ESM: .js расширения в импортах на бэке
+"""
+
+[github_app]
+pr_commands = [
+    "/describe",
+    "/review",
+    "/improve",
+]
+handle_pr_actions = ['opened', 'reopened', 'ready_for_review', 'synchronize']

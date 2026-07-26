@@ -1,0 +1,17 @@
+node_modules
+dist
+.git
+.gitignore
+*.log
+npm-debug.log*
+
+# Env files — inject via docker-compose env_file / environment
+.env
+.env.*
+!.env.template
+
+# Runtime upload dirs — not needed in image; GridFS is the source of truth
+public/images/
+public/videos/
+
+# seed-assets/ IS included in the image so `npm run seed` works inside the container

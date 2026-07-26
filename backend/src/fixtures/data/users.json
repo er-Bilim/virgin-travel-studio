@@ -1,0 +1,26 @@
+[
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5e01",
+    "fullName": "admin",
+    "phone": "0555172032",
+    "password": "123456789",
+    "role": "ADMIN",
+    "status": "active"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5e02",
+    "fullName": "manager",
+    "phone": "0555172043",
+    "password": "123456789",
+    "role": "MANAGER",
+    "status": "active"
+  },
+  {
+    "_id": "60c72b2f9b1d8b2a3c4d5e03",
+    "fullName": "manager2",
+    "phone": "0555172011",
+    "password": "123456789",
+    "role": "MANAGER",
+    "status": "active"
+  }
+]

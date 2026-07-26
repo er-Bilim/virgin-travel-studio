@@ -1,0 +1,117 @@
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {
+  delegateOrder,
+  deleteOrder,
+  getOneOrder,
+  getOrders,
+  getOrdersStats,
+  postOrder,
+  updateOrder
+} from '@/services/orders';
+import type {OrderMutationType} from '@/types/order';
+import {toast} from 'sonner';
+import type {AxiosError} from 'axios';
+import type {GlobalError} from '@/types/error';
+
+
+export const useOrders = (
+    filters: {
+      managerId?: string,
+      status?: string,
+      page?: number,
+      limit?: number,
+    } = {}) => {
+  return useQuery({
+    queryKey: ['orders', filters],
+    queryFn: () => getOrders(filters),
+    refetchInterval: 10000,
+  });
+};
+
+export const useOrderStats = () => {
+  return useQuery({
+    queryKey: ['order-stats'],
+    queryFn: getOrdersStats,
+    refetchInterval: 60_000,
+  });
+};
+
+export const useOneOrder = (id: string) => {
+  return useQuery({
+    queryKey: ['order', id], 
+    queryFn: () => getOneOrder(id), 
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
+export const useCreateOrder = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: postOrder,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+    },
+    onError: (error: AxiosError<GlobalError>) => {
+      const data = error.response?.data;
+      toast.error(data?.error ?? 'Ошибка при оформлении заявки');
+    }
+  });
+};
+
+export const useUpdateOrder = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: OrderMutationType }) =>
+      updateOrder(id, data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.invalidateQueries({ queryKey: ['order', variables.id] });
+    },
+    onError: (err: AxiosError<GlobalError>) => {
+      const data = err.response?.data;
+      if (!data) {
+        return toast.error(
+          'Вы не можете взять заявку, так как вы Забанены!',
+        );
+      }
+
+      toast.error(
+        data.error || 'Вы не можете взять заявку, так как вы Забанены!',
+        { position: 'top-center' },
+      );
+    }
+  });
+};
+
+export const useDelegateOrder = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, managerId } : { id: string, managerId: string }) =>
+        delegateOrder(id, managerId),
+    onSuccess: (data, variables) => {
+      toast.success(data.message);
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.invalidateQueries({ queryKey: ['order', variables.id] });
+    },
+    onError: (err: AxiosError<GlobalError>) => {
+      const data = err.response?.data;
+      toast.error(data?.error || 'Не удалось переназначить заявку');
+    }
+  })
+};
+
+
+export const useDeleteOrder = () => {
+    const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteOrder(id),
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.invalidateQueries({ queryKey: ['order', id] });
+      toast.success('Заявка удалена');
+    },
+  });
+}
+
