@@ -1,7 +1,7 @@
 'use client';
 
 import { useHomepageSettings } from '@/lib/hooks/homepageSettingsHooks';
-import { apiURL, isDev } from '@/lib/constants';
+import { imageUrl, isDev } from '@/lib/constants';
 import Image from 'next/image';
 import { CircleCheck } from 'lucide-react';
 import SectionHeaderSkeleton from '@/components/shared/skeletons/SectionHeaderSkeleton';
@@ -70,7 +70,7 @@ export default function Advantages() {
             >
               <div className="mb-5 size-14 overflow-hidden rounded-2xl relative">
                 <Image
-                  src={`${apiURL}/homepage-settings/image/${adv.image}`}
+                src={`${imageUrl}api/news/image/${adv.image}`}
                   alt={adv.title || 'Advantage image'}
                   fill
                   unoptimized={isDev}
