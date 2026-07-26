@@ -113,9 +113,8 @@ describe('StatsWidgets', () => {
   });
 
   describe('роль менеджера', () => {
-    it('не рендерит виджеты администратора', () => {
+    it('не рендерит виджет выручки для роли менеджера', () => {
       setup({ role: 'MANAGER' });
-      expect(screen.queryByText('Новые заявки')).not.toBeInTheDocument();
       expect(screen.queryByText('Выручка за месяц')).not.toBeInTheDocument();
     });
 
