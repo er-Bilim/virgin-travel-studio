@@ -1,51 +1,51 @@
-"use client";
+'use client';
 import CreateNewsForm from '@/components/dashboard/news/CreateNewsForm';
-import {useDeleteNews, useNews, usePublicateNews} from '@/lib/hooks/newsHooks';
-import {Button} from '@/components/ui/button';
+import {
+  useDeleteNews,
+  useNews,
+  usePublicateNews,
+} from '@/lib/hooks/newsHooks';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
-  DialogContent, DialogDescription,
+  DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
+  DialogTrigger,
 } from '@/components/ui/dialog';
-import {useEffect, useMemo, useState} from 'react';
-import {
-  getNewsColumns
-} from '@/components/dashboard/shared/data-table/columns/createColumnInTable/new-column';
-import type {NewsFields} from '@/types/news';
-import {DataTable} from '@/components/dashboard/shared/data-table/data-table';
-import {
-  ConfirmDialog
-} from '@/components/dashboard/ConfirmDialog/ConfirmDialog';
+import { useEffect, useMemo, useState } from 'react';
+import { getNewsColumns } from '@/components/dashboard/shared/data-table/columns/createColumnInTable/new-column';
+import type { NewsFields } from '@/types/news';
+import { DataTable } from '@/components/dashboard/shared/data-table/data-table';
+import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog/ConfirmDialog';
 import {
   headerRowClassName,
   rowClassName,
-  tableClassName
+  tableClassName,
 } from '@/lib/constants';
-import {Input} from '@/components/ui/input';
-import {Plus, Search} from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Plus, Search } from 'lucide-react';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from '@/components/ui/select';
-import {useUsers} from '@/lib/hooks/userHooks';
-import {PaginationCustom} from '@/components/pagination/PaginationCustom';
-import {useModalStore} from '@/lib/stores/modalStore';
-import {Modal} from '@/components/shared/Modal';
+import { useUsers } from '@/lib/hooks/userHooks';
+import { PaginationCustom } from '@/components/pagination/PaginationCustom';
+import { useModalStore } from '@/lib/stores/modalStore';
+import { Modal } from '@/components/shared/Modal';
 import NewsDetailedInfo from '@/components/dashboard/news/NewsDetailedInfo';
 
 export default function NewsList() {
-  const [searchNews, setSearchNews] = useState("");
-  const [searchNewsWithDelay, setSearchNewsWithDelay] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [authorFilter, setAuthorFilter] = useState("all");
+  const [searchNews, setSearchNews] = useState('');
+  const [searchNewsWithDelay, setSearchNewsWithDelay] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [authorFilter, setAuthorFilter] = useState('all');
   const [page, setPage] = useState(1);
   const limit = 10;
-
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -59,7 +59,7 @@ export default function NewsList() {
   useEffect(() => {
     const changePage = () => {
       setPage(1);
-    }
+    };
 
     void changePage();
   }, [statusFilter, authorFilter]);
@@ -74,33 +74,37 @@ export default function NewsList() {
     limit,
     searchText: searchNewsWithDelay,
     isPublished: statusFilter,
-    authorId: authorFilter
+    authorId: authorFilter,
   });
-  const {mutate: deleteNews, isPending: isDeleting} = useDeleteNews();
-  const {mutate: togglePublicate} = usePublicateNews();
+  const { mutate: deleteNews, isPending: isDeleting } = useDeleteNews();
+  const { mutate: togglePublicate } = usePublicateNews();
   const news = newsData?.allNews;
-  const meta = newsData?.metadata
+  const meta = newsData?.metadata;
   const {
     data: users,
     isLoading: loadingUsers,
-    refetch: refetchUser
+    refetch: refetchUser,
   } = useUsers();
 
   const [newsToDelete, setNewsToDelete] = useState<string | null>(null);
   const [editingNewsId, setEditingNewsId] = useState<string | null>(null);
   const [view, setView] = useState<NewsFields | null>(null);
-  const {openModal} = useModalStore();
+  const { openModal } = useModalStore();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
-  const columns = useMemo(() => getNewsColumns({
-    onView: (news: NewsFields) => {
-      setView(news);
-      openModal("detailedNews");
-    },
-    onDelete: (news: NewsFields) => setNewsToDelete(news._id),
-    onEdit: (news: NewsFields) => setEditingNewsId(news._id),
-    onTogglePublish: (news: NewsFields) => togglePublicate(news._id),
-  }), [togglePublicate, openModal]);
+  const columns = useMemo(
+    () =>
+      getNewsColumns({
+        onView: (news: NewsFields) => {
+          setView(news);
+          openModal('detailedNews');
+        },
+        onDelete: (news: NewsFields) => setNewsToDelete(news._id),
+        onEdit: (news: NewsFields) => setEditingNewsId(news._id),
+        onTogglePublish: (news: NewsFields) => togglePublicate(news._id),
+      }),
+    [togglePublicate, openModal],
+  );
 
   const confirmDelete = () => {
     if (newsToDelete) {
@@ -110,29 +114,26 @@ export default function NewsList() {
     }
   };
 
-  const editingNews = news?.find(
-    (item) => item._id === editingNewsId
-  );
+  const editingNews = news?.find((item) => item._id === editingNewsId);
 
   const handlePageChange = (page: number) => {
     setPage(page);
     window.scrollTo(0, 0);
-  }
+  };
 
   const handleRefetch = async () => {
     await refetchNews();
-    await refetchUser()
+    await refetchUser();
   };
 
   return (
     <div className="p-8 space-y-8 bg-gray-50">
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold tracking-tight text-[#1E2B6D]">Новости</h1>
-          <Dialog
-            open={isCreateOpen}
-            onOpenChange={setIsCreateOpen}
-          >
+          <h1 className="text-3xl font-bold tracking-tight text-[#1E2B6D]">
+            Новости
+          </h1>
+          <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <DialogTrigger asChild>
               <Button className="bg-[#1E2B6D] hover:bg-[#162356]">
                 <Plus className="w-4 h-4 mr-2" /> Добавить новость
@@ -157,10 +158,7 @@ export default function NewsList() {
               className="pl-9 bg-white border-gray-300 focus-visible:ring-1 focus-visible:ring-offset-0 transition-colors focus-visible:border-primary h-8"
             />
           </div>
-          <Select
-            value={statusFilter}
-            onValueChange={setStatusFilter}
-          >
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-full shrink-0 w-full lg:w-48 bg-white border-gray-300">
               <SelectValue placeholder="Статус" />
             </SelectTrigger>
@@ -176,15 +174,14 @@ export default function NewsList() {
             disabled={loadingUsers}
           >
             <SelectTrigger className="w-full shrink-0 w-full lg:w-48 bg-white border-gray-300">
-              <SelectValue placeholder={loadingUsers ? "Загрузка..." : "Авторы"} />
+              <SelectValue
+                placeholder={loadingUsers ? 'Загрузка...' : 'Авторы'}
+              />
             </SelectTrigger>
             <SelectContent position="popper">
               <SelectItem value="all">Все авторы</SelectItem>
               {users?.map((user) => (
-                <SelectItem
-                  key={user._id}
-                  value={user._id}
-                >
+                <SelectItem key={user._id} value={user._id}>
                   {user.fullName}
                 </SelectItem>
               ))}
@@ -203,9 +200,8 @@ export default function NewsList() {
         className={tableClassName}
         onRowClickAction={(news) => {
           setView(news);
-          openModal("detailedNews")
-        }
-        }
+          openModal('detailedNews');
+        }}
       />
 
       {isError && (
@@ -271,7 +267,7 @@ export default function NewsList() {
                 title: editingNews.title,
                 content: editingNews.content,
                 tags: editingNews.tags,
-                image: null
+                image: null,
               }}
               editImage={editingNews.image}
               editedId={editingNews._id}

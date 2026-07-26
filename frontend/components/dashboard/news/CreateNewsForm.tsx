@@ -1,11 +1,11 @@
 'use client';
-import {useEffect, useState} from 'react';
-import type {NewsMutation} from '@/types/news';
+import { useEffect, useState } from 'react';
+import type { NewsMutation } from '@/types/news';
 import FileInput from '@/components/dashboard/FileInput/FileInput';
-import {Plus, Trash2} from 'lucide-react';
-import useCreateNews, {useEditNews} from '@/lib/hooks/newsHooks';
-import {Input} from '@/components/ui/input';
-import {useFieldArray, useForm} from 'react-hook-form';
+import { Plus, Trash2 } from 'lucide-react';
+import useCreateNews, { useEditNews } from '@/lib/hooks/newsHooks';
+import { Input } from '@/components/ui/input';
+import { useFieldArray, useForm } from 'react-hook-form';
 
 type NewsFormValues = Omit<NewsMutation, 'tags'> & {
   tags: { value: string }[];
@@ -24,7 +24,7 @@ export default function CreateNewsForm({
   editedId,
   editImage,
   initialValues,
-    onSuccess,
+  onSuccess,
 }: Props) {
   const {
     handleSubmit,
@@ -202,6 +202,7 @@ export default function CreateNewsForm({
             label="Добавить"
             onChange={fileChangeHandler}
             editImage={editImage}
+            previewUrl="api/news/image/`"
           />
         ) : (
           <FileInput

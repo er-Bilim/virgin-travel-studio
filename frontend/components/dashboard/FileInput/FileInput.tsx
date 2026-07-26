@@ -6,16 +6,17 @@ import { imageUrl } from '@/lib/constants';
 
 interface Props {
   name: string;
-  id?: string
+  id?: string;
   label: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   editImage?: string;
+  previewUrl?: string;
 }
 
 const FileInput: React.FC<Props> = ({
   name,
   label,
-  
+  previewUrl,
   id,
   onChange,
   editImage = null,
@@ -24,9 +25,9 @@ const FileInput: React.FC<Props> = ({
   const blobUrlRef = useRef<string | null>(null);
   const [fileName, setFileName] = useState('');
   const [preview, setPreview] = useState<string | null>(
-    editImage ? imageUrl + editImage : null,
+    editImage ? `${imageUrl}${previewUrl}${editImage}` : null,
   );
-
+  console.log(preview);
   useEffect(() => {
     return () => {
       if (blobUrlRef.current) {
