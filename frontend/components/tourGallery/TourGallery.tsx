@@ -54,7 +54,8 @@ export default function TourGallery({ images, title }: Props) {
               )}
             >
               <Image
-                src={imageUrl + path}
+                key={`${path}-${index}`}
+                src={imageUrl + 'api/tours/image/' + path}
                 alt={`${title} — фото ${activeIdx + 1}`}
                 fill
                 unoptimized={isDev}
