@@ -514,7 +514,11 @@ toursRouter.patch(
           const tourAggregate = await aggregate_tour(
             tour.toObject() as unknown as TourDocumentType,
           );
-          if (tourAggregate.hotelLocation) await telegramMessage(tourAggregate);
+          if (tourAggregate.hotelLocation) {
+            telegramMessage(tourAggregate).catch((e) =>
+              console.error('Не удалось запостить тур в Telegram:', e),
+            );
+          }
         }
       }
 
