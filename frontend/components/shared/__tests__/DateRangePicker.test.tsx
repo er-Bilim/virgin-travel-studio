@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DateRangePicker } from '../DateRangePicker';
 import type { DateRange } from 'react-day-picker';
@@ -52,6 +52,7 @@ describe('DateRangePicker (inline)', () => {
   });
 
   it('открывает календарь по клику на триггер', async () => {
+    const user = userEvent.setup();
     render(
       <DateRangePicker
         value={undefined}
@@ -59,8 +60,8 @@ describe('DateRangePicker (inline)', () => {
         placeholder="Период"
       />,
     );
-    await user.keyboard('{Escape}');
-
-    await waitFor(() => expect(screen.queryAllByRole('grid')).toHaveLength(0));
+    await user.click(screen.getByRole('button', { name: /Период/ }));
+    const grids = await screen.findAllByRole('grid');
+    expect(grids).toHaveLength(2);
   });
 });
