@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   useForm,
+  useWatch,
   type FieldErrors,
   type UseFormRegister,
   type UseFormSetValue,
@@ -10,7 +11,7 @@ import {
 } from 'react-hook-form';
 import type { IContactSettings } from '@/types/contactSettings';
 import { Input } from '@/components/ui/input';
-import { imageUrl, inputClass, isDev } from '@/lib/constants';
+import { imageUrl, inputClass } from '@/lib/constants';
 import {
   useMutateContacts,
   useMutateCreateContacts,
@@ -52,10 +53,28 @@ export default function ContactSettingsForm() {
     watch,
     setValue,
     reset,
+    control,
     formState: { errors },
   } = useForm<IContactSettings>({
     defaultValues: contactSettings || {},
   });
+
+  const logoField = useWatch({
+    control,
+    name: 'logo',
+  });
+
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+
+  useEffect(() => {
+    const file = logoField?.[0];
+    if (file instanceof File) {
+      const url = URL.createObjectURL(file);
+      setLogoPreview(url);
+      return () => URL.revokeObjectURL(url);
+    }
+    setLogoPreview(null);
+  }, [logoField]);
 
   useEffect(() => {
     if (contactSettings) {
@@ -247,17 +266,19 @@ export default function ContactSettingsForm() {
           />
         </Field>
 
-        {typeof contactSettings?.logo === 'string' && contactSettings.logo && (
+        {(logoPreview ||
+          (typeof contactSettings?.logo === 'string' &&
+            contactSettings.logo)) && (
           <div className="space-y-1">
             <p className="text-sm font-medium text-gray-700">
-              Текущий логотип:
+              {logoPreview ? 'Новый логотип:' : 'Текущий логотип:'}
             </p>
             <Image
-              src={imageUrl + contactSettings.logo}
-              alt="Текущий логотип"
+              src={logoPreview ?? `${imageUrl}${contactSettings!.logo}`}
+              alt="Логотип"
               width={50}
               height={50}
-              unoptimized={isDev}
+              unoptimized
               className="object-contain"
             />
           </div>

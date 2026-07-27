@@ -1,8 +1,8 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import {
   useContacts,
-  mutateContacts,
-  mutateCreateContacts,
+  useMutateContacts,
+  useMutateCreateContacts,
 } from '@/lib/hooks/contactSettings';
 import {
   fetchContacts,
@@ -53,7 +53,7 @@ describe('mutateContacts', () => {
     const formData = new FormData();
     formData.append('phone', contactsStub.phone);
 
-    const { result } = renderHook(() => mutateContacts(), { wrapper });
+    const { result } = renderHook(() => useMutateContacts(), { wrapper });
     result.current.mutate(formData);
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
@@ -66,7 +66,7 @@ describe('mutateContacts', () => {
     const { wrapper, queryClient } = createWrapper();
     const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
 
-    const { result } = renderHook(() => mutateContacts(), { wrapper });
+    const { result } = renderHook(() => useMutateContacts(), { wrapper });
     result.current.mutate(new FormData());
 
     await waitFor(() => expect(result.current.isError).toBe(true));
@@ -83,7 +83,7 @@ describe('mutateCreateContacts', () => {
     const formData = new FormData();
     formData.append('email', contactsStub.email);
 
-    const { result } = renderHook(() => mutateCreateContacts(), { wrapper });
+    const { result } = renderHook(() => useMutateCreateContacts(), { wrapper });
     result.current.mutate(formData);
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
@@ -95,7 +95,7 @@ describe('mutateCreateContacts', () => {
     vi.mocked(createContacts).mockRejectedValue(new Error('500'));
     const { wrapper } = createWrapper();
 
-    const { result } = renderHook(() => mutateCreateContacts(), { wrapper });
+    const { result } = renderHook(() => useMutateCreateContacts(), { wrapper });
     result.current.mutate(new FormData());
 
     await waitFor(() => expect(result.current.isError).toBe(true));

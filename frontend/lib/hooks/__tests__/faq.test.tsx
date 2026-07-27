@@ -2,11 +2,11 @@ import { renderHook, waitFor } from '@testing-library/react';
 import {
   usePublicFaqs,
   useAdminFaqs,
-  mutateCreateFaq,
-  mutateReorderFaqs,
-  mutateTogglePublishFaq,
-  mutateEditFaq,
-  mutateDeleteFaq,
+  useMutateCreateFaq,
+  useMutateReorderFaqs,
+  useMutateTogglePublishFaq,
+  useMutateEditFaq,
+  useMutateDeleteFaq,
 } from '@/lib/hooks/faq';
 import {
   fetchPublicFaqs,
@@ -85,35 +85,35 @@ const faqResponse = { message: 'ok', faq: faqStub };
 const mutationCases = [
   {
     name: 'mutateCreateFaq',
-    useHook: mutateCreateFaq,
+    useHook: useMutateCreateFaq,
     service: createFaq as ReturnType<typeof vi.fn>,
     vars: { question: 'Новый вопрос', answer: 'Ответ' },
     resolved: faqResponse,
   },
   {
     name: 'mutateReorderFaqs',
-    useHook: mutateReorderFaqs,
+    useHook: useMutateReorderFaqs,
     service: reorderFaqs as ReturnType<typeof vi.fn>,
     vars: ['f2', 'f1'],
     resolved: { message: 'ok' },
   },
   {
     name: 'mutateTogglePublishFaq',
-    useHook: mutateTogglePublishFaq,
+    useHook: useMutateTogglePublishFaq,
     service: togglePublishFaq as ReturnType<typeof vi.fn>,
     vars: 'f1',
     resolved: faqStub,
   },
   {
     name: 'mutateEditFaq',
-    useHook: mutateEditFaq,
+    useHook: useMutateEditFaq,
     service: editFaq as ReturnType<typeof vi.fn>,
     vars: { id: 'f1', data: { question: 'Правка' } },
     resolved: faqResponse,
   },
   {
     name: 'mutateDeleteFaq',
-    useHook: mutateDeleteFaq,
+    useHook: useMutateDeleteFaq,
     service: deleteFaq as ReturnType<typeof vi.fn>,
     vars: 'f1',
     resolved: { message: 'deleted' },

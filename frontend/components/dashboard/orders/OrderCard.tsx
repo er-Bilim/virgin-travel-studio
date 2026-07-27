@@ -67,11 +67,6 @@ const OrderCard = ({
           { position: 'top-center' },
         );
       },
-      onError: () => {
-        toast.error('Ошибка на стороне сервера, попробуйте позже', {
-          position: 'top-center',
-        });
-      },
     });
   };
 

@@ -16,31 +16,33 @@ import {
   Send,
   ShieldCog,
   Star,
-  UsersRound
+  UsersRound,
 } from 'lucide-react';
-import {useMemo, useState} from 'react';
+import { useMemo, useState } from 'react';
 import CreateReviewForm from '@/components/public/reviews/form/CreateReviewForm';
 import {
   formatDayAndMonthWords,
   formatToReadablePrice,
-  pluralize
+  pluralize,
 } from '@/lib/utils';
 import SeatsIndicator from '@/components/shared/SeatsIndicator';
-import {buildTourInquiryMessage, openWhatsApp} from '@/lib/whatsapp';
-import {FaWhatsapp} from 'react-icons/fa';
+import { buildTourInquiryMessage, openWhatsApp } from '@/lib/whatsapp';
+import { FaWhatsapp } from 'react-icons/fa';
 import Review from '@/components/public/reviews/Review';
-import {Spinner} from '@/components/ui/spinner';
-import {useInfiniteReviews} from '@/lib/hooks/reviewHooks';
-import {Breadcrumbs} from '@/components/shared/Breadcrumbs';
-import {useTourById} from '@/lib/hooks/tourHooks';
+import { Spinner } from '@/components/ui/spinner';
+import { useInfiniteReviews } from '@/lib/hooks/reviewHooks';
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
+import { useTourById } from '@/lib/hooks/tourHooks';
 import TourSetCard from './TourSetCard';
-import type {TourSetType} from '@/types/tourSets';
+import type { TourSetType } from '@/types/tourSets';
 import OrderCard from '@/components/dashboard/orders/OrderCard';
 import TourDetailLoading from '@/app/(public)/tours/[slug]/loading';
-import type {DateRange} from 'react-day-picker';
-import {DateRangePicker} from '@/components/shared/DateRangePicker';
-import {cn} from '@/lib/utils';
+import type { DateRange } from 'react-day-picker';
+import { DateRangePicker } from '@/components/shared/DateRangePicker';
+import { cn } from '@/lib/utils';
 import ErrorState from '@/components/shared/ErrorState';
+import { useContacts } from '@/lib/hooks/contactSettings';
+import { toast } from 'sonner';
 
 interface Props {
   id: string;
@@ -60,9 +62,8 @@ const TourDetailView = ({ id }: Props) => {
 
       if (dateRange.from && start < dateRange.from) return false;
       return !(dateRange.to && start > dateRange.to);
-
     });
-  },[tour?.tourSets, dateRange]);
+  }, [tour?.tourSets, dateRange]);
 
   const {
     data: reviewsData,
@@ -73,8 +74,10 @@ const TourDetailView = ({ id }: Props) => {
     isFetchingNextPage,
   } = useInfiniteReviews(id);
 
+  const { data: settings } = useContacts();
+
   if (isPending) {
-    return <TourDetailLoading/>;
+    return <TourDetailLoading />;
   }
 
   if (isError || !tour) {
@@ -86,9 +89,9 @@ const TourDetailView = ({ id }: Props) => {
   }
 
   const selectedTourSet: TourSetType =
-    tour.tourSets.find((tourSet) => tourSet._id === selectedSetId)
-    ?? tour.tourSets[0]
-    ?? null;
+    tour.tourSets.find((tourSet) => tourSet._id === selectedSetId) ??
+    tour.tourSets[0] ??
+    null;
 
   if (!selectedTourSet) {
     return (
@@ -136,7 +139,7 @@ const TourDetailView = ({ id }: Props) => {
     Math.ceil(
       (new Date(selectedTourSet.endDate).getTime() -
         new Date(selectedTourSet.startDate).getTime()) /
-      (1000 * 3600 * 24),
+        (1000 * 3600 * 24),
     ),
   );
   const nights = Math.max(days - 1, 0);
@@ -145,11 +148,19 @@ const TourDetailView = ({ id }: Props) => {
   ).length;
 
   const handleWhatsAppClick = () => {
+    const startText = selectedTourSet
+      ? `${startDay} ${startMonth}`
+      : 'уточняется';
+
     const message: string = buildTourInquiryMessage(
       tour?.title ?? 'тур',
-      selectedTourSet?.startDate,
+      startText,
     );
-    openWhatsApp(message);
+    if (!settings?.whatsapp) {
+      return toast.error('Не удалось получить номер телефона для WhatsApp');
+    }
+
+    openWhatsApp(message, settings.whatsapp);
   };
 
   const renderReviews = () => {
@@ -159,7 +170,9 @@ const TourDetailView = ({ id }: Props) => {
 
     if (isReviewsError) {
       return (
-        <p className="text-lg text-muted-foreground font-semibold text-center">Ошибка</p>
+        <p className="text-lg text-muted-foreground font-semibold text-center">
+          Ошибка
+        </p>
       );
     }
 
@@ -169,7 +182,9 @@ const TourDetailView = ({ id }: Props) => {
           <p className="text-gray-400 bg-gray-200 p-2.5 rounded-full">
             <MessageSquareDashed className="size-5" />
           </p>
-          <p className="text-sm text-center">Здесь появятся отзывы путешественников.</p>
+          <p className="text-sm text-center">
+            Здесь появятся отзывы путешественников.
+          </p>
         </div>
       );
     }
@@ -185,10 +200,12 @@ const TourDetailView = ({ id }: Props) => {
 
   const renderRating = (centered = false) => {
     return (
-      <div className={cn(
-        "flex flex-wrap gap-1 items-center text-sm sm:text-base",
-        centered ? "justify-center lg:justify-start" : "justify-start"
-      )}>
+      <div
+        className={cn(
+          'flex flex-wrap gap-1 items-center text-sm sm:text-base',
+          centered ? 'justify-center lg:justify-start' : 'justify-start',
+        )}
+      >
         <Star className="stroke-2 size-4 sm:size-5 fill-yellow-400 text-yellow-400" />
         <span className="text-[var(--primary)] font-bold">
           {tour.rating > 0 ? tour.rating : 'нет оценок :('}
@@ -297,7 +314,9 @@ const TourDetailView = ({ id }: Props) => {
             <div className="flex flex-col sm:flex-row sm:items-center text-gray-500 gap-2 sm:gap-6 text-xs sm:text-sm mt-3 border-b border-slate-100 pb-4">
               <div className="flex gap-1.5 items-center">
                 <MapPin className="stroke-2 size-4 text-gray-400" />
-                <span className="font-medium text-gray-600">{selectedTourSet.hotelLocation}</span>
+                <span className="font-medium text-gray-600">
+                  {selectedTourSet.hotelLocation}
+                </span>
               </div>
               {renderRating()}
             </div>
@@ -305,31 +324,60 @@ const TourDetailView = ({ id }: Props) => {
         </section>
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8 mt-6 mb-10 items-start">
-
           <div className="flex flex-col gap-8 lg:col-start-1">
             <section aria-labelledby="description-title">
-              <h2 id="description-title" className="font-bold text-lg sm:text-[1.3rem] text-[var(--primary)]">
+              <h2
+                id="description-title"
+                className="font-bold text-lg sm:text-[1.3rem] text-[var(--primary)]"
+              >
                 Описание
               </h2>
-              <p className="mt-2.5 text-sm sm:text-base text-gray-600 leading-relaxed whitespace-pre-line">{tour.description}</p>
+              <p className="mt-2.5 text-sm sm:text-base text-gray-600 leading-relaxed whitespace-pre-line">
+                {tour.description}
+              </p>
             </section>
 
             <section aria-labelledby="logistics-title">
-              <h2 id="logistics-title" className="sr-only">Логистика</h2>
+              <h2 id="logistics-title" className="sr-only">
+                Логистика
+              </h2>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {[
-                  { icon: <Clock3 className="size-4" />, label: "Длительность", value: `${days} дней` },
-                  { icon: <Plane className="size-4" />, label: "Перелёт", value: "Включён" },
-                  { icon: <MapPin className="size-4" />, label: "Направление", value: tour.category.title },
-                  { icon: <CalendarHeart className="size-4" />, label: "Заездов", value: `${activeSetsCount} ${pluralize(activeSetsCount, 'дата', 'даты', 'дат')}` }
+                  {
+                    icon: <Clock3 className="size-4" />,
+                    label: 'Длительность',
+                    value: `${days} дней`,
+                  },
+                  {
+                    icon: <Plane className="size-4" />,
+                    label: 'Перелёт',
+                    value: 'Включён',
+                  },
+                  {
+                    icon: <MapPin className="size-4" />,
+                    label: 'Направление',
+                    value: tour.category.title,
+                  },
+                  {
+                    icon: <CalendarHeart className="size-4" />,
+                    label: 'Заездов',
+                    value: `${activeSetsCount} ${pluralize(activeSetsCount, 'дата', 'даты', 'дат')}`,
+                  },
                 ].map((item, i) => (
-                  <article key={i} className="rounded-xl border border-slate-100 bg-slate-50/50 p-3 sm:p-4 flex flex-col justify-between min-h-[100px]">
+                  <article
+                    key={i}
+                    className="rounded-xl border border-slate-100 bg-slate-50/50 p-3 sm:p-4 flex flex-col justify-between min-h-[100px]"
+                  >
                     <span className="mb-2 inline-flex size-8 items-center justify-center rounded-lg bg-[var(--navy-700)] text-cyan-400 shrink-0">
                       {item.icon}
                     </span>
                     <div>
-                      <p className="text-[10px] uppercase tracking-wider font-bold text-gray-400">{item.label}</p>
-                      <p className="mt-0.5 font-bold text-xs sm:text-sm text-[var(--primary)] truncate">{item.value}</p>
+                      <p className="text-[10px] uppercase tracking-wider font-bold text-gray-400">
+                        {item.label}
+                      </p>
+                      <p className="mt-0.5 font-bold text-xs sm:text-sm text-[var(--primary)] truncate">
+                        {item.value}
+                      </p>
                     </div>
                   </article>
                 ))}
@@ -337,7 +385,10 @@ const TourDetailView = ({ id }: Props) => {
             </section>
 
             <section aria-labelledby="advantages-title">
-              <h2 id="advantages-title" className="font-bold text-lg sm:text-[1.3rem] text-[var(--primary)]">
+              <h2
+                id="advantages-title"
+                className="font-bold text-lg sm:text-[1.3rem] text-[var(--primary)]"
+              >
                 Преимущества тура
               </h2>
               <ul className="flex flex-wrap gap-2 mt-4">
@@ -349,15 +400,23 @@ const TourDetailView = ({ id }: Props) => {
                     <span className="advantage-check inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white">
                       <Check className="size-3 stroke-[3]" />
                     </span>
-                    <span className="font-medium text-slate-700">{advantage}</span>
+                    <span className="font-medium text-slate-700">
+                      {advantage}
+                    </span>
                   </li>
                 ))}
               </ul>
             </section>
 
-            <section aria-labelledby="where-to-go-title" className="border-t border-slate-100 pt-8">
+            <section
+              aria-labelledby="where-to-go-title"
+              className="border-t border-slate-100 pt-8"
+            >
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-                <h2 id="where-to-go-title" className="font-bold text-lg sm:text-[1.3rem] text-[var(--primary)]">
+                <h2
+                  id="where-to-go-title"
+                  className="font-bold text-lg sm:text-[1.3rem] text-[var(--primary)]"
+                >
                   Когда поехать
                 </h2>
                 <DateRangePicker
@@ -368,9 +427,11 @@ const TourDetailView = ({ id }: Props) => {
               </div>
 
               <div className="flex flex-col gap-4">
-                {dateRange?.from && visibleTours?.length === 0 &&
-                  <span className="text-sm text-muted-foreground text-center bg-slate-50 p-6 rounded-xl border border-dashed">Заездов на эту дату не найдено</span>
-                }
+                {dateRange?.from && visibleTours?.length === 0 && (
+                  <span className="text-sm text-muted-foreground text-center bg-slate-50 p-6 rounded-xl border border-dashed">
+                    Заездов на эту дату не найдено
+                  </span>
+                )}
                 {visibleTours?.map((tourSet) => (
                   <TourSetCard
                     key={tourSet._id}
@@ -383,7 +444,10 @@ const TourDetailView = ({ id }: Props) => {
             </section>
           </div>
 
-          <aside aria-labelledby="booking-title" className="lg:col-start-2 lg:row-start-1 lg:sticky lg:top-6 w-full">
+          <aside
+            aria-labelledby="booking-title"
+            className="lg:col-start-2 lg:row-start-1 lg:sticky lg:top-6 w-full"
+          >
             <div className="border border-slate-100 rounded-2xl text-[var(--navy-700)] shadow-sm bg-white overflow-hidden relative">
               {selectedTourSet.isHot && (
                 <div className="absolute top-3 right-3 text-[10px] py-1 px-2.5 uppercase text-red-50 bg-red-500 flex items-center gap-1 rounded-lg font-bold tracking-wider shadow-sm">
@@ -408,9 +472,13 @@ const TourDetailView = ({ id }: Props) => {
                       <span>Даты</span>
                     </dt>
                     <dd className="font-bold text-slate-800 text-right flex flex-wrap gap-1 justify-end">
-                      <span>{startDay} {startMonth}</span>
+                      <span>
+                        {startDay} {startMonth}
+                      </span>
                       <span className="text-slate-400 mx-0.5">—</span>
-                      <span>{endDay} {endMonth}</span>
+                      <span>
+                        {endDay} {endMonth}
+                      </span>
                     </dd>
                   </div>
 
@@ -443,7 +511,9 @@ const TourDetailView = ({ id }: Props) => {
                       <span>Отель</span>
                     </dt>
                     <dd className="font-bold text-slate-800 text-right max-w-[60%]">
-                      <span className="block truncate">{selectedTourSet.hotelName}</span>
+                      <span className="block truncate">
+                        {selectedTourSet.hotelName}
+                      </span>
                       <span className="block font-normal text-xs text-muted-foreground mt-0.5 line-clamp-1">
                         {selectedTourSet.hotelLocation}
                       </span>
@@ -456,7 +526,9 @@ const TourDetailView = ({ id }: Props) => {
                       <span>Перелёт</span>
                     </dt>
                     <dd className="font-bold text-slate-800 text-right max-w-[60%]">
-                      <span className="block truncate">{selectedTourSet.airline}</span>
+                      <span className="block truncate">
+                        {selectedTourSet.airline}
+                      </span>
                       <span className="block font-normal text-xs text-muted-foreground mt-0.5 line-clamp-1">
                         {selectedTourSet.flightDetails}
                       </span>
@@ -486,7 +558,7 @@ const TourDetailView = ({ id }: Props) => {
                 </div>
                 <p className="text-xs mt-4 flex gap-2 items-center justify-center text-gray-400 font-medium">
                   <ShieldCog className="size-4 text-slate-400" />
-                  <span>С вами свяжутся in течение часа</span>
+                  <span>С вами свяжутся в течение часа</span>
                 </p>
               </div>
             </div>
@@ -497,7 +569,10 @@ const TourDetailView = ({ id }: Props) => {
               <CreateReviewForm tourId={id} />
 
               <div className="flex flex-col items-center lg:items-start border-t border-slate-100 pt-6 mt-8 text-center lg:text-left gap-2">
-                <h2 id="reviews-title" className="font-bold text-lg sm:text-[1.3rem] text-[var(--primary)]">
+                <h2
+                  id="reviews-title"
+                  className="font-bold text-lg sm:text-[1.3rem] text-[var(--primary)]"
+                >
                   Отзывы путешественников
                 </h2>
                 {renderRating(true)}
@@ -518,7 +593,6 @@ const TourDetailView = ({ id }: Props) => {
               )}
             </div>
           </section>
-
         </div>
       </div>
     </>
