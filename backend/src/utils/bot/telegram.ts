@@ -128,7 +128,6 @@ export async function aggregate_tour(
   const minPrice = tourSets.length
     ? Math.min(...tourSets.map((s) => s.price))
     : null;
-
   const hotelLocation = tourSets[0]?.hotelLocation ?? null;
 
   const nextStartDate = tourSets.length

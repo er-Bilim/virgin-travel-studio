@@ -31,6 +31,7 @@ export interface TourType {
 }
 
 export interface ITourWithTourSetFields extends TourType {
+  tourSetId?: string;
   isHot: boolean;
   minPrice: number;
   discountPrice?: number;
