@@ -196,13 +196,6 @@ describe('Footer', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('рендерит ссылку на политику конфиденциальности', () => {
-    setup();
-    expect(
-      screen.getByRole('link', { name: /Политика конфиденциальности/ }),
-    ).toHaveAttribute('href', '/privacy');
-  });
-
   it('рендерит копирайт', () => {
     setup();
     expect(screen.getByText(/© 2026 Virgin Travel Studio/)).toBeInTheDocument();

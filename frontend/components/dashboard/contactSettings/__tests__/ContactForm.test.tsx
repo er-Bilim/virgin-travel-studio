@@ -99,7 +99,8 @@ describe('ContactSettingsForm', () => {
 
   it('показывает текущий логотип, если он строка', () => {
     setup();
-    expect(screen.getByAltText('Текущий логотип')).toBeInTheDocument();
+    expect(screen.getByText('Текущий логотип:')).toBeInTheDocument();
+    expect(screen.getByAltText('Логотип')).toBeInTheDocument();
   });
 
   it('не показывает логотип, если его нет', () => {
