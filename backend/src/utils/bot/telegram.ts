@@ -3,7 +3,6 @@ import Category from '@/model/category/Category.js';
 import TourSet from '@/model/tourSet/TourSet.js';
 import type { Types } from 'mongoose';
 
-
 interface TourCategoryType {
   _id: string;
   title: string;
@@ -28,84 +27,112 @@ export interface TourType extends Omit<TourDocumentType, 'category'> {
 }
 
 export interface ITourWithTourSetFields extends TourType {
-  tourSetId?: string,
+  tourSetId?: string;
   isHot: boolean;
-  minPrice: number;
-  hotelLocation: string;
-  nextStartDate: string;
-  durationDays: number;
-} 
-
+  minPrice: number | null;
+  hotelLocation: string | null;
+  nextStartDate: string | null;
+  durationDays: number | null;
+}
 
 export default async function telegramMessage(tour: ITourWithTourSetFields) {
+  const text = formatTourText(tour);
+  const photo_url = `${config.corsOrigin}/api/tours/image/${tour.images[0]}`;   // tour.images[0];
+  // const photo_url = `https://imgs.search.brave.com/X3RlYWP5-cxhIVKxzW-C-UZU3YuVcTkNDHciYyyh5Gc/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdDIu/ZGVwb3NpdHBob3Rv/cy5jb20vNzk3MjAy/Ni8xMTkxNi9pLzQ1/MC9kZXBvc2l0cGhv/dG9zXzExOTE2NDg4/Mi1zdG9jay1waG90/by1jYXVjYXN1cy1t/b3VudGFpbnMtZ2Vv/cmdpYS5qcGc`;
+  const url = `${config.tgApi}${config.botToken}/sendPhoto`;
 
-    const text = formatTourText(tour);
-    // const photo_url = `${config.corsOrigin}/api/tours/image/${tour.images[0]}`;   // tour.images[0];
-    const photo_url = `https://imgs.search.brave.com/X3RlYWP5-cxhIVKxzW-C-UZU3YuVcTkNDHciYyyh5Gc/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdDIu/ZGVwb3NpdHBob3Rv/cy5jb20vNzk3MjAy/Ni8xMTkxNi9pLzQ1/MC9kZXBvc2l0cGhv/dG9zXzExOTE2NDg4/Mi1zdG9jay1waG90/by1jYXVjYXN1cy1t/b3VudGFpbnMtZ2Vv/cmdpYS5qcGc`;
-    const url = `${config.tgApi}${config.botToken}/sendPhoto`;
-
-    const result = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: config.channelId,
-        photo: photo_url,
-        caption: text,
-        parse_mode: 'HTML',
-        reply_markup: {
-          inline_keyboard: [
-            [
-              {
-                text: '🎒 Хочу поехать!',
-                callback_data: `book:${tour.tourSetId}`,
-              },
-            ],
+  const result = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: config.channelId,
+      photo: photo_url,
+      caption: text,
+      parse_mode: 'HTML',
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              text: '🎒 Хочу поехать!',
+              callback_data: `book:${tour.tourSetId}`,
+            },
           ],
-        },
-      }),
-    });
-    if (result.status === 400) {
-      console.log('Не удалось отправить сообщение');
-    }
+        ],
+      },
+    }),
+  });
+  if (!result.ok) {
+    const errorBody = (await result.json().catch(() => null)) as {
+      description: string;
+    };
+    console.error(
+      `Не удалось отправить тур ${tour._id}:`,
+      result.status,
+      errorBody?.description ?? 'unknown error',
+    );
+  }
+}
+
+function truncate(str: string, maxLength: number): string {
+  return str.length > maxLength ? str.slice(0, maxLength - 1) + '…' : str;
 }
 
 function formatTourText(tour: ITourWithTourSetFields): string {
-  const date = new Date(tour.nextStartDate);
-  const formattedDate = date.toLocaleDateString('ru-RU', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  });
-
-  const formattedPrice = tour.minPrice.toLocaleString('ru-RU');
   const hotPrefix = tour.isHot ? '🔥 ' : '';
-  return (
+
+  let text =
     `${hotPrefix}<b>${tour.title}</b> [<i>${tour.category.title}</i>]\n\n` +
-    `📝 <b>Описание:</b> ${tour.description}\n` +
-    `📍 <b>Локация:</b> ${tour.hotelLocation}\n` +
-    `📅 <b>Старт:</b> ${formattedDate} (${tour.durationDays} дней)\n` +
-    `⭐️ <b>Рейтинг:</b> ${tour.rating} (${tour.ratingCount} отз.)\n\n` +
-    `💳 <b>Стоимость от:</b> ${formattedPrice} ₽`
-  );
+    `📝 <b>Описание:</b> ${truncate(tour.description, 400)}\n`;
+
+  if (tour.nextStartDate && tour.minPrice) {
+    const date = new Date(tour.nextStartDate);
+    const formattedDate = date.toLocaleDateString('ru-RU', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
+    const formattedPrice = tour.minPrice.toLocaleString('ru-RU');
+
+    text +=
+      `📅 <b>Старт:</b> ${formattedDate} (${tour.durationDays} дней)\n` +
+      `⭐️ <b>Рейтинг:</b> ${tour.rating} (${tour.ratingCount} отз.)\n\n` +
+      `💳 <b>Стоимость от:</b> ${formattedPrice} ₽\n` +
+      `📍 <b>Локация:</b> ${tour.hotelLocation}\n`;
+  } else {
+    text +=
+      `📅 <b>В ближайшее время не планируется посещение данного места</b>\n` +
+      `⭐️ <b>Рейтинг:</b> ${tour.rating} (${tour.ratingCount} отз.)\n\n`;
+  }
+  return text;
 }
 
-
-export async function aggregate_tour(tour: TourDocumentType): Promise<ITourWithTourSetFields> {
+export async function aggregate_tour(
+  tour: TourDocumentType,
+): Promise<ITourWithTourSetFields> {
   const tourSets = await TourSet.find({ tourId: tour._id }).lean();
-  if (!tourSets) {
-    throw new Error('Турсетов нет');
+
+  const category = (await Category.findById(
+    tour.category,
+  ).lean()) as unknown as TourCategoryType | null;
+  if (!category) {
+    throw new Error(
+      `Категория ${tour.category} не найдена для тура ${tour._id}`,
+    );
   }
-  const category = await Category.findById(tour.category).lean() as unknown as TourCategoryType;
+
   const isHot = tourSets.some((s) => s.isHot);
+
   const minPrice = tourSets.length
     ? Math.min(...tourSets.map((s) => s.price))
-    : 0;
-  const hotelLocation = tourSets[0]?.hotelLocation ?? '';
+    : null;
+
+  const hotelLocation = tourSets[0]?.hotelLocation ?? null;
+
   const nextStartDate = tourSets.length
     ? new Date(
         Math.min(...tourSets.map((s) => new Date(s.startDate).getTime())),
-      ).toString()
-    : '';
+      ).toISOString()
+    : null;
 
   const durationDays =
     tourSets[0]?.startDate && tourSets[0]?.endDate
@@ -114,10 +141,11 @@ export async function aggregate_tour(tour: TourDocumentType): Promise<ITourWithT
             new Date(tourSets[0].startDate).getTime()) /
             (1000 * 60 * 60 * 24),
         )
-      : 0;
-  
-  const tourSetId = tourSets[0] ? tourSets[0]._id : null;
-  const response = {
+      : null;
+
+  const tourSetId = tourSets[0]?._id?.toString();
+
+  return {
     ...tour,
     category,
     isHot,
@@ -125,7 +153,6 @@ export async function aggregate_tour(tour: TourDocumentType): Promise<ITourWithT
     hotelLocation,
     nextStartDate,
     durationDays,
+    ...(tourSetId && { tourSetId }),
   };
-  if (tourSetId) return {...response, tourSetId: tourSetId as unknown as string}
-  return response
 }
