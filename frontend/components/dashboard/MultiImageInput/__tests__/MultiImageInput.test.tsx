@@ -12,15 +12,6 @@ vi.mock('@/lib/utils', async (importOriginal) => {
   };
 });
 
-vi.mock('@/lib/constants', () => ({
-  imageUrl: 'http://localhost:8000/',
-  IMAGE_UPLOAD: {
-    ALLOWED_MIME_TYPES: ['image/jpeg', 'image/png', 'image/webp'],
-    MAX_FILE_SIZE_BYTES: 5 * 1024 * 1024,
-    MAX_FILES: 5,
-  },
-}));
-
 const createFile = (name = 'photo.jpg', type = 'image/jpeg') =>
   new File(['x'], name, { type });
 
@@ -195,7 +186,7 @@ describe('MultiImageInput', () => {
     expect(screen.queryByText(/big.jpg/)).not.toBeInTheDocument();
   });
 
-  it('строит превью с префиксом imageUrl для относительных путей', () => {
+  it('использует строковый путь как есть для превью', () => {
     render(
       <MultiImageInput
         name="images"
@@ -206,7 +197,7 @@ describe('MultiImageInput', () => {
     );
     expect(screen.getByAltText('Preview 1')).toHaveAttribute(
       'src',
-      'http://localhost:8000//uploads/tour1.jpg',
+      '/uploads/tour1.jpg',
     );
   });
 
