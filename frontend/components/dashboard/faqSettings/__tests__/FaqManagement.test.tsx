@@ -4,9 +4,9 @@ import FaqManagement from '../FaqManagement';
 import { useModalStore } from '@/lib/stores/modalStore';
 import {
   useAdminFaqs,
-  mutateDeleteFaq,
-  mutateTogglePublishFaq,
-  mutateReorderFaqs,
+  useMutateDeleteFaq,
+  useMutateTogglePublishFaq,
+  useMutateReorderFaqs,
 } from '@/lib/hooks/faq';
 import type { Faq } from '@/types/faq';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
@@ -17,9 +17,9 @@ vi.mock('@/lib/stores/modalStore', () => ({
 
 vi.mock('@/lib/hooks/faq', () => ({
   useAdminFaqs: vi.fn(),
-  mutateDeleteFaq: vi.fn(),
-  mutateTogglePublishFaq: vi.fn(),
-  mutateReorderFaqs: vi.fn(),
+  useMutateDeleteFaq: vi.fn(),
+  useMutateTogglePublishFaq: vi.fn(),
+  useMutateReorderFaqs: vi.fn(),
 }));
 
 vi.mock('@/components/dashboard/faqSettings/SortableFaqItem', () => ({
@@ -73,17 +73,17 @@ describe('FaqManagement Component (Dashboard)', () => {
       isPending,
     } as never);
 
-    vi.mocked(mutateDeleteFaq).mockReturnValue({
+    vi.mocked(useMutateDeleteFaq).mockReturnValue({
       mutate: mockDeleteMutate,
       isPending: false,
     } as never);
 
-    vi.mocked(mutateTogglePublishFaq).mockReturnValue({
+    vi.mocked(useMutateTogglePublishFaq).mockReturnValue({
       mutate: mockTogglePublishMutate,
       isPending: false,
     } as never);
 
-    vi.mocked(mutateReorderFaqs).mockReturnValue({
+    vi.mocked(useMutateReorderFaqs).mockReturnValue({
       mutate: mockReorderMutate,
       isPending: false,
     } as never);

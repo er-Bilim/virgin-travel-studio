@@ -13,7 +13,7 @@ export const useContacts = () => {
   });
 };
 
-export const mutateContacts = () => {
+export const useMutateContacts = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: editContacts,
@@ -24,7 +24,7 @@ export const mutateContacts = () => {
   });
 };
 
-export const mutateCreateContacts = () => {
+export const useMutateCreateContacts = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createContacts,

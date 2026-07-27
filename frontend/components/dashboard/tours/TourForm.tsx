@@ -42,6 +42,7 @@ interface Props {
 }
 
 export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
+  const [open, setOpen] = useState(false);
   const router = useRouter();
   const baseToursPath = '/admin/tours';
   const { data: categoriesData, isLoading: isCatsLoading } = useCategories();
@@ -207,7 +208,6 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
           name="countryCode"
           rules={{ required: 'Выберите страну' }}
           render={({ field }) => {
-            const [open, setOpen] = useState(false);
 
             const selectedName = countryOptions.find(
               (c) => c.code === field.value,

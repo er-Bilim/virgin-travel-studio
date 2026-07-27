@@ -7,10 +7,12 @@ import mongoose, {type PipelineStage} from 'mongoose';
 import validateObjectId from '@/middlewares/validateObjectId.js';
 import parseSort from '@/lib/sort.js';
 import TourSet from '@/model/tourSet/TourSet.js';
-import type {AggregatedTour, AggregatedTours} from '@/types/tour.types.js';
+import type {AggregatedTour, AggregatedTours, ITour} from '@/types/tour.types.js';
 import type {ICategory} from '@/types/category.types.js';
-import path from 'path';
-import fs from 'fs/promises';
+import telegramMessage, {
+  aggregate_tour,
+  type TourDocumentType,
+} from '@/utils/bot/telegram.js';
 import TourView from '@/model/tour/TourView.js';
 import {buildTourPipeline} from '@/aggregations/tours.pipeline.js';
 import { uploadImageToGridFS } from '@/lib/gridfs.js';
@@ -203,7 +205,7 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
           title: 1,
           description: 1,
           images: 1,
-          baseAdventages: 1,
+          baseAdvantages: 1,
           isPublished: 1,
           rating: 1,
           ratingCount: 1,
@@ -508,6 +510,16 @@ toursRouter.patch(
 
       if (isPublished !== undefined) {
         tour.isPublished = String(isPublished) === 'true';
+        if (tour.isPublished) {
+          const tourAggregate = await aggregate_tour(
+            tour.toObject() as unknown as TourDocumentType,
+          );
+          if (tourAggregate.hotelLocation) {
+            telegramMessage(tourAggregate).catch((e) =>
+              console.error('Не удалось запостить тур в Telegram:', e),
+            );
+          }
+        }
       }
 
       if (baseAdvantages !== undefined) {

@@ -75,9 +75,9 @@ export default function AboutUsForm({ initialValues, isLoading, errorLoad }: Pro
     name: 'steps' as const as never,
   });
 
-  const { mutate, isPending } = initialValues
-    ? useEditAboutUsData()
-    : useCreateAboutUsData();
+  const editMutation = useEditAboutUsData();
+  const createMutation = useCreateAboutUsData();
+  const { mutate, isPending } = initialValues ? editMutation : createMutation;
 
   const onSubmit = (data: AboutUsFieldsMutation) => {
     mutate(data, {

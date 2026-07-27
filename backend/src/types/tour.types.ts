@@ -21,10 +21,10 @@ export type AggregatedTour = Omit<ITour, 'category'> & {
   tourSets: TourSetFields[];
 }
 
-export interface AggregatedTours extends ITour{
+export interface AggregatedTours extends ITour {
   isHot: boolean;
   minPrice: number;
   hotelLocation: string;
   durationDays: number;
-  nextStartDays: string;
+  nextStartDate: string;
 }

@@ -1,8 +1,8 @@
-import { Types } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export type TourSetStatus = 'OPEN' | 'CLOSED' | 'FINISHED';
 
-export interface TourSetFields {
+export interface TourSetFields extends Document {
   tourId: Types.ObjectId;
   startDate: Date;
   endDate: Date;

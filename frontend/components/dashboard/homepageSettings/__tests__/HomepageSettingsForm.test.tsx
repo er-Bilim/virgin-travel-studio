@@ -3,15 +3,15 @@ import userEvent from '@testing-library/user-event';
 import HomepageSettingsForm from '../HomepageSettingsForm';
 import {
   useHomepageSettings,
-  mutateCreateHomepageSettings,
-  mutateHomepageSettings,
+  useMutateCreateHomepageSettings,
+  useMutateHomepageSettings,
 } from '@/lib/hooks/homepageSettingsHooks';
 import { toast } from 'sonner';
 
 vi.mock('@/lib/hooks/homepageSettingsHooks', () => ({
   useHomepageSettings: vi.fn(),
-  mutateCreateHomepageSettings: vi.fn(),
-  mutateHomepageSettings: vi.fn(),
+  useMutateCreateHomepageSettings: vi.fn(),
+  useMutateHomepageSettings: vi.fn(),
 }));
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 vi.mock('../VideoInput', () => ({
@@ -43,11 +43,11 @@ const setup = ({
     data,
     isPending: isFetching,
   } as never);
-  vi.mocked(mutateCreateHomepageSettings).mockReturnValue({
+  vi.mocked(useMutateCreateHomepageSettings).mockReturnValue({
     mutate: createMutate,
     isPending: isSaving,
   } as never);
-  vi.mocked(mutateHomepageSettings).mockReturnValue({
+  vi.mocked(useMutateHomepageSettings).mockReturnValue({
     mutate: updateMutate,
     isPending: isSaving,
   } as never);

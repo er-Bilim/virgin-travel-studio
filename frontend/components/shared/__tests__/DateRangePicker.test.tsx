@@ -52,6 +52,7 @@ describe('DateRangePicker (inline)', () => {
   });
 
   it('открывает календарь по клику на триггер', async () => {
+    const user = userEvent.setup();
     render(
       <DateRangePicker
         value={undefined}
@@ -59,7 +60,7 @@ describe('DateRangePicker (inline)', () => {
         placeholder="Период"
       />,
     );
-    await userEvent.click(screen.getByRole('button', { name: /Период/ }));
+    await user.click(screen.getByRole('button', { name: /Период/ }));
     const grids = await screen.findAllByRole('grid');
     expect(grids).toHaveLength(2);
   });

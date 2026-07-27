@@ -3,6 +3,7 @@ import MultiImageInput from '../MultiImageInput';
 import { validateImageFile } from '@/lib/utils';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import type * as UtilsModule from '@/lib/utils';
+import { IMAGE_UPLOAD } from '@/lib/constants';
 
 vi.mock('@/lib/utils', async (importOriginal) => {
   const actual = await importOriginal<typeof UtilsModule>();
@@ -11,15 +12,6 @@ vi.mock('@/lib/utils', async (importOriginal) => {
     validateImageFile: vi.fn(),
   };
 });
-
-vi.mock('@/lib/constants', () => ({
-  imageUrl: 'http://localhost:8000/',
-  IMAGE_UPLOAD: {
-    ALLOWED_MIME_TYPES: ['image/jpeg', 'image/png', 'image/webp'],
-    MAX_FILE_SIZE_BYTES: 5 * 1024 * 1024,
-    MAX_FILES: 5,
-  },
-}));
 
 const createFile = (name = 'photo.jpg', type = 'image/jpeg') =>
   new File(['x'], name, { type });
@@ -71,7 +63,10 @@ describe('MultiImageInput', () => {
       'input[type="file"]',
     ) as HTMLInputElement;
     expect(input).toHaveAttribute('multiple');
-    expect(input).toHaveAttribute('accept', 'image/jpeg,image/png,image/webp');
+    expect(input).toHaveAttribute(
+      'accept',
+      IMAGE_UPLOAD.ALLOWED_MIME_TYPES.join(','),
+    );
     expect(input).toHaveAttribute('name', 'images');
   });
 
@@ -195,7 +190,7 @@ describe('MultiImageInput', () => {
     expect(screen.queryByText(/big.jpg/)).not.toBeInTheDocument();
   });
 
-  it('строит превью с префиксом imageUrl для относительных путей', () => {
+  it('использует строковый путь как есть для превью', () => {
     render(
       <MultiImageInput
         name="images"
@@ -206,7 +201,7 @@ describe('MultiImageInput', () => {
     );
     expect(screen.getByAltText('Preview 1')).toHaveAttribute(
       'src',
-      'http://localhost:8000//uploads/tour1.jpg',
+      '/uploads/tour1.jpg',
     );
   });
 

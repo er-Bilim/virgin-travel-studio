@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { inputClass } from '@/lib/constants';
-import { mutateCreateFaq, mutateEditFaq } from '@/lib/hooks/faq';
+import { useMutateCreateFaq, useMutateEditFaq } from '@/lib/hooks/faq';
 import type { GlobalError } from '@/types/error';
 import type { Faq, FaqMutation } from '@/types/faq';
 
@@ -21,8 +21,8 @@ export function FaqForm({ faq, onClose }: FaqFormProps) {
   const [globalError, setGlobalError] = useState<string | null>(null);
   const isEdit = !!faq;
 
-  const { mutate: createFaq, isPending: isCreating } = mutateCreateFaq();
-  const { mutate: editFaq, isPending: isEditing } = mutateEditFaq();
+  const { mutate: createFaq, isPending: isCreating } = useMutateCreateFaq();
+  const { mutate: editFaq, isPending: isEditing } = useMutateEditFaq();
   const isSaving = isCreating || isEditing;
 
   const {

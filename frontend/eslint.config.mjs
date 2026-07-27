@@ -29,6 +29,7 @@ const eslintConfig = defineConfig(
       ],
 
       // React
+      "react-hooks/set-state-in-effect": "warn",
       "react/self-closing-comp": "error",
       "react/jsx-curly-brace-presence": [
         "error",

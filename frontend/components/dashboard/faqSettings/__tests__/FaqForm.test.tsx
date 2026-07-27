@@ -1,23 +1,23 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { FaqForm } from '../FaqForm';
-import { mutateCreateFaq, mutateEditFaq } from '@/lib/hooks/faq';
+import { useMutateCreateFaq, useMutateEditFaq } from '@/lib/hooks/faq';
 import type { Faq } from '@/types/faq';
 
 vi.mock('@/lib/hooks/faq', () => ({
-  mutateCreateFaq: vi.fn(),
-  mutateEditFaq: vi.fn(),
+  useMutateCreateFaq: vi.fn(),
+  useMutateEditFaq: vi.fn(),
 }));
 
 const createMutate = vi.fn();
 const editMutate = vi.fn();
 
 const setupMutations = ({ isCreating = false, isEditing = false } = {}) => {
-  vi.mocked(mutateCreateFaq).mockReturnValue({
+  vi.mocked(useMutateCreateFaq).mockReturnValue({
     mutate: createMutate,
     isPending: isCreating,
   } as never);
-  vi.mocked(mutateEditFaq).mockReturnValue({
+  vi.mocked(useMutateEditFaq).mockReturnValue({
     mutate: editMutate,
     isPending: isEditing,
   } as never);
