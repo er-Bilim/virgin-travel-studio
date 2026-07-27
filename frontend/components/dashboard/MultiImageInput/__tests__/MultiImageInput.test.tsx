@@ -3,6 +3,7 @@ import MultiImageInput from '../MultiImageInput';
 import { validateImageFile } from '@/lib/utils';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import type * as UtilsModule from '@/lib/utils';
+import { IMAGE_UPLOAD } from '@/lib/constants';
 
 vi.mock('@/lib/utils', async (importOriginal) => {
   const actual = await importOriginal<typeof UtilsModule>();
@@ -62,7 +63,10 @@ describe('MultiImageInput', () => {
       'input[type="file"]',
     ) as HTMLInputElement;
     expect(input).toHaveAttribute('multiple');
-    expect(input).toHaveAttribute('accept', 'image/jpeg,image/png,image/webp');
+    expect(input).toHaveAttribute(
+      'accept',
+      IMAGE_UPLOAD.ALLOWED_MIME_TYPES.join(','),
+    );
     expect(input).toHaveAttribute('name', 'images');
   });
 
