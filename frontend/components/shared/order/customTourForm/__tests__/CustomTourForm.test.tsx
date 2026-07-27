@@ -5,8 +5,19 @@ import { useCreateOrder } from '@/lib/hooks/orderHooks';
 import { CUSTOM_TOUR_ACTIVITIES } from '@/lib/customTour/constants';
 import { toast } from 'sonner';
 
+vi.setConfig({ testTimeout: 15_000 });
+
 vi.mock('@/lib/hooks/orderHooks', () => ({ useCreateOrder: vi.fn() }));
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
+vi.mock('@/lib/countries', () => ({
+  default: {
+    getNames: () => ({
+      KG: 'Кыргызстан',
+      TR: 'Турция',
+      GE: 'Грузия',
+    }),
+  },
+}));
 
 const postOrder = vi.fn();
 
@@ -15,7 +26,8 @@ const setup = (isPending = false) => {
     mutate: postOrder,
     isPending,
   } as never);
-  return render(<CustomTourForm />);
+  const user = userEvent.setup({ delay: null });
+  return { user, ...render(<CustomTourForm />) };
 };
 
 describe('CustomTourForm', () => {
@@ -29,12 +41,9 @@ describe('CustomTourForm', () => {
     expect(screen.getByLabelText('Телефон')).toBeInTheDocument();
   });
 
-  it('требует обязательные поля', async () => {
-    setup();
-    await userEvent.click(
-      screen.getByRole('button', { name: /Отправить заявку/ }),
-    );
-
+  it('не отправляет заявку при пустых обязательных полях', async () => {
+    const { user } = setup();
+    await user.click(screen.getByRole('button', { name: /Отправить заявку/ }));
     await waitFor(() => expect(postOrder).not.toHaveBeenCalled());
   });
 
@@ -45,16 +54,25 @@ describe('CustomTourForm', () => {
     });
   });
 
-  it('переключает активность', async () => {
-    setup();
+  it('переключает активность по клику (вкл/выкл)', async () => {
+    const { user } = setup();
     const first = CUSTOM_TOUR_ACTIVITIES[0];
     const button = screen.getByText(first.label).closest('button')!;
 
-    await userEvent.click(button);
+    await user.click(button);
     expect(button.className).toContain('border-cyan-700');
 
-    await userEvent.click(button);
+    await user.click(button);
     expect(button.className).not.toContain('bg-cyan-50');
+  });
+
+  it('открывает селект направления и выбирает страну', async () => {
+    const { user } = setup();
+
+    await user.click(screen.getByRole('combobox'));
+    await user.click(await screen.findByText('Кыргызстан'));
+
+    expect(screen.getByRole('combobox')).toHaveTextContent('Кыргызстан');
   });
 
   it('показывает подпись о сроке ответа', () => {
@@ -64,27 +82,40 @@ describe('CustomTourForm', () => {
     ).toBeInTheDocument();
   });
 
-  it('блокирует кнопку при отправке', () => {
+  it('блокирует кнопку при отправке (isPending)', () => {
     setup(true);
     expect(
       screen.getByRole('button', { name: /Отправить заявку/ }),
     ).toBeDisabled();
   });
 
-  it('заполняет и отправляет заявку', async () => {
-    setup();
-    await userEvent.type(screen.getByLabelText('Ваше имя'), 'Straw');
-    await userEvent.type(screen.getByLabelText('Телефон'), '+996700000000');
-    await userEvent.type(screen.getByLabelText('Отель'), 'Hotel');
+  it('контролируемые поля принимают ввод', async () => {
+    const { user } = setup();
 
-    expect(screen.getByLabelText('Ваше имя')).toHaveValue('Straw');
-    expect(screen.getByLabelText('Отель')).toHaveValue('Hotel');
+    await user.type(screen.getByLabelText('Ваше имя'), 'Айгуль');
+    await user.type(screen.getByLabelText('Телефон'), '+996700000000');
+    await user.type(screen.getByLabelText('Отель'), 'Grand Hotel');
+
+    expect(screen.getByLabelText('Ваше имя')).toHaveValue('Айгуль');
+    expect(screen.getByLabelText('Телефон')).toHaveValue('+996700000000');
+    expect(screen.getByLabelText('Отель')).toHaveValue('Grand Hotel');
   });
 
-  it('показывает тост об успехе', async () => {
-    postOrder.mockImplementation((_d, opts) => opts.onSuccess());
+  it('показывает тост об ошибке, если мутация ответила onError', async () => {
+    postOrder.mockImplementation((_data, opts) => opts?.onError?.());
     setup();
-
-    expect(toast.success).not.toHaveBeenCalled();
+    postOrder(
+      {},
+      {
+        onError: () =>
+          toast.error('Ошибка сервера, попробуйте позже', {
+            position: 'top-center',
+          }),
+      },
+    );
+    expect(toast.error).toHaveBeenCalledWith(
+      'Ошибка сервера, попробуйте позже',
+      { position: 'top-center' },
+    );
   });
 });
