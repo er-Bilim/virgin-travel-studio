@@ -25,7 +25,7 @@ describe('openWhatsApp', () => {
   });
 
   it('открывает wa.me с правильным номером', () => {
-    openWhatsApp('Привет');
+    openWhatsApp('Привет', '996550176420');
     expect(window.open).toHaveBeenCalledOnce();
     const url = (window.open as any).mock.calls[0][0];
     expect(url).toContain('https://wa.me/996550176420');
