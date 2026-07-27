@@ -9,9 +9,3 @@ npm-debug.log*
 .env
 .env.*
 !.env.template
-
-# Runtime upload dirs — not needed in image; GridFS is the source of truth
-public/images/
-public/videos/
-
-# seed-assets/ IS included in the image so `npm run seed` works inside the container
