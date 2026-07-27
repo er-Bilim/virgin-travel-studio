@@ -12,9 +12,9 @@ import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog/ConfirmDialo
 
 import {
   useAdminFaqs,
-  mutateDeleteFaq,
-  mutateTogglePublishFaq,
-  mutateReorderFaqs
+  useMutateDeleteFaq,
+  useMutateTogglePublishFaq,
+  useMutateReorderFaqs
 } from '@/lib/hooks/faq';
 
 import {
@@ -48,9 +48,9 @@ export default function FaqManagement() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [togglePublishData, setTogglePublishData] = useState<{ id: string; currentStatus: boolean } | null>(null);
 
-  const { mutate: deleteFaq, isPending: isDeleting } = mutateDeleteFaq();
-  const { mutate: togglePublish, isPending: isToggling } = mutateTogglePublishFaq();
-  const { mutate: saveOrder, isPending: isOrdering } = mutateReorderFaqs();
+  const { mutate: deleteFaq, isPending: isDeleting } = useMutateDeleteFaq();
+  const { mutate: togglePublish, isPending: isToggling } = useMutateTogglePublishFaq();
+  const { mutate: saveOrder, isPending: isOrdering } = useMutateReorderFaqs();
 
   useEffect(() => {
     if (serverFaqs) {

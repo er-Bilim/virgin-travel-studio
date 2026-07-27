@@ -3,15 +3,15 @@ import userEvent from '@testing-library/user-event';
 import ContactSettingsForm from '../contactForm';
 import {
   useContacts,
-  mutateContacts,
-  mutateCreateContacts,
+  useMutateContacts,
+  useMutateCreateContacts,
 } from '@/lib/hooks/contactSettings';
 import type { IContactSettings } from '@/types/contactSettings';
 
 vi.mock('@/lib/hooks/contactSettings', () => ({
   useContacts: vi.fn(),
-  mutateContacts: vi.fn(),
-  mutateCreateContacts: vi.fn(),
+  useMutateContacts: vi.fn(),
+  useMutateCreateContacts: vi.fn(),
 }));
 
 const updateMutate = vi.fn();
@@ -50,11 +50,11 @@ const setup = ({
     isPending: isFetching,
     error,
   } as never);
-  vi.mocked(mutateContacts).mockReturnValue({
+  vi.mocked(useMutateContacts).mockReturnValue({
     mutate: updateMutate,
     isPending,
   } as never);
-  vi.mocked(mutateCreateContacts).mockReturnValue({
+  vi.mocked(useMutateCreateContacts).mockReturnValue({
     mutate: createMutate,
     isPending,
   } as never);

@@ -14,7 +14,7 @@ export const useHomepageSettings = (isAdmin = false) => {
   });
 };
 
-export const mutateHomepageSettings = () => {
+export const useMutateHomepageSettings = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: editHomepageSettings,
@@ -24,7 +24,7 @@ export const mutateHomepageSettings = () => {
   });
 };
 
-export const mutateCreateHomepageSettings = () => {
+export const useMutateCreateHomepageSettings = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createHomepageSettings,

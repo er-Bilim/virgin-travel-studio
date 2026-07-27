@@ -14,8 +14,8 @@ import {
 import AdvantageItem from './advantages/advantageItem';
 import type { HomepageSettingsMutationData } from '@/types/homepageSettings';
 import {
-  mutateCreateHomepageSettings,
-  mutateHomepageSettings,
+  useMutateCreateHomepageSettings,
+  useMutateHomepageSettings,
   useHomepageSettings,
 } from '@/lib/hooks/homepageSettingsHooks';
 import type { GlobalError } from '@/types/error';
@@ -55,9 +55,9 @@ export default function HomepageSettingsForm() {
   const isNew = !currentSettings;
 
   const { mutate: createSettings, isPending: isCreating } =
-    mutateCreateHomepageSettings();
+    useMutateCreateHomepageSettings();
   const { mutate: updateSettings, isPending: isUpdating } =
-    mutateHomepageSettings();
+    useMutateHomepageSettings();
 
   const mutate = isNew ? createSettings : updateSettings;
   const isSaving = isNew ? isCreating : isUpdating;

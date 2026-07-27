@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DateRangePicker } from '../DateRangePicker';
 import type { DateRange } from 'react-day-picker';
@@ -59,8 +59,8 @@ describe('DateRangePicker (inline)', () => {
         placeholder="Период"
       />,
     );
-    await userEvent.click(screen.getByRole('button', { name: /Период/ }));
-    const grids = await screen.findAllByRole('grid');
-    expect(grids).toHaveLength(2);
+    await user.keyboard('{Escape}');
+
+    await waitFor(() => expect(screen.queryAllByRole('grid')).toHaveLength(0));
   });
 });

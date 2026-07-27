@@ -24,7 +24,7 @@ export const useAdminFaqs = () => {
   });
 };
 
-export const mutateCreateFaq = () => {
+export const useMutateCreateFaq = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createFaq,
@@ -34,7 +34,7 @@ export const mutateCreateFaq = () => {
   });
 };
 
-export const mutateReorderFaqs = () => {
+export const useMutateReorderFaqs = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: reorderFaqs,
@@ -44,7 +44,7 @@ export const mutateReorderFaqs = () => {
   });
 };
 
-export const mutateTogglePublishFaq = () => {
+export const useMutateTogglePublishFaq = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: togglePublishFaq,
@@ -54,7 +54,7 @@ export const mutateTogglePublishFaq = () => {
   });
 };
 
-export const mutateEditFaq = () => {
+export const useMutateEditFaq = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: editFaq,
@@ -64,7 +64,7 @@ export const mutateEditFaq = () => {
   });
 };
 
-export const mutateDeleteFaq = () => {
+export const useMutateDeleteFaq = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: deleteFaq,

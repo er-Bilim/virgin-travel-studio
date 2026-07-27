@@ -12,8 +12,8 @@ import type { IContactSettings } from '@/types/contactSettings';
 import { Input } from '@/components/ui/input';
 import { imageUrl, inputClass, isDev } from '@/lib/constants';
 import {
-  mutateContacts,
-  mutateCreateContacts,
+  useMutateContacts,
+  useMutateCreateContacts,
   useContacts,
 } from '@/lib/hooks/contactSettings';
 import { Loader2 } from 'lucide-react';
@@ -65,9 +65,9 @@ export default function ContactSettingsForm() {
 
   const isNew = !contactSettings;
 
-  const { mutate, isPending } = isNew
-    ? mutateCreateContacts()
-    : mutateContacts();
+  const createMutation = useMutateCreateContacts();
+  const editMutation = useMutateContacts();
+  const { mutate, isPending } = isNew ? createMutation : editMutation;
 
   const onSubmit = (data: IContactSettings) => {
     const formattedData = { ...data };
