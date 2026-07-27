@@ -8,6 +8,7 @@ const rootPath = path.dirname(__filename);
 const config = {
   rootPath,
   publicPath: path.join(rootPath, '../public'),
+  seedAssetsPath: path.join(rootPath, '../public'),
   port: process.env.PORT ?? 8000,
   corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:3000',
   db: process.env.MONGODB_URI ?? 'mongodb://localhost:27017/virgin-travel',

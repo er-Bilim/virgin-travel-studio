@@ -4,16 +4,18 @@ import { createActionsColumn } from '@/components/dashboard/shared/data-table/co
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { imageUrl } from '@/lib/constants';
+import { imageUrl, isDev } from '@/lib/constants';
 import { TooltipCustom } from '@/components/ui/tooltip-custom';
 import type { IReview } from '@/types/review';
 import dayjs from 'dayjs';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 type Props = {
   onView: (tour: IReview) => void;
@@ -42,6 +44,7 @@ export const getReviewColumns = ({
               <button
                 type="button"
                 className="text-blue-600 hover:underline text-sm"
+                aria-label="Просмотр тура"
               >
                 Посмотреть тур
               </button>
@@ -52,13 +55,20 @@ export const getReviewColumns = ({
                 <DialogTitle>Информация о туре</DialogTitle>
               </DialogHeader>
 
+              <DialogDescription className="sr-only">
+                Диалоговое для отзыва
+              </DialogDescription>
+
               <div className="flex flex-col gap-3">
                 {tour?.images && tour.images.length > 0 && (
                   <div className="relative w-full h-48 overflow-hidden rounded-md bg-gray-100">
-                    <img
+                    <Image
                       src={`${imageUrl}${tour.images[0]}`}
                       alt={tour.title}
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="(min-width: 768px) 384px, 100vw"
+                      unoptimized={isDev}
+                      className="object-cover"
                     />
                   </div>
                 )}
@@ -91,6 +101,9 @@ export const getReviewColumns = ({
   {
     accessorKey: 'clientName',
     header: 'Имя клиента',
+    meta: {
+      className: 'hidden md:table-cell',
+    },
     cell: ({ row }) => {
       const author = row.original.clientName;
       return (
@@ -101,6 +114,9 @@ export const getReviewColumns = ({
   {
     accessorKey: 'comment',
     header: 'Текст отзыва',
+    meta: {
+      className: 'hidden xl:table-cell',
+    },
     cell: ({ row }) => {
       const text = row.original.comment;
       return (
@@ -177,6 +193,9 @@ export const getReviewColumns = ({
   {
     accessorKey: 'featuredOnHomepage',
     header: 'на главной',
+    meta: {
+      className: 'hidden lg:table-cell',
+    },
     cell: ({ row }) => {
       const review = row.original;
 
@@ -204,7 +223,9 @@ export const getReviewColumns = ({
             />
             {review.isModerated === 'pending' && (
               <>
-                <p className="text-gray-200 text-xs font-semibold mt-2 tracking-widest">опубликуйте</p>
+                <p className="text-gray-200 text-xs font-semibold mt-2 tracking-widest">
+                  опубликуйте
+                </p>
               </>
             )}
           </div>

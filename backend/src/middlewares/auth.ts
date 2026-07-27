@@ -34,7 +34,7 @@ export const authOrNot: RequestHandler = async (
     req.user = user;
     next();
   } catch (e) {
-    console.log(e);
+    next(e);
     if (e instanceof jwt.TokenExpiredError) {
       return res.status(401).send({ error: "Токен истёк" });
     } else {

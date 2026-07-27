@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import FileInput from '@/components/dashboard/FileInput/FileInput';
 import {
   Dialog,
-  DialogContent,
+  DialogContent, DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -52,7 +52,6 @@ export default function AdvantageItem({
       setPreviewSrc(undefined);
     }
 
-    // Функция очистки памяти при размонтировании карточки или смене картинки
     return () => {
       if (objectUrl) {
         URL.revokeObjectURL(objectUrl);
@@ -126,6 +125,9 @@ export default function AdvantageItem({
                     Просмотр изображения
                   </DialogTitle>
                 </DialogHeader>
+                <DialogDescription className="sr-only">
+                  Изображение
+                </DialogDescription>
 
                 {previewSrc && (
                   <div className="flex items-center justify-center">

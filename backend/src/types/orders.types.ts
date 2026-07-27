@@ -1,5 +1,5 @@
-import { Document, Types } from 'mongoose';
-import type { TourSetFields } from '@/types/tourSets.types.js';
+import {Document, Types} from 'mongoose';
+import type {TourSetFields} from '@/types/tourSets.types.js';
 
 export type OrderStatus =
   | 'NEW'
@@ -7,6 +7,12 @@ export type OrderStatus =
   | 'CONTRACT_PENDING'
   | 'COMPLETED'
   | 'REJECTED';
+
+export type OrderPayment =
+  | 'CASH'
+  | 'CARD'
+  | 'QR'
+  | 'BANK';
 
 export interface IOrder extends Document {
   type: 'STANDARD' | 'CUSTOM';
@@ -19,6 +25,7 @@ export interface IOrder extends Document {
   managerId?: Types.ObjectId | null;
   createdAt: Date;
   updatedAt: Date;
+  assignedAt?: Date | null;
   customTour?: {
     countryCode?: string;
     startDate?: Date;
@@ -26,6 +33,8 @@ export interface IOrder extends Document {
     hotel?: string;
     description?: string;
   } | null;
+  paymentMethod?: OrderPayment;
+  paymentAmount?: number;
 }
 
 export type PassportPayload = {

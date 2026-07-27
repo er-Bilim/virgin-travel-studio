@@ -1,5 +1,5 @@
-import type {MetaType} from './meta';
-import type {TourSetType} from './tourSets';
+import type { MetaType } from './meta';
+import type { TourSetType } from './tourSets';
 
 export interface TourCategoryType {
   _id: string;
@@ -38,10 +38,10 @@ export interface ITourWithTourSetFields extends TourType {
   nextStartDate: string;
   durationDays: number;
   saleDeadline: string;
-} 
+}
 
 export interface ISingleTour extends TourType {
-  tourSets: TourSetType[]
+  tourSets: TourSetType[];
 }
 
 export interface TourMutation {
@@ -53,13 +53,17 @@ export interface TourMutation {
   images: (File | string)[];
 }
 
+export type TourFormValues = Omit<TourMutation, 'baseAdvantages'> & {
+  baseAdvantages: { value: string }[];
+};
+
 export interface GetToursParams {
-  page?: number,
-  limit: number,
-  categoryId?: string | null,
-  search?: string | null,
-  isPublished?: string | boolean,
-  countryCode?: string | null,
+  page?: number;
+  limit: number;
+  categoryId?: string | null;
+  search?: string | null;
+  isPublished?: string | boolean;
+  countryCode?: string | null;
   sort?: string | null;
   isHot?: boolean;
   hasDiscount?: boolean;

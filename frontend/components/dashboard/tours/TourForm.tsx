@@ -1,36 +1,39 @@
 'use client';
 
-import {Controller, useFieldArray, useForm} from 'react-hook-form';
-import {useRouter} from 'next/navigation';
-import {Check, ChevronsUpDown, Loader2, Plus, Trash2} from 'lucide-react';
-import {Input} from '@/components/ui/input';
-import {Textarea} from '@/components/ui/textarea';
-import {useState} from 'react';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
+import { Check, ChevronsUpDown, Loader2, Plus, Trash2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { useState } from 'react';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from '@/components/ui/select';
-import MultiImageInput
-  from '@/components/dashboard/MultiImageInput/MultiImageInput';
-import {inputClass} from '@/lib/constants';
-import {useCategories} from '@/lib/hooks/categoryHooks';
-import {useCreateTour, useUpdateTour} from '@/lib/hooks/tourHooks';
-import type {TourMutation} from '@/types/tour';
+import MultiImageInput from '@/components/dashboard/MultiImageInput/MultiImageInput';
+import { apiURL, inputClass } from '@/lib/constants';
+import { useCategories } from '@/lib/hooks/categoryHooks';
+import { useCreateTour, useUpdateTour } from '@/lib/hooks/tourHooks';
+import type { TourMutation, TourFormValues } from '@/types/tour';
 import countries from 'i18n-iso-countries';
 import ru from 'i18n-iso-countries/langs/ru.json';
-import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
-import {Button} from '@/components/ui/button';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
-  CommandItem
+  CommandItem,
 } from '@/components/ui/command';
-import {cn} from '@/lib/utils';
+import { cn } from '@/lib/utils';
 
 interface Props {
   isEdit?: boolean;
@@ -40,6 +43,7 @@ interface Props {
 
 export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
   const router = useRouter();
+  const baseToursPath = '/admin/tours';
   const { data: categoriesData, isLoading: isCatsLoading } = useCategories();
   const { mutate: createTour, isPending: isCreating } = useCreateTour();
   const { mutate: updateTour, isPending: isUpdating } = useUpdateTour();
@@ -48,11 +52,11 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
   const categories = categoriesData?.categories;
   countries.registerLocale(ru);
   const countryOptions = Object.entries(countries.getNames('ru')).map(
-  ([alpha2, name]) => ({
-    code: countries.alpha2ToAlpha3(alpha2) ?? alpha2,
-    name,
-  }),
-);
+    ([alpha2, name]) => ({
+      code: countries.alpha2ToAlpha3(alpha2) ?? alpha2,
+      name,
+    }),
+  );
 
   const {
     register,
@@ -60,28 +64,39 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
     control,
     reset,
     formState: { errors },
-  } = useForm<TourMutation>({
-    defaultValues: initialValues || {
-      title: '',
-      description: '',
-      countryCode: '',
-      category: '',
-      baseAdvantages: [''],
-      images: [],
-    },
+  } = useForm<TourFormValues>({
+    defaultValues: initialValues
+      ? {
+          ...initialValues,
+          baseAdvantages: initialValues.baseAdvantages.map((value) => ({
+            value,
+          })),
+        }
+      : {
+          title: '',
+          description: '',
+          countryCode: '',
+          category: '',
+          baseAdvantages: [{ value: '' }],
+          images: [],
+        },
   });
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'baseAdvantages' as const as never,
+    name: 'baseAdvantages',
   });
 
-  const onSubmit = (data: TourMutation) => {
+  const onSubmit = (formValues: TourFormValues) => {
+    const data: TourMutation = {
+      ...formValues,
+      baseAdvantages: formValues.baseAdvantages.map((adv) => adv.value),
+    };
     if (!isEdit) {
       createTour(data, {
         onSuccess: () => {
           reset();
-          router.push('/manager/tours');
+          router.push(baseToursPath);
         },
       });
     } else {
@@ -91,7 +106,7 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
         { id: tourId, data },
         {
           onSuccess: () => {
-            router.push('/manager/tours');
+            router.push(baseToursPath);
           },
         },
       );
@@ -116,6 +131,7 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
           {...register('title', { required: 'Введите название' })}
           className={`${inputClass} ${errors.title ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
           disabled={isPending}
+          placeholder="Введите название тура"
         />
         {errors.title && (
           <p className="text-xs font-semibold text-red-500 pt-0.5">
@@ -175,6 +191,7 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
           {...register('description', { required: 'Введите описание' })}
           className={`${inputClass} min-h-[100px] resize-none ${errors.description ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
           disabled={isPending}
+          placeholder="Введите описание тура"
         />
         {errors.description && (
           <p className="text-xs font-semibold text-red-500 pt-0.5">
@@ -269,11 +286,12 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
             <div key={field.id} className="space-y-1">
               <div className="flex items-center gap-2">
                 <Input
-                  {...register(`baseAdvantages.${index}` as const, {
+                  {...register(`baseAdvantages.${index}.value`, {
                     required: 'Поле не может быть пустым',
                   })}
-                  className={`${inputClass} ${errors.baseAdvantages?.[index] ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+                  className={`${inputClass} ${errors.baseAdvantages?.[index]?.value ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                   disabled={isPending}
+                  placeholder="Введите преимущество"
                 />
                 {fields.length > 1 && (
                   <button
@@ -286,9 +304,9 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
                   </button>
                 )}
               </div>
-              {errors.baseAdvantages?.[index] && (
+              {errors.baseAdvantages?.[index]?.value && (
                 <p className="text-xs font-semibold text-red-500 pt-0.5">
-                  {errors.baseAdvantages[index]?.message}
+                  {errors.baseAdvantages[index]?.value?.message}
                 </p>
               )}
             </div>
@@ -296,7 +314,7 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
         </div>
         <button
           type="button"
-          onClick={() => append('')}
+          onClick={() => append({ value: '' })}
           className="inline-flex items-center justify-center rounded-xl text-sm font-semibold border border-gray-200 text-[#1E2B6D] bg-transparent hover:bg-gray-50 h-10 px-4 w-full mt-2 transition-colors"
         >
           <Plus className="mr-2 h-4 w-4" /> Добавить преимущество
@@ -308,21 +326,30 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
           Фотографии (до 5 штук)
         </label>
 
-        {isEdit ? <Controller
-          control={control}
-          name="images"
-          render={({ field }) => (
-            <MultiImageInput
-              name="images"
-              label="Выберите изображения"
-              onChange={field.onChange}
-              value={field.value}
-              showPreviews={true}
-              allowReorder={true}
-            />
-          )}
-        />
-          :
+        {isEdit ? (
+          <Controller
+            control={control}
+            name="images"
+            render={({ field }) => {
+              const previews = field.value.map((item) => {
+                if (typeof item === 'string')
+                  return `${apiURL}/tours/image/${item}`;
+                else return item;
+              });
+              return (
+                <MultiImageInput
+                  name="images"
+                  label="Выберите изображения"
+                  onChange={field.onChange}
+                  value={field.value}
+                  previewsValues={previews}
+                  showPreviews={true}
+                  allowReorder={true}
+                />
+              );
+            }}
+          />
+        ) : (
           <Controller
             control={control}
             name="images"
@@ -336,8 +363,7 @@ export const TourForm = ({ isEdit = false, initialValues, tourId }: Props) => {
               />
             )}
           />
-        }
-
+        )}
       </div>
 
       <button

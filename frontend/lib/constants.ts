@@ -5,7 +5,8 @@ import {
   LayoutDashboard,
   type LucideIcon,
   Newspaper,
-  Plane, Star,
+  Plane,
+  Star,
   Tags,
   Users
 } from 'lucide-react';
@@ -14,9 +15,13 @@ import type {UserRole} from '@/types/user';
 import type {QueryClient} from '@tanstack/react-query';
 
 export const isDev = process.env.NODE_ENV === 'development';
-export const apiURL = process.env.NEXT_API_URL || 'http://localhost:8000/api';
-const _rawImageUrl = process.env.NEXT_IMAGE_URL || 'http://localhost:8000';
-export const imageUrl = _rawImageUrl.endsWith('/') ? _rawImageUrl : _rawImageUrl + '/';
+
+export const apiURL =
+  typeof window !== 'undefined'
+    ? '/api'
+    : (process.env.NEXT_API_URL?.trim() || 'http://localhost:8000/api');
+
+export const imageUrl = '/';
 export const toursLimitPag = 9;
 
 
@@ -30,6 +35,17 @@ export const queryConfig = {
     },
   },
 } satisfies ConstructorParameters<typeof QueryClient>[0];
+
+export const REPORT_BUTTONS: string[] = ["Сегодня", "Неделя", "Месяц", "3 месяца"] as const;
+export const IMAGE_UPLOAD = {
+  MAX_FILE_SIZE_BYTES: 10 * 1024 * 1024,
+  ALLOWED_MIME_TYPES: ['image/png', 'image/jpeg', 'image/webp'] as const,
+  MAX_FILES: 5,
+  COMPRESSION: {
+    MAX_SIZE_MB: 1,
+    MAX_WIDTH_OR_HEIGHT: 1600,
+  },
+} as const;
 
 export enum UserStatus {
   BANNED = 'banned',
@@ -158,29 +174,11 @@ export const dashboardMenuItems: DashboardMenuItem[] = [
     icon: LayoutDashboard,
   },
   {
-    label: 'Новости',
-    href: '/manager/news',
-    roles: ['MANAGER'],
-    icon: Newspaper,
-  },
-  {
-    label: 'Туры',
-    href: '/manager/tours',
-    roles: ['MANAGER'],
-    icon: Plane,
-  },
-  {
     label: 'Заявки',
     href: '/manager/leads',
     roles: ['MANAGER'],
     icon: FolderOpen,
-  },
-  {
-    label: 'Отзывы',
-    href: '/manager/reviews',
-    roles: ['MANAGER'],
-    icon: Star,
-  },
+  }
 ];
 
 export const roleDashboardPaths: Record<UserRole, string> = {

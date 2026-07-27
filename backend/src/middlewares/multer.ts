@@ -5,6 +5,7 @@ import { randomUUID } from 'crypto';
 import config from '@/config.js';
 import fileFilterImage from '@/lib/fileFilter.js';
 
+
 const imageStorage = multer.diskStorage({
   destination: async (_req, _file, cb) => {
     const destDir = path.join(config.publicPath, 'images');
@@ -42,6 +43,16 @@ export const videosUpload = multer({
 });
 
 export const imagesUpload = multer({ storage: imageStorage });
+export const homepageUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 15 * 1024 * 1024,
+  },
+  fileFilter: (_req, file, callback) => {
+    fileFilterImage({ file, callback });
+  },
+});
+
 export const imageMemoryUpload = multer({
   storage: multer.memoryStorage(),
   limits: {

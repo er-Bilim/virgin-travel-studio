@@ -26,7 +26,7 @@ export default function TourGallery({ images, title }: Props) {
     <div className="w-full max-w-[1440px] mx-auto">
       <div className="relative aspect-[4/3] md:aspect-[21/9] w-full overflow-hidden rounded-3xl">
         <Image
-          src={imageUrl + images[activeIdx]}
+          src={imageUrl + 'api/tours/image/' + images[activeIdx]}
           alt={`${title} — фото ${activeIdx + 1}`}
           fill
           sizes="(max-width: 768px) 100vw, 1440px"
@@ -54,7 +54,8 @@ export default function TourGallery({ images, title }: Props) {
               )}
             >
               <Image
-                src={imageUrl + path}
+                key={`${path}-${index}`}
+                src={imageUrl + 'api/tours/image/' + path}
                 alt={`${title} — фото ${activeIdx + 1}`}
                 fill
                 unoptimized={isDev}

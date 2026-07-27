@@ -282,7 +282,7 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
   }
 });
 
-toursRouter.get('/countries', async (req, res, next) => {
+toursRouter.get('/countries', async (_req, res, next) => {
   try {
     const countries = await Tour.distinct('countryCode');
 
@@ -405,7 +405,7 @@ toursRouter.get('/image/:id', async (req, res, next) => {
     const _id = new ObjectId(req.params.id);
     const files = await bucket.find({ _id }).toArray();
 
-    if (!files || files.length === 0) {
+    if (files.length === 0) {
       return res.status(404).send({
         error: 'Изображение не найдено',
       });
@@ -426,7 +426,7 @@ toursRouter.get('/image/:id', async (req, res, next) => {
 toursRouter.post(
   '/',
   auth,
-  permit('ADMIN', 'MANAGER'),
+  permit('ADMIN'),
   imageMemoryUpload.array('images', 5),
   async (req, res, next) => {
     try {
@@ -477,7 +477,7 @@ toursRouter.post(
 toursRouter.patch(
   '/:id',
   auth,
-  permit('ADMIN', 'MANAGER'),
+  permit('ADMIN'),
   validateObjectId(),
   imageMemoryUpload.array('images', 5),
   async (req, res, next) => {
@@ -548,12 +548,16 @@ toursRouter.patch(
             finalImages.push(new mongoose.Types.ObjectId(await uploadImageToGridFS(currentFile)));
             newFileIndex++;
           } else if (item !== 'NEW_FILE' && item !== 'EMPTY') {
-            finalImages.push(item);
+            finalImages.push(new mongoose.Types.ObjectId(item));
           }
         }
 
+        const finalImageIds = finalImages.map((id) => id.toString());
+
         const imagesToDelete =
-          tour.images?.filter((oldImg) => !finalImages.includes(oldImg)) || [];
+          tour.images?.filter(
+            (oldImg) => !finalImageIds.includes(oldImg.toString()),
+          ) || [];
         
         const bucket = getGridFSBucket();
         for (const imgId of imagesToDelete) {
@@ -606,7 +610,7 @@ toursRouter.delete(
         const bucket = getGridFSBucket();
         try {
           const deletePromises = tour.images.map((id) =>
-            bucket.delete(new mongoose.Types.ObjectId(id)),
+            bucket.delete(id),
           );
 
           await Promise.all(deletePromises);

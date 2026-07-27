@@ -38,7 +38,7 @@ const run = async () => {
       bucketName: 'uploads',
     });
   }
-
+  
   app.listen(config.port, () => {
     console.log(`http://localhost:${config.port}/api`);
   });
@@ -49,4 +49,4 @@ const run = async () => {
 };
 
 run().catch((error) => console.error(error));
-export const getGridFSBucket = () => gridFSBucket;
+export const getGridFSBucket = (): GridFSBucket => gridFSBucket;

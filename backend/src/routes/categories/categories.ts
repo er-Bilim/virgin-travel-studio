@@ -8,7 +8,7 @@ import Tour from '@/model/tour/Tour.js';
 
 const categoriesRouter = express.Router();
 
-categoriesRouter.post('/', auth, permit('ADMIN', 'MANAGER'), async (req, res, next) => {
+categoriesRouter.post('/', auth, permit('ADMIN'), async (req, res, next) => {
   const {title} = req.body;
   if (typeof title !== 'string' || title.trim() === '') {
     return res.status(400).send({error: 'Название обязательно'});
@@ -43,7 +43,7 @@ categoriesRouter.get('/', async (req, res) => {
     Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(50, rawLimit) : 10;
   const skip = (page - 1) * limit;
 
-  const categories = await Category.find().skip(skip).limit(limit);
+  const categories = await Category.find().sort({ createdAt: -1 }).skip(skip).limit(limit);
 
   const categoriesTotal = await Category.countDocuments();
   
@@ -61,7 +61,7 @@ categoriesRouter.get('/', async (req, res) => {
 categoriesRouter.delete(
   '/:id',
   auth,
-  permit('ADMIN', 'MANAGER'),
+  permit('ADMIN'),
   validateObjectId(),
   async (req, res, next) => {
     const {id} = req.params;
@@ -84,7 +84,6 @@ categoriesRouter.delete(
       }
       return res.send({message: 'Категория успешно удалена'});
     } catch (e) {
-      console.log(e);
       next(e);
     }
   },

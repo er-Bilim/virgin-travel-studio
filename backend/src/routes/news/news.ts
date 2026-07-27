@@ -3,9 +3,12 @@ import mongoose from 'mongoose';
 import News from '@/model/New/News.js';
 import auth, { authOrNot, type RequestWithUser } from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
-import { imagesUpload } from '@/middlewares/multer.js';
+import { imageMemoryUpload, imagesUpload } from '@/middlewares/multer.js';
 import type { NewsFields } from '@/types/news.types.js';
 import validateObjectId from '@/middlewares/validateObjectId.js';
+import { getGridFSBucket } from '@/index.js';
+import { uploadImageToGridFS } from '@/lib/gridfs.js';
+import { ObjectId } from 'mongodb';
 
 const newsRouter = express.Router();
 
@@ -24,6 +27,10 @@ newsRouter.get(
         tags?: { $in: string[] };
         title?: { $regex: string; $options: 'i' };
         author?: string;
+        createdAt?: {
+          $gte?: Date;
+          $lte?: Date;
+        };
       } = {};
 
       const rawPage = Number.parseInt(req.query.page as string, 10);
@@ -75,6 +82,41 @@ newsRouter.get(
       if (typeof authorId === 'string') {
         if (authorId.trim().length > 0) {
           query.author = authorId;
+        }
+      }
+
+      const startDate = req.query.startDate;
+      const endDate = req.query.endDate;
+
+      const hasStart = typeof startDate === 'string' && startDate.trim();
+      const hasEnd = typeof endDate === 'string' && endDate.trim();
+
+      if (hasStart || hasEnd) {
+        const createdAt: {
+          $gte?: Date;
+          $lte?: Date;
+        } = {};
+
+        if (hasStart) {
+          const from = new Date(startDate);
+
+          if (!Number.isNaN(from.getTime())) {
+            from.setHours(0, 0, 0, 0);
+            createdAt.$gte = from;
+          }
+        }
+
+        if (hasEnd) {
+          const to = new Date(endDate);
+
+          if (!Number.isNaN(to.getTime())) {
+            to.setHours(23, 59, 59, 999);
+            createdAt.$lte = to;
+          }
+        }
+
+        if (Object.keys(createdAt).length > 0) {
+          query.createdAt = createdAt;
         }
       }
 
@@ -149,8 +191,8 @@ newsRouter.get(
 newsRouter.post(
   '/',
   auth,
-  permit('ADMIN', 'MANAGER'),
-  imagesUpload.single('image'),
+  permit('ADMIN'),
+  imageMemoryUpload.single('image'),
   async (req, res, next) => {
     try {
       const { title, content, tags } = req.body;
@@ -165,10 +207,15 @@ newsRouter.post(
               .filter(Boolean)
           : [];
 
+      let imageId: string | null = null;
+      if (req.file) {
+        imageId = await uploadImageToGridFS(req.file);
+      }
+
       const news = new News({
         title,
         content,
-        image: req.file ? 'images/' + req.file.filename : null,
+        image: imageId,
         tags: parsedTags,
         author: user._id,
       });
@@ -191,15 +238,41 @@ newsRouter.post(
   },
 );
 
+newsRouter.get('/image/:id', async (req, res, next) => {
+  try {
+    const bucket = getGridFSBucket();
+    const _id = new ObjectId(req.params.id);
+    const files = await bucket.find({ _id }).toArray();
+
+    if (!files || files.length === 0) {
+      return res.status(404).send({
+        error: 'Изображение не найдено',
+      });
+    }
+
+    const file = files[0];
+    res.set(
+      'Content-Type',
+      file?.metadata?.contentType || 'application/octet-stream',
+    );
+
+    bucket.openDownloadStream(_id).pipe(res);
+  } catch (error) {
+    next(error);
+  }
+});
+
 newsRouter.delete(
   '/:id',
   auth,
-  permit('ADMIN', 'MANAGER'),
+  permit('ADMIN'),
   validateObjectId(),
   async (req, res, next) => {
     const { id } = req.params;
 
     try {
+      const bucket = getGridFSBucket();
+      const news = await News.findById(id);
       const { deletedCount } = await News.deleteOne({ _id: id });
       if (!deletedCount) {
         return res.status(404).send({
@@ -207,6 +280,14 @@ newsRouter.delete(
         });
       }
 
+      if (news && news.image) {
+        try {
+          await bucket.delete(new ObjectId(news.image));
+        } catch (error) {
+          console.error(error);
+        }
+      }
+      
       return res.send({
         message: 'Новость удалена',
       });
@@ -219,7 +300,7 @@ newsRouter.delete(
 newsRouter.patch(
   '/:id/isPublished',
   auth,
-  permit('ADMIN', 'MANAGER'),
+  permit('ADMIN'),
   validateObjectId(),
   async (req, res, next) => {
     const { id } = req.params;
@@ -244,7 +325,7 @@ newsRouter.patch(
 newsRouter.patch(
   '/:id/edit',
   auth,
-  permit('ADMIN', 'MANAGER'),
+  permit('ADMIN'),
   validateObjectId(),
   imagesUpload.single('image'),
   async (req, res, next) => {
@@ -274,7 +355,17 @@ newsRouter.patch(
       }
 
       if (req.file) {
-        updateData.image = 'images/' + req.file.filename;
+        const imageId = await uploadImageToGridFS(req.file);
+
+        if (news.image) {
+          try {
+            await getGridFSBucket().delete(new ObjectId(news.image));
+          } catch (e) {
+            console.error(e);
+          }
+        }
+
+        updateData.image = imageId;
       }
 
       const updated = await News.findByIdAndUpdate(id, updateData, {

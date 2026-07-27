@@ -7,6 +7,13 @@ import {
   QueryClient,
 } from '@tanstack/react-query';
 import ContactsPage from '@/components/public/contacts/ContactsPage';
+import { buildMetadata } from '@/lib/seo';
+
+export const metadata = buildMetadata(
+    'Контакты | Virgin Travel Studio',
+    'Свяжитесь с Virgin Travel Studio: телефон, электронная почта, социальные сети и адрес офиса.',
+    '/contacts',
+);
 
 const Contacts = async () => {
   const qc = new QueryClient(queryConfig);

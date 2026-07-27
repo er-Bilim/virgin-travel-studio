@@ -1,5 +1,5 @@
-import mongoose, { Schema, Types } from 'mongoose';
-import type { IOrder } from '@/types/orders.types.js';
+import mongoose, {Schema, Types} from 'mongoose';
+import type {IOrder} from '@/types/orders.types.js';
 
 const OrderSchema = new Schema(
   {
@@ -65,9 +65,50 @@ const OrderSchema = new Schema(
         message: 'Причина отказа обязательна, если установлен статус REJECTED',
       },
     },
+    assignedAt: {
+      type: Date,
+      default: null
+    },
     managerId: {
       type: Types.ObjectId,
       ref: 'User',
+    },
+    paymentMethod: {
+      type: String,
+      enum: {
+        values: [
+          'CASH',
+          'CARD',
+          'QR',
+          'BANK',
+        ],
+        message: 'Недопустимый способ оплаты',
+      },
+      validate: {
+        validator: function (this: IOrder, v: string | undefined) {
+          if (v && (this.paymentAmount === undefined || this.paymentAmount <= 0)) {
+            return false;
+          }
+          if (!v && (this.paymentAmount !== undefined && this.paymentAmount !== null)) {
+            return false;
+          }
+          return true;
+        },
+        message: 'Сумма оплаты обязательна и должна быть больше 0, если указан способ оплаты. Способ оплаты не может быть указан без суммы.',
+      },
+    },
+    paymentAmount: {
+      type: Number,
+      min: [0, 'Сумма оплаты не может быть отрицательной'],
+      validate: {
+        validator: function (this: IOrder, v: number | undefined) {
+          if ((v !== undefined && v !== null) && !this.paymentMethod) {
+            return false;
+          }
+          return true;
+        },
+        message: 'Способ оплаты обязателен, если указана сумма оплаты.',
+      },
     },
 
     customTour: {
@@ -82,6 +123,7 @@ const OrderSchema = new Schema(
         endDate: Date,
         hotel: { type: String, trim: true },
         description: { type: String, trim: true },
+        activities: [{ type: String, trim: true }]
       },
       required: function (this: IOrder) {
         return this.type === 'CUSTOM';

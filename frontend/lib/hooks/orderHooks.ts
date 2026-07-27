@@ -1,5 +1,6 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {
+  delegateOrder,
   deleteOrder,
   getOneOrder,
   getOrders,
@@ -81,6 +82,24 @@ export const useUpdateOrder = () => {
       );
     }
   });
+};
+
+export const useDelegateOrder = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, managerId } : { id: string, managerId: string }) =>
+        delegateOrder(id, managerId),
+    onSuccess: (data, variables) => {
+      toast.success(data.message);
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.invalidateQueries({ queryKey: ['order', variables.id] });
+    },
+    onError: (err: AxiosError<GlobalError>) => {
+      const data = err.response?.data;
+      toast.error(data?.error || 'Не удалось переназначить заявку');
+    }
+  })
 };
 
 

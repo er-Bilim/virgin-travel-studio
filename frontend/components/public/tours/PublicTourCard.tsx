@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import BasePhoto from '@/components/assets/lake.webp';
+import BasePhoto from '@/components/assets/placeholders/content_placeholder.png';
 import { imageUrl, isDev } from '@/lib/constants';
 import type { ITourWithTourSetFields } from '@/types/tour';
 import Image from 'next/image';
@@ -188,11 +188,12 @@ const PublicTourCard = ({ tour }: Props) => {
                           <span className="text-[12px] uppercase tracking-wider text-muted-foreground">
                             от
                           </span>
-                          {Number.isFinite(discountPercent) && discountPercent > 0 && (
-                            <p className="text-[12px] uppercase tracking-wider text-cyan-500 bg-slate-100 font-semibold rounded-xl px-3">
-                              –{discountPercent.toFixed(0)}%
-                            </p>
-                          )}
+                          {Number.isFinite(discountPercent) &&
+                            discountPercent > 0 && (
+                              <p className="text-[12px] uppercase tracking-wider text-cyan-500 bg-slate-100 font-semibold rounded-xl px-3">
+                                –{discountPercent.toFixed(0)}%
+                              </p>
+                            )}
                         </div>
                         {tour.discountPrice && (
                           <p
@@ -243,21 +244,14 @@ const PublicTourCard = ({ tour }: Props) => {
 
                 <div className="text-sm text-gray-400 flex flex-col gap-1">
                   <span className="uppercase">ближайший</span>
-                  {tour.nextStartDate ? (
-                    <>
-                      <p
-                        className="inline-flex gap-1 font-semibold text-[var(--primary)]"
-                        suppressHydrationWarning
-                      >
-                        <span>{day}</span>
-                        <span>{month}</span>
-                      </p>
-                    </>
-                  ) : (
-                    <p className="text-base text-gray-400 font-semibold">
-                      даты уточняются
-                    </p>
-                  )}
+
+                  <p
+                    className="inline-flex gap-1 font-semibold text-[var(--primary)]"
+                    suppressHydrationWarning
+                  >
+                    <span>{day}</span>
+                    <span>{month}</span>
+                  </p>
                 </div>
               </footer>
             </div>

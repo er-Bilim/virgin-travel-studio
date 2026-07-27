@@ -1,11 +1,11 @@
 'use client';
 
-import { useForm, Controller } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import type { OrderMutationType } from '@/types/order';
 import {
   inputClass,
-  ORDER_STATUS_LABELS,
   ORDER_STATUS_FLOW,
+  ORDER_STATUS_LABELS,
 } from '@/lib/constants';
 import { Input } from '@/components/ui/input';
 import { useUpdateOrder } from '@/lib/hooks/orderHooks';
@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -35,14 +36,20 @@ export default function OrderManageForm({ initialValues, orderId }: Props) {
     setValue,
     watch,
     trigger,
+    clearErrors,
     formState: { errors },
   } = useForm<OrderMutationType>({ defaultValues: initialValues });
 
   const { mutate: updateOrder, isPending: isUpdating } = useUpdateOrder();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const currentStatus = watch('status');
+
   const onSubmit = (data: OrderMutationType) => {
-    if (!orderId) return;
+    if (!orderId) {
+      toast.error('Ошибка: Нет ID заявки');
+      return;
+    }
 
     const payload = {
       ...data,
@@ -55,8 +62,16 @@ export default function OrderManageForm({ initialValues, orderId }: Props) {
         onSuccess: () => {
           toast.success('Заявка обновлена', { position: 'top-center' });
         },
+        onError: () => {
+          toast.error('Ошибка при обновлении на сервере');
+        },
       },
     );
+  };
+
+  const onError = (formErrors: any) => {
+    console.error('ОШИБКИ ФОРМЫ БЛОКИРУЮТ ОТПРАВКУ:', formErrors);
+    toast.error('Проверьте правильность заполнения полей');
   };
 
   const handleConfirmReject = async () => {
@@ -78,7 +93,10 @@ export default function OrderManageForm({ initialValues, orderId }: Props) {
   }));
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 w-full">
+    <form
+      onSubmit={handleSubmit(onSubmit, onError)}
+      className="space-y-5 w-full"
+    >
       <div className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
@@ -142,7 +160,13 @@ export default function OrderManageForm({ initialValues, orderId }: Props) {
                         <button
                           key={index}
                           type="button"
-                          onClick={() => field.onChange(status.status)}
+                          onClick={() => {
+                            field.onChange(status.status);
+                            if (status.status !== rejectStatus) {
+                              clearErrors('rejectionReason');
+                              setValue('rejectionReason', '');
+                            }
+                          }}
                           className={cn(
                             'flex items-center gap-2 w-full p-2.5 rounded-xl border text-left transition-all h-full min-h-[48px] select-none cursor-pointer',
                             isActive &&
@@ -246,7 +270,10 @@ export default function OrderManageForm({ initialValues, orderId }: Props) {
             <div className="mt-3">
               <Input
                 {...register('rejectionReason', {
-                  required: 'Укажите причину отказа',
+                  required:
+                    currentStatus === 'REJECTED'
+                      ? 'Укажите причину отказа'
+                      : false,
                 })}
                 placeholder="Например: Клиент передумал лететь..."
                 className={cn(
@@ -264,12 +291,21 @@ export default function OrderManageForm({ initialValues, orderId }: Props) {
               )}
             </div>
           </DialogHeader>
+          <DialogDescription className="sr-only">
+            Диалоговое окно указания причины отмены заявки
+          </DialogDescription>
           <DialogFooter className="mt-2 flex-col sm:flex-row gap-2">
             <Button
               variant="outline"
               type="button"
               onClick={() => {
-                setValue('status', 'IN_PROGRESS');
+                setValue(
+                  'status',
+                  initialValues.status !== 'REJECTED'
+                    ? initialValues.status
+                    : 'IN_PROGRESS',
+                );
+                clearErrors('rejectionReason');
                 setValue('rejectionReason', '');
                 setIsModalOpen(false);
               }}

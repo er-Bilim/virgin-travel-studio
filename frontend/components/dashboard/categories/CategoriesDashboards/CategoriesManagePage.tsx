@@ -73,6 +73,7 @@ export default function CategoriesManagePage() {
       {title: data.title.trim()},
       {
         onSuccess: () => {
+          setPage(1);
           reset();
           toast.success('Категория успешно создана');
         },
@@ -201,8 +202,8 @@ export default function CategoriesManagePage() {
         description="Категорию тура нельзя удалить пока есть тур с такой категорией. Сначала удалите тур!"
         loading={isDeleting}
         confirmText="Удалить"
-        onCancel={() => setCategoryToDelete(null)}
-        onConfirm={confirmDelete}
+        onCancelAction={() => setCategoryToDelete(null)}
+        onConfirmAction={confirmDelete}
       />
     </div>
   );

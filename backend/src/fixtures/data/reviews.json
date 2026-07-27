@@ -407,7 +407,8 @@
     "comment": "Отличный экскурсионный тур в Египет. Гид Мухаммед рассказал столько интересных фактов, которых нет в учебниках! Всем рекомендую.",
     "image": "images/egypt_1.png",
     "companyReply": "Сергей, спасибо за теплые слова! Мухаммед действительно один из лучших наших гидов.",
-    "isModerated": "approved"
+    "isModerated": "approved",
+    "featuredOnHomepage": true
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5a42",
@@ -417,7 +418,8 @@
     "comment": "Эльбрус покорен! Тяжелейшая акклиматизация, но организация страховок и забросок на ратраках спасла ситуацию. Спасибо парням-проводникам.",
     "image": "images/elbrus_1.png",
     "companyReply": null,
-    "isModerated": "approved"
+    "isModerated": "approved",
+    "featuredOnHomepage": true
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5a43",
@@ -427,7 +429,8 @@
     "comment": "Стамбул прекрасен в любое время года. Отель чистый, персонал вежливый. Прогулка по Босфору на закате — это восторг!",
     "image": "images/stamb_1.png",
     "companyReply": "Ольга, благодарим за отзыв! Рады, что прогулка по Босфору оставила такие приятные воспоминания.",
-    "isModerated": "approved"
+    "isModerated": "approved",
+    "featuredOnHomepage": true
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5a44",
@@ -437,7 +440,8 @@
     "comment": "Красивые Мальдивы, но трансфер на гидросамолете задержали на 3 часа в аэропорту. Устали безумно еще до прибытия в отель.",
     "image": null,
     "companyReply": "Андрей, сожалеем о задержке. К сожалению, вылеты гидросамолетов сильно зависят от погодных условий на атоллах.",
-    "isModerated": "approved"
+    "isModerated": "approved",
+    "featuredOnHomepage": true
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5a45",
@@ -447,7 +451,8 @@
     "comment": "Прекрасно провели время в Сочи. Отличные трассы, в отеле Камелия великолепный открытый бассейн с подогревом.",
     "image": null,
     "companyReply": null,
-    "isModerated": "approved"
+    "isModerated": "approved",
+    "featuredOnHomepage": true
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5a46",
@@ -457,7 +462,8 @@
     "comment": "Байкальский лед стоит увидеть каждому хотя бы раз в жизни. Размещение в Хужире простое, но чистое и уютное. Рыбалка удалась!",
     "image": "images/news_karelia.jpg",
     "companyReply": null,
-    "isModerated": "approved"
+    "isModerated": "approved",
+    "featuredOnHomepage": true
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5a47",
@@ -465,9 +471,10 @@
     "tourId": "60c72b2f9b1d8b2a3c4d5c08",
     "rating": 5,
     "comment": "Рим — это ожившая история. Музеи Ватикана поражают. Огромное спасибо нашему гиду Елене за потрясающие рассказы.",
-    "image": null,
+    "image": "images/news_karelia.jpg",
     "companyReply": "Ирина, спасибо! Мы обязательно передадим вашу благодарность Елене.",
-    "isModerated": "approved"
+    "isModerated": "approved",
+    "featuredOnHomepage": true
   },
   {
     "_id": "60c72b2f9b1d8b2a3c4d5a48",

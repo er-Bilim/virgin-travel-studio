@@ -1,5 +1,6 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {
+  changeManagerPassword,
   createManager,
   setStatusManager,
   getManagers,
@@ -7,7 +8,7 @@ import {
   updateManager,
 } from '@/services/manager';
 import type {UseFormSetError} from 'react-hook-form';
-import type {IUser, ManagerMutation, ManagerUpdateMutation} from '@/types/user';
+import type {IUser, ManagerMutation, ManagerPasswordMutation, ManagerUpdateMutation} from '@/types/user';
 import type {AxiosError} from 'axios';
 import {toast} from 'sonner';
 import type {GlobalError} from '@/types/error';
@@ -102,6 +103,38 @@ export const useUpdateManager = (setError: UseFormSetError<ManagerUpdateMutation
       toast.error(
         data.error || 'Не удалось создать менеджера. Попробуйте снова.',
       );
+    },
+  });
+};
+
+export const useChangeManagerPassword = (
+  setError: UseFormSetError<ManagerPasswordMutation>,
+) => {
+  return useMutation({
+    mutationFn: ({ id, password }: { id: string; password: string }) =>
+      changeManagerPassword(id, { password }),
+    onSuccess: () => {
+      toast.success('Пароль менеджера успешно изменён!');
+    },
+    onError: (err: AxiosError<GlobalError>) => {
+      const data = err.response?.data;
+
+      if (!data) {
+        return toast.error(
+          'Не удалось изменить пароль. Проверьте соединение и попробуйте снова.',
+        );
+      }
+
+      if ('details' in data && data.details) {
+        Object.entries(data.details).forEach(([field, value]) => {
+          if (field === 'password') {
+            setError('password', { type: 'server', message: value.message });
+          }
+        });
+        return;
+      }
+
+      toast.error(data.error || 'Не удалось изменить пароль. Попробуйте снова.');
     },
   });
 };

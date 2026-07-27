@@ -1,9 +1,6 @@
 import type { Request } from 'express';
 import type multer from 'multer';
-import {
-  ALLOWED_VIDEO_TYPES,
-  ALLOWED_IMAGE_TYPES,
-} from '../constants/constants.js';
+import { ALLOWED_VIDEO_TYPES, ALLOWED_IMAGE_TYPES } from '../constants.js';
 
 const fileFilterImage = ({
   req,
@@ -46,5 +43,6 @@ const fileFilterImage = ({
     new Error(`Неизвестное поле для загрузки файлов: ${file.fieldname}`),
   );
 };
+
 
 export default fileFilterImage;

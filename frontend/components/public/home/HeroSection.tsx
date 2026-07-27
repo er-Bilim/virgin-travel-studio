@@ -2,16 +2,14 @@
 
 import { imageUrl } from '@/lib/constants';
 import { useHomepageSettings } from '@/lib/hooks/homepageSettingsHooks';
+import HERO_POSTER from '@/assets/placeholders/hero-poster.jpg';
 
 const HeroSection = () => {
-
-  const {
-    data: settings,
-  } = useHomepageSettings();
+  const { data: settings } = useHomepageSettings();
 
   const videoSource = settings?.hero?.videoUrl
-    ? `${imageUrl}${settings.hero.videoUrl}`
-    : 'http://localhost:8000/videos/default.mp4';
+    ? `${imageUrl}api/homepage-settings/video/${settings.hero.videoUrl}`
+    : `${imageUrl}videos/default.mp4`;
 
   return (
     <section aria-labelledby="hero-title">
@@ -23,7 +21,7 @@ const HeroSection = () => {
           muted
           loop
           playsInline
-          poster="/images/poster.jpg"
+          poster={HERO_POSTER.src}
         />
 
         <div className="absolute inset-0 bg-black/40" />
@@ -39,7 +37,7 @@ const HeroSection = () => {
         </div>
       </div>
     </section>
-  )
+  );
 };
 
 export default HeroSection;

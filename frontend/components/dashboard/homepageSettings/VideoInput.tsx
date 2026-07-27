@@ -40,10 +40,10 @@ export const VideoInput = ({
   const videoPreviewUrl = selectedFile
     ? URL.createObjectURL(selectedFile)
     : null;
-  const displayVideoUrl =
+    const displayVideoUrl =
     videoPreviewUrl ||
     (hasExistingVideo
-      ? `${imageUrl}${currentVideoUrl}`
+      ? `${imageUrl}api/homepage-settings/video/${currentVideoUrl}`
       : null);
 
   const handleFile = (file: File) => {
@@ -116,7 +116,16 @@ export const VideoInput = ({
             <button
               type="button"
               onClick={handleDeleteClick}
-              className="absolute top-3 right-3 p-2.5 rounded-xl bg-red-500 text-white shadow-md hover:bg-red-600 transition-all opacity-90 sm:opacity-0 sm:group-hover:opacity-100"
+              className="
+              absolute top-3 right-3
+              p-2.5
+              rounded-xl
+              bg-red-500
+              text-white
+              shadow-md
+              hover:bg-red-600
+              transition-all
+            "
               title="Удалить видеоролик"
             >
               <Trash2 className="w-4 h-4" />
@@ -185,8 +194,8 @@ export const VideoInput = ({
         title="Вы уверены, что хотите удалить видеоролик?"
         description="Текущее фоновое видео будет убрано с главного экрана после сохранения настроек."
         confirmText="Удалить"
-        onCancel={() => setIsConfirmOpen(false)}
-        onConfirm={handleConfirmDelete}
+        onCancelAction={() => setIsConfirmOpen(false)}
+        onConfirmAction={handleConfirmDelete}
       />
 
       {localError && (

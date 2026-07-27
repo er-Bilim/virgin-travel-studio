@@ -1,17 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
-import type { AxiosError } from 'axios';
-import { Loader2, Layout, Compass, FileText, Plus } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Spinner } from '@/components/ui/spinner';
-import { imageUrl, inputClass } from '@/lib/constants';
-import { VideoInput } from './VideoInput';
-import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog/ConfirmDialog'; 
+import {useEffect, useState} from 'react';
+import {useFieldArray, useForm} from 'react-hook-form';
+import type {AxiosError} from 'axios';
+import {Compass, FileText, Layout, Loader2, Plus} from 'lucide-react';
+import {Input} from '@/components/ui/input';
+import {Spinner} from '@/components/ui/spinner';
+import {apiURL, inputClass} from '@/lib/constants';
+import {VideoInput} from './VideoInput';
+import {
+  ConfirmDialog
+} from '@/components/dashboard/ConfirmDialog/ConfirmDialog';
 import AdvantageItem from './advantages/advantageItem';
-
-import type { HomepageSettingsMutationData, AdvantagesFields } from '@/types/homepageSettings';
+import type { HomepageSettingsMutationData } from '@/types/homepageSettings';
 import {
   mutateCreateHomepageSettings,
   mutateHomepageSettings,
@@ -53,9 +54,31 @@ export default function HomepageSettingsForm() {
     useHomepageSettings(true);
   const isNew = !currentSettings;
 
-  const { mutate, isPending: isSaving } = isNew
-    ? mutateCreateHomepageSettings()
-    : mutateHomepageSettings();
+  const { mutate: createSettings, isPending: isCreating } =
+    mutateCreateHomepageSettings();
+  const { mutate: updateSettings, isPending: isUpdating } =
+    mutateHomepageSettings();
+
+  const mutate = isNew ? createSettings : updateSettings;
+  const isSaving = isNew ? isCreating : isUpdating;
+
+  const defaultHomepageValues: HomepageSettingsMutationData = {
+    hero: { title: 'Путешествуйте по миру с комфортом', subtitle: '' },
+    mainPopularTours: { title: 'Популярные направления', subtitle: '' },
+    mainLatestNews: { title: 'Блог и новости компании', subtitle: '' },
+    reviewsPage: { title: 'Отзывы о нашей компании', subtitle: '' },
+    toursPage: {
+      badge: 'Наш каталог',
+      title: 'Найдите тур своей мечты',
+      subtitle: '',
+    },
+    newsPage: {
+      badge: 'Новости',
+      title: 'Будьте в курсе событий',
+      subtitle: '',
+    },
+    advantages: [],
+  };
 
   const {
     register,
@@ -67,9 +90,7 @@ export default function HomepageSettingsForm() {
     setError,
     formState: { errors },
   } = useForm<HomepageSettingsMutationData>({
-    defaultValues: currentSettings || {
-      advantages: [],
-    },
+    defaultValues: currentSettings || defaultHomepageValues,
   });
 
   useEffect(() => {
@@ -78,12 +99,7 @@ export default function HomepageSettingsForm() {
     }
   }, [currentSettings, reset]);
 
-  const {
-    fields,
-    update,
-    remove,
-    append,
-  } = useFieldArray({
+  const { fields, update, remove, append } = useFieldArray({
     control,
     name: 'advantages',
   });
@@ -101,7 +117,7 @@ export default function HomepageSettingsForm() {
 
     mutate(pendingData, {
       onSuccess: () => {
-        toast.success('Данные обновились!', { position: 'top-center'})
+        toast.success('Данные обновились!', { position: 'top-center' });
         setPendingData(null);
       },
       onError: (err: unknown) => {
@@ -273,7 +289,7 @@ export default function HomepageSettingsForm() {
               <div className="space-y-4">
                 {fields.map((field, index) => (
                   <AdvantageItem
-                    key={field.id}    
+                    key={field.id}
                     index={index}
                     field={field}
                     fieldError={errors.advantages?.[index]}
@@ -282,7 +298,7 @@ export default function HomepageSettingsForm() {
                     watch={watch}
                     update={update}
                     remove={remove}
-                    imageUrl={imageUrl}
+                    imageUrl={`${apiURL}/homepage-settings/image/`}
                     inputClass={inputClass}
                   />
                 ))}
@@ -495,11 +511,11 @@ export default function HomepageSettingsForm() {
         description="Обновленные заголовки, описания и медиафайлы сразу же вступят в силу на публичной части сайта."
         loading={isSaving}
         confirmText="Сохранить"
-        onCancel={() => {
+        onCancelAction={() => {
           setIsConfirmOpen(false);
           setPendingData(null);
         }}
-        onConfirm={handleConfirmSave}
+        onConfirmAction={handleConfirmSave}
       />
     </div>
   );
