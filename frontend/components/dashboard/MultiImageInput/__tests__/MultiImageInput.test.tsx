@@ -210,6 +210,21 @@ describe('MultiImageInput', () => {
     );
   });
 
+  it('использует относительный путь как есть, без префикса imageUrl', () => {
+    render(
+      <MultiImageInput
+        name="images"
+        label="Фото"
+        onChange={onChange}
+        value={['/uploads/tour1.jpg']}
+      />,
+    );
+    expect(screen.getByAltText('Preview 1')).toHaveAttribute(
+      'src',
+      '/uploads/tour1.jpg',
+    );
+  });
+
   it('использует абсолютный URL как есть для превью, начинающихся с http', () => {
     render(
       <MultiImageInput
