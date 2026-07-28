@@ -219,3 +219,10 @@ body {
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background-color: #94a3b8;
 }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--navy-800);
+}
+::-webkit-scrollbar-thumb:hover { background: #aab2c4; }
