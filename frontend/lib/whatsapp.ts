@@ -1,7 +1,5 @@
-const WHATSAPP_PHONE = '996550176420';
-
-export function openWhatsApp(message: string) {
-  const url = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
+export function openWhatsApp(message: string, whatsapp_phone: string) {
+  const url = `https://wa.me/${whatsapp_phone}?text=${encodeURIComponent(message)}`;
   window.open(url, '_blank', 'noopener,noreferrer');
 }
 

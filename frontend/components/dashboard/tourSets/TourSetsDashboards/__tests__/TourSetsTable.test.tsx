@@ -138,6 +138,6 @@ describe('TourSetsTable Component (Dashboard)', () => {
     const resetButton = screen.getByRole('button', { name: /Сбросить фильтры/i });
     await user.click(resetButton);
 
-    expect(screen.getByText('500 000 сом')).toBeInTheDocument();
+    expect(screen.getByText(/500[\s\u00A0]000 сом/)).toBeInTheDocument();
   });
 });

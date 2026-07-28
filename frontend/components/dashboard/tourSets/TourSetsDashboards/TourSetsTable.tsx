@@ -195,7 +195,7 @@ export default function TourSetsTable({
               Макс. цена
             </span>
             <span className="font-extrabold text-[#1E2B6D] bg-gray-100/80 px-2 py-0.5 rounded-md text-[11px] shrink-0">
-              {maxPrice.toLocaleString()} сом
+              {maxPrice.toLocaleString('ru-RU')} сом
             </span>
           </div>
           <div className="bg-gray-50/50 px-4 rounded-xl border border-gray-200 h-11 flex items-center justify-center">

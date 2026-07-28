@@ -108,15 +108,15 @@ export const getTourSetsColumns = ({
           {s.discountPrice ? (
             <>
               <span className="text-emerald-600 font-bold text-xs md:text-sm">
-                {s.discountPrice.toLocaleString()} KGS
+                {s.discountPrice.toLocaleString('ru-RU')} KGS
               </span>
               <span className="text-[10px] line-through text-gray-400">
-                {s.price.toLocaleString()} KGS
+                {s.price.toLocaleString('ru-RU')} KGS
               </span>
             </>
           ) : (
             <span className="text-xs md:text-sm font-medium text-gray-900">
-              {s.price.toLocaleString()} KGS
+              {s.price.toLocaleString('ru-RU')} KGS
             </span>
           )}
         </div>

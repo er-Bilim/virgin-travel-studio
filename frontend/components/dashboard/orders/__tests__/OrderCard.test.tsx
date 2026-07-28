@@ -135,20 +135,17 @@ describe('OrderCard', () => {
     );
   });
 
-  it('показывает тост при ошибке сервера', async () => {
-    postOrder.mockImplementation((_d, opts) => opts.onError());
-    setup();
+  it('при ошибке сервера не показывает тост успеха и не закрывает модалку', async () => {
+    postOrder.mockImplementation((_d, opts) => opts?.onError?.(new Error('500')));
+    const { onClose } = setup();
     await fill();
     await userEvent.click(
       screen.getByRole('button', { name: /Отправить заявку/ }),
     );
 
-    await waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith(
-        'Ошибка на стороне сервера, попробуйте позже',
-        expect.anything(),
-      ),
-    );
+    await waitFor(() => expect(postOrder).toHaveBeenCalled());
+    expect(toast.success).not.toHaveBeenCalled();
+    expect(onClose).not.toHaveBeenCalled();
   });
 
   it('закрывает модалку по кнопке "Закрыть"', async () => {
