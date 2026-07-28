@@ -83,9 +83,9 @@ describe('Footer', () => {
       expect(phone).toHaveAttribute('href', 'tel:+996 703 754 456');
     });
 
-    it('показывает дефолтный телефон без контактного', () => {
+    it('показывает дефолтное значения если номер не пришел', () => {
       setup({ contacts: { ...fullContacts, phone: '' } });
-      expect(screen.getByText('+996 700 000 000')).toBeInTheDocument();
+      expect(screen.getByText('временно недоступен')).toBeInTheDocument();
     });
   });
 
