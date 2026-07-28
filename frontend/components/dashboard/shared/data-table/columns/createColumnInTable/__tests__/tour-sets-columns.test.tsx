@@ -103,7 +103,7 @@ describe('getTourSetsColumns', () => {
   it('без скидки показывает одну цену', () => {
     const columns = getTourSetsColumns({ ...handlers(), canDelete: true });
     renderCellByHeader(columns, 'Стоимость', baseSet);
-    expect(screen.getByText(/45[\s ]?000 KGS/)).toBeInTheDocument();
+    expect(screen.getByText(/45[\s\u00A0]000 KGS/)).toBeInTheDocument();
   });
 
   it('со скидкой показывает обе цены', () => {
@@ -113,7 +113,7 @@ describe('getTourSetsColumns', () => {
       price: 100000,
       discountPrice: 90000,
     });
-    expect(screen.getByText(/90[\s ]?000 KGS/)).toBeInTheDocument();
+    expect(screen.getByText(/90[\s\u00A0]000 KGS/)).toBeInTheDocument();
     expect(screen.getByText(/100[\s ]?000 KGS/)).toBeInTheDocument();
   });
 

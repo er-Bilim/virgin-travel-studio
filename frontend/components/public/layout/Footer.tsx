@@ -135,13 +135,6 @@ export default function Footer() {
                 </a>
               )}
             </div>
-
-            <Link
-              href="/privacy"
-              className="text-sm text-white/70 hover:text-white transition"
-            >
-              Политика конфиденциальности (в разработке)
-            </Link>
           </div>
         </div>
 

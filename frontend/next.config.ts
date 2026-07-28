@@ -48,6 +48,10 @@ const nextConfig: NextConfig = {
         destination: `${backBase}/logo/:path*`,
       },
       {
+        source: '/images/:path*',
+        destination: `${backBase}/images/:path*`,
+      },
+      {
         source: '/videos/:path*',
         destination: `${backBase}/videos/:path*`,
       },

@@ -1,20 +1,24 @@
 import express from 'express';
-import auth, {authOrNot, type RequestWithUser} from '@/middlewares/auth.js';
+import auth, { authOrNot, type RequestWithUser } from '@/middlewares/auth.js';
 import permit from '@/middlewares/permit.js';
-import {imageMemoryUpload} from '@/middlewares/multer.js';
+import { imageMemoryUpload } from '@/middlewares/multer.js';
 import Tour from '@/model/tour/Tour.js';
-import mongoose, {type PipelineStage} from 'mongoose';
+import mongoose, { type PipelineStage } from 'mongoose';
 import validateObjectId from '@/middlewares/validateObjectId.js';
 import parseSort from '@/lib/sort.js';
 import TourSet from '@/model/tourSet/TourSet.js';
-import type {AggregatedTour, AggregatedTours, ITour} from '@/types/tour.types.js';
-import type {ICategory} from '@/types/category.types.js';
+import type {
+  AggregatedTour,
+  AggregatedTours,
+  ITour,
+} from '@/types/tour.types.js';
+import type { ICategory } from '@/types/category.types.js';
 import telegramMessage, {
   aggregate_tour,
   type TourDocumentType,
 } from '@/utils/bot/telegram.js';
 import TourView from '@/model/tour/TourView.js';
-import {buildTourPipeline} from '@/aggregations/tours.pipeline.js';
+import { buildTourPipeline } from '@/aggregations/tours.pipeline.js';
 import { uploadImageToGridFS } from '@/lib/gridfs.js';
 import { getGridFSBucket } from '@/index.js';
 import { ObjectId } from 'mongodb';
@@ -101,7 +105,7 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
     }
 
     const tours: AggregatedTours[] = await Tour.aggregate([
-      {$match: query},
+      { $match: query },
       {
         $lookup: {
           from: 'categories',
@@ -124,12 +128,12 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
             $filter: {
               input: '$tourSets',
               as: 'set',
-              cond: { $eq: ['$$set.status', 'OPEN'] }
-            }
-          }
-        }
+              cond: { $eq: ['$$set.status', 'OPEN'] },
+            },
+          },
+        },
       },
-      {$unwind: {path: '$category', preserveNullAndEmptyArrays: true}},
+      { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } },
       {
         $addFields: {
           isHot: {
@@ -148,25 +152,26 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
                 as: 'tour_set',
                 in: {
                   $and: [
-                      { $ne: ['$$tour_set.discountPrice', null] },
+                    { $ne: ['$$tour_set.discountPrice', null] },
                     { $gt: ['$$tour_set.discountPrice', 0] },
-                  ]
+                  ],
                 },
               },
             },
           },
-          minPrice: {$min: '$tourSets.price'},
-          hotelLocation: {$arrayElemAt: ['$tourSets.hotelLocation', 0]},
+          minPrice: { $min: '$tourSets.price' },
+          hotelLocation: { $arrayElemAt: ['$tourSets.hotelLocation', 0] },
+          tourSetId: { $arrayElemAt: ['$tourSets._id', 0] },
           durationDays: {
             $cond: {
-              if: {$gt: [{$size: '$tourSets'}, 0]},
+              if: { $gt: [{ $size: '$tourSets' }, 0] },
               then: {
                 $ceil: {
                   $divide: [
                     {
                       $subtract: [
-                        {$arrayElemAt: ['$tourSets.endDate', 0]},
-                        {$arrayElemAt: ['$tourSets.startDate', 0]},
+                        { $arrayElemAt: ['$tourSets.endDate', 0] },
+                        { $arrayElemAt: ['$tourSets.startDate', 0] },
                       ],
                     },
                     1000 * 60 * 60 * 24,
@@ -186,20 +191,20 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
                   $filter: {
                     input: '$tourSets',
                     as: 'set',
-                    cond: { $eq: ['$$set.isHot', true]}
+                    cond: { $eq: ['$$set.isHot', true] },
                   },
                 },
                 as: 'hotSet',
-                in: '$$hotSet.saleDeadline'
-              }
-            }
-          }
+                in: '$$hotSet.saleDeadline',
+              },
+            },
+          },
         },
       },
-        ...postMatchStages,
-      {$sort: sort},
-      {$skip: skip},
-      {$limit: limit},
+      ...postMatchStages,
+      { $sort: sort },
+      { $skip: skip },
+      { $limit: limit },
       {
         $project: {
           title: 1,
@@ -214,6 +219,7 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
           saleDeadline: 1,
           hotelLocation: 1,
           minPrice: 1,
+          tourSetId: 1,
           durationDays: 1,
           nextStartDate: 1,
           createdAt: 1,
@@ -226,7 +232,7 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
     ]);
 
     const countResult = await Tour.aggregate([
-        { $match: query },
+      { $match: query },
       {
         $lookup: {
           from: 'toursets',
@@ -253,7 +259,7 @@ toursRouter.get('/', authOrNot, async (req, res, next) => {
                 as: 'tour_set',
                 in: {
                   $and: [
-                      { $ne: ['$$tour_set.discountPrice', null] },
+                    { $ne: ['$$tour_set.discountPrice', null] },
                     { $gt: ['$$tour_set.discountPrice', 0] },
                   ],
                 },
@@ -319,8 +325,14 @@ toursRouter.get('/popular', async (req, res, next) => {
   try {
     const limit = Math.min(Number(req.query.limit) || 6, 12);
 
-    const tours = await Tour.aggregate(buildTourPipeline({ match: {isPublished: true}, sort: { viewsCount: -1, createdAt: -1 }, limit}))
-      
+    const tours = await Tour.aggregate(
+      buildTourPipeline({
+        match: { isPublished: true },
+        sort: { viewsCount: -1, createdAt: -1 },
+        limit,
+      }),
+    );
+
     return res.json(tours);
   } catch (error) {
     next(error);
@@ -400,7 +412,7 @@ toursRouter.get(
 );
 
 toursRouter.get('/image/:id', async (req, res, next) => {
-    try {
+  try {
     const bucket = getGridFSBucket();
     const _id = new ObjectId(req.params.id);
     const files = await bucket.find({ _id }).toArray();
@@ -421,7 +433,7 @@ toursRouter.get('/image/:id', async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-})
+});
 
 toursRouter.post(
   '/',
@@ -549,7 +561,11 @@ toursRouter.patch(
           const currentFile = uploadedFiles[newFileIndex];
 
           if (item === 'NEW_FILE' && currentFile) {
-            finalImages.push(new mongoose.Types.ObjectId(await uploadImageToGridFS(currentFile)));
+            finalImages.push(
+              new mongoose.Types.ObjectId(
+                await uploadImageToGridFS(currentFile),
+              ),
+            );
             newFileIndex++;
           } else if (item !== 'NEW_FILE' && item !== 'EMPTY') {
             finalImages.push(new mongoose.Types.ObjectId(item));
@@ -562,7 +578,7 @@ toursRouter.patch(
           tour.images?.filter(
             (oldImg) => !finalImageIds.includes(oldImg.toString()),
           ) || [];
-        
+
         const bucket = getGridFSBucket();
         for (const imgId of imagesToDelete) {
           try {
@@ -613,9 +629,7 @@ toursRouter.delete(
       if (tour && tour.images.length > 0) {
         const bucket = getGridFSBucket();
         try {
-          const deletePromises = tour.images.map((id) =>
-            bucket.delete(id),
-          );
+          const deletePromises = tour.images.map((id) => bucket.delete(id));
 
           await Promise.all(deletePromises);
         } catch (error) {

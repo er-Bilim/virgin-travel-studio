@@ -7,6 +7,9 @@ import { openWhatsApp } from '@/lib/whatsapp';
 
 vi.mock('@/lib/hooks/tourHooks', () => ({ useTourById: vi.fn() }));
 vi.mock('@/lib/hooks/reviewHooks', () => ({ useInfiniteReviews: vi.fn() }));
+vi.mock('@/lib/hooks/contactSettings', () => ({
+  useContacts: vi.fn(() => ({ data: { whatsapp: '+996550176420' } })),
+}));
 vi.mock('@/lib/whatsapp', () => ({
   openWhatsApp: vi.fn(),
   buildTourInquiryMessage: vi.fn(() => 'сообщение'),
@@ -229,7 +232,7 @@ describe('TourDetailView', () => {
   it('открывает WhatsApp по клику', async () => {
     setup();
     await userEvent.click(screen.getByRole('button', { name: /WhatsApp/ }));
-    expect(openWhatsApp).toHaveBeenCalledWith('сообщение');
+    expect(openWhatsApp).toHaveBeenCalledWith('сообщение', '+996550176420');
   });
 
   describe('отзывы', () => {
