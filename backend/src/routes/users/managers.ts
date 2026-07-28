@@ -132,12 +132,11 @@ managersRouter.put(
         status: req.body.status,
       };
 
-      const updatedManager = await existingUser.updateOne(data);
-
-      res.send({
-        message: 'Менеджер успешно обновлён',
-        user: updatedManager,
+      const updatedManager = await User.findByIdAndUpdate(id, data, {
+        new: true,
+        runValidators: true,
       });
+      res.send({ message: 'Менеджер успешно обновлён', user: updatedManager });
     } catch (e) {
       if (e instanceof mongoose.Error.ValidationError) {
         return res.status(400).send({
