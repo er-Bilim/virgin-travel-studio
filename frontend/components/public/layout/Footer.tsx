@@ -18,7 +18,7 @@ export default function Footer() {
 
   const logoSrc = contacts?.logo ? imageUrl + contacts.logo : iconLogo.src;
 
-  const mobile = contacts?.phone ? contacts.phone : '+996 700 000 000';
+  const mobile = contacts?.phone ? contacts.phone : 'временно недоступен';
   const instagram = contacts?.instagram ? contacts.instagram : null;
   const telegram = contacts?.telegram ? contacts.telegram.slice(1) : null;
   const whatsApp = contacts?.whatsapp ? contacts.whatsapp.slice(1) : null;
