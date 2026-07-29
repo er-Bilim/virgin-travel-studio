@@ -125,6 +125,15 @@ const run = async () => {
               const tourset = new TourSet(toursetData);
               await tourset.save();
             }
+
+            const tourSets = await TourSet.find();
+            for (const tourSet of tourSets) {
+              const bookedSeats = await Order.countDocuments({
+                tourSetId: tourSet._id,
+                status: 'COMPLETED',
+              });
+              await TourSet.updateOne({ _id: tourSet._id }, { bookedSeats });
+            }
             console.log('Турсеты успешно созданы');
             break;
           case 'orders':
