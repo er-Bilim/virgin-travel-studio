@@ -1,5 +1,5 @@
-import mongoose, {Document, Model, Schema} from 'mongoose';
-import type {TourSetFields} from '@/types/tourSets.types.js';
+import mongoose, { Document, Model, Schema } from 'mongoose';
+import type { TourSetFields } from '@/types/tourSets.types.js';
 
 interface ITourSetMethods {
   hasAvailableSeats(): boolean;
@@ -51,6 +51,7 @@ const TourSetSchema = new Schema<ITourSetDocument, ITourSetModel>(
       validate: {
         validator: function (value: number) {
           const doc = this as unknown as TourSetFields;
+          if (typeof doc.totalSeats !== 'number') return true;
           return value <= doc.totalSeats;
         },
         message:
@@ -81,8 +82,11 @@ const TourSetSchema = new Schema<ITourSetDocument, ITourSetModel>(
 );
 
 TourSetSchema.methods.hasAvailableSeats = function () {
-    return this.bookedSeats < this.totalSeats;
+  return this.bookedSeats < this.totalSeats;
 };
 
-const TourSet = mongoose.model<ITourSetDocument, ITourSetModel>('TourSet', TourSetSchema);
+const TourSet = mongoose.model<ITourSetDocument, ITourSetModel>(
+  'TourSet',
+  TourSetSchema,
+);
 export default TourSet;
