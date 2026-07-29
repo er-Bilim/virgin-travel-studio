@@ -97,7 +97,7 @@ describe('CustomTourForm', () => {
     await user.type(screen.getByLabelText('Отель'), 'Grand Hotel');
 
     expect(screen.getByLabelText('Ваше имя')).toHaveValue('Айгуль');
-    expect(screen.getByLabelText('Телефон')).toHaveValue('+996700000000');
+    expect(screen.getByLabelText('Телефон')).toHaveValue('+996700 000 000');
     expect(screen.getByLabelText('Отель')).toHaveValue('Grand Hotel');
   });
 
