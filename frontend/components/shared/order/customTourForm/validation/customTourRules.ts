@@ -1,5 +1,12 @@
 import type { CustomTourMutation } from '@/types/order';
 import type { RegisterOptions } from 'react-hook-form';
+import { isValidPhoneNumber } from 'libphonenumber-js';
+
+const normalizePhone = (value: string) => {
+  const cleaned = value.replace(/[\s()-]/g, '');
+  if (!cleaned) return cleaned;
+  return cleaned.startsWith('+') ? cleaned : `+996${cleaned.replace(/^0/, '')}`;
+};
 
 export const countryCodeRule = {
   required: 'Выберите направление',
@@ -23,9 +30,11 @@ export const clientNameRule = {
 
 export const clientPhoneRule = {
   required: 'Пожалуйста, введите корректный номер',
-  setValueAs: (value: string) => value.replace(/[\s()-]/g, ''),
-  pattern: {
-    value: /^\+?[0-9]{10,15}$/,
-    message: 'Неверный формат номер телефона',
+  setValueAs: normalizePhone,
+  validate: (value) => {
+    return (
+      isValidPhoneNumber(value) ||
+      'Введите корректный номер телефона, например +996 123 456 789'
+    );
   },
 } satisfies RegisterOptions<CustomTourMutation, 'clientPhone'>;

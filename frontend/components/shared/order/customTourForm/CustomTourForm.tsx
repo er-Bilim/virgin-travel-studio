@@ -42,6 +42,7 @@ import { ru } from 'date-fns/locale';
 import { Spinner } from '@/components/ui/spinner';
 import { useWatch } from 'react-hook-form';
 import { CUSTOM_TOUR_ACTIVITIES } from '@/lib/customTour/constants';
+import { AsYouType } from 'libphonenumber-js';
 
 const CustomTourForm = () => {
   const [activities, setActivities] = useState<string[]>([]);
@@ -217,7 +218,9 @@ const CustomTourForm = () => {
                             disabled={(date) =>
                               date < new Date(new Date().setHours(0, 0, 0, 0))
                             }
-                            onSelect={(date) => field.onChange(date?.toISOString())}
+                            onSelect={(date) =>
+                              field.onChange(date?.toISOString())
+                            }
                           />
                         </PopoverContent>
                       </Popover>
@@ -275,7 +278,9 @@ const CustomTourForm = () => {
                                 : date <
                                   new Date(new Date().setHours(0, 0, 0, 0))
                             }
-                            onSelect={(date) => field.onChange(date?.toISOString())}
+                            onSelect={(date) =>
+                              field.onChange(date?.toISOString())
+                            }
                           />
                         </PopoverContent>
                       </Popover>
@@ -432,7 +437,16 @@ const CustomTourForm = () => {
                         'w-full rounded-xl border-[1.5px] border-slate-200 py-3 pl-11 pr-4 text-sm outline-none focus:border-cyan-700 focus:ring-4 focus:ring-cyan-700/10',
                         errors.clientPhone && 'border-red-400',
                       )}
-                      {...register('clientPhone', clientPhoneRule)}
+                      {...register('clientPhone', {
+                        onChange: (event) => {
+                          const digits = event.target.value.replace(
+                            /[^\d+]/g,
+                            '',
+                          );
+                          event.target.value = new AsYouType().input(digits);
+                        },
+                        ...clientPhoneRule,
+                      })}
                     />
                   </div>
                   {errors.clientPhone && (
