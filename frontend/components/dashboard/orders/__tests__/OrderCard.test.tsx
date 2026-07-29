@@ -82,7 +82,7 @@ describe('OrderCard', () => {
     );
 
     expect(
-      await screen.findByText('Введите корректный номер телефона'),
+      await screen.findByText('Введите корректный номер телефона, например +996 123 456 789'),
     ).toBeInTheDocument();
   });
 

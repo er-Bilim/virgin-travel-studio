@@ -331,7 +331,7 @@ async function syncTourSetSeats(tourSetId: Types.ObjectId) {
   return TourSet.findByIdAndUpdate(
     tourSetId,
     { bookedSeats },
-    { new: true, runValidators: true },
+    { returnDocument: 'after' },
   );
 }
 
