@@ -19,6 +19,7 @@ import { formatDayAndMonthWords, formatToReadablePrice } from '@/lib/utils';
 import { X } from 'lucide-react';
 import { DialogClose } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
+import { isValidPhoneNumber, AsYouType } from 'libphonenumber-js';
 
 interface Props {
   isOpen: boolean;
@@ -135,7 +136,7 @@ const OrderCard = ({
                   type="text"
                   placeholder="Как к вам обращаться"
                   className={cn(
-                    'pl-10 h-11 rounded-xl focus-visible:ring-[#031633]',
+                    'pl-10 h-11 rounded-xl focus-visible:ring-[#031633] border-border',
                     errors.clientName &&
                       'border-red-500 focus-visible:ring-red-500',
                   )}
@@ -163,21 +164,31 @@ const OrderCard = ({
               </Label>
               <div className="relative">
                 <Phone className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+
                 <Input
                   id="phone"
                   type="tel"
                   placeholder="+996 ___ ___ ___"
                   className={cn(
-                    'pl-10 h-11 rounded-xl focus-visible:ring-[#031633]',
+                    'pl-10 h-11 rounded-xl focus-visible:ring-[#031633] border-border',
                     errors.clientPhone &&
                       'border-red-500 focus-visible:ring-red-500',
                   )}
                   {...register('clientPhone', {
+                    onChange: (event) => {
+                      const digits = event.target.value.replace(/[^\d+]/g, '');
+                      event.target.value = new AsYouType().input(digits);
+                    },
                     required: 'Поле обязательно',
                     validate: (value) => {
                       const cleaned = value.replace(/[\s()-]/g, '');
-                      const isValid = /^\+?[0-9]{9,15}$/.test(cleaned);
-                      return isValid || 'Введите корректный номер телефона';
+                      const normalized = cleaned.startsWith('+')
+                        ? cleaned
+                        : `+996${cleaned.replace(/^0/, '')}`;
+                      return (
+                        isValidPhoneNumber(normalized) ||
+                        'Введите корректный номер телефона, например +996 123 456 789'
+                      );
                     },
                   })}
                 />
@@ -187,6 +198,9 @@ const OrderCard = ({
                   {errors.clientPhone.message}
                 </span>
               )}
+              <p className="mt-1 text-xs text-muted-foreground">
+                Номер любой страны в международном формате: +996, +7, +90…
+              </p>
             </div>
           </div>
 
