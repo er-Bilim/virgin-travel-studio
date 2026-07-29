@@ -77,6 +77,14 @@ const OrderCard = ({
     formatDayAndMonthWords(startDate);
   const { day: endDay, month: endMonth } = formatDayAndMonthWords(endDate);
 
+  const normalizePhone = (value: string) => {
+    const cleaned = value.replace(/[\s()-]/g, '');
+    if (!cleaned) return cleaned;
+    return cleaned.startsWith('+')
+      ? cleaned
+      : `+996${cleaned.replace(/^0/, '')}`;
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
@@ -180,13 +188,10 @@ const OrderCard = ({
                       event.target.value = new AsYouType().input(digits);
                     },
                     required: 'Поле обязательно',
+                    setValueAs: normalizePhone,
                     validate: (value) => {
-                      const cleaned = value.replace(/[\s()-]/g, '');
-                      const normalized = cleaned.startsWith('+')
-                        ? cleaned
-                        : `+996${cleaned.replace(/^0/, '')}`;
                       return (
-                        isValidPhoneNumber(normalized) ||
+                        isValidPhoneNumber(value) ||
                         'Введите корректный номер телефона, например +996 123 456 789'
                       );
                     },
